@@ -1,0 +1,1 @@
+{"version":3,"file":"CreateBlockDefinitionNumberArgs.js","sourceRoot":"","sources":["../../../src/assembler/types/CreateBlockDefinitionNumberArgs.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAOA,gEAAiD;AAUpC,QAAA,mCAAmC,GAC9C,IAAI,IAAI,CAAC,cAAc,CACrB;IACE,CAAC,KAAK,EAAE,IAAI,CAAC,GAAG,CAAC;IACjB,CAAC,KAAK,EAAE,IAAI,CAAC,GAAG,CAAC;CAClB,EACD,iCAAiC,CAClC,CAAA"}

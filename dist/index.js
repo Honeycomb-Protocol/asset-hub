@@ -14,9 +14,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PROGRAM_ID = exports.PROGRAM_ADDRESS = void 0;
-const web3_js_1 = require("@solana/web3.js");
-__exportStar(require("./instructions"), exports);
-exports.PROGRAM_ADDRESS = 'Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS';
-exports.PROGRAM_ID = new web3_js_1.PublicKey(exports.PROGRAM_ADDRESS);
+__exportStar(require("./assembler"), exports);
 //# sourceMappingURL=index.js.map

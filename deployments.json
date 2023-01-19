@@ -1,0 +1,11 @@
+{
+  "assembler": {
+    "devnet": {
+      "program": "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT",
+      "assembler": "HBX43h5q5yaRVVPW5C4ibk6FqaDVD4KbMULCCcU4B42D",
+      "block": "Eg5qG37iHgQsDj248Cc377E9EbF2xzECBLXM9dFxDg9p",
+      "blockDefinition": "8e7gzP1dHA9XCZwz6dKCT7FG7D7Hafmac8tbcoCdjYmY",
+      "blockDefinitionMint": "HdjzhUA5nmdXGpxrbENBjXUVQCi8Uubqay6WM9ribKrN"
+    }
+  }
+}

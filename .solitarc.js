@@ -2,10 +2,10 @@ const path = require("path");
 
 module.exports = {
   idlGenerator: "anchor",
-  programName: "anchor_template",
-  programId: "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
+  programName: "assembler",
+  programId: "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT",
   idlDir: path.join(__dirname, "idl"),
-  sdkDir: path.join(__dirname, "src"),
+  sdkDir: path.join(__dirname, "src", "assembler"),
   binaryInstallDir: path.join(__dirname, ".crates"),
-  programDir: path.join(__dirname, "programs", "anchor-template"),
+  programDir: path.join(__dirname, "programs", "assembler"),
 };
