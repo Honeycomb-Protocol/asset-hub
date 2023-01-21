@@ -11,7 +11,8 @@ export type AssemblerProgramAction =
   | "create-assembler"
   | "create-block"
   | "create-block-definition"
-  | "create-and-mint-nft";
+  | "create-and-mint-nft"
+  | "disband-nft";
 export type Actions = AssemblerProgramAction;
 
 export type TxSigners = {

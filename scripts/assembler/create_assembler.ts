@@ -97,7 +97,7 @@ export default async function (
     wallet.publicKey,
     wallet.publicKey,
     {
-      assemblingAction: AssemblingAction.Burn,
+      assemblingAction: AssemblingAction.TakeCustody,
       collectionName: "Assembler Test Collection",
       collectionSymbol: "ATC",
       collectionDescription: "This is a test collection to test assembler",

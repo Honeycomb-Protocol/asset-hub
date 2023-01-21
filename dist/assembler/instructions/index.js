@@ -15,12 +15,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./addBlock"), exports);
+__exportStar(require("./burnNft"), exports);
 __exportStar(require("./createAssembler"), exports);
 __exportStar(require("./createAssemblerCollectionMasterEdition"), exports);
 __exportStar(require("./createBlock"), exports);
-__exportStar(require("./createBlockDefinitionBoolean"), exports);
-__exportStar(require("./createBlockDefinitionEnum"), exports);
-__exportStar(require("./createBlockDefinitionNumber"), exports);
+__exportStar(require("./createBlockDefinition"), exports);
 __exportStar(require("./createNft"), exports);
 __exportStar(require("./mintNft"), exports);
+__exportStar(require("./removeBlock"), exports);
 //# sourceMappingURL=index.js.map

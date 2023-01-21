@@ -23,13 +23,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assemblingActionBeet = exports.AssemblingAction = void 0;
+exports.nFTAttributeValueBeet = exports.isNFTAttributeValueNumber = exports.isNFTAttributeValueBoolean = exports.isNFTAttributeValueString = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
-var AssemblingAction;
-(function (AssemblingAction) {
-    AssemblingAction[AssemblingAction["Burn"] = 0] = "Burn";
-    AssemblingAction[AssemblingAction["Freeze"] = 1] = "Freeze";
-    AssemblingAction[AssemblingAction["TakeCustody"] = 2] = "TakeCustody";
-})(AssemblingAction = exports.AssemblingAction || (exports.AssemblingAction = {}));
-exports.assemblingActionBeet = beet.fixedScalarEnum(AssemblingAction);
-//# sourceMappingURL=AssemblingAction.js.map
+const isNFTAttributeValueString = (x) => x.__kind === 'String';
+exports.isNFTAttributeValueString = isNFTAttributeValueString;
+const isNFTAttributeValueBoolean = (x) => x.__kind === 'Boolean';
+exports.isNFTAttributeValueBoolean = isNFTAttributeValueBoolean;
+const isNFTAttributeValueNumber = (x) => x.__kind === 'Number';
+exports.isNFTAttributeValueNumber = isNFTAttributeValueNumber;
+exports.nFTAttributeValueBeet = beet.dataEnum([
+    [
+        'String',
+        new beet.FixableBeetArgsStruct([['value', beet.utf8String]], 'NFTAttributeValueRecord["String"]'),
+    ],
+    [
+        'Boolean',
+        new beet.BeetArgsStruct([['value', beet.bool]], 'NFTAttributeValueRecord["Boolean"]'),
+    ],
+    [
+        'Number',
+        new beet.BeetArgsStruct([['value', beet.u64]], 'NFTAttributeValueRecord["Number"]'),
+    ],
+]);
+//# sourceMappingURL=NFTAttributeValue.js.map

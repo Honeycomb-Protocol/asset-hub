@@ -1,9 +1,6 @@
 use crate::{
     errors::ErrorCode,
-    structs::{
-        Assembler, Block, BlockDefinitionBoolean, BlockDefinitionEnum, BlockDefinitionNumber,
-        BlockType,
-    },
+    structs::{Assembler, Block, BlockDefinition, BlockDefinitionValue, BlockType},
     utils::EXTRA_SIZE,
 };
 use anchor_lang::prelude::*;
@@ -63,10 +60,9 @@ pub fn create_block(ctx: Context<CreateBlock>, args: CreateBlockArgs) -> Result<
     Ok(())
 }
 
-/// Accounts used in the create block definition enum instruction
+/// Accounts used in the create block definition instruction
 #[derive(Accounts)]
-#[instruction(args: CreateBlockDefinitionEnumArgs)]
-pub struct CreateBlockDefinitionEnum<'info> {
+pub struct CreateBlockDefinition<'info> {
     /// Assembler state account
     #[account( has_one = authority )]
     pub assembler: Account<'info, Assembler>,
@@ -78,15 +74,15 @@ pub struct CreateBlockDefinitionEnum<'info> {
     /// Block Definition account
     #[account(
       init, payer = payer,
-      space = EXTRA_SIZE + BlockDefinitionEnum::LEN,
+      space = EXTRA_SIZE + BlockDefinition::LEN,
       seeds = [
         b"block_definition".as_ref(),
-        args.value.as_bytes(),
         block.key().as_ref(),
+        block_definition_mint.key().as_ref(),
       ],
       bump,
     )]
-    pub block_definition: Account<'info, BlockDefinitionEnum>,
+    pub block_definition: Account<'info, BlockDefinition>,
 
     /// Mint of the SFT/Collection
     #[account(mut)]
@@ -104,155 +100,242 @@ pub struct CreateBlockDefinitionEnum<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct CreateBlockDefinitionEnumArgs {
-    pub is_collection: bool,
-    pub value: String,
-    pub image: Option<String>,
-}
-
 /// Create a new block definition
-pub fn create_block_definition_enum(
-    ctx: Context<CreateBlockDefinitionEnum>,
-    args: CreateBlockDefinitionEnumArgs,
+pub fn create_block_definition(
+    ctx: Context<CreateBlockDefinition>,
+    args: BlockDefinitionValue,
 ) -> Result<()> {
-    let block = &ctx.accounts.block;
-
-    if block.block_type != BlockType::Enum {
-        return Err(ErrorCode::BlockNotEnum.into());
-    }
-
-    if args.image.is_none() && block.is_graphical {
-        return Err(ErrorCode::RequiredBlockImage.into());
-    }
-
     let block_definition = &mut ctx.accounts.block_definition;
     block_definition.bump = ctx.bumps["block_definition"];
     block_definition.block = ctx.accounts.block.key();
     block_definition.mint = ctx.accounts.block_definition_mint.key();
-    block_definition.value = args.value;
-    block_definition.image = args.image;
-    Ok(())
+    block_definition.value = args;
+
+    match &block_definition.value {
+        BlockDefinitionValue::Enum {
+            is_collection: _is_collection,
+            value: _value,
+            image,
+        } => {
+            if ctx.accounts.block.block_type != BlockType::Enum {
+                return Err(ErrorCode::BlockTypeMismatch.into());
+            }
+            if ctx.accounts.block.is_graphical && image.is_none() {
+                return Err(ErrorCode::RequiredBlockImage.into());
+            }
+            return Ok(());
+        }
+        BlockDefinitionValue::Boolean { value: _value1 } => {
+            if ctx.accounts.block.block_type != BlockType::Boolean {
+                return Err(ErrorCode::BlockTypeMismatch.into());
+            }
+            return Ok(());
+        }
+        BlockDefinitionValue::Number {
+            min: _min1,
+            max: _max1,
+        } => {
+            if ctx.accounts.block.block_type != BlockType::Random
+                && ctx.accounts.block.block_type != BlockType::Computed
+            {
+                return Err(ErrorCode::BlockTypeMismatch.into());
+            }
+            return Ok(());
+        }
+    };
 }
 
-/// Accounts used in the create block definition number instruction
-#[derive(Accounts)]
-#[instruction(args: CreateBlockDefinitionNumberArgs)]
-pub struct CreateBlockDefinitionNumber<'info> {
-    /// Assembler state account
-    #[account( has_one = authority )]
-    pub assembler: Account<'info, Assembler>,
+// /// Accounts used in the create block definition enum instruction
+// #[derive(Accounts)]
+// #[instruction(args: CreateBlockDefinitionEnumArgs)]
+// pub struct CreateBlockDefinitionEnum<'info> {
+//     /// Assembler state account
+//     #[account( has_one = authority )]
+//     pub assembler: Account<'info, Assembler>,
 
-    /// Block account
-    #[account( has_one = assembler )]
-    pub block: Account<'info, Block>,
+//     /// Block account
+//     #[account( has_one = assembler )]
+//     pub block: Account<'info, Block>,
 
-    /// Block Definition account
-    #[account(
-      init, payer = payer,
-      space = EXTRA_SIZE + BlockDefinitionNumber::LEN,
-      seeds = [
-        b"block_definition".as_ref(),
-        b"number".as_ref(),
-        block.key().as_ref(),
-      ],
-      bump,
-    )]
-    pub block_definition: Account<'info, BlockDefinitionNumber>,
+//     /// Block Definition account
+//     #[account(
+//       init, payer = payer,
+//       space = EXTRA_SIZE + BlockDefinitionEnum::LEN,
+//       seeds = [
+//         b"block_definition".as_ref(),
+//         args.value.as_bytes(),
+//         block.key().as_ref(),
+//       ],
+//       bump,
+//     )]
+//     pub block_definition: Account<'info, BlockDefinitionEnum>,
 
-    /// The wallet that holds the authority over the assembler
-    #[account()]
-    pub authority: Signer<'info>,
+//     /// Mint of the SFT/Collection
+//     #[account(mut)]
+//     pub block_definition_mint: Account<'info, Mint>,
 
-    /// The wallet that pays for the rent
-    #[account(mut)]
-    pub payer: Signer<'info>,
+//     /// The wallet that holds the authority over the assembler
+//     #[account()]
+//     pub authority: Signer<'info>,
 
-    /// NATIVE SYSTEM PROGRAM
-    pub system_program: Program<'info, System>,
-}
+//     /// The wallet that pays for the rent
+//     #[account(mut)]
+//     pub payer: Signer<'info>,
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct CreateBlockDefinitionNumberArgs {
-    min: u64,
-    max: u64,
-}
+//     /// NATIVE SYSTEM PROGRAM
+//     pub system_program: Program<'info, System>,
+// }
 
-/// Create a new block definition
-pub fn create_block_definition_number(
-    ctx: Context<CreateBlockDefinitionNumber>,
-    args: CreateBlockDefinitionNumberArgs,
-) -> Result<()> {
-    let block = &ctx.accounts.block;
+// #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+// pub struct CreateBlockDefinitionEnumArgs {
+//     pub is_collection: bool,
+//     pub value: String,
+//     pub image: Option<String>,
+// }
 
-    if block.block_type != BlockType::Random || block.block_type != BlockType::Computed {
-        return Err(ErrorCode::BlockNotNumber.into());
-    }
+// /// Create a new block definition
+// pub fn create_block_definition_enum(
+//     ctx: Context<CreateBlockDefinitionEnum>,
+//     args: CreateBlockDefinitionEnumArgs,
+// ) -> Result<()> {
+//     let block = &ctx.accounts.block;
 
-    let block_definition = &mut ctx.accounts.block_definition;
-    block_definition.bump = ctx.bumps["block_definition"];
-    block_definition.block = ctx.accounts.block.key();
-    block_definition.min = args.min;
-    block_definition.max = args.max;
-    Ok(())
-}
+//     if block.block_type != BlockType::Enum {
+//         return Err(ErrorCode::BlockNotEnum.into());
+//     }
 
-/// Accounts used in the create block definition number instruction
-#[derive(Accounts)]
-#[instruction(args: CreateBlockDefinitionBooleanArgs)]
-pub struct CreateBlockDefinitionBoolean<'info> {
-    /// Assembler state account
-    #[account( has_one = authority )]
-    pub assembler: Account<'info, Assembler>,
+//     if args.image.is_none() && block.is_graphical {
+//         return Err(ErrorCode::RequiredBlockImage.into());
+//     }
 
-    /// Block account
-    #[account( has_one = assembler )]
-    pub block: Account<'info, Block>,
+//     let block_definition = &mut ctx.accounts.block_definition;
+//     block_definition.bump = ctx.bumps["block_definition"];
+//     block_definition.block = ctx.accounts.block.key();
+//     block_definition.mint = ctx.accounts.block_definition_mint.key();
+//     block_definition.is_collection = args.is_collection;
+//     block_definition.value = args.value;
+//     block_definition.image = args.image;
+//     Ok(())
+// }
 
-    /// Block Definition account
-    #[account(
-      init, payer = payer,
-      space = EXTRA_SIZE + BlockDefinitionBoolean::LEN,
-      seeds = [
-        b"block_definition".as_ref(),
-        b"boolean".as_ref(),
-        block.key().as_ref(),
-      ],
-      bump,
-    )]
-    pub block_definition: Account<'info, BlockDefinitionBoolean>,
+// /// Accounts used in the create block definition number instruction
+// #[derive(Accounts)]
+// #[instruction(args: CreateBlockDefinitionNumberArgs)]
+// pub struct CreateBlockDefinitionNumber<'info> {
+//     /// Assembler state account
+//     #[account( has_one = authority )]
+//     pub assembler: Account<'info, Assembler>,
 
-    /// The wallet that holds the authority over the assembler
-    #[account()]
-    pub authority: Signer<'info>,
+//     /// Block account
+//     #[account( has_one = assembler )]
+//     pub block: Account<'info, Block>,
 
-    /// The wallet that pays for the rent
-    #[account(mut)]
-    pub payer: Signer<'info>,
+//     /// Block Definition account
+//     #[account(
+//       init, payer = payer,
+//       space = EXTRA_SIZE + BlockDefinitionNumber::LEN,
+//       seeds = [
+//         b"block_definition".as_ref(),
+//         b"number".as_ref(),
+//         block.key().as_ref(),
+//       ],
+//       bump,
+//     )]
+//     pub block_definition: Account<'info, BlockDefinitionNumber>,
 
-    /// NATIVE SYSTEM PROGRAM
-    pub system_program: Program<'info, System>,
-}
+//     /// The wallet that holds the authority over the assembler
+//     #[account()]
+//     pub authority: Signer<'info>,
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct CreateBlockDefinitionBooleanArgs {
-    value: bool,
-}
+//     /// The wallet that pays for the rent
+//     #[account(mut)]
+//     pub payer: Signer<'info>,
 
-/// Create a new block definition
-pub fn create_block_definition_boolean(
-    ctx: Context<CreateBlockDefinitionBoolean>,
-    args: CreateBlockDefinitionBooleanArgs,
-) -> Result<()> {
-    let block = &ctx.accounts.block;
+//     /// NATIVE SYSTEM PROGRAM
+//     pub system_program: Program<'info, System>,
+// }
 
-    if block.block_type != BlockType::Boolean {
-        return Err(ErrorCode::BlockNotBoolean.into());
-    }
+// #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+// pub struct CreateBlockDefinitionNumberArgs {
+//     min: u64,
+//     max: u64,
+// }
 
-    let block_definition = &mut ctx.accounts.block_definition;
-    block_definition.bump = ctx.bumps["block_definition"];
-    block_definition.block = ctx.accounts.block.key();
-    block_definition.value = args.value;
-    Ok(())
-}
+// /// Create a new block definition
+// pub fn create_block_definition_number(
+//     ctx: Context<CreateBlockDefinitionNumber>,
+//     args: CreateBlockDefinitionNumberArgs,
+// ) -> Result<()> {
+//     let block = &ctx.accounts.block;
+
+//     if block.block_type != BlockType::Random || block.block_type != BlockType::Computed {
+//         return Err(ErrorCode::BlockNotNumber.into());
+//     }
+
+//     let block_definition = &mut ctx.accounts.block_definition;
+//     block_definition.bump = ctx.bumps["block_definition"];
+//     block_definition.block = ctx.accounts.block.key();
+//     block_definition.min = args.min;
+//     block_definition.max = args.max;
+//     Ok(())
+// }
+
+// /// Accounts used in the create block definition number instruction
+// #[derive(Accounts)]
+// #[instruction(args: CreateBlockDefinitionBooleanArgs)]
+// pub struct CreateBlockDefinitionBoolean<'info> {
+//     /// Assembler state account
+//     #[account( has_one = authority )]
+//     pub assembler: Account<'info, Assembler>,
+
+//     /// Block account
+//     #[account( has_one = assembler )]
+//     pub block: Account<'info, Block>,
+
+//     /// Block Definition account
+//     #[account(
+//       init, payer = payer,
+//       space = EXTRA_SIZE + BlockDefinitionBoolean::LEN,
+//       seeds = [
+//         b"block_definition".as_ref(),
+//         b"boolean".as_ref(),
+//         block.key().as_ref(),
+//       ],
+//       bump,
+//     )]
+//     pub block_definition: Account<'info, BlockDefinitionBoolean>,
+
+//     /// The wallet that holds the authority over the assembler
+//     #[account()]
+//     pub authority: Signer<'info>,
+
+//     /// The wallet that pays for the rent
+//     #[account(mut)]
+//     pub payer: Signer<'info>,
+
+//     /// NATIVE SYSTEM PROGRAM
+//     pub system_program: Program<'info, System>,
+// }
+
+// #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+// pub struct CreateBlockDefinitionBooleanArgs {
+//     value: bool,
+// }
+
+// /// Create a new block definition
+// pub fn create_block_definition_boolean(
+//     ctx: Context<CreateBlockDefinitionBoolean>,
+//     args: CreateBlockDefinitionBooleanArgs,
+// ) -> Result<()> {
+//     let block = &ctx.accounts.block;
+
+//     if block.block_type != BlockType::Boolean {
+//         return Err(ErrorCode::BlockNotBoolean.into());
+//     }
+
+//     let block_definition = &mut ctx.accounts.block_definition;
+//     block_definition.bump = ctx.bumps["block_definition"];
+//     block_definition.block = ctx.accounts.block.key();
+//     block_definition.value = args.value;
+//     Ok(())
+// }

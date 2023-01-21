@@ -1,23 +1,17 @@
 export * from './Assembler';
 export * from './Block';
-export * from './BlockDefinitionBoolean';
-export * from './BlockDefinitionEnum';
-export * from './BlockDefinitionNumber';
+export * from './BlockDefinition';
 export * from './NFT';
 export * from './NFTAttribute';
 import { Assembler } from './Assembler';
 import { Block } from './Block';
-import { BlockDefinitionEnum } from './BlockDefinitionEnum';
-import { BlockDefinitionBoolean } from './BlockDefinitionBoolean';
-import { BlockDefinitionNumber } from './BlockDefinitionNumber';
+import { BlockDefinition } from './BlockDefinition';
 import { NFT } from './NFT';
 import { NFTAttribute } from './NFTAttribute';
 export declare const accountProviders: {
     Assembler: typeof Assembler;
     Block: typeof Block;
-    BlockDefinitionEnum: typeof BlockDefinitionEnum;
-    BlockDefinitionBoolean: typeof BlockDefinitionBoolean;
-    BlockDefinitionNumber: typeof BlockDefinitionNumber;
+    BlockDefinition: typeof BlockDefinition;
     NFT: typeof NFT;
     NFTAttribute: typeof NFTAttribute;
 };

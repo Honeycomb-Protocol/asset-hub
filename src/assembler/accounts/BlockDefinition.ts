@@ -8,69 +8,60 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
+import {
+  BlockDefinitionValue,
+  blockDefinitionValueBeet,
+} from '../types/BlockDefinitionValue'
 
 /**
- * Arguments used to create {@link BlockDefinitionEnum}
+ * Arguments used to create {@link BlockDefinition}
  * @category Accounts
  * @category generated
  */
-export type BlockDefinitionEnumArgs = {
+export type BlockDefinitionArgs = {
   bump: number
   block: web3.PublicKey
   mint: web3.PublicKey
-  isCollection: boolean
-  value: string
-  image: beet.COption<string>
+  value: BlockDefinitionValue
 }
 
-export const blockDefinitionEnumDiscriminator = [
-  96, 135, 54, 133, 70, 183, 156, 24,
-]
+export const blockDefinitionDiscriminator = [107, 76, 146, 41, 130, 62, 5, 143]
 /**
- * Holds the data for the {@link BlockDefinitionEnum} Account and provides de/serialization
+ * Holds the data for the {@link BlockDefinition} Account and provides de/serialization
  * functionality for that data
  *
  * @category Accounts
  * @category generated
  */
-export class BlockDefinitionEnum implements BlockDefinitionEnumArgs {
+export class BlockDefinition implements BlockDefinitionArgs {
   private constructor(
     readonly bump: number,
     readonly block: web3.PublicKey,
     readonly mint: web3.PublicKey,
-    readonly isCollection: boolean,
-    readonly value: string,
-    readonly image: beet.COption<string>
+    readonly value: BlockDefinitionValue
   ) {}
 
   /**
-   * Creates a {@link BlockDefinitionEnum} instance from the provided args.
+   * Creates a {@link BlockDefinition} instance from the provided args.
    */
-  static fromArgs(args: BlockDefinitionEnumArgs) {
-    return new BlockDefinitionEnum(
-      args.bump,
-      args.block,
-      args.mint,
-      args.isCollection,
-      args.value,
-      args.image
-    )
+  static fromArgs(args: BlockDefinitionArgs) {
+    return new BlockDefinition(args.bump, args.block, args.mint, args.value)
   }
 
   /**
-   * Deserializes the {@link BlockDefinitionEnum} from the data of the provided {@link web3.AccountInfo}.
+   * Deserializes the {@link BlockDefinition} from the data of the provided {@link web3.AccountInfo}.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
     offset = 0
-  ): [BlockDefinitionEnum, number] {
-    return BlockDefinitionEnum.deserialize(accountInfo.data, offset)
+  ): [BlockDefinition, number] {
+    return BlockDefinition.deserialize(accountInfo.data, offset)
   }
 
   /**
    * Retrieves the account info from the provided address and deserializes
-   * the {@link BlockDefinitionEnum} from its data.
+   * the {@link BlockDefinition} from its data.
    *
    * @throws Error if no account info is found at the address or if deserialization fails
    */
@@ -78,17 +69,15 @@ export class BlockDefinitionEnum implements BlockDefinitionEnumArgs {
     connection: web3.Connection,
     address: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
-  ): Promise<BlockDefinitionEnum> {
+  ): Promise<BlockDefinition> {
     const accountInfo = await connection.getAccountInfo(
       address,
       commitmentOrConfig
     )
     if (accountInfo == null) {
-      throw new Error(
-        `Unable to find BlockDefinitionEnum account at ${address}`
-      )
+      throw new Error(`Unable to find BlockDefinition account at ${address}`)
     }
-    return BlockDefinitionEnum.fromAccountInfo(accountInfo, 0)[0]
+    return BlockDefinition.fromAccountInfo(accountInfo, 0)[0]
   }
 
   /**
@@ -102,64 +91,64 @@ export class BlockDefinitionEnum implements BlockDefinitionEnumArgs {
       'AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT'
     )
   ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, blockDefinitionEnumBeet)
+    return beetSolana.GpaBuilder.fromStruct(programId, blockDefinitionBeet)
   }
 
   /**
-   * Deserializes the {@link BlockDefinitionEnum} from the provided data Buffer.
+   * Deserializes the {@link BlockDefinition} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static deserialize(buf: Buffer, offset = 0): [BlockDefinitionEnum, number] {
-    return blockDefinitionEnumBeet.deserialize(buf, offset)
+  static deserialize(buf: Buffer, offset = 0): [BlockDefinition, number] {
+    return blockDefinitionBeet.deserialize(buf, offset)
   }
 
   /**
-   * Serializes the {@link BlockDefinitionEnum} into a Buffer.
+   * Serializes the {@link BlockDefinition} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   serialize(): [Buffer, number] {
-    return blockDefinitionEnumBeet.serialize({
-      accountDiscriminator: blockDefinitionEnumDiscriminator,
+    return blockDefinitionBeet.serialize({
+      accountDiscriminator: blockDefinitionDiscriminator,
       ...this,
     })
   }
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link BlockDefinitionEnum} for the provided args.
+   * {@link BlockDefinition} for the provided args.
    *
    * @param args need to be provided since the byte size for this account
    * depends on them
    */
-  static byteSize(args: BlockDefinitionEnumArgs) {
-    const instance = BlockDefinitionEnum.fromArgs(args)
-    return blockDefinitionEnumBeet.toFixedFromValue({
-      accountDiscriminator: blockDefinitionEnumDiscriminator,
+  static byteSize(args: BlockDefinitionArgs) {
+    const instance = BlockDefinition.fromArgs(args)
+    return blockDefinitionBeet.toFixedFromValue({
+      accountDiscriminator: blockDefinitionDiscriminator,
       ...instance,
     }).byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
-   * {@link BlockDefinitionEnum} data from rent
+   * {@link BlockDefinition} data from rent
    *
    * @param args need to be provided since the byte size for this account
    * depends on them
    * @param connection used to retrieve the rent exemption information
    */
   static async getMinimumBalanceForRentExemption(
-    args: BlockDefinitionEnumArgs,
+    args: BlockDefinitionArgs,
     connection: web3.Connection,
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      BlockDefinitionEnum.byteSize(args),
+      BlockDefinition.byteSize(args),
       commitment
     )
   }
 
   /**
-   * Returns a readable version of {@link BlockDefinitionEnum} properties
+   * Returns a readable version of {@link BlockDefinition} properties
    * and can be used to convert to JSON and/or logging
    */
   pretty() {
@@ -167,9 +156,7 @@ export class BlockDefinitionEnum implements BlockDefinitionEnumArgs {
       bump: this.bump,
       block: this.block.toBase58(),
       mint: this.mint.toBase58(),
-      isCollection: this.isCollection,
-      value: this.value,
-      image: this.image,
+      value: this.value.__kind,
     }
   }
 }
@@ -178,9 +165,9 @@ export class BlockDefinitionEnum implements BlockDefinitionEnumArgs {
  * @category Accounts
  * @category generated
  */
-export const blockDefinitionEnumBeet = new beet.FixableBeetStruct<
-  BlockDefinitionEnum,
-  BlockDefinitionEnumArgs & {
+export const blockDefinitionBeet = new beet.FixableBeetStruct<
+  BlockDefinition,
+  BlockDefinitionArgs & {
     accountDiscriminator: number[] /* size: 8 */
   }
 >(
@@ -189,10 +176,8 @@ export const blockDefinitionEnumBeet = new beet.FixableBeetStruct<
     ['bump', beet.u8],
     ['block', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
-    ['isCollection', beet.bool],
-    ['value', beet.utf8String],
-    ['image', beet.coption(beet.utf8String)],
+    ['value', blockDefinitionValueBeet],
   ],
-  BlockDefinitionEnum.fromArgs,
-  'BlockDefinitionEnum'
+  BlockDefinition.fromArgs,
+  'BlockDefinition'
 )

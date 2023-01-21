@@ -11,19 +11,19 @@ import * as web3 from '@solana/web3.js'
 
 /**
  * @category Instructions
- * @category AddBlock
+ * @category RemoveBlock
  * @category generated
  */
-export const addBlockStruct = new beet.BeetArgsStruct<{
+export const removeBlockStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'AddBlockInstructionArgs'
+  'RemoveBlockInstructionArgs'
 )
 /**
- * Accounts required by the _addBlock_ instruction
+ * Accounts required by the _removeBlock_ instruction
  *
- * @property [] assembler
+ * @property [_writable_] assembler
  * @property [] nft
  * @property [] block
  * @property [] blockDefinition
@@ -34,13 +34,12 @@ export const addBlockStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] depositAccount
  * @property [_writable_] nftAttribute
  * @property [_writable_, **signer**] authority
- * @property [_writable_, **signer**] payer
  * @property [] tokenMetadataProgram
  * @category Instructions
- * @category AddBlock
+ * @category RemoveBlock
  * @category generated
  */
-export type AddBlockInstructionAccounts = {
+export type RemoveBlockInstructionAccounts = {
   assembler: web3.PublicKey
   nft: web3.PublicKey
   block: web3.PublicKey
@@ -52,36 +51,34 @@ export type AddBlockInstructionAccounts = {
   depositAccount: web3.PublicKey
   nftAttribute: web3.PublicKey
   authority: web3.PublicKey
-  payer: web3.PublicKey
-  systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const addBlockInstructionDiscriminator = [
-  208, 84, 156, 155, 72, 188, 114, 37,
+export const removeBlockInstructionDiscriminator = [
+  145, 94, 239, 114, 4, 117, 167, 145,
 ]
 
 /**
- * Creates a _AddBlock_ instruction.
+ * Creates a _RemoveBlock_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @category Instructions
- * @category AddBlock
+ * @category RemoveBlock
  * @category generated
  */
-export function createAddBlockInstruction(
-  accounts: AddBlockInstructionAccounts,
+export function createRemoveBlockInstruction(
+  accounts: RemoveBlockInstructionAccounts,
   programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')
 ) {
-  const [data] = addBlockStruct.serialize({
-    instructionDiscriminator: addBlockInstructionDiscriminator,
+  const [data] = removeBlockStruct.serialize({
+    instructionDiscriminator: removeBlockInstructionDiscriminator,
   })
   const keys: web3.AccountMeta[] = [
     {
       pubkey: accounts.assembler,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -133,16 +130,6 @@ export function createAddBlockInstruction(
       pubkey: accounts.authority,
       isWritable: true,
       isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,

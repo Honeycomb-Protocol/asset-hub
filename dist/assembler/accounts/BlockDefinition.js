@@ -23,78 +23,69 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.nFTAttributeBeet = exports.NFTAttribute = exports.nFTAttributeDiscriminator = void 0;
+exports.blockDefinitionBeet = exports.BlockDefinition = exports.blockDefinitionDiscriminator = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
-const NFTAttributeValue_1 = require("../types/NFTAttributeValue");
-exports.nFTAttributeDiscriminator = [161, 3, 226, 65, 113, 87, 24, 132];
-class NFTAttribute {
-    constructor(bump, nft, block, blockDefinition, mint, attributeName, attributeValue) {
+const BlockDefinitionValue_1 = require("../types/BlockDefinitionValue");
+exports.blockDefinitionDiscriminator = [107, 76, 146, 41, 130, 62, 5, 143];
+class BlockDefinition {
+    constructor(bump, block, mint, value) {
         this.bump = bump;
-        this.nft = nft;
         this.block = block;
-        this.blockDefinition = blockDefinition;
         this.mint = mint;
-        this.attributeName = attributeName;
-        this.attributeValue = attributeValue;
+        this.value = value;
     }
     static fromArgs(args) {
-        return new NFTAttribute(args.bump, args.nft, args.block, args.blockDefinition, args.mint, args.attributeName, args.attributeValue);
+        return new BlockDefinition(args.bump, args.block, args.mint, args.value);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
-        return NFTAttribute.deserialize(accountInfo.data, offset);
+        return BlockDefinition.deserialize(accountInfo.data, offset);
     }
     static async fromAccountAddress(connection, address, commitmentOrConfig) {
         const accountInfo = await connection.getAccountInfo(address, commitmentOrConfig);
         if (accountInfo == null) {
-            throw new Error(`Unable to find NFTAttribute account at ${address}`);
+            throw new Error(`Unable to find BlockDefinition account at ${address}`);
         }
-        return NFTAttribute.fromAccountInfo(accountInfo, 0)[0];
+        return BlockDefinition.fromAccountInfo(accountInfo, 0)[0];
     }
     static gpaBuilder(programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
-        return beetSolana.GpaBuilder.fromStruct(programId, exports.nFTAttributeBeet);
+        return beetSolana.GpaBuilder.fromStruct(programId, exports.blockDefinitionBeet);
     }
     static deserialize(buf, offset = 0) {
-        return exports.nFTAttributeBeet.deserialize(buf, offset);
+        return exports.blockDefinitionBeet.deserialize(buf, offset);
     }
     serialize() {
-        return exports.nFTAttributeBeet.serialize({
-            accountDiscriminator: exports.nFTAttributeDiscriminator,
+        return exports.blockDefinitionBeet.serialize({
+            accountDiscriminator: exports.blockDefinitionDiscriminator,
             ...this,
         });
     }
     static byteSize(args) {
-        const instance = NFTAttribute.fromArgs(args);
-        return exports.nFTAttributeBeet.toFixedFromValue({
-            accountDiscriminator: exports.nFTAttributeDiscriminator,
+        const instance = BlockDefinition.fromArgs(args);
+        return exports.blockDefinitionBeet.toFixedFromValue({
+            accountDiscriminator: exports.blockDefinitionDiscriminator,
             ...instance,
         }).byteSize;
     }
     static async getMinimumBalanceForRentExemption(args, connection, commitment) {
-        return connection.getMinimumBalanceForRentExemption(NFTAttribute.byteSize(args), commitment);
+        return connection.getMinimumBalanceForRentExemption(BlockDefinition.byteSize(args), commitment);
     }
     pretty() {
         return {
             bump: this.bump,
-            nft: this.nft.toBase58(),
             block: this.block.toBase58(),
-            blockDefinition: this.blockDefinition.toBase58(),
             mint: this.mint.toBase58(),
-            attributeName: this.attributeName,
-            attributeValue: this.attributeValue.__kind,
+            value: this.value.__kind,
         };
     }
 }
-exports.NFTAttribute = NFTAttribute;
-exports.nFTAttributeBeet = new beet.FixableBeetStruct([
+exports.BlockDefinition = BlockDefinition;
+exports.blockDefinitionBeet = new beet.FixableBeetStruct([
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['bump', beet.u8],
-    ['nft', beetSolana.publicKey],
     ['block', beetSolana.publicKey],
-    ['blockDefinition', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
-    ['attributeName', beet.utf8String],
-    ['attributeValue', NFTAttributeValue_1.nFTAttributeValueBeet],
-], NFTAttribute.fromArgs, 'NFTAttribute');
-//# sourceMappingURL=NFTAttribute.js.map
+    ['value', BlockDefinitionValue_1.blockDefinitionValueBeet],
+], BlockDefinition.fromArgs, 'BlockDefinition');
+//# sourceMappingURL=BlockDefinition.js.map

@@ -23,18 +23,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAddBlockInstruction = exports.addBlockInstructionDiscriminator = exports.addBlockStruct = void 0;
+exports.createBurnNftInstruction = exports.burnNftInstructionDiscriminator = exports.burnNftStruct = void 0;
 const splToken = __importStar(require("@solana/spl-token"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const web3 = __importStar(require("@solana/web3.js"));
-exports.addBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]], 'AddBlockInstructionArgs');
-exports.addBlockInstructionDiscriminator = [
-    208, 84, 156, 155, 72, 188, 114, 37,
+exports.burnNftStruct = new beet.BeetArgsStruct([['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]], 'BurnNftInstructionArgs');
+exports.burnNftInstructionDiscriminator = [
+    119, 13, 183, 17, 194, 243, 38, 31,
 ];
-function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
-    var _a, _b;
-    const [data] = exports.addBlockStruct.serialize({
-        instructionDiscriminator: exports.addBlockInstructionDiscriminator,
+function createBurnNftInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+    var _a;
+    const [data] = exports.burnNftStruct.serialize({
+        instructionDiscriminator: exports.burnNftInstructionDiscriminator,
     });
     const keys = [
         {
@@ -44,21 +44,11 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
         },
         {
             pubkey: accounts.nft,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {
-            pubkey: accounts.block,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.blockDefinition,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.tokenMint,
+            pubkey: accounts.nftMint,
             isWritable: true,
             isSigner: false,
         },
@@ -68,47 +58,12 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
             isSigner: false,
         },
         {
-            pubkey: accounts.tokenMetadata,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.tokenEdition,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.depositAccount,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.nftAttribute,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
             pubkey: accounts.authority,
-            isWritable: true,
+            isWritable: false,
             isSigner: true,
         },
         {
-            pubkey: accounts.payer,
-            isWritable: true,
-            isSigner: true,
-        },
-        {
-            pubkey: (_a = accounts.systemProgram) !== null && _a !== void 0 ? _a : web3.SystemProgram.programId,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: (_b = accounts.tokenProgram) !== null && _b !== void 0 ? _b : splToken.TOKEN_PROGRAM_ID,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.tokenMetadataProgram,
+            pubkey: (_a = accounts.tokenProgram) !== null && _a !== void 0 ? _a : splToken.TOKEN_PROGRAM_ID,
             isWritable: false,
             isSigner: false,
         },
@@ -125,5 +80,5 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
     });
     return ix;
 }
-exports.createAddBlockInstruction = createAddBlockInstruction;
-//# sourceMappingURL=addBlock.js.map
+exports.createBurnNftInstruction = createBurnNftInstruction;
+//# sourceMappingURL=burnNft.js.map

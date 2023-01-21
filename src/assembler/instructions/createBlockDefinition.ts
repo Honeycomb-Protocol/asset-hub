@@ -8,36 +8,36 @@
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  CreateBlockDefinitionEnumArgs,
-  createBlockDefinitionEnumArgsBeet,
-} from '../types/CreateBlockDefinitionEnumArgs'
+  BlockDefinitionValue,
+  blockDefinitionValueBeet,
+} from '../types/BlockDefinitionValue'
 
 /**
  * @category Instructions
- * @category CreateBlockDefinitionEnum
+ * @category CreateBlockDefinition
  * @category generated
  */
-export type CreateBlockDefinitionEnumInstructionArgs = {
-  args: CreateBlockDefinitionEnumArgs
+export type CreateBlockDefinitionInstructionArgs = {
+  args: BlockDefinitionValue
 }
 /**
  * @category Instructions
- * @category CreateBlockDefinitionEnum
+ * @category CreateBlockDefinition
  * @category generated
  */
-export const createBlockDefinitionEnumStruct = new beet.FixableBeetArgsStruct<
-  CreateBlockDefinitionEnumInstructionArgs & {
+export const createBlockDefinitionStruct = new beet.FixableBeetArgsStruct<
+  CreateBlockDefinitionInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', createBlockDefinitionEnumArgsBeet],
+    ['args', blockDefinitionValueBeet],
   ],
-  'CreateBlockDefinitionEnumInstructionArgs'
+  'CreateBlockDefinitionInstructionArgs'
 )
 /**
- * Accounts required by the _createBlockDefinitionEnum_ instruction
+ * Accounts required by the _createBlockDefinition_ instruction
  *
  * @property [] assembler
  * @property [] block
@@ -46,10 +46,10 @@ export const createBlockDefinitionEnumStruct = new beet.FixableBeetArgsStruct<
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @category Instructions
- * @category CreateBlockDefinitionEnum
+ * @category CreateBlockDefinition
  * @category generated
  */
-export type CreateBlockDefinitionEnumInstructionAccounts = {
+export type CreateBlockDefinitionInstructionAccounts = {
   assembler: web3.PublicKey
   block: web3.PublicKey
   blockDefinition: web3.PublicKey
@@ -60,27 +60,27 @@ export type CreateBlockDefinitionEnumInstructionAccounts = {
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const createBlockDefinitionEnumInstructionDiscriminator = [
-  241, 173, 227, 189, 53, 230, 149, 206,
+export const createBlockDefinitionInstructionDiscriminator = [
+  84, 173, 223, 150, 100, 247, 106, 4,
 ]
 
 /**
- * Creates a _CreateBlockDefinitionEnum_ instruction.
+ * Creates a _CreateBlockDefinition_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CreateBlockDefinitionEnum
+ * @category CreateBlockDefinition
  * @category generated
  */
-export function createCreateBlockDefinitionEnumInstruction(
-  accounts: CreateBlockDefinitionEnumInstructionAccounts,
-  args: CreateBlockDefinitionEnumInstructionArgs,
+export function createCreateBlockDefinitionInstruction(
+  accounts: CreateBlockDefinitionInstructionAccounts,
+  args: CreateBlockDefinitionInstructionArgs,
   programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')
 ) {
-  const [data] = createBlockDefinitionEnumStruct.serialize({
-    instructionDiscriminator: createBlockDefinitionEnumInstructionDiscriminator,
+  const [data] = createBlockDefinitionStruct.serialize({
+    instructionDiscriminator: createBlockDefinitionInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [

@@ -10,7 +10,7 @@
     "build": "yarn build:program & yarn build:sdk",
     "deploy": "anchor deploy",
     "build-deploy": "yarn build && yarn deploy",
-    "scripts": "ts-node ./scripts/index.ts"
+    "assembler": "ts-node ./scripts/index.ts assembler"
   },
   "dependencies": {
     "@project-serum/anchor": "^0.26.0",

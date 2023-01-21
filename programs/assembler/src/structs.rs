@@ -31,18 +31,22 @@ impl Assembler {
 }
 
 /// Assembling Action
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
 pub enum AssemblingAction {
-    /// burn the block SFT
-    Burn = 0,
+    /// burn the block token
+    Burn,
 
-    /// Take custody of the block SFT
-    TakeCustody = 1,
+    /// Freeze the block token
+    Freeze,
+
+    /// Take custody of the block token
+    TakeCustody,
 }
 impl PartialEq for AssemblingAction {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (AssemblingAction::Burn, AssemblingAction::Burn) => true,
+            (AssemblingAction::Freeze, AssemblingAction::Freeze) => true,
             (AssemblingAction::TakeCustody, AssemblingAction::TakeCustody) => true,
             _ => false,
         }
@@ -50,7 +54,7 @@ impl PartialEq for AssemblingAction {
 }
 
 /// Block types
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
 pub enum BlockType {
     /// If the block has a string value
     Enum = 0,
@@ -100,61 +104,72 @@ impl Block {
     pub const LEN: usize = 64;
 }
 
+/// Block Definition Value
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub enum BlockDefinitionValue {
+    Enum {
+        is_collection: bool,
+        value: String,
+        image: Option<String>,
+    },
+    Boolean {
+        value: bool,
+    },
+    Number {
+        min: u64,
+        max: u64,
+    },
+}
+impl PartialEq for BlockDefinitionValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (
+                BlockDefinitionValue::Enum {
+                    is_collection: is_collection1,
+                    value: value1,
+                    image: image1,
+                },
+                BlockDefinitionValue::Enum {
+                    is_collection: is_collection2,
+                    value: value2,
+                    image: image2,
+                },
+            ) => is_collection1 == is_collection2 && value1 == value2 && image1 == image2,
+            (
+                BlockDefinitionValue::Boolean { value: value1 },
+                BlockDefinitionValue::Boolean { value: value2 },
+            ) => value1 == value2,
+            (
+                BlockDefinitionValue::Number {
+                    min: min1,
+                    max: max1,
+                },
+                BlockDefinitionValue::Number {
+                    min: min2,
+                    max: max2,
+                },
+            ) => min1 == min2 && max1 == max2,
+            _ => false,
+        }
+    }
+}
+
 /// Block Definition Account
 #[account]
-pub struct BlockDefinitionEnum {
+pub struct BlockDefinition {
     pub bump: u8,
 
     /// The block this definition is associated to
     pub block: Pubkey,
 
-    /// The mint address of this block definition
+    /// The mint address of the block definition
     pub mint: Pubkey,
 
-    /// Flag if the given mint is of a collection
-    pub is_collection: bool,
-
-    /// The value of the block
-    pub value: String,
-
-    /// [optional] Image url of the block if it's graphic
-    pub image: Option<String>,
+    /// The value of the block definition
+    pub value: BlockDefinitionValue,
 }
-impl BlockDefinitionEnum {
-    pub const LEN: usize = 120;
-}
-
-/// Block Definition Account
-#[account]
-pub struct BlockDefinitionBoolean {
-    pub bump: u8,
-
-    /// The block this definition is associated to
-    pub block: Pubkey,
-
-    /// The value of the block defintion
-    pub value: bool,
-}
-impl BlockDefinitionBoolean {
-    pub const LEN: usize = 34;
-}
-
-/// Block Definition Account
-#[account]
-pub struct BlockDefinitionNumber {
-    pub bump: u8,
-
-    /// The block this definition is associated to
-    pub block: Pubkey,
-
-    /// The minimum number allowed as value
-    pub min: u64,
-
-    /// The maximum number allowed as value
-    pub max: u64,
-}
-impl BlockDefinitionNumber {
-    pub const LEN: usize = 52;
+impl BlockDefinition {
+    pub const LEN: usize = 128;
 }
 
 /// NFT state account
@@ -196,6 +211,19 @@ impl NFT {
     pub const LEN: usize = 232;
 }
 
+/// NFT Attribute Value
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub enum NFTAttributeValue {
+    /// If the attribute has a string value
+    String { value: String },
+
+    /// If the attribute has a boolean value
+    Boolean { value: bool },
+
+    /// If the attribute value is a number
+    Number { value: u64 },
+}
+
 /// NFT Attribute
 #[account]
 pub struct NFTAttribute {
@@ -210,12 +238,15 @@ pub struct NFTAttribute {
     /// The block definition
     pub block_definition: Pubkey,
 
+    /// The token mint associated with this attribute
+    pub mint: Pubkey,
+
     /// Attribute name
     pub attribute_name: String,
 
     /// Attribute value
-    pub attribute_value: String,
+    pub attribute_value: NFTAttributeValue,
 }
 impl NFTAttribute {
-    pub const LEN: usize = 152;
+    pub const LEN: usize = 192;
 }

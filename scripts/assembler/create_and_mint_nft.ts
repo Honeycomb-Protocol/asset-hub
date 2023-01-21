@@ -7,8 +7,8 @@ import {
   createCreateNftInstruction,
   createAddBlockInstruction,
   createMintNftInstruction,
-  Block,
   Assembler,
+  AssemblingAction,
 } from "../../src";
 import { TxSigners } from "../types";
 import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../utils";
@@ -82,6 +82,9 @@ export function createCreateNFTTransaction(
     signers: [nftMint],
     accounts: [
       assembler,
+      collectionMint,
+      collectionMetadataAccount,
+      collectionMasterEdition,
       nftMint.publicKey,
       nftMetadata,
       nft,
@@ -103,6 +106,7 @@ export function createAddBlockTransaction(
   tokenMint: web3.PublicKey,
   authority: web3.PublicKey,
   payer: web3.PublicKey,
+  assemblingAction: AssemblingAction = AssemblingAction.Freeze,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSigners & { accounts: web3.PublicKey[] } {
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
@@ -119,8 +123,23 @@ export function createAddBlockTransaction(
     METADATA_PROGRAM_ID
   );
 
+  const [tokenEdition] = web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      METADATA_PROGRAM_ID.toBuffer(),
+      tokenMint.toBuffer(),
+      Buffer.from("edition"),
+    ],
+    METADATA_PROGRAM_ID
+  );
+
   const [nftAttribute] = web3.PublicKey.findProgramAddressSync(
     [Buffer.from("nft_attribute"), block.toBuffer(), nftMint.toBuffer()],
+    programId
+  );
+
+  const [depositAccount] = web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("deposit"), tokenMint.toBuffer()],
     programId
   );
 
@@ -135,9 +154,15 @@ export function createAddBlockTransaction(
           tokenMint,
           tokenAccount,
           tokenMetadata,
+          tokenEdition,
+          depositAccount:
+            assemblingAction === AssemblingAction.TakeCustody
+              ? depositAccount
+              : programId,
           nftAttribute,
           authority,
           payer,
+          tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
         programId
       )
@@ -151,9 +176,11 @@ export function createAddBlockTransaction(
       tokenMint,
       tokenAccount,
       tokenMetadata,
+      tokenEdition,
       nftAttribute,
       authority,
       payer,
+      METADATA_PROGRAM_ID,
     ],
   };
 }
@@ -253,7 +280,8 @@ export default async function (
           blockT.blockDefinition,
           blockT.tokenMint,
           wallet.publicKey,
-          wallet.publicKey
+          wallet.publicKey,
+          assemblerAccount.assemblingAction
         );
         signers = [...signers, ...sigs];
         accounts = [...accounts, ...acc];

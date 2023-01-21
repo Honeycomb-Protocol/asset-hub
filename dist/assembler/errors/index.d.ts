@@ -2,17 +2,12 @@ type ErrorWithCode = Error & {
     code: number;
 };
 type MaybeErrorWithCode = ErrorWithCode | null | undefined;
-export declare class BlockNotEnumError extends Error {
+export declare class OverflowError extends Error {
     readonly code: number;
     readonly name: string;
     constructor();
 }
-export declare class BlockNotNumberError extends Error {
-    readonly code: number;
-    readonly name: string;
-    constructor();
-}
-export declare class BlockNotBooleanError extends Error {
+export declare class BlockTypeMismatchError extends Error {
     readonly code: number;
     readonly name: string;
     constructor();
@@ -43,6 +38,21 @@ export declare class InvalidTokenForBlockDefinitionError extends Error {
     constructor();
 }
 export declare class NFTAlreadyMintedError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
+export declare class DepositAccountNotProvidedError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
+export declare class NFTNotMintedError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
+export declare class NFTNotBurnableError extends Error {
     readonly code: number;
     readonly name: string;
     constructor();

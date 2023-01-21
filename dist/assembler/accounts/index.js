@@ -17,24 +17,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountProviders = void 0;
 __exportStar(require("./Assembler"), exports);
 __exportStar(require("./Block"), exports);
-__exportStar(require("./BlockDefinitionBoolean"), exports);
-__exportStar(require("./BlockDefinitionEnum"), exports);
-__exportStar(require("./BlockDefinitionNumber"), exports);
+__exportStar(require("./BlockDefinition"), exports);
 __exportStar(require("./NFT"), exports);
 __exportStar(require("./NFTAttribute"), exports);
 const Assembler_1 = require("./Assembler");
 const Block_1 = require("./Block");
-const BlockDefinitionEnum_1 = require("./BlockDefinitionEnum");
-const BlockDefinitionBoolean_1 = require("./BlockDefinitionBoolean");
-const BlockDefinitionNumber_1 = require("./BlockDefinitionNumber");
+const BlockDefinition_1 = require("./BlockDefinition");
 const NFT_1 = require("./NFT");
 const NFTAttribute_1 = require("./NFTAttribute");
 exports.accountProviders = {
     Assembler: Assembler_1.Assembler,
     Block: Block_1.Block,
-    BlockDefinitionEnum: BlockDefinitionEnum_1.BlockDefinitionEnum,
-    BlockDefinitionBoolean: BlockDefinitionBoolean_1.BlockDefinitionBoolean,
-    BlockDefinitionNumber: BlockDefinitionNumber_1.BlockDefinitionNumber,
+    BlockDefinition: BlockDefinition_1.BlockDefinition,
     NFT: NFT_1.NFT,
     NFTAttribute: NFTAttribute_1.NFTAttribute,
 };

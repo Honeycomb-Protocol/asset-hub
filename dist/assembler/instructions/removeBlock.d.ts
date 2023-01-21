@@ -1,9 +1,9 @@
 import * as beet from '@metaplex-foundation/beet';
 import * as web3 from '@solana/web3.js';
-export declare const addBlockStruct: beet.BeetArgsStruct<{
+export declare const removeBlockStruct: beet.BeetArgsStruct<{
     instructionDiscriminator: number[];
 }>;
-export type AddBlockInstructionAccounts = {
+export type RemoveBlockInstructionAccounts = {
     assembler: web3.PublicKey;
     nft: web3.PublicKey;
     block: web3.PublicKey;
@@ -15,11 +15,9 @@ export type AddBlockInstructionAccounts = {
     depositAccount: web3.PublicKey;
     nftAttribute: web3.PublicKey;
     authority: web3.PublicKey;
-    payer: web3.PublicKey;
-    systemProgram?: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
-export declare const addBlockInstructionDiscriminator: number[];
-export declare function createAddBlockInstruction(accounts: AddBlockInstructionAccounts, programId?: web3.PublicKey): web3.TransactionInstruction;
+export declare const removeBlockInstructionDiscriminator: number[];
+export declare function createRemoveBlockInstruction(accounts: RemoveBlockInstructionAccounts, programId?: web3.PublicKey): web3.TransactionInstruction;

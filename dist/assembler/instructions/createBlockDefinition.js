@@ -23,27 +23,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAddBlockInstruction = exports.addBlockInstructionDiscriminator = exports.addBlockStruct = void 0;
-const splToken = __importStar(require("@solana/spl-token"));
+exports.createCreateBlockDefinitionInstruction = exports.createBlockDefinitionInstructionDiscriminator = exports.createBlockDefinitionStruct = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const web3 = __importStar(require("@solana/web3.js"));
-exports.addBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]], 'AddBlockInstructionArgs');
-exports.addBlockInstructionDiscriminator = [
-    208, 84, 156, 155, 72, 188, 114, 37,
+const BlockDefinitionValue_1 = require("../types/BlockDefinitionValue");
+exports.createBlockDefinitionStruct = new beet.FixableBeetArgsStruct([
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['args', BlockDefinitionValue_1.blockDefinitionValueBeet],
+], 'CreateBlockDefinitionInstructionArgs');
+exports.createBlockDefinitionInstructionDiscriminator = [
+    84, 173, 223, 150, 100, 247, 106, 4,
 ];
-function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
-    var _a, _b;
-    const [data] = exports.addBlockStruct.serialize({
-        instructionDiscriminator: exports.addBlockInstructionDiscriminator,
+function createCreateBlockDefinitionInstruction(accounts, args, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+    var _a;
+    const [data] = exports.createBlockDefinitionStruct.serialize({
+        instructionDiscriminator: exports.createBlockDefinitionInstructionDiscriminator,
+        ...args,
     });
     const keys = [
         {
             pubkey: accounts.assembler,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.nft,
             isWritable: false,
             isSigner: false,
         },
@@ -54,42 +53,17 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
         },
         {
             pubkey: accounts.blockDefinition,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.tokenMint,
             isWritable: true,
             isSigner: false,
         },
         {
-            pubkey: accounts.tokenAccount,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.tokenMetadata,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.tokenEdition,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.depositAccount,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.nftAttribute,
+            pubkey: accounts.blockDefinitionMint,
             isWritable: true,
             isSigner: false,
         },
         {
             pubkey: accounts.authority,
-            isWritable: true,
+            isWritable: false,
             isSigner: true,
         },
         {
@@ -99,16 +73,6 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
         },
         {
             pubkey: (_a = accounts.systemProgram) !== null && _a !== void 0 ? _a : web3.SystemProgram.programId,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: (_b = accounts.tokenProgram) !== null && _b !== void 0 ? _b : splToken.TOKEN_PROGRAM_ID,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.tokenMetadataProgram,
             isWritable: false,
             isSigner: false,
         },
@@ -125,5 +89,5 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
     });
     return ix;
 }
-exports.createAddBlockInstruction = createAddBlockInstruction;
-//# sourceMappingURL=addBlock.js.map
+exports.createCreateBlockDefinitionInstruction = createCreateBlockDefinitionInstruction;
+//# sourceMappingURL=createBlockDefinition.js.map

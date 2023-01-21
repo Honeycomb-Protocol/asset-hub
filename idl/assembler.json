@@ -235,7 +235,7 @@
       ]
     },
     {
-      "name": "createBlockDefinitionEnum",
+      "name": "createBlockDefinition",
       "accounts": [
         {
           "name": "assembler",
@@ -298,129 +298,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "CreateBlockDefinitionEnumArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "createBlockDefinitionBoolean",
-      "accounts": [
-        {
-          "name": "assembler",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Assembler state account"
-          ]
-        },
-        {
-          "name": "block",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Block account"
-          ]
-        },
-        {
-          "name": "blockDefinition",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Block Definition account"
-          ]
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "The wallet that holds the authority over the assembler"
-          ]
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "The wallet that pays for the rent"
-          ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "NATIVE SYSTEM PROGRAM"
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "CreateBlockDefinitionBooleanArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "createBlockDefinitionNumber",
-      "accounts": [
-        {
-          "name": "assembler",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Assembler state account"
-          ]
-        },
-        {
-          "name": "block",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Block account"
-          ]
-        },
-        {
-          "name": "blockDefinition",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Block Definition account"
-          ]
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "The wallet that holds the authority over the assembler"
-          ]
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "The wallet that pays for the rent"
-          ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "NATIVE SYSTEM PROGRAM"
-          ]
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "CreateBlockDefinitionNumberArgs"
+            "defined": "BlockDefinitionValue"
           }
         }
       ]
@@ -582,7 +460,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Burning token mint"
+            "Attribute token mint"
           ]
         },
         {
@@ -590,7 +468,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Burning token account"
+            "Attribute token account"
           ]
         },
         {
@@ -598,7 +476,24 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Burning token metadata"
+            "Attribute token metadata"
+          ]
+        },
+        {
+          "name": "tokenEdition",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Attribute token edition"
+          ]
+        },
+        {
+          "name": "depositAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The account that will hold the nft sent on expedition"
           ]
         },
         {
@@ -639,6 +534,14 @@
           "isSigner": false,
           "docs": [
             "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "METAPLEX TOKEN METADATA PROGRAM"
           ]
         }
       ],
@@ -701,6 +604,171 @@
           "isSigner": false,
           "docs": [
             "SPL TOKEN PROGRAM"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "burnNft",
+      "accounts": [
+        {
+          "name": "assembler",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Assembler state account"
+          ]
+        },
+        {
+          "name": "nft",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT account"
+          ]
+        },
+        {
+          "name": "nftMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT mint account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT token account"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the pre mint authority over this NFT"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "removeBlock",
+      "accounts": [
+        {
+          "name": "assembler",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Assembler state account"
+          ]
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NFT account"
+          ]
+        },
+        {
+          "name": "block",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Block account"
+          ]
+        },
+        {
+          "name": "blockDefinition",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Block definition account"
+          ]
+        },
+        {
+          "name": "tokenMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Burning token mint"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Burning token account"
+          ]
+        },
+        {
+          "name": "tokenMetadata",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Burning token metadata"
+          ]
+        },
+        {
+          "name": "tokenEdition",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Burning token edition"
+          ]
+        },
+        {
+          "name": "depositAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The account that will hold the nft sent on expedition"
+          ]
+        },
+        {
+          "name": "nftAttribute",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT Attribute"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that has pre mint authority over this NFT"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "METAPLEX TOKEN METADATA PROGRAM"
           ]
         }
       ],
@@ -827,7 +895,7 @@
       }
     },
     {
-      "name": "BlockDefinitionEnum",
+      "name": "BlockDefinition",
       "docs": [
         "Block Definition Account"
       ],
@@ -848,97 +916,18 @@
           {
             "name": "mint",
             "docs": [
-              "The mint address of this block definition"
+              "The mint address of the block definition"
             ],
             "type": "publicKey"
           },
           {
-            "name": "isCollection",
-            "docs": [
-              "Flag if the given mint is of a collection"
-            ],
-            "type": "bool"
-          },
-          {
             "name": "value",
             "docs": [
-              "The value of the block"
-            ],
-            "type": "string"
-          },
-          {
-            "name": "image",
-            "docs": [
-              "[optional] Image url of the block if it's graphic"
+              "The value of the block definition"
             ],
             "type": {
-              "option": "string"
+              "defined": "BlockDefinitionValue"
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "BlockDefinitionBoolean",
-      "docs": [
-        "Block Definition Account"
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "block",
-            "docs": [
-              "The block this definition is associated to"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "value",
-            "docs": [
-              "The value of the block defintion"
-            ],
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "BlockDefinitionNumber",
-      "docs": [
-        "Block Definition Account"
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "block",
-            "docs": [
-              "The block this definition is associated to"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "min",
-            "docs": [
-              "The minimum number allowed as value"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "max",
-            "docs": [
-              "The maximum number allowed as value"
-            ],
-            "type": "u64"
           }
         ]
       }
@@ -1062,6 +1051,13 @@
             "type": "publicKey"
           },
           {
+            "name": "mint",
+            "docs": [
+              "The token mint associated with this attribute"
+            ],
+            "type": "publicKey"
+          },
+          {
             "name": "attributeName",
             "docs": [
               "Attribute name"
@@ -1073,7 +1069,9 @@
             "docs": [
               "Attribute value"
             ],
-            "type": "string"
+            "type": {
+              "defined": "NFTAttributeValue"
+            }
           }
         ]
       }
@@ -1137,56 +1135,6 @@
       }
     },
     {
-      "name": "CreateBlockDefinitionEnumArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "isCollection",
-            "type": "bool"
-          },
-          {
-            "name": "value",
-            "type": "string"
-          },
-          {
-            "name": "image",
-            "type": {
-              "option": "string"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "CreateBlockDefinitionNumberArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "min",
-            "type": "u64"
-          },
-          {
-            "name": "max",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CreateBlockDefinitionBooleanArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "value",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
       "name": "CreateNFTArgs",
       "type": {
         "kind": "struct",
@@ -1212,6 +1160,9 @@
         "variants": [
           {
             "name": "Burn"
+          },
+          {
+            "name": "Freeze"
           },
           {
             "name": "TakeCustody"
@@ -1241,53 +1192,153 @@
           }
         ]
       }
+    },
+    {
+      "name": "BlockDefinitionValue",
+      "docs": [
+        "Block Definition Value"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Enum",
+            "fields": [
+              {
+                "name": "is_collection",
+                "type": "bool"
+              },
+              {
+                "name": "value",
+                "type": "string"
+              },
+              {
+                "name": "image",
+                "type": {
+                  "option": "string"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Boolean",
+            "fields": [
+              {
+                "name": "value",
+                "type": "bool"
+              }
+            ]
+          },
+          {
+            "name": "Number",
+            "fields": [
+              {
+                "name": "min",
+                "type": "u64"
+              },
+              {
+                "name": "max",
+                "type": "u64"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "NFTAttributeValue",
+      "docs": [
+        "NFT Attribute Value"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "String",
+            "fields": [
+              {
+                "name": "value",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "Boolean",
+            "fields": [
+              {
+                "name": "value",
+                "type": "bool"
+              }
+            ]
+          },
+          {
+            "name": "Number",
+            "fields": [
+              {
+                "name": "value",
+                "type": "u64"
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   "errors": [
     {
       "code": 6000,
-      "name": "BlockNotEnum",
-      "msg": "The type of block is not enum, block definitions must only be created for enum"
+      "name": "Overflow",
+      "msg": "Opertaion overflowed"
     },
     {
       "code": 6001,
-      "name": "BlockNotNumber",
-      "msg": "The type of block is not number, block definitions must only be created for number"
+      "name": "BlockTypeMismatch",
+      "msg": "The type of block is not same as the block definition value provided"
     },
     {
       "code": 6002,
-      "name": "BlockNotBoolean",
-      "msg": "The type of block is not boolean, block definitions must only be created for boolean"
-    },
-    {
-      "code": 6003,
       "name": "RequiredBlockImage",
       "msg": "The particular block requires an image in definition"
     },
     {
-      "code": 6004,
+      "code": 6003,
       "name": "InvalidBlockType",
       "msg": "The block has an invalid type"
     },
     {
-      "code": 6005,
+      "code": 6004,
       "name": "InvalidBlockDefinition",
       "msg": "The block defintion is invalid"
     },
     {
-      "code": 6006,
+      "code": 6005,
       "name": "InvalidMetadata",
       "msg": "The metadata provided for the mint is not valid"
     },
     {
-      "code": 6007,
+      "code": 6006,
       "name": "InvalidTokenForBlockDefinition",
       "msg": "The token is not valid for this block definition"
     },
     {
-      "code": 6008,
+      "code": 6007,
       "name": "NFTAlreadyMinted",
       "msg": "The NFT is already minted"
+    },
+    {
+      "code": 6008,
+      "name": "DepositAccountNotProvided",
+      "msg": "Deposit account is not provided"
+    },
+    {
+      "code": 6009,
+      "name": "NFTNotMinted",
+      "msg": "The NFT is not minted"
+    },
+    {
+      "code": 6010,
+      "name": "NFTNotBurnable",
+      "msg": "The NFT is cannot be burned"
     }
   ],
   "metadata": {

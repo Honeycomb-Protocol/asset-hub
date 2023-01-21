@@ -23,23 +23,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAddBlockInstruction = exports.addBlockInstructionDiscriminator = exports.addBlockStruct = void 0;
+exports.createRemoveBlockInstruction = exports.removeBlockInstructionDiscriminator = exports.removeBlockStruct = void 0;
 const splToken = __importStar(require("@solana/spl-token"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const web3 = __importStar(require("@solana/web3.js"));
-exports.addBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]], 'AddBlockInstructionArgs');
-exports.addBlockInstructionDiscriminator = [
-    208, 84, 156, 155, 72, 188, 114, 37,
+exports.removeBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]], 'RemoveBlockInstructionArgs');
+exports.removeBlockInstructionDiscriminator = [
+    145, 94, 239, 114, 4, 117, 167, 145,
 ];
-function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
-    var _a, _b;
-    const [data] = exports.addBlockStruct.serialize({
-        instructionDiscriminator: exports.addBlockInstructionDiscriminator,
+function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+    var _a;
+    const [data] = exports.removeBlockStruct.serialize({
+        instructionDiscriminator: exports.removeBlockInstructionDiscriminator,
     });
     const keys = [
         {
             pubkey: accounts.assembler,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {
@@ -93,17 +93,7 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
             isSigner: true,
         },
         {
-            pubkey: accounts.payer,
-            isWritable: true,
-            isSigner: true,
-        },
-        {
-            pubkey: (_a = accounts.systemProgram) !== null && _a !== void 0 ? _a : web3.SystemProgram.programId,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: (_b = accounts.tokenProgram) !== null && _b !== void 0 ? _b : splToken.TOKEN_PROGRAM_ID,
+            pubkey: (_a = accounts.tokenProgram) !== null && _a !== void 0 ? _a : splToken.TOKEN_PROGRAM_ID,
             isWritable: false,
             isSigner: false,
         },
@@ -125,5 +115,5 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
     });
     return ix;
 }
-exports.createAddBlockInstruction = createAddBlockInstruction;
-//# sourceMappingURL=addBlock.js.map
+exports.createRemoveBlockInstruction = createRemoveBlockInstruction;
+//# sourceMappingURL=removeBlock.js.map

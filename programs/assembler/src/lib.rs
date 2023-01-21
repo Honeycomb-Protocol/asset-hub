@@ -6,6 +6,7 @@ pub mod structs;
 pub mod utils;
 
 use instructions::*;
+use structs::*;
 
 declare_id!("AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT");
 
@@ -30,25 +31,11 @@ pub mod assembler {
         instructions::create_block(ctx, args)
     }
 
-    pub fn create_block_definition_enum(
-        ctx: Context<CreateBlockDefinitionEnum>,
-        args: CreateBlockDefinitionEnumArgs,
+    pub fn create_block_definition(
+        ctx: Context<CreateBlockDefinition>,
+        args: BlockDefinitionValue,
     ) -> Result<()> {
-        instructions::create_block_definition_enum(ctx, args)
-    }
-
-    pub fn create_block_definition_boolean(
-        ctx: Context<CreateBlockDefinitionBoolean>,
-        args: CreateBlockDefinitionBooleanArgs,
-    ) -> Result<()> {
-        instructions::create_block_definition_boolean(ctx, args)
-    }
-
-    pub fn create_block_definition_number(
-        ctx: Context<CreateBlockDefinitionNumber>,
-        args: CreateBlockDefinitionNumberArgs,
-    ) -> Result<()> {
-        instructions::create_block_definition_number(ctx, args)
+        instructions::create_block_definition(ctx, args)
     }
 
     pub fn create_nft(ctx: Context<CreateNFT>, args: CreateNFTArgs) -> Result<()> {
@@ -61,5 +48,13 @@ pub mod assembler {
 
     pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
         instructions::mint_nft(ctx)
+    }
+
+    pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
+        instructions::burn_nft(ctx)
+    }
+
+    pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
+        instructions::remove_block(ctx)
     }
 }

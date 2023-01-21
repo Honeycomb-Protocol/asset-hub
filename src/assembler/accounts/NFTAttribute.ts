@@ -8,6 +8,10 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
+import {
+  NFTAttributeValue,
+  nFTAttributeValueBeet,
+} from '../types/NFTAttributeValue'
 
 /**
  * Arguments used to create {@link NFTAttribute}
@@ -19,8 +23,9 @@ export type NFTAttributeArgs = {
   nft: web3.PublicKey
   block: web3.PublicKey
   blockDefinition: web3.PublicKey
+  mint: web3.PublicKey
   attributeName: string
-  attributeValue: string
+  attributeValue: NFTAttributeValue
 }
 
 export const nFTAttributeDiscriminator = [161, 3, 226, 65, 113, 87, 24, 132]
@@ -37,8 +42,9 @@ export class NFTAttribute implements NFTAttributeArgs {
     readonly nft: web3.PublicKey,
     readonly block: web3.PublicKey,
     readonly blockDefinition: web3.PublicKey,
+    readonly mint: web3.PublicKey,
     readonly attributeName: string,
-    readonly attributeValue: string
+    readonly attributeValue: NFTAttributeValue
   ) {}
 
   /**
@@ -50,6 +56,7 @@ export class NFTAttribute implements NFTAttributeArgs {
       args.nft,
       args.block,
       args.blockDefinition,
+      args.mint,
       args.attributeName,
       args.attributeValue
     )
@@ -164,8 +171,9 @@ export class NFTAttribute implements NFTAttributeArgs {
       nft: this.nft.toBase58(),
       block: this.block.toBase58(),
       blockDefinition: this.blockDefinition.toBase58(),
+      mint: this.mint.toBase58(),
       attributeName: this.attributeName,
-      attributeValue: this.attributeValue,
+      attributeValue: this.attributeValue.__kind,
     }
   }
 }
@@ -186,8 +194,9 @@ export const nFTAttributeBeet = new beet.FixableBeetStruct<
     ['nft', beetSolana.publicKey],
     ['block', beetSolana.publicKey],
     ['blockDefinition', beetSolana.publicKey],
+    ['mint', beetSolana.publicKey],
     ['attributeName', beet.utf8String],
-    ['attributeValue', beet.utf8String],
+    ['attributeValue', nFTAttributeValueBeet],
   ],
   NFTAttribute.fromArgs,
   'NFTAttribute'

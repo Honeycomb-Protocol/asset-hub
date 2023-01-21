@@ -5,6 +5,7 @@ import create_and_mint_nft from "./create_and_mint_nft";
 import create_assembler from "./create_assembler";
 import create_block from "./create_block";
 import create_block_definition from "./create_block_definition";
+import disband_nft from "./disband_nft";
 
 export default async function (
   action: AssemblerProgramAction,
@@ -38,6 +39,8 @@ export default async function (
       break;
 
     case "create-block-definition":
+      if (!args[0])
+        throw new Error("Block definition mint address not provided");
       if (!deployments.block)
         throw new Error(
           "Block address not found in deployments, Please create block first"
@@ -47,7 +50,7 @@ export default async function (
         connection,
         wallet,
         new web3.PublicKey(deployments.block),
-        args[0] ? new web3.PublicKey(args[0]) : undefined
+        new web3.PublicKey(args[0])
       );
       console.log(
         "Block definition address: ",
@@ -84,6 +87,21 @@ export default async function (
         ]
       );
       console.log("Mint address: ", mint.toString());
+      setDeployments({
+        ...deployments,
+        nftMint: mint,
+      });
+      break;
+
+    case "disband-nft":
+      if (!deployments.nftMint)
+        throw new Error("NFT mint address not found in deployments");
+
+      await disband_nft(
+        connection,
+        wallet,
+        new web3.PublicKey(deployments.nftMint)
+      );
       break;
 
     default:
