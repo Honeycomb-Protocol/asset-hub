@@ -2,7 +2,6 @@ import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import {
-  PROGRAM_ID,
   createBurnNftInstruction,
   createRemoveBlockInstruction,
   NFT,
@@ -10,6 +9,7 @@ import {
   AssemblingAction,
   Assembler,
 } from "../../src";
+import { PROGRAM_ID } from "../../src/assembler";
 import { TxSigners } from "../types";
 import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../utils";
 

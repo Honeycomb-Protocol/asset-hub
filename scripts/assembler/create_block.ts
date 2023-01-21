@@ -1,11 +1,11 @@
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
 import {
-  PROGRAM_ID,
   createCreateBlockInstruction,
   CreateBlockArgs,
   BlockType,
 } from "../../src";
+import { PROGRAM_ID } from "../../src/assembler";
 import { TxSigners } from "../types";
 import { sendAndConfirmTransaction } from "../utils";
 

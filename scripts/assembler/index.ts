@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import { AssemblerProgramAction } from "../types";
-import { getDependencies, sendAndConfirmTransaction } from "../utils";
+import { getDependencies } from "../utils";
 import create_and_mint_nft from "./create_and_mint_nft";
 import create_assembler from "./create_assembler";
 import create_block from "./create_block";

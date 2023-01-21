@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "name": "assetmanager",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [],
+      "args": []
+    }
+  ],
+  "metadata": {
+    "address": "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT",
+    "origin": "anchor",
+    "binaryVersion": "0.26.0",
+    "libVersion": "0.26.0"
+  }
+}
