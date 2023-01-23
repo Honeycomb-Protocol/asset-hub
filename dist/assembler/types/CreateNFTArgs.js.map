@@ -1,1 +1,0 @@
-{"version":3,"file":"CreateNFTArgs.js","sourceRoot":"","sources":["../../../src/assembler/types/CreateNFTArgs.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAOA,gEAAiD;AAUpC,QAAA,iBAAiB,GAAG,IAAI,IAAI,CAAC,qBAAqB,CAC7D;IACE,CAAC,OAAO,EAAE,IAAI,CAAC,UAAU,CAAC;IAC1B,CAAC,KAAK,EAAE,IAAI,CAAC,UAAU,CAAC;CACzB,EACD,eAAe,CAChB,CAAA"}

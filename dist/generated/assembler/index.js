@@ -14,5 +14,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./generated"), exports);
+exports.PROGRAM_ID = exports.PROGRAM_ADDRESS = void 0;
+const web3_js_1 = require("@solana/web3.js");
+__exportStar(require("./accounts"), exports);
+__exportStar(require("./errors"), exports);
+__exportStar(require("./instructions"), exports);
+__exportStar(require("./types"), exports);
+exports.PROGRAM_ADDRESS = 'AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT';
+exports.PROGRAM_ID = new web3_js_1.PublicKey(exports.PROGRAM_ADDRESS);
 //# sourceMappingURL=index.js.map
