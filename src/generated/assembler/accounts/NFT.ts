@@ -22,10 +22,7 @@ export type NFTArgs = {
   mint: web3.PublicKey
   minted: boolean
   id: number
-  name: string
-  symbol: string
-  description: string
-  image: string
+  uri: string
 }
 
 export const nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217]
@@ -45,10 +42,7 @@ export class NFT implements NFTArgs {
     readonly mint: web3.PublicKey,
     readonly minted: boolean,
     readonly id: number,
-    readonly name: string,
-    readonly symbol: string,
-    readonly description: string,
-    readonly image: string
+    readonly uri: string
   ) {}
 
   /**
@@ -63,10 +57,7 @@ export class NFT implements NFTArgs {
       args.mint,
       args.minted,
       args.id,
-      args.name,
-      args.symbol,
-      args.description,
-      args.image
+      args.uri
     )
   }
 
@@ -182,10 +173,7 @@ export class NFT implements NFTArgs {
       mint: this.mint.toBase58(),
       minted: this.minted,
       id: this.id,
-      name: this.name,
-      symbol: this.symbol,
-      description: this.description,
-      image: this.image,
+      uri: this.uri,
     }
   }
 }
@@ -209,10 +197,7 @@ export const nFTBeet = new beet.FixableBeetStruct<
     ['mint', beetSolana.publicKey],
     ['minted', beet.bool],
     ['id', beet.u16],
-    ['name', beet.utf8String],
-    ['symbol', beet.utf8String],
-    ['description', beet.utf8String],
-    ['image', beet.utf8String],
+    ['uri', beet.utf8String],
   ],
   NFT.fromArgs,
   'NFT'

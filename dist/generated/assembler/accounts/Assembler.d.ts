@@ -10,6 +10,7 @@ export type AssemblerArgs = {
     collectionName: string;
     collectionSymbol: string;
     collectionDescription: string;
+    nftBaseUri: string;
     assemblingAction: AssemblingAction;
     nfts: number;
 };
@@ -21,6 +22,7 @@ export declare class Assembler implements AssemblerArgs {
     readonly collectionName: string;
     readonly collectionSymbol: string;
     readonly collectionDescription: string;
+    readonly nftBaseUri: string;
     readonly assemblingAction: AssemblingAction;
     readonly nfts: number;
     private constructor();
@@ -41,6 +43,7 @@ export declare class Assembler implements AssemblerArgs {
         collectionName: string;
         collectionSymbol: string;
         collectionDescription: string;
+        nftBaseUri: string;
         assemblingAction: string;
         nfts: number;
     };

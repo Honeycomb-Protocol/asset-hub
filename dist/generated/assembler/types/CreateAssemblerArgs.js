@@ -32,5 +32,6 @@ exports.createAssemblerArgsBeet = new beet.FixableBeetArgsStruct([
     ['collectionSymbol', beet.utf8String],
     ['collectionUri', beet.utf8String],
     ['collectionDescription', beet.utf8String],
+    ['nftBaseUri', beet.utf8String],
 ], 'CreateAssemblerArgs');
 //# sourceMappingURL=CreateAssemblerArgs.js.map

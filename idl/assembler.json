@@ -411,14 +411,7 @@
           ]
         }
       ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "CreateNFTArgs"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "addBlock",
@@ -824,6 +817,13 @@
             "type": "string"
           },
           {
+            "name": "nftBaseUri",
+            "docs": [
+              "The base uri of each nft metadata"
+            ],
+            "type": "string"
+          },
+          {
             "name": "assemblingAction",
             "docs": [
               "Action to take for the block SFT while assembling"
@@ -987,30 +987,9 @@
             "type": "u16"
           },
           {
-            "name": "name",
+            "name": "uri",
             "docs": [
-              "The name of the NFT"
-            ],
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "docs": [
-              "The symbol of the NFT"
-            ],
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "docs": [
-              "The description of the NFT"
-            ],
-            "type": "string"
-          },
-          {
-            "name": "image",
-            "docs": [
-              "The image url of the NFT"
+              "The uri of the NFT"
             ],
             "type": "string"
           }
@@ -1104,6 +1083,10 @@
           {
             "name": "collectionDescription",
             "type": "string"
+          },
+          {
+            "name": "nftBaseUri",
+            "type": "string"
           }
         ]
       }
@@ -1129,22 +1112,6 @@
           },
           {
             "name": "blockName",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CreateNFTArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "image",
-            "type": "string"
-          },
-          {
-            "name": "uri",
             "type": "string"
           }
         ]

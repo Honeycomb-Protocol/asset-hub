@@ -86,14 +86,8 @@ pub struct CreateNFT<'info> {
     pub rent: Sysvar<'info, Rent>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct CreateNFTArgs {
-    pub image: String,
-    pub uri: String,
-}
-
 /// Create a new nft
-pub fn create_nft(ctx: Context<CreateNFT>, args: CreateNFTArgs) -> Result<()> {
+pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
     let assembler = &mut ctx.accounts.assembler;
     let assembler_key = assembler.key();
     assembler.nfts += 1;
@@ -105,10 +99,7 @@ pub fn create_nft(ctx: Context<CreateNFT>, args: CreateNFTArgs) -> Result<()> {
     nft.collection_address = assembler.collection;
     nft.mint = ctx.accounts.nft_mint.key();
     nft.id = assembler.nfts;
-    nft.name = format!("{} #{}", assembler.collection_name, nft.id);
-    nft.symbol = assembler.collection_symbol.clone();
-    nft.description = assembler.collection_description.clone();
-    nft.image = args.image;
+    nft.uri = format!("{}/{}.json", assembler.nft_base_uri, nft.mint.to_string());
 
     let assembler_seeds = &[
         b"assembler".as_ref(),
@@ -124,9 +115,9 @@ pub fn create_nft(ctx: Context<CreateNFT>, args: CreateNFTArgs) -> Result<()> {
         assembler_key,
         ctx.accounts.payer.key(),
         assembler_key,
-        nft.name.clone(),
-        nft.symbol.clone(),
-        args.uri,
+        format!("{} #{}", assembler.collection_name, nft.id),
+        assembler.collection_symbol.clone(),
+        nft.uri.clone(),
         None,
         0,
         false,

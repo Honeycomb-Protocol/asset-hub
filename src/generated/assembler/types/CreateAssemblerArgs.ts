@@ -13,6 +13,7 @@ export type CreateAssemblerArgs = {
   collectionSymbol: string
   collectionUri: string
   collectionDescription: string
+  nftBaseUri: string
 }
 
 /**
@@ -27,6 +28,7 @@ export const createAssemblerArgsBeet =
       ['collectionSymbol', beet.utf8String],
       ['collectionUri', beet.utf8String],
       ['collectionDescription', beet.utf8String],
+      ['nftBaseUri', beet.utf8String],
     ],
     'CreateAssemblerArgs'
   )

@@ -8,30 +8,16 @@
 import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
-import { CreateNFTArgs, createNFTArgsBeet } from '../types/CreateNFTArgs'
 
 /**
  * @category Instructions
  * @category CreateNft
  * @category generated
  */
-export type CreateNftInstructionArgs = {
-  args: CreateNFTArgs
-}
-/**
- * @category Instructions
- * @category CreateNft
- * @category generated
- */
-export const createNftStruct = new beet.FixableBeetArgsStruct<
-  CreateNftInstructionArgs & {
-    instructionDiscriminator: number[] /* size: 8 */
-  }
->(
-  [
-    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', createNFTArgsBeet],
-  ],
+export const createNftStruct = new beet.BeetArgsStruct<{
+  instructionDiscriminator: number[] /* size: 8 */
+}>(
+  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
   'CreateNftInstructionArgs'
 )
 /**
@@ -76,20 +62,16 @@ export const createNftInstructionDiscriminator = [
  * Creates a _CreateNft_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
- * @param args to provide as instruction data to the program
- *
  * @category Instructions
  * @category CreateNft
  * @category generated
  */
 export function createCreateNftInstruction(
   accounts: CreateNftInstructionAccounts,
-  args: CreateNftInstructionArgs,
   programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')
 ) {
   const [data] = createNftStruct.serialize({
     instructionDiscriminator: createNftInstructionDiscriminator,
-    ...args,
   })
   const keys: web3.AccountMeta[] = [
     {

@@ -20,6 +20,9 @@ pub struct Assembler {
     /// The collection description to be associated with each nft
     pub collection_description: String,
 
+    /// The base uri of each nft metadata
+    pub nft_base_uri: String,
+
     /// Action to take for the block SFT while assembling
     pub assembling_action: AssemblingAction,
 
@@ -195,20 +198,11 @@ pub struct NFT {
     /// The id of the NFT
     pub id: u16,
 
-    /// The name of the NFT
-    pub name: String,
-
-    /// The symbol of the NFT
-    pub symbol: String,
-
-    /// The description of the NFT
-    pub description: String,
-
-    /// The image url of the NFT
-    pub image: String,
+    /// The uri of the NFT
+    pub uri: String,
 }
 impl NFT {
-    pub const LEN: usize = 232;
+    pub const LEN: usize = 160;
 }
 
 /// NFT Attribute Value

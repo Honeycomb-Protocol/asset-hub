@@ -1,8 +1,8 @@
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
-import { CreateNFTArgs, AssemblingAction } from "../../generated";
+import { AssemblingAction } from "../../generated";
 import { TxSigners } from "../../types";
-export declare function createCreateNftTransaction(assembler: web3.PublicKey, collectionMint: web3.PublicKey, authority: web3.PublicKey, payer: web3.PublicKey, args: CreateNFTArgs, programId?: web3.PublicKey): TxSigners & {
+export declare function createCreateNftTransaction(assembler: web3.PublicKey, collectionMint: web3.PublicKey, authority: web3.PublicKey, payer: web3.PublicKey, programId?: web3.PublicKey): TxSigners & {
     accounts: web3.PublicKey[];
     nft: web3.PublicKey;
     nftMint: web3.PublicKey;
@@ -17,4 +17,4 @@ export declare function createAndMintNft(connection: web3.Connection, wallet: an
     block: web3.PublicKey;
     blockDefinition: web3.PublicKey;
     tokenMint: web3.PublicKey;
-}[], args: CreateNFTArgs): Promise<anchor.web3.PublicKey>;
+}[]): Promise<anchor.web3.PublicKey>;

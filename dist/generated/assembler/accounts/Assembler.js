@@ -30,18 +30,19 @@ const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const AssemblingAction_1 = require("../types/AssemblingAction");
 exports.assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95];
 class Assembler {
-    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, assemblingAction, nfts) {
+    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, nftBaseUri, assemblingAction, nfts) {
         this.bump = bump;
         this.authority = authority;
         this.collection = collection;
         this.collectionName = collectionName;
         this.collectionSymbol = collectionSymbol;
         this.collectionDescription = collectionDescription;
+        this.nftBaseUri = nftBaseUri;
         this.assemblingAction = assemblingAction;
         this.nfts = nfts;
     }
     static fromArgs(args) {
-        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.assemblingAction, args.nfts);
+        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.nftBaseUri, args.assemblingAction, args.nfts);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Assembler.deserialize(accountInfo.data, offset);
@@ -83,6 +84,7 @@ class Assembler {
             collectionName: this.collectionName,
             collectionSymbol: this.collectionSymbol,
             collectionDescription: this.collectionDescription,
+            nftBaseUri: this.nftBaseUri,
             assemblingAction: 'AssemblingAction.' + AssemblingAction_1.AssemblingAction[this.assemblingAction],
             nfts: this.nfts,
         };
@@ -97,6 +99,7 @@ exports.assemblerBeet = new beet.FixableBeetStruct([
     ['collectionName', beet.utf8String],
     ['collectionSymbol', beet.utf8String],
     ['collectionDescription', beet.utf8String],
+    ['nftBaseUri', beet.utf8String],
     ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
     ['nfts', beet.u16],
 ], Assembler.fromArgs, 'Assembler');

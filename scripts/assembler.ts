@@ -31,6 +31,7 @@ export default async function (
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",
         collectionUri: "https://assembler.test",
+        nftBaseUri: "",
       });
       console.log("Assembler address: ", assemblerAddress.toString());
       setDeployments({ ...deployments, assembler: assemblerAddress });
@@ -133,11 +134,7 @@ export default async function (
             blockDefinition: new web3.PublicKey(deployments.blockDefinition),
             tokenMint: new web3.PublicKey(deployments.blockDefinitionMint),
           },
-        ],
-        {
-          image: "",
-          uri: "",
-        }
+        ]
       );
       console.log("Mint address: ", mint.toString());
       setDeployments({

@@ -10,10 +10,7 @@ export type NFTArgs = {
     mint: web3.PublicKey;
     minted: boolean;
     id: number;
-    name: string;
-    symbol: string;
-    description: string;
-    image: string;
+    uri: string;
 };
 export declare const nFTDiscriminator: number[];
 export declare class NFT implements NFTArgs {
@@ -24,10 +21,7 @@ export declare class NFT implements NFTArgs {
     readonly mint: web3.PublicKey;
     readonly minted: boolean;
     readonly id: number;
-    readonly name: string;
-    readonly symbol: string;
-    readonly description: string;
-    readonly image: string;
+    readonly uri: string;
     private constructor();
     static fromArgs(args: NFTArgs): NFT;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [NFT, number];
@@ -47,10 +41,7 @@ export declare class NFT implements NFTArgs {
         mint: string;
         minted: boolean;
         id: number;
-        name: string;
-        symbol: string;
-        description: string;
-        image: string;
+        uri: string;
     };
 }
 export declare const nFTBeet: beet.FixableBeetStruct<NFT, NFTArgs & {

@@ -65,6 +65,7 @@ pub struct CreateAssemblerArgs {
     collection_symbol: String,
     collection_uri: String,
     collection_description: String,
+    nft_base_uri: String,
 }
 
 /// Create a new assembler
@@ -77,6 +78,7 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
     assembler.collection_name = args.collection_name;
     assembler.collection_symbol = args.collection_symbol;
     assembler.collection_description = args.collection_description;
+    assembler.nft_base_uri = args.nft_base_uri;
     assembler.assembling_action = args.assembling_action;
     assembler.nfts = 0;
 

@@ -29,7 +29,7 @@ const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
 const utils_1 = require("../../utils");
-function createCreateNftTransaction(assembler, collectionMint, authority, payer, args, programId = assembler_1.PROGRAM_ID) {
+function createCreateNftTransaction(assembler, collectionMint, authority, payer, programId = assembler_1.PROGRAM_ID) {
     const [collectionMetadataAccount] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
         utils_1.METADATA_PROGRAM_ID.toBuffer(),
@@ -60,7 +60,7 @@ function createCreateNftTransaction(assembler, collectionMint, authority, payer,
             authority,
             payer,
             tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
-        }, { args }, programId)),
+        }, programId)),
         signers: [nftMint],
         accounts: [
             assembler,
@@ -147,9 +147,9 @@ function createMintNftTransaction(assembler, nftMint, authority, payer, programI
     };
 }
 exports.createMintNftTransaction = createMintNftTransaction;
-async function createAndMintNft(connection, wallet, assembler, blocks, args) {
+async function createAndMintNft(connection, wallet, assembler, blocks) {
     const assemblerAccount = await generated_1.Assembler.fromAccountAddress(connection, assembler);
-    const nftCreateTx = createCreateNftTransaction(assembler, assemblerAccount.collection, wallet.publicKey, wallet.publicKey, args);
+    const nftCreateTx = createCreateNftTransaction(assembler, assemblerAccount.collection, wallet.publicKey, wallet.publicKey);
     const mintNftTx = createMintNftTransaction(assembler, nftCreateTx.nftMint, wallet.publicKey, wallet.publicKey);
     let signers = [...nftCreateTx.signers, ...mintNftTx.signers];
     let accounts = [...nftCreateTx.accounts, ...mintNftTx.accounts];

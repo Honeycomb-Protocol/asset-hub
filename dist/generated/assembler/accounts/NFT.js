@@ -29,7 +29,7 @@ const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 exports.nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217];
 class NFT {
-    constructor(bump, assembler, authority, collectionAddress, mint, minted, id, name, symbol, description, image) {
+    constructor(bump, assembler, authority, collectionAddress, mint, minted, id, uri) {
         this.bump = bump;
         this.assembler = assembler;
         this.authority = authority;
@@ -37,13 +37,10 @@ class NFT {
         this.mint = mint;
         this.minted = minted;
         this.id = id;
-        this.name = name;
-        this.symbol = symbol;
-        this.description = description;
-        this.image = image;
+        this.uri = uri;
     }
     static fromArgs(args) {
-        return new NFT(args.bump, args.assembler, args.authority, args.collectionAddress, args.mint, args.minted, args.id, args.name, args.symbol, args.description, args.image);
+        return new NFT(args.bump, args.assembler, args.authority, args.collectionAddress, args.mint, args.minted, args.id, args.uri);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return NFT.deserialize(accountInfo.data, offset);
@@ -86,10 +83,7 @@ class NFT {
             mint: this.mint.toBase58(),
             minted: this.minted,
             id: this.id,
-            name: this.name,
-            symbol: this.symbol,
-            description: this.description,
-            image: this.image,
+            uri: this.uri,
         };
     }
 }
@@ -103,9 +97,6 @@ exports.nFTBeet = new beet.FixableBeetStruct([
     ['mint', beetSolana.publicKey],
     ['minted', beet.bool],
     ['id', beet.u16],
-    ['name', beet.utf8String],
-    ['symbol', beet.utf8String],
-    ['description', beet.utf8String],
-    ['image', beet.utf8String],
+    ['uri', beet.utf8String],
 ], NFT.fromArgs, 'NFT');
 //# sourceMappingURL=NFT.js.map

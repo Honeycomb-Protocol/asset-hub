@@ -25,6 +25,7 @@ export type AssemblerArgs = {
   collectionName: string
   collectionSymbol: string
   collectionDescription: string
+  nftBaseUri: string
   assemblingAction: AssemblingAction
   nfts: number
 }
@@ -45,6 +46,7 @@ export class Assembler implements AssemblerArgs {
     readonly collectionName: string,
     readonly collectionSymbol: string,
     readonly collectionDescription: string,
+    readonly nftBaseUri: string,
     readonly assemblingAction: AssemblingAction,
     readonly nfts: number
   ) {}
@@ -60,6 +62,7 @@ export class Assembler implements AssemblerArgs {
       args.collectionName,
       args.collectionSymbol,
       args.collectionDescription,
+      args.nftBaseUri,
       args.assemblingAction,
       args.nfts
     )
@@ -176,6 +179,7 @@ export class Assembler implements AssemblerArgs {
       collectionName: this.collectionName,
       collectionSymbol: this.collectionSymbol,
       collectionDescription: this.collectionDescription,
+      nftBaseUri: this.nftBaseUri,
       assemblingAction:
         'AssemblingAction.' + AssemblingAction[this.assemblingAction],
       nfts: this.nfts,
@@ -201,6 +205,7 @@ export const assemblerBeet = new beet.FixableBeetStruct<
     ['collectionName', beet.utf8String],
     ['collectionSymbol', beet.utf8String],
     ['collectionDescription', beet.utf8String],
+    ['nftBaseUri', beet.utf8String],
     ['assemblingAction', assemblingActionBeet],
     ['nfts', beet.u16],
   ],

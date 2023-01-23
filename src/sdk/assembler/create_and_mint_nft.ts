@@ -2,7 +2,6 @@ import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import {
-  CreateNFTArgs,
   createCreateNftInstruction,
   createAddBlockInstruction,
   createMintNftInstruction,
@@ -18,7 +17,6 @@ export function createCreateNftTransaction(
   collectionMint: web3.PublicKey,
   authority: web3.PublicKey,
   payer: web3.PublicKey,
-  args: CreateNFTArgs,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSigners & {
   accounts: web3.PublicKey[];
@@ -75,7 +73,6 @@ export function createCreateNftTransaction(
           payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
-        { args },
         programId
       )
     ),
@@ -236,8 +233,7 @@ export async function createAndMintNft(
     block: web3.PublicKey;
     blockDefinition: web3.PublicKey;
     tokenMint: web3.PublicKey;
-  }[],
-  args: CreateNFTArgs
+  }[]
 ) {
   const assemblerAccount = await Assembler.fromAccountAddress(
     connection,
@@ -248,8 +244,7 @@ export async function createAndMintNft(
     assembler,
     assemblerAccount.collection,
     wallet.publicKey,
-    wallet.publicKey,
-    args
+    wallet.publicKey
   );
 
   const mintNftTx = createMintNftTransaction(
