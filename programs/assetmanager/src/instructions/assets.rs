@@ -59,10 +59,9 @@ pub struct CreateAsset<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub struct CreateAssetArgs {
-    pub max_supply: u64,
+    pub candy_guard: Option<Pubkey>,
     pub name: String,
     pub symbol: String,
-    pub description: String,
     pub uri: String,
 }
 
@@ -73,12 +72,9 @@ pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<
     let asset = &mut ctx.accounts.asset;
     asset.bump = ctx.bumps["asset"];
     asset.manager = asset_manager.key();
+    asset.candy_guard = args.candy_guard;
     asset.mint = ctx.accounts.mint.key();
-    asset.max_supply = args.max_supply;
-    asset.supply = 0;
-    asset.name = args.name;
-    asset.symbol = args.symbol;
-    asset.description = args.description;
+    asset.items_redeemed = 0;
     asset.uri = args.uri;
 
     let asset_manager_seeds = &[
@@ -95,8 +91,8 @@ pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<
         asset_manager.key(),
         ctx.accounts.payer.key(),
         asset_manager.key(),
-        asset.name.clone(),
-        asset.symbol.clone(),
+        args.name.clone(),
+        args.symbol.clone(),
         asset.uri.clone(),
         None,
         // Some(vec![mpl_token_metadata::state::Creator {
@@ -148,6 +144,10 @@ pub struct MintAsset<'info> {
     #[account(mut, has_one = mint, constraint = token_account.owner == wallet.key())]
     pub token_account: Account<'info, TokenAccount>,
 
+    /// Candy guard address of the asset
+    #[account()]
+    pub candy_guard: Option<AccountInfo<'info>>,
+
     /// The wallet holds the complete authority over the asset manager.
     #[account(mut)]
     pub wallet: Signer<'info>,
@@ -162,8 +162,13 @@ pub fn mint_asset(ctx: Context<MintAsset>, amount: u64) -> Result<()> {
     let asset_manager = &ctx.accounts.asset_manager;
     let asset = &mut ctx.accounts.asset;
 
-    if asset.max_supply > 0 && asset.supply + amount > asset.max_supply {
-        return Err(ErrorCode::MaxSupplyExceeded.into());
+    let candy_guard = &ctx.accounts.candy_guard;
+    if let Some(candy_guard) = candy_guard {
+        if !candy_guard.is_signer || candy_guard.key() != asset.candy_guard.unwrap() {
+            return Err(ErrorCode::UnauthorizedMint.into());
+        }
+    } else if ctx.accounts.wallet.key() != asset_manager.authority {
+        return Err(ErrorCode::UnauthorizedMint.into());
     }
 
     let asset_manager_seeds = &[
@@ -185,8 +190,6 @@ pub fn mint_asset(ctx: Context<MintAsset>, amount: u64) -> Result<()> {
         ),
         amount,
     )?;
-
-    asset.supply += amount;
 
     Ok(())
 }

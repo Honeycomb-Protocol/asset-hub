@@ -10,7 +10,7 @@ import {
   Assembler,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
-import { TxSigners } from "../../types";
+import { TxSignersAccounts } from "../../types";
 import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../../utils";
 
 export function createBurnNFTTransaction(
@@ -19,9 +19,7 @@ export function createBurnNFTTransaction(
   nftMint: web3.PublicKey,
   authority: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
-): TxSigners & {
-  accounts: web3.PublicKey[];
-} {
+): TxSignersAccounts {
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
     nftMint,
     authority
@@ -55,7 +53,7 @@ export function createRemoveBlockTransaction(
   authority: web3.PublicKey,
   assemblingAction: AssemblingAction = AssemblingAction.Freeze,
   programId: web3.PublicKey = PROGRAM_ID
-): TxSigners & { accounts: web3.PublicKey[] } {
+): TxSignersAccounts {
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
     tokenMint,
     authority
@@ -201,5 +199,8 @@ export async function disbandNft(
     signers,
     { skipPreflight: true }
   );
-  console.log("NFT Disbanded:", txId);
+
+  return {
+    txId,
+  };
 }

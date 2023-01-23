@@ -29,27 +29,18 @@ pub struct Asset {
     /// The asset manager this asset is associated to
     pub manager: Pubkey,
 
+    /// Candy Guard address if any
+    pub candy_guard: Option<Pubkey>,
+
     /// The mint address of this Asset
     pub mint: Pubkey,
 
-    /// The maximum supply of this Asset
-    pub max_supply: u64,
-
-    /// The current supply of this Asset
-    pub supply: u64,
-
-    /// The name of the Asset
-    pub name: String,
-
-    /// The symbol of the Asset
-    pub symbol: String,
-
-    /// The description of the Asset
-    pub description: String,
+    /// Total items minted
+    pub items_redeemed: u64,
 
     /// The uri of the metadata of the Asset
     pub uri: String,
 }
 impl Asset {
-    pub const LEN: usize = 184;
+    pub const LEN: usize = 136;
 }

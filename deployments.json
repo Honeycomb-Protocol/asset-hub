@@ -8,5 +8,14 @@
       "blockDefinitionMint": "792L76MDHSLbYGMmGfwxFHM6QYWnCMbiJiJjeefC8nhi",
       "nftMint": "7GCJuWoGRGEPBjR1rB3jWd7MAEHG2svJcMvpUgheQXkd"
     }
+  },
+  "assetmanager": {
+    "devnet": {
+      "program": "BNGKUeQQHw2MgZc9EqFsCWmnkLEKLCUfu5cw9YFWK3hF",
+      "assetManager": "LssWPLcj7uJFzMhFPdFoCtWVeKaX9RM9EGXyo5htWUZ",
+      "assetMint": "8vN3yCzRpkcDceXJ3SYHwEonRY9gRGRgGmGYAka764b2",
+      "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+      "asset": "2CjtcXxGEpmiAVHQLjgawBnGaCCW3Yen67nuXrCibGJU"
+    }
   }
 }

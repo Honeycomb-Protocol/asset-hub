@@ -7,7 +7,7 @@ import {
   createCreateAssemblerCollectionMasterEditionInstruction,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
-import { TxSigners } from "../../types";
+import { TxSignersAccounts } from "../../types";
 import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../../utils";
 
 export function createCreateAssemblerTransaction(
@@ -15,7 +15,7 @@ export function createCreateAssemblerTransaction(
   payer: web3.PublicKey,
   args: CreateAssemblerArgs,
   programId: web3.PublicKey = PROGRAM_ID
-): TxSigners & { assembler: web3.PublicKey } {
+): TxSignersAccounts & { assembler: web3.PublicKey } {
   const collectionMint = web3.Keypair.generate();
 
   const [collectionMetadataAccount] = web3.PublicKey.findProgramAddressSync(
@@ -84,6 +84,16 @@ export function createCreateAssemblerTransaction(
       )
     ),
     signers: [collectionMint],
+    accounts: [
+      collectionMint.publicKey,
+      collectionMetadataAccount,
+      collectionMasterEdition,
+      collectionTokenAccount,
+      assembler,
+      authority,
+      payer,
+      METADATA_PROGRAM_ID,
+    ],
     assembler,
   };
 }
@@ -99,7 +109,6 @@ export async function createAssembler(
     args
   );
 
-  console.log("Wallet", wallet.publicKey.toString());
   const txId = await sendAndConfirmTransaction(
     assemblerTx.tx,
     connection,
@@ -107,6 +116,9 @@ export async function createAssembler(
     assemblerTx.signers,
     { skipPreflight: true }
   );
-  console.log("Assembler created:", txId);
-  return assemblerTx.assembler;
+
+  return {
+    txId,
+    assembler: assemblerTx.assembler,
+  };
 }

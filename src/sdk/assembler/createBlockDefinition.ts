@@ -3,11 +3,9 @@ import * as web3 from "@solana/web3.js";
 import {
   createCreateBlockDefinitionInstruction,
   BlockDefinitionValue,
-  BlockType,
-  Block,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
-import { TxSigners } from "../../types";
+import { TxSignersAccounts } from "../../types";
 import { sendAndConfirmTransaction } from "../../utils";
 
 export function createCreateBlockDefinitionTransaction(
@@ -17,7 +15,7 @@ export function createCreateBlockDefinitionTransaction(
   authority: web3.PublicKey,
   payer: web3.PublicKey,
   args: BlockDefinitionValue
-): TxSigners & { blockDefinition: web3.PublicKey } {
+): TxSignersAccounts & { blockDefinition: web3.PublicKey } {
   const [blockDefinition] = web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("block_definition"),
@@ -42,6 +40,14 @@ export function createCreateBlockDefinitionTransaction(
       )
     ),
     signers: [],
+    accounts: [
+      assembler,
+      block,
+      blockDefinition,
+      blockDefinitionMint,
+      authority,
+      payer,
+    ],
     blockDefinition,
   };
 }
@@ -71,6 +77,9 @@ export async function createBlockDefinition(
     signers,
     { skipPreflight: true }
   );
-  console.log("Block Definition created:", txId);
-  return blockDefinition;
+
+  return {
+    txId,
+    blockDefinition,
+  };
 }

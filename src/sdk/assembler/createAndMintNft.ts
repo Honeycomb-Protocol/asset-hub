@@ -9,7 +9,7 @@ import {
   AssemblingAction,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
-import { TxSigners } from "../../types";
+import { TxSignersAccounts } from "../../types";
 import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../../utils";
 
 export function createCreateNftTransaction(
@@ -18,8 +18,7 @@ export function createCreateNftTransaction(
   authority: web3.PublicKey,
   payer: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
-): TxSigners & {
-  accounts: web3.PublicKey[];
+): TxSignersAccounts & {
   nft: web3.PublicKey;
   nftMint: web3.PublicKey;
 } {
@@ -105,7 +104,7 @@ export function createAddBlockTransaction(
   payer: web3.PublicKey,
   assemblingAction: AssemblingAction = AssemblingAction.Freeze,
   programId: web3.PublicKey = PROGRAM_ID
-): TxSigners & { accounts: web3.PublicKey[] } {
+): TxSignersAccounts {
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
     tokenMint,
     authority
@@ -188,7 +187,7 @@ export function createMintNftTransaction(
   authority: web3.PublicKey,
   payer: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
-): TxSigners & { accounts: web3.PublicKey[] } {
+): TxSignersAccounts {
   const [nft] = web3.PublicKey.findProgramAddressSync(
     [Buffer.from("nft"), nftMint.toBuffer()],
     programId
@@ -294,6 +293,9 @@ export async function createAndMintNft(
     signers,
     { skipPreflight: true }
   );
-  console.log("NFT created:", txId);
-  return nftCreateTx.nftMint;
+
+  return {
+    txId,
+    mint: nftCreateTx.nftMint,
+  };
 }

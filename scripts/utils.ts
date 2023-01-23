@@ -3,7 +3,7 @@ import * as anchor from "@project-serum/anchor";
 import key from "../key.json";
 import fs from "fs";
 import { PROGRAM_ADDRESS } from "../src";
-import { Config } from "./types";
+import { Config, ProgramName } from "./types";
 
 export const METADATA_PROGRAM_ID = new web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -67,7 +67,7 @@ export const setDeployments = (
 
 export const getDependencies = (
   network: "mainnet" | "devnet",
-  programName: "assembler"
+  programName: ProgramName
 ) => {
   const config = network === "mainnet" ? mainnetConfig : devnetConfig;
 

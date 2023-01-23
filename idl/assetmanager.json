@@ -59,6 +59,164 @@
           }
         }
       ]
+    },
+    {
+      "name": "createAsset",
+      "accounts": [
+        {
+          "name": "assetManager",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The asset manager state account."
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Mint of the asset"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata account of the asset"
+          ]
+        },
+        {
+          "name": "asset",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet holds the complete authority over the asset manager."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for everything."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The system program."
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SYSVAR RENT"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CreateAssetArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mintAsset",
+      "accounts": [
+        {
+          "name": "assetManager",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The asset manager state account."
+          ]
+        },
+        {
+          "name": "asset",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The asset state account."
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Mint of the asset"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The token account of user wallet."
+          ]
+        },
+        {
+          "name": "candyGuard",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Candy guard address of the asset"
+          ]
+        },
+        {
+          "name": "wallet",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet holds the complete authority over the asset manager."
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -125,6 +283,15 @@
             "type": "publicKey"
           },
           {
+            "name": "candyGuard",
+            "docs": [
+              "Candy Guard address if any"
+            ],
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
             "name": "mint",
             "docs": [
               "The mint address of this Asset"
@@ -132,39 +299,11 @@
             "type": "publicKey"
           },
           {
-            "name": "maxSupply",
+            "name": "itemsRedeemed",
             "docs": [
-              "The maximum supply of this Asset"
+              "Total items minted"
             ],
             "type": "u64"
-          },
-          {
-            "name": "supply",
-            "docs": [
-              "The current supply of this Asset"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "name",
-            "docs": [
-              "The name of the Asset"
-            ],
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "docs": [
-              "The symbol of the Asset"
-            ],
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "docs": [
-              "The description of the Asset"
-            ],
-            "type": "string"
           },
           {
             "name": "uri",
@@ -196,8 +335,10 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "maxSupply",
-            "type": "u64"
+            "name": "candyGuard",
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
             "name": "name",
@@ -205,10 +346,6 @@
           },
           {
             "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "description",
             "type": "string"
           },
           {
@@ -222,12 +359,12 @@
   "errors": [
     {
       "code": 6000,
-      "name": "MaxSupplyExceeded",
-      "msg": "Max supply limit exceeded"
+      "name": "UnauthorizedMint",
+      "msg": "Unauthorized to mints"
     }
   ],
   "metadata": {
-    "address": "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT",
+    "address": "BNGKUeQQHw2MgZc9EqFsCWmnkLEKLCUfu5cw9YFWK3hF",
     "origin": "anchor",
     "binaryVersion": "0.26.0",
     "libVersion": "0.26.0"

@@ -30,8 +30,20 @@ const sendAndConfirmTransaction = async (tx, connection, wallet, signers = [], s
     const block = await connection.getLatestBlockhash();
     tx.recentBlockhash = block.blockhash;
     tx.feePayer = wallet.publicKey;
-    signers.length && (await tx.partialSign(...signers));
-    const signedTx = await wallet.signTransaction(tx);
+    let adapterSigners = {};
+    signers.length &&
+        signers.forEach((s) => {
+            if ("signTransaction" in s)
+                adapterSigners[s.publicKey.toString()] = s;
+            else if ("secretKey" in s)
+                tx.partialSign(s);
+            else if ("_signer" in s)
+                tx.partialSign(s._signer);
+        });
+    let signedTx = await wallet.signTransaction(tx);
+    for (let signer in adapterSigners) {
+        signedTx = await adapterSigners[signer].signTransaction(signedTx);
+    }
     const txId = await connection.sendRawTransaction(signedTx.serialize(), {
         preflightCommitment: "processed",
         ...sendOpts,

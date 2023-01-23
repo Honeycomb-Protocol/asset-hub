@@ -1,12 +1,8 @@
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
-import {
-  createCreateBlockInstruction,
-  CreateBlockArgs,
-  BlockType,
-} from "../../generated";
+import { createCreateBlockInstruction, CreateBlockArgs } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
-import { TxSigners } from "../../types";
+import { TxSignersAccounts } from "../../types";
 import { sendAndConfirmTransaction } from "../../utils";
 
 export function createCreateBlockTransaction(
@@ -14,7 +10,7 @@ export function createCreateBlockTransaction(
   authority: web3.PublicKey,
   payer: web3.PublicKey,
   args: CreateBlockArgs
-): TxSigners & { block: web3.PublicKey } {
+): TxSignersAccounts & { block: web3.PublicKey } {
   const [block] = web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("block"),
@@ -38,6 +34,7 @@ export function createCreateBlockTransaction(
       )
     ),
     signers: [],
+    accounts: [assembler, block, authority, payer],
     block,
   };
 }
@@ -62,6 +59,9 @@ export async function createBlock(
     signers,
     { skipPreflight: true }
   );
-  console.log("Block created:", txId);
-  return block;
+
+  return {
+    txId,
+    block,
+  };
 }

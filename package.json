@@ -10,9 +10,12 @@
     "build": "yarn build:program & yarn build:sdk",
     "deploy": "anchor deploy",
     "build-deploy": "yarn build && yarn deploy",
-    "assembler": "ts-node ./scripts/index.ts assembler"
+    "assembler": "ts-node ./scripts/index.ts assembler",
+    "assetmanager": "ts-node ./scripts/index.ts assetmanager"
   },
   "dependencies": {
+    "@metaplex-foundation/js": "^0.17.12",
+    "@metaplex-foundation/mpl-candy-guard": "/Users/lucifer/Projects/Metaplex/mpl-candy-guard/js",
     "@project-serum/anchor": "^0.26.0",
     "@solana/spl-token": "^0.3.7"
   },
