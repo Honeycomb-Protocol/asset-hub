@@ -192,6 +192,15 @@ pub struct NFT {
     /// The mint address of this NFT
     pub mint: Pubkey,
 
+    /// The name of the NFT
+    pub name: String,
+
+    /// The symbol of the NFT
+    pub symbol: String,
+
+    /// The description of the NFT
+    pub description: String,
+
     /// Flag if this NFT is minted
     pub minted: bool,
 
@@ -202,7 +211,7 @@ pub struct NFT {
     pub uri: String,
 }
 impl NFT {
-    pub const LEN: usize = 160;
+    pub const LEN: usize = 232;
 }
 
 /// NFT Attribute Value

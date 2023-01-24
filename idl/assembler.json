@@ -411,7 +411,14 @@
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CreateNFTArgs"
+          }
+        }
+      ]
     },
     {
       "name": "addBlock",
@@ -973,6 +980,27 @@
             "type": "publicKey"
           },
           {
+            "name": "name",
+            "docs": [
+              "The name of the NFT"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "docs": [
+              "The symbol of the NFT"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "docs": [
+              "The description of the NFT"
+            ],
+            "type": "string"
+          },
+          {
             "name": "minted",
             "docs": [
               "Flag if this NFT is minted"
@@ -1112,6 +1140,29 @@
           },
           {
             "name": "blockName",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateNFTArgs",
+      "docs": [
+        "Create a new nft"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "description",
             "type": "string"
           }
         ]

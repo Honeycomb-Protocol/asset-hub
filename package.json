@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@metaplex-foundation/js": "^0.17.12",
-    "@metaplex-foundation/mpl-candy-guard": "/Users/lucifer/Projects/Metaplex/mpl-candy-guard/js",
+    "@metaplex-foundation/mpl-candy-guard": "https://github.com/Solana-Studio/mpl-candy-guard",
     "@project-serum/anchor": "^0.26.0",
     "@solana/spl-token": "^0.3.7",
     "yargs": "^17.6.2",

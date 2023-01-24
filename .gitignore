@@ -8,3 +8,6 @@ test-ledger
 yarn.lock
 package-lock.json
 .crates
+
+*key.json
+assembler.json

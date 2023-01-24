@@ -115,14 +115,14 @@ pub fn create_block_definition(
         BlockDefinitionValue::Enum {
             is_collection: _is_collection,
             value: _value,
-            image,
+            image: _image,
         } => {
             if ctx.accounts.block.block_type != BlockType::Enum {
                 return Err(ErrorCode::BlockTypeMismatch.into());
             }
-            if ctx.accounts.block.is_graphical && image.is_none() {
-                return Err(ErrorCode::RequiredBlockImage.into());
-            }
+            // if ctx.accounts.block.is_graphical && image.is_none() {
+            //     return Err(ErrorCode::RequiredBlockImage.into());
+            // }
             return Ok(());
         }
         BlockDefinitionValue::Boolean { value: _value1 } => {

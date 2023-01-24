@@ -2,20 +2,11 @@
   "assembler": {
     "devnet": {
       "program": "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT",
-      "assembler": "GqX1KoZnNbZtNWxnxyjMsfJfDD17hBqPNAB3db4ANkTB",
-      "block": "CbFdKSt9wH2xSMHbeY3MBonjhgKPDBVNYtzrZnvzjM4h",
-      "blockDefinition": "3EqM8BmRkbEH37CLXiVk6kt6VkYUEYjr3dXmQkJqBKWT",
-      "blockDefinitionMint": "792L76MDHSLbYGMmGfwxFHM6QYWnCMbiJiJjeefC8nhi",
-      "nftMint": "7GCJuWoGRGEPBjR1rB3jWd7MAEHG2svJcMvpUgheQXkd"
-    }
-  },
-  "assetmanager": {
-    "devnet": {
-      "program": "BNGKUeQQHw2MgZc9EqFsCWmnkLEKLCUfu5cw9YFWK3hF",
-      "assetManager": "LssWPLcj7uJFzMhFPdFoCtWVeKaX9RM9EGXyo5htWUZ",
-      "assetMint": "8vN3yCzRpkcDceXJ3SYHwEonRY9gRGRgGmGYAka764b2",
-      "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
-      "asset": "2CjtcXxGEpmiAVHQLjgawBnGaCCW3Yen67nuXrCibGJU"
+      "assembler": "Hx2TA5BXNGQU7qqns7iQks7Ht8bdfaBADhxhBb1MBQbd",
+      "block": "BGnLJvTW4VEA2Q9Qf7cty7Dx7DCfcG4tJDQykR7gKvZA",
+      "blockDefinition": "F9H8csTWoyNWbs9ZH8mX19nD3EeD3atX7Wt9CqoJduCK",
+      "blockDefinitionMint": "CAemWX1J9LhREb9BSkFYsxqzpUehiX3DMgk2YkJ9crra",
+      "nftMint": "969qrVmmv1Mzs6CYtq8ZHB4bzcQaVt9YmFKAGjJSFEcj"
     }
   }
 }

@@ -53,6 +53,7 @@ function createCreateAssetTransaction(payer, args, programId = assetmanager_1.PR
             utils_1.METADATA_PROGRAM_ID,
         ],
         mint: mintKeypair.publicKey,
+        asset,
     };
 }
 exports.createCreateAssetTransaction = createCreateAssetTransaction;

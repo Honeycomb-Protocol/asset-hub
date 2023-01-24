@@ -105,12 +105,11 @@ const createLookupTable = async (connection, wallet, ...addresses) => {
     console.log(txId);
     const createTxConfirmation = await connection.confirmTransaction(txId, "finalized");
     if (createTxConfirmation.value.err) {
-        throw new Error("Lookup table creation error " +
-            createTxConfirmation.value.err.toString());
+        throw new Error("Lookup table creation error " + createTxConfirmation.value.err.toString());
     }
     const transactions = [];
     const latestBlockhash = await connection.getLatestBlockhash();
-    const batchSize = 30;
+    const batchSize = 25;
     for (let i = 0; i < addresses.length; i += batchSize) {
         transactions.push((0, exports.createV0Tx)(wallet.publicKey, latestBlockhash.blockhash, web3.AddressLookupTableProgram.extendLookupTable({
             payer: wallet.publicKey,
@@ -119,7 +118,7 @@ const createLookupTable = async (connection, wallet, ...addresses) => {
             addresses: addresses.slice(i, i + batchSize),
         })));
     }
-    transactions.map(tx => tx.sign([wallet.payer]));
+    transactions.map((tx) => tx.sign([wallet.payer]));
     const sigs = await Promise.all(transactions.map((t) => connection.sendTransaction(t, {
         skipPreflight: true,
     })));
@@ -140,7 +139,7 @@ const sendAndConfirmV0Transaction = async (tx, connection, wallet, signers = [],
     tx.sign([wallet.payer]);
     let signedTx = tx;
     const txId = await connection.sendRawTransaction(signedTx.serialize(), {
-        preflightCommitment: "processed",
+        skipPreflight: true,
         ...sendOpts,
     });
     await connection.confirmTransaction(txId);

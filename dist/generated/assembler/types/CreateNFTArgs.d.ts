@@ -1,6 +1,7 @@
 import * as beet from '@metaplex-foundation/beet';
 export type CreateNFTArgs = {
-    image: string;
-    uri: string;
+    name: string;
+    symbol: string;
+    description: string;
 };
 export declare const createNFTArgsBeet: beet.FixableBeetArgsStruct<CreateNFTArgs>;

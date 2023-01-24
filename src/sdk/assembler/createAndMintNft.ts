@@ -8,7 +8,7 @@ import {
   Assembler,
   AssemblingAction,
 } from "../../generated";
-import { PROGRAM_ID } from "../../generated/assembler";
+import { CreateNFTArgs, PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
 import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../../utils";
 
@@ -17,6 +17,7 @@ export function createCreateNftTransaction(
   collectionMint: web3.PublicKey,
   authority: web3.PublicKey,
   payer: web3.PublicKey,
+  args: CreateNFTArgs,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts & {
   nft: web3.PublicKey;
@@ -72,6 +73,7 @@ export function createCreateNftTransaction(
           payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
+        { args },
         programId
       )
     ),
@@ -228,6 +230,7 @@ export async function createAndMintNft(
   connection: web3.Connection,
   wallet: anchor.Wallet,
   assembler: web3.PublicKey,
+  args: CreateNFTArgs,
   blocks: {
     block: web3.PublicKey;
     blockDefinition: web3.PublicKey;
@@ -243,7 +246,8 @@ export async function createAndMintNft(
     assembler,
     assemblerAccount.collection,
     wallet.publicKey,
-    wallet.publicKey
+    wallet.publicKey,
+    args
   );
 
   const mintNftTx = createMintNftTransaction(

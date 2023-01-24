@@ -8,7 +8,7 @@ import {
   BlockDefinitionValue,
   BlockType,
 } from "../../generated";
-import { AssemblerConfig } from "../../types";
+import { AssemblerConfig, TxSignersAccounts } from "../../types";
 import {
   createCreateAssemblerTransaction,
   createCreateBlockTransaction,
@@ -17,6 +17,7 @@ import {
 import {
   createLookupTable,
   createV0TxWithLUT,
+  sendAndConfirmTransaction,
   sendAndConfirmV0Transaction,
 } from "../../utils";
 import {
@@ -35,8 +36,13 @@ const connection = new web3.Connection(
   "processed"
 );
 
-export async function setupAssembler(config: AssemblerConfig) {
-  let transactions: web3.Transaction[] = [];
+export async function setupAssembler(
+  config: AssemblerConfig,
+  updateConfig: (cfg: AssemblerConfig) => void
+) {
+  let transactions: (TxSignersAccounts & {
+    postAction: (...args: any[]) => any;
+  })[] = [];
   let signers: Signer[] = [];
   let accounts: web3.PublicKey[] = [];
 
@@ -61,26 +67,35 @@ export async function setupAssembler(config: AssemblerConfig) {
       break;
   }
 
-  const collectionUri = "";
-  const createAssemblerCtx = createCreateAssemblerTransaction(
-    wallet.publicKey,
-    wallet.publicKey,
-    {
-      assemblingAction: assemblingAction,
-      collectionName: config.name,
-      collectionSymbol: config.symbol,
-      collectionUri,
-      collectionDescription: config.description,
-      nftBaseUri: config.base_url,
-    }
-  );
-  transactions.push(createAssemblerCtx.tx);
-  signers.push(...createAssemblerCtx.signers);
-  accounts.push(...createAssemblerCtx.accounts);
-  config.assemblerAddress = createAssemblerCtx.assembler.toString();
-
+  let assemblerAddress = config.assemblerAddress;
+  if (!assemblerAddress) {
+    const collectionUri = "";
+    const createAssemblerCtx = createCreateAssemblerTransaction(
+      wallet.publicKey,
+      wallet.publicKey,
+      {
+        assemblingAction: assemblingAction,
+        collectionName: config.name,
+        collectionSymbol: config.symbol,
+        collectionUri,
+        collectionDescription: config.description,
+        nftBaseUri: config.base_url,
+      }
+    );
+    transactions.push({
+      ...createAssemblerCtx,
+      postAction() {
+        config.assemblerAddress = createAssemblerCtx.assembler.toString();
+        updateConfig(config);
+      },
+    });
+    signers.push(...createAssemblerCtx.signers);
+    accounts.push(...createAssemblerCtx.accounts);
+    assemblerAddress = createAssemblerCtx.assembler.toString();
+  }
   /// Creating blocks
-  config.blocks = await Promise.all(
+  // config.blocks =
+  await Promise.all(
     config.blocks.map(async (block) => {
       let blockType: BlockType;
       switch (block.type) {
@@ -100,25 +115,36 @@ export async function setupAssembler(config: AssemblerConfig) {
           throw new Error("Invalid Block Type");
       }
 
-      const createBlockCtx = createCreateBlockTransaction(
-        createAssemblerCtx.assembler,
-        wallet.publicKey,
-        wallet.publicKey,
-        {
-          blockName: block.name,
-          blockOrder: block.order,
-          blockType: blockType,
-          isGraphical: block.isGraphical,
-        }
-      );
-      transactions.push(createBlockCtx.tx);
-      signers.push(...createBlockCtx.signers);
-      accounts.push(...createBlockCtx.accounts);
-      block.address = createBlockCtx.block.toString();
+      let blockAddress = block.address;
+      if (!blockAddress) {
+        const createBlockCtx = createCreateBlockTransaction(
+          new web3.PublicKey(assemblerAddress),
+          wallet.publicKey,
+          wallet.publicKey,
+          {
+            blockName: block.name,
+            blockOrder: block.order,
+            blockType: blockType,
+            isGraphical: block.isGraphical,
+          }
+        );
+        transactions.push({
+          ...createBlockCtx,
+          postAction() {
+            block.address = createBlockCtx.block.toString();
+            updateConfig(config);
+          },
+        });
+        signers.push(...createBlockCtx.signers);
+        accounts.push(...createBlockCtx.accounts);
+        blockAddress = createBlockCtx.block.toString();
+      }
 
       /// Creating block definitions
-      block.definitions = await Promise.all(
+      // block.definitions =
+      await Promise.all(
         block.definitions.map(async (blockDefinition) => {
+          if (blockDefinition.address) return;
           let blockDefArgs: BlockDefinitionValue;
           if (blockType === BlockType.Enum) {
             blockDefArgs = {
@@ -179,6 +205,7 @@ export async function setupAssembler(config: AssemblerConfig) {
                 symbol: blockDefinition.assetConfig.symbol,
               });
               uri = blockDefinition.assetConfig.uri = m.uri;
+              updateConfig(config);
             }
 
             const createAssetCtx = createCreateAssetTransaction(
@@ -192,29 +219,46 @@ export async function setupAssembler(config: AssemblerConfig) {
                 uri: uri,
               }
             );
-            transactions.push(createAssetCtx.tx);
+            transactions.push({
+              ...createAssetCtx,
+              postAction() {
+                blockDefinition.assetConfig.address =
+                  createAssetCtx.asset.toString();
+                blockDefinition.mintAddress = createAssetCtx.mint.toString();
+                updateConfig(config);
+              },
+            });
+            // transactions.push(createAssetCtx);
             signers.push(...createAssetCtx.signers);
             accounts.push(...createAssetCtx.accounts);
             blockDefinitionMint = createAssetCtx.mint;
-            blockDefinition.mintAddress = createAssetCtx.mint.toString();
+            // blockDefinition.mintAddress = createAssetCtx.mint.toString();
           } else {
             throw new Error("Block definition details not provided properly");
           }
 
           const createBlockDefinitionCtx =
             createCreateBlockDefinitionTransaction(
-              createAssemblerCtx.assembler,
-              createBlockCtx.block,
+              new web3.PublicKey(assemblerAddress),
+              new web3.PublicKey(blockAddress),
               blockDefinitionMint,
               wallet.publicKey,
               wallet.publicKey,
               blockDefArgs
             );
-          transactions.push(createBlockDefinitionCtx.tx);
+          transactions.push({
+            ...createBlockDefinitionCtx,
+            postAction() {
+              blockDefinition.address =
+                createBlockDefinitionCtx.blockDefinition.toString();
+              updateConfig(config);
+            },
+          });
+          // transactions.push(createBlockDefinitionCtx);
           signers.push(...createBlockDefinitionCtx.signers);
           accounts.push(...createBlockDefinitionCtx.accounts);
-          blockDefinition.address =
-            createBlockDefinitionCtx.blockDefinition.toString();
+          // blockDefinition.address =
+          //   createBlockDefinitionCtx.blockDefinition.toString();
           return blockDefinition;
         })
       );
@@ -228,23 +272,36 @@ export async function setupAssembler(config: AssemblerConfig) {
     (x, index, self) => index === self.findIndex((y) => x.equals(y))
   );
 
-  const lookuptable = await createLookupTable(connection, wallet, ...accounts);
-
-  const v0Tx = await createV0TxWithLUT(
-    connection,
-    wallet.publicKey,
-    lookuptable,
-    ...transactions.map((t) => t.instructions).flat()
-  );
-
-  const txId = await sendAndConfirmV0Transaction(
-    v0Tx,
-    connection,
-    wallet,
-    signers
-  );
-
-  console.log("Assembler setup tx:", txId);
+  // const lookuptable = await createLookupTable(connection, wallet, ...accounts);
+  let i = 0;
+  for (let t of transactions) {
+    await sendAndConfirmTransaction(t.tx, connection, wallet, t.signers, {
+      skipPreflight: true,
+    })
+      .then((txId) => {
+        if (t.postAction) t.postAction();
+        console.log(
+          `Assembler setup tx: ${txId}, (${++i}/${transactions.length})`
+        );
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+    // await createV0TxWithLUT(
+    //   connection,
+    //   wallet.publicKey,
+    //   lookuptable,
+    //   ...t.tx.instructions
+    // )
+    //   .then((v0Tx) =>
+    //     sendAndConfirmV0Transaction(v0Tx, connection, wallet, t.signers)
+    //   )
+    //   .then((txId) =>
+    //     console.log(
+    //       `Assembler setup tx: ${txId}, (${++i}/${transactions.length})`
+    //     )
+    //   );
+  }
 
   return config;
 }

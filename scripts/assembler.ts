@@ -31,10 +31,10 @@ export default async function (
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",
         collectionUri: "https://assembler.test",
-        nftBaseUri: "",
+        nftBaseUri: "https://api.eboy.dev/u/temp",
       });
       console.log("Assembler address: ", assemblerAddress.toString());
-      setDeployments({ ...deployments, assembler: assemblerAddress });
+      setDeployments({ ...deployments, assembler: assemblerAddress.assembler });
       break;
 
     case "create-block":
@@ -54,7 +54,7 @@ export default async function (
         }
       );
       console.log("Block address: ", blockAddress.toString());
-      setDeployments({ ...deployments, block: blockAddress });
+      setDeployments({ ...deployments, block: blockAddress.block });
       break;
 
     case "create-block-definition":
@@ -108,7 +108,7 @@ export default async function (
       );
       setDeployments({
         ...deployments,
-        blockDefinition: blockDefinitionAddress,
+        blockDefinition: blockDefinitionAddress.blockDefinition,
         blockDefinitionMint: args[0],
       });
       break;
@@ -128,6 +128,11 @@ export default async function (
         connection,
         wallet,
         new web3.PublicKey(deployments.assembler),
+        {
+          name: "Test NFT",
+          symbol: "TNFT",
+          description: "This is a test NFT",
+        },
         [
           {
             block: new web3.PublicKey(deployments.block),
@@ -139,7 +144,7 @@ export default async function (
       console.log("Mint address: ", mint.toString());
       setDeployments({
         ...deployments,
-        nftMint: mint,
+        nftMint: mint.mint,
       });
       break;
 

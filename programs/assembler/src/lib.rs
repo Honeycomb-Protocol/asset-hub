@@ -38,8 +38,8 @@ pub mod assembler {
         instructions::create_block_definition(ctx, args)
     }
 
-    pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
-        instructions::create_nft(ctx)
+    pub fn create_nft(ctx: Context<CreateNFT>, args: CreateNFTArgs) -> Result<()> {
+        instructions::create_nft(ctx, args)
     }
 
     pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {

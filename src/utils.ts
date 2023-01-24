@@ -137,7 +137,7 @@ export const createLookupTable = async (
   const transactions: web3.VersionedTransaction[] = [];
   const latestBlockhash = await connection.getLatestBlockhash();
 
-  const batchSize = 20;
+  const batchSize = 25;
   for (let i = 0; i < addresses.length; i += batchSize) {
     transactions.push(
       createV0Tx(
@@ -208,7 +208,8 @@ export const sendAndConfirmV0Transaction = async (
   let signedTx = tx;
 
   const txId = await connection.sendRawTransaction(signedTx.serialize(), {
-    preflightCommitment: "processed",
+    // preflightCommitment: "processed",
+    skipPreflight: true,
     ...sendOpts,
   });
   await connection.confirmTransaction(txId);

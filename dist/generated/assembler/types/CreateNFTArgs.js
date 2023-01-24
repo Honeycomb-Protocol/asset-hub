@@ -26,7 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createNFTArgsBeet = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
 exports.createNFTArgsBeet = new beet.FixableBeetArgsStruct([
-    ['image', beet.utf8String],
-    ['uri', beet.utf8String],
+    ['name', beet.utf8String],
+    ['symbol', beet.utf8String],
+    ['description', beet.utf8String],
 ], 'CreateNFTArgs');
 //# sourceMappingURL=CreateNFTArgs.js.map

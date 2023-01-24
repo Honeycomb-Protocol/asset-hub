@@ -52,10 +52,10 @@ export default async function (
         }
       );
       console.log("Tx:", createAssetCtx.txId);
-      console.log("Asset: ", createAssetCtx.asset.toString());
+      console.log("Asset: ", createAssetCtx.mint.toString());
       setDeployments({
         ...deployments,
-        asset: createAssetCtx.asset,
+        mint: createAssetCtx.mint,
         candyGuard: candyGuardBuilder.getContext().candyGuardAddress,
       });
       break;

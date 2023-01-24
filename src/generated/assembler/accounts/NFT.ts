@@ -20,6 +20,9 @@ export type NFTArgs = {
   authority: web3.PublicKey
   collectionAddress: web3.PublicKey
   mint: web3.PublicKey
+  name: string
+  symbol: string
+  description: string
   minted: boolean
   id: number
   uri: string
@@ -40,6 +43,9 @@ export class NFT implements NFTArgs {
     readonly authority: web3.PublicKey,
     readonly collectionAddress: web3.PublicKey,
     readonly mint: web3.PublicKey,
+    readonly name: string,
+    readonly symbol: string,
+    readonly description: string,
     readonly minted: boolean,
     readonly id: number,
     readonly uri: string
@@ -55,6 +61,9 @@ export class NFT implements NFTArgs {
       args.authority,
       args.collectionAddress,
       args.mint,
+      args.name,
+      args.symbol,
+      args.description,
       args.minted,
       args.id,
       args.uri
@@ -171,6 +180,9 @@ export class NFT implements NFTArgs {
       authority: this.authority.toBase58(),
       collectionAddress: this.collectionAddress.toBase58(),
       mint: this.mint.toBase58(),
+      name: this.name,
+      symbol: this.symbol,
+      description: this.description,
       minted: this.minted,
       id: this.id,
       uri: this.uri,
@@ -195,6 +207,9 @@ export const nFTBeet = new beet.FixableBeetStruct<
     ['authority', beetSolana.publicKey],
     ['collectionAddress', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
+    ['name', beet.utf8String],
+    ['symbol', beet.utf8String],
+    ['description', beet.utf8String],
     ['minted', beet.bool],
     ['id', beet.u16],
     ['uri', beet.utf8String],

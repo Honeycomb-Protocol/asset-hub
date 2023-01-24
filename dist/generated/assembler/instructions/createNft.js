@@ -27,14 +27,19 @@ exports.createCreateNftInstruction = exports.createNftInstructionDiscriminator =
 const splToken = __importStar(require("@solana/spl-token"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const web3 = __importStar(require("@solana/web3.js"));
-exports.createNftStruct = new beet.BeetArgsStruct([['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]], 'CreateNftInstructionArgs');
+const CreateNFTArgs_1 = require("../types/CreateNFTArgs");
+exports.createNftStruct = new beet.FixableBeetArgsStruct([
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['args', CreateNFTArgs_1.createNFTArgsBeet],
+], 'CreateNftInstructionArgs');
 exports.createNftInstructionDiscriminator = [
     231, 119, 61, 97, 217, 46, 142, 109,
 ];
-function createCreateNftInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+function createCreateNftInstruction(accounts, args, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
     var _a, _b, _c;
     const [data] = exports.createNftStruct.serialize({
         instructionDiscriminator: exports.createNftInstructionDiscriminator,
+        ...args,
     });
     const keys = [
         {

@@ -8,6 +8,9 @@ export type NFTArgs = {
     authority: web3.PublicKey;
     collectionAddress: web3.PublicKey;
     mint: web3.PublicKey;
+    name: string;
+    symbol: string;
+    description: string;
     minted: boolean;
     id: number;
     uri: string;
@@ -19,6 +22,9 @@ export declare class NFT implements NFTArgs {
     readonly authority: web3.PublicKey;
     readonly collectionAddress: web3.PublicKey;
     readonly mint: web3.PublicKey;
+    readonly name: string;
+    readonly symbol: string;
+    readonly description: string;
     readonly minted: boolean;
     readonly id: number;
     readonly uri: string;
@@ -39,6 +45,9 @@ export declare class NFT implements NFTArgs {
         authority: string;
         collectionAddress: string;
         mint: string;
+        name: string;
+        symbol: string;
+        description: string;
         minted: boolean;
         id: number;
         uri: string;
