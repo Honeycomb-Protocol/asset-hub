@@ -209,6 +209,9 @@ pub struct NFT {
 
     /// The uri of the NFT
     pub uri: String,
+
+    /// Flag if the image for this nft is already generated
+    pub is_generated: bool,
 }
 impl NFT {
     pub const LEN: usize = 232;

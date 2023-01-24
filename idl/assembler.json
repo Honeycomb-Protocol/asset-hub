@@ -773,6 +773,20 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "setNftGenerated",
+      "accounts": [
+        {
+          "name": "nft",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The nft account"
+          ]
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1020,6 +1034,13 @@
               "The uri of the NFT"
             ],
             "type": "string"
+          },
+          {
+            "name": "isGenerated",
+            "docs": [
+              "Flag if the image for this nft is already generated"
+            ],
+            "type": "bool"
           }
         ]
       }

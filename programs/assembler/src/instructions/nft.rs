@@ -110,6 +110,7 @@ pub fn create_nft(ctx: Context<CreateNFT>, args: CreateNFTArgs) -> Result<()> {
     nft.minted = false;
     nft.id = assembler.nfts;
     nft.uri = format!("{}/{}.json", assembler.nft_base_uri, nft.mint.to_string());
+    nft.is_generated = false;
 
     let assembler_seeds = &[
         b"assembler".as_ref(),
@@ -534,7 +535,7 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
     Ok(())
 }
 
-/// Accounts used in the add block instruction
+/// Accounts used in the remove block instruction
 #[derive(Accounts)]
 pub struct RemoveBlock<'info> {
     /// Assembler state account
@@ -730,5 +731,27 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
     let data_len = source_account_data.len();
     solana_program::program_memory::sol_memset(*source_account_data, 0, data_len);
 
+    Ok(())
+}
+
+/// Accounts used in set nft generated instruction
+#[derive(Accounts)]
+pub struct SetNFTGenerated<'info> {
+    /// The nft account
+    #[account(
+        mut,
+        seeds = [
+            b"nft".as_ref(),
+            nft.mint.as_ref(),
+        ],
+        bump,
+    )]
+    pub nft: Account<'info, NFT>,
+}
+
+/// Set NFT is generated
+pub fn set_nft_generated(ctx: Context<SetNFTGenerated>) -> Result<()> {
+    let nft = &mut ctx.accounts.nft;
+    nft.is_generated = true;
     Ok(())
 }

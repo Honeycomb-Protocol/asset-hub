@@ -14,6 +14,7 @@ export type NFTArgs = {
     minted: boolean;
     id: number;
     uri: string;
+    isGenerated: boolean;
 };
 export declare const nFTDiscriminator: number[];
 export declare class NFT implements NFTArgs {
@@ -28,6 +29,7 @@ export declare class NFT implements NFTArgs {
     readonly minted: boolean;
     readonly id: number;
     readonly uri: string;
+    readonly isGenerated: boolean;
     private constructor();
     static fromArgs(args: NFTArgs): NFT;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [NFT, number];
@@ -51,6 +53,7 @@ export declare class NFT implements NFTArgs {
         minted: boolean;
         id: number;
         uri: string;
+        isGenerated: boolean;
     };
 }
 export declare const nFTBeet: beet.FixableBeetStruct<NFT, NFTArgs & {

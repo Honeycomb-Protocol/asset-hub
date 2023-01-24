@@ -23,4 +23,5 @@ __exportStar(require("./createBlockDefinition"), exports);
 __exportStar(require("./createNft"), exports);
 __exportStar(require("./mintNft"), exports);
 __exportStar(require("./removeBlock"), exports);
+__exportStar(require("./setNftGenerated"), exports);
 //# sourceMappingURL=index.js.map

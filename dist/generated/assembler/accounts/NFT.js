@@ -29,7 +29,7 @@ const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 exports.nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217];
 class NFT {
-    constructor(bump, assembler, authority, collectionAddress, mint, name, symbol, description, minted, id, uri) {
+    constructor(bump, assembler, authority, collectionAddress, mint, name, symbol, description, minted, id, uri, isGenerated) {
         this.bump = bump;
         this.assembler = assembler;
         this.authority = authority;
@@ -41,9 +41,10 @@ class NFT {
         this.minted = minted;
         this.id = id;
         this.uri = uri;
+        this.isGenerated = isGenerated;
     }
     static fromArgs(args) {
-        return new NFT(args.bump, args.assembler, args.authority, args.collectionAddress, args.mint, args.name, args.symbol, args.description, args.minted, args.id, args.uri);
+        return new NFT(args.bump, args.assembler, args.authority, args.collectionAddress, args.mint, args.name, args.symbol, args.description, args.minted, args.id, args.uri, args.isGenerated);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return NFT.deserialize(accountInfo.data, offset);
@@ -90,6 +91,7 @@ class NFT {
             minted: this.minted,
             id: this.id,
             uri: this.uri,
+            isGenerated: this.isGenerated,
         };
     }
 }
@@ -107,5 +109,6 @@ exports.nFTBeet = new beet.FixableBeetStruct([
     ['minted', beet.bool],
     ['id', beet.u16],
     ['uri', beet.utf8String],
+    ['isGenerated', beet.bool],
 ], NFT.fromArgs, 'NFT');
 //# sourceMappingURL=NFT.js.map

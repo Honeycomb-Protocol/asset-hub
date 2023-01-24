@@ -2,6 +2,7 @@ import * as anchor from "@project-serum/anchor";
 import fs from "fs/promises";
 import path from "path";
 import * as web3 from "@solana/web3.js";
+//@ts-ignore
 import key from "../../../key.json";
 import {
   AssemblingAction,

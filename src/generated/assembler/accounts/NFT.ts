@@ -26,6 +26,7 @@ export type NFTArgs = {
   minted: boolean
   id: number
   uri: string
+  isGenerated: boolean
 }
 
 export const nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217]
@@ -48,7 +49,8 @@ export class NFT implements NFTArgs {
     readonly description: string,
     readonly minted: boolean,
     readonly id: number,
-    readonly uri: string
+    readonly uri: string,
+    readonly isGenerated: boolean
   ) {}
 
   /**
@@ -66,7 +68,8 @@ export class NFT implements NFTArgs {
       args.description,
       args.minted,
       args.id,
-      args.uri
+      args.uri,
+      args.isGenerated
     )
   }
 
@@ -186,6 +189,7 @@ export class NFT implements NFTArgs {
       minted: this.minted,
       id: this.id,
       uri: this.uri,
+      isGenerated: this.isGenerated,
     }
   }
 }
@@ -213,6 +217,7 @@ export const nFTBeet = new beet.FixableBeetStruct<
     ['minted', beet.bool],
     ['id', beet.u16],
     ['uri', beet.utf8String],
+    ['isGenerated', beet.bool],
   ],
   NFT.fromArgs,
   'NFT'
