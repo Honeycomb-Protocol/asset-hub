@@ -16,7 +16,7 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
  */
 export type AssetArgs = {
   bump: number
-  manager: web3.PublicKey
+  owner: web3.PublicKey
   candyGuard: beet.COption<web3.PublicKey>
   mint: web3.PublicKey
   itemsRedeemed: beet.bignum
@@ -34,7 +34,7 @@ export const assetDiscriminator = [234, 180, 241, 252, 139, 224, 160, 8]
 export class Asset implements AssetArgs {
   private constructor(
     readonly bump: number,
-    readonly manager: web3.PublicKey,
+    readonly owner: web3.PublicKey,
     readonly candyGuard: beet.COption<web3.PublicKey>,
     readonly mint: web3.PublicKey,
     readonly itemsRedeemed: beet.bignum,
@@ -47,7 +47,7 @@ export class Asset implements AssetArgs {
   static fromArgs(args: AssetArgs) {
     return new Asset(
       args.bump,
-      args.manager,
+      args.owner,
       args.candyGuard,
       args.mint,
       args.itemsRedeemed,
@@ -161,7 +161,7 @@ export class Asset implements AssetArgs {
   pretty() {
     return {
       bump: this.bump,
-      manager: this.manager.toBase58(),
+      owner: this.owner.toBase58(),
       candyGuard: this.candyGuard,
       mint: this.mint.toBase58(),
       itemsRedeemed: (() => {
@@ -193,7 +193,7 @@ export const assetBeet = new beet.FixableBeetStruct<
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['bump', beet.u8],
-    ['manager', beetSolana.publicKey],
+    ['owner', beetSolana.publicKey],
     ['candyGuard', beet.coption(beetSolana.publicKey)],
     ['mint', beetSolana.publicKey],
     ['itemsRedeemed', beet.u64],

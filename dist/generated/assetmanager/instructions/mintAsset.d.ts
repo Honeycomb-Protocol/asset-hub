@@ -7,7 +7,6 @@ export declare const mintAssetStruct: beet.BeetArgsStruct<MintAssetInstructionAr
     instructionDiscriminator: number[];
 }>;
 export type MintAssetInstructionAccounts = {
-    assetManager: web3.PublicKey;
     asset: web3.PublicKey;
     mint: web3.PublicKey;
     tokenAccount: web3.PublicKey;

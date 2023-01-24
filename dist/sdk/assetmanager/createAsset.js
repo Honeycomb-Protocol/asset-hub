@@ -28,7 +28,7 @@ const web3 = __importStar(require("@solana/web3.js"));
 const utils_1 = require("../../utils");
 const generated_1 = require("../../generated");
 const assetmanager_1 = require("../../generated/assetmanager");
-function createCreateAssetTransaction(assetManager, authority, payer, args, programId = assetmanager_1.PROGRAM_ID) {
+function createCreateAssetTransaction(payer, args, programId = assetmanager_1.PROGRAM_ID) {
     const mintKeypair = web3.Keypair.generate();
     const [metadata] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
@@ -38,21 +38,17 @@ function createCreateAssetTransaction(assetManager, authority, payer, args, prog
     const [asset] = web3.PublicKey.findProgramAddressSync([Buffer.from("asset"), mintKeypair.publicKey.toBuffer()], programId);
     return {
         tx: new web3.Transaction().add((0, generated_1.createCreateAssetInstruction)({
-            assetManager,
             mint: mintKeypair.publicKey,
             metadata,
             asset,
-            authority,
-            payer,
+            owner: payer,
             tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
         }, { args })),
         signers: [mintKeypair],
         accounts: [
-            assetManager,
             mintKeypair.publicKey,
             metadata,
             asset,
-            authority,
             payer,
             utils_1.METADATA_PROGRAM_ID,
         ],
@@ -60,9 +56,9 @@ function createCreateAssetTransaction(assetManager, authority, payer, args, prog
     };
 }
 exports.createCreateAssetTransaction = createCreateAssetTransaction;
-async function createAsset(connection, wallet, assetManager, candyGuardBuilder, args) {
+async function createAsset(connection, wallet, candyGuardBuilder, args) {
     const blockhashCtx = await connection.getLatestBlockhash();
-    const ctx = createCreateAssetTransaction(assetManager, wallet.publicKey, wallet.publicKey, args);
+    const ctx = createCreateAssetTransaction(wallet.publicKey, args);
     const tx = new web3.Transaction().add(candyGuardBuilder.toTransaction(blockhashCtx), ctx.tx);
     const txId = await (0, utils_1.sendAndConfirmTransaction)(tx, connection, wallet, [...ctx.signers, ...candyGuardBuilder.getSigners()], { skipPreflight: true });
     return {

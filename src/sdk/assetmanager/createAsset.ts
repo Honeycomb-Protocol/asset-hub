@@ -10,8 +10,6 @@ import {
 } from "@metaplex-foundation/js";
 
 export function createCreateAssetTransaction(
-  assetManager: web3.PublicKey,
-  authority: web3.PublicKey,
   payer: web3.PublicKey,
   args: CreateAssetArgs,
   programId = PROGRAM_ID
@@ -36,12 +34,10 @@ export function createCreateAssetTransaction(
     tx: new web3.Transaction().add(
       createCreateAssetInstruction(
         {
-          assetManager,
           mint: mintKeypair.publicKey,
           metadata,
           asset,
-          authority,
-          payer,
+          owner: payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
         { args }
@@ -49,11 +45,9 @@ export function createCreateAssetTransaction(
     ),
     signers: [mintKeypair],
     accounts: [
-      assetManager,
       mintKeypair.publicKey,
       metadata,
       asset,
-      authority,
       payer,
       METADATA_PROGRAM_ID,
     ],
@@ -64,18 +58,12 @@ export function createCreateAssetTransaction(
 export async function createAsset(
   connection: web3.Connection,
   wallet: anchor.Wallet,
-  assetManager: web3.PublicKey,
   candyGuardBuilder: TransactionBuilder<CreateCandyGuardBuilderContext>,
   args: CreateAssetArgs
 ) {
   const blockhashCtx = await connection.getLatestBlockhash();
 
-  const ctx = createCreateAssetTransaction(
-    assetManager,
-    wallet.publicKey,
-    wallet.publicKey,
-    args
-  );
+  const ctx = createCreateAssetTransaction(wallet.publicKey, args);
 
   const tx = new web3.Transaction().add(
     candyGuardBuilder.toTransaction(blockhashCtx),

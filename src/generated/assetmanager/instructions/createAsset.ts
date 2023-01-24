@@ -37,24 +37,20 @@ export const createAssetStruct = new beet.FixableBeetArgsStruct<
 /**
  * Accounts required by the _createAsset_ instruction
  *
- * @property [] assetManager
  * @property [_writable_, **signer**] mint
  * @property [_writable_] metadata
  * @property [_writable_] asset
- * @property [**signer**] authority
- * @property [_writable_, **signer**] payer
+ * @property [_writable_, **signer**] owner
  * @property [] tokenMetadataProgram
  * @category Instructions
  * @category CreateAsset
  * @category generated
  */
 export type CreateAssetInstructionAccounts = {
-  assetManager: web3.PublicKey
   mint: web3.PublicKey
   metadata: web3.PublicKey
   asset: web3.PublicKey
-  authority: web3.PublicKey
-  payer: web3.PublicKey
+  owner: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
@@ -87,11 +83,6 @@ export function createCreateAssetInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.assetManager,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.mint,
       isWritable: true,
       isSigner: true,
@@ -107,12 +98,7 @@ export function createCreateAssetInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.authority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
+      pubkey: accounts.owner,
       isWritable: true,
       isSigner: true,
     },

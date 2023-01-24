@@ -8,12 +8,10 @@ export declare const createAssetStruct: beet.FixableBeetArgsStruct<CreateAssetIn
     instructionDiscriminator: number[];
 }>;
 export type CreateAssetInstructionAccounts = {
-    assetManager: web3.PublicKey;
     mint: web3.PublicKey;
     metadata: web3.PublicKey;
     asset: web3.PublicKey;
-    authority: web3.PublicKey;
-    payer: web3.PublicKey;
+    owner: web3.PublicKey;
     systemProgram?: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;

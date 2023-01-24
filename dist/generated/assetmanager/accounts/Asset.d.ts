@@ -4,7 +4,7 @@ import * as beet from '@metaplex-foundation/beet';
 import * as beetSolana from '@metaplex-foundation/beet-solana';
 export type AssetArgs = {
     bump: number;
-    manager: web3.PublicKey;
+    owner: web3.PublicKey;
     candyGuard: beet.COption<web3.PublicKey>;
     mint: web3.PublicKey;
     itemsRedeemed: beet.bignum;
@@ -13,7 +13,7 @@ export type AssetArgs = {
 export declare const assetDiscriminator: number[];
 export declare class Asset implements AssetArgs {
     readonly bump: number;
-    readonly manager: web3.PublicKey;
+    readonly owner: web3.PublicKey;
     readonly candyGuard: beet.COption<web3.PublicKey>;
     readonly mint: web3.PublicKey;
     readonly itemsRedeemed: beet.bignum;
@@ -31,7 +31,7 @@ export declare class Asset implements AssetArgs {
     static getMinimumBalanceForRentExemption(args: AssetArgs, connection: web3.Connection, commitment?: web3.Commitment): Promise<number>;
     pretty(): {
         bump: number;
-        manager: string;
+        owner: string;
         candyGuard: web3.PublicKey;
         mint: string;
         itemsRedeemed: number | {

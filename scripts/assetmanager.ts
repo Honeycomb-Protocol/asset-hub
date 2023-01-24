@@ -6,7 +6,7 @@ import {
 } from "@metaplex-foundation/js";
 import { AssetManagerProgramAction } from "./types";
 import { getDependencies } from "./utils";
-import { createAsset, createAssetManager, mintAsset } from "../src";
+import { createAsset, mintAsset } from "../src";
 
 export default async function (
   action: AssetManagerProgramAction,
@@ -19,31 +19,7 @@ export default async function (
   );
 
   switch (action) {
-    case "create-asset-manager":
-      const createAssetManagerCtx = await createAssetManager(
-        connection,
-        wallet,
-        {
-          name: "Test Collection",
-        }
-      );
-      console.log("Tx:", createAssetManagerCtx.txId);
-      console.log(
-        "Asset Manager address: ",
-        createAssetManagerCtx.assetManager.toString()
-      );
-      setDeployments({
-        ...deployments,
-        assetManager: createAssetManagerCtx.assetManager,
-      });
-      break;
-
     case "create-asset":
-      if (!deployments.assetManager)
-        throw new Error(
-          "Asset manager address not found in deployments, Please create asset manager first"
-        );
-
       const mx = new Metaplex(connection);
       mx.use(walletAdapterIdentity(wallet));
       const candyGuardBuilder = mx
@@ -67,7 +43,6 @@ export default async function (
       const createAssetCtx = await createAsset(
         connection,
         wallet,
-        new web3.PublicKey(deployments.assetManager),
         candyGuardBuilder,
         {
           candyGuard: candyGuardBuilder.getContext().candyGuardAddress,

@@ -9,12 +9,11 @@ import {
 import { createMintInstruction } from "@metaplex-foundation/mpl-candy-guard";
 import { sendAndConfirmTransaction } from "../../utils";
 import { createMintAssetInstruction, Asset } from "../../generated";
-import { AssetManager, PROGRAM_ID } from "../../generated/assetmanager";
+import { PROGRAM_ID } from "../../generated/assetmanager";
 import { TxSignersAccounts } from "../../types";
 
 export async function createMintAssetTransaction(
   metaplex: Metaplex,
-  asset: Asset,
   assetAddress: web3.PublicKey,
   mint: web3.PublicKey,
   wallet: web3.PublicKey,
@@ -24,10 +23,8 @@ export async function createMintAssetTransaction(
   programId = PROGRAM_ID
 ): Promise<TxSignersAccounts> {
   const tokenAccount = splToken.getAssociatedTokenAddressSync(mint, wallet);
-  // Asset Manager
   const mintInstruction = createMintAssetInstruction(
     {
-      assetManager: asset.manager,
       asset: assetAddress,
       mint,
       tokenAccount,
@@ -53,7 +50,7 @@ export async function createMintAssetTransaction(
     const parsedMintSettings = cmClient.guards().parseMintSettings(
       assetAddress,
       candyGuard,
-      asset.manager,
+      metaplex.identity().publicKey,
       metaplex.identity(),
       { publicKey: mint } as Signer,
       group
@@ -106,7 +103,6 @@ export async function createMintAssetTransaction(
       signers: [...parsedMintSettings.signers],
       accounts: [],
       // accounts: [
-      //   assetManager,
       //   asset,
       //   mint,
       //   tokenAccount,
@@ -130,7 +126,6 @@ export async function createMintAssetTransaction(
       signers: [],
       accounts: [],
       // accounts: [
-      //   assetManager,
       //   asset,
       //   mint,
       //   tokenAccount,
@@ -156,7 +151,6 @@ export async function mintAsset(
   console.log(assetAccount.candyGuard.toString());
   const ctx = await createMintAssetTransaction(
     mx,
-    assetAccount,
     asset,
     assetAccount.mint,
     wallet.publicKey,

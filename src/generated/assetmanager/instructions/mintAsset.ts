@@ -36,7 +36,6 @@ export const mintAssetStruct = new beet.BeetArgsStruct<
 /**
  * Accounts required by the _mintAsset_ instruction
  *
- * @property [] assetManager
  * @property [] asset
  * @property [_writable_] mint
  * @property [_writable_] tokenAccount
@@ -47,7 +46,6 @@ export const mintAssetStruct = new beet.BeetArgsStruct<
  * @category generated
  */
 export type MintAssetInstructionAccounts = {
-  assetManager: web3.PublicKey
   asset: web3.PublicKey
   mint: web3.PublicKey
   tokenAccount: web3.PublicKey
@@ -81,11 +79,6 @@ export function createMintAssetInstruction(
     ...args,
   })
   const keys: web3.AccountMeta[] = [
-    {
-      pubkey: accounts.assetManager,
-      isWritable: false,
-      isSigner: false,
-    },
     {
       pubkey: accounts.asset,
       isWritable: false,

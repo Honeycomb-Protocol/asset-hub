@@ -42,11 +42,6 @@ function createMintAssetInstruction(accounts, args, programId = new web3.PublicK
     });
     const keys = [
         {
-            pubkey: accounts.assetManager,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
             pubkey: accounts.asset,
             isWritable: false,
             isSigner: false,

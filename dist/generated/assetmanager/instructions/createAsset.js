@@ -43,11 +43,6 @@ function createCreateAssetInstruction(accounts, args, programId = new web3.Publi
     });
     const keys = [
         {
-            pubkey: accounts.assetManager,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
             pubkey: accounts.mint,
             isWritable: true,
             isSigner: true,
@@ -63,12 +58,7 @@ function createCreateAssetInstruction(accounts, args, programId = new web3.Publi
             isSigner: false,
         },
         {
-            pubkey: accounts.authority,
-            isWritable: false,
-            isSigner: true,
-        },
-        {
-            pubkey: accounts.payer,
+            pubkey: accounts.owner,
             isWritable: true,
             isSigner: true,
         },

@@ -60,12 +60,12 @@ async function setupAssembler(config) {
         collectionSymbol: config.symbol,
         collectionUri,
         collectionDescription: config.description,
-        nftBaseUri: config.base_url
+        nftBaseUri: config.base_url,
     });
     transactions.push(createAssemblerCtx.tx);
     signers.push(...createAssemblerCtx.signers);
     accounts.push(...createAssemblerCtx.accounts);
-    config.blocks.forEach(block => {
+    config.blocks.forEach((block) => {
         let blockType;
         switch (block.type) {
             case "Enum":
@@ -92,7 +92,7 @@ async function setupAssembler(config) {
         transactions.push(createBlockCtx.tx);
         signers.push(...createBlockCtx.signers);
         accounts.push(...createBlockCtx.accounts);
-        block.definitions.forEach(blockDefinition => {
+        block.definitions.forEach((blockDefinition) => {
             let blockDefArgs;
             if (blockType === generated_1.BlockType.Enum) {
                 blockDefArgs = {
@@ -126,7 +126,10 @@ async function setupAssembler(config) {
                     blockDefinitionMint = new web3.PublicKey(blockDefinition.mintAddress || blockDefinition.collection);
                 }
                 catch (error) {
-                    throw new Error("Invalid mint address or collection address in block definition " + blockDefinition.value + " of block " + block.name);
+                    throw new Error("Invalid mint address or collection address in block definition " +
+                        blockDefinition.value +
+                        " of block " +
+                        block.name);
                 }
             }
             else {
@@ -140,7 +143,7 @@ async function setupAssembler(config) {
     });
     accounts = accounts.filter((x, index, self) => index === self.findIndex((y) => x.equals(y)));
     const lookuptable = await (0, utils_1.createLookupTable)(connection, wallet, ...accounts);
-    const v0Tx = await (0, utils_1.createV0TxWithLUT)(connection, wallet.publicKey, lookuptable, ...transactions.map(t => t.instructions).flat());
+    const v0Tx = await (0, utils_1.createV0TxWithLUT)(connection, wallet.publicKey, lookuptable, ...transactions.map((t) => t.instructions).flat());
     const txId = await (0, utils_1.sendAndConfirmV0Transaction)(v0Tx, connection, wallet, signers);
     console.log("Assembler setup tx:", txId);
 }

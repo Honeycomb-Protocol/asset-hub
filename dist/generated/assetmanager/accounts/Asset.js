@@ -29,16 +29,16 @@ const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 exports.assetDiscriminator = [234, 180, 241, 252, 139, 224, 160, 8];
 class Asset {
-    constructor(bump, manager, candyGuard, mint, itemsRedeemed, uri) {
+    constructor(bump, owner, candyGuard, mint, itemsRedeemed, uri) {
         this.bump = bump;
-        this.manager = manager;
+        this.owner = owner;
         this.candyGuard = candyGuard;
         this.mint = mint;
         this.itemsRedeemed = itemsRedeemed;
         this.uri = uri;
     }
     static fromArgs(args) {
-        return new Asset(args.bump, args.manager, args.candyGuard, args.mint, args.itemsRedeemed, args.uri);
+        return new Asset(args.bump, args.owner, args.candyGuard, args.mint, args.itemsRedeemed, args.uri);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Asset.deserialize(accountInfo.data, offset);
@@ -75,7 +75,7 @@ class Asset {
     pretty() {
         return {
             bump: this.bump,
-            manager: this.manager.toBase58(),
+            owner: this.owner.toBase58(),
             candyGuard: this.candyGuard,
             mint: this.mint.toBase58(),
             itemsRedeemed: (() => {
@@ -98,7 +98,7 @@ exports.Asset = Asset;
 exports.assetBeet = new beet.FixableBeetStruct([
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['bump', beet.u8],
-    ['manager', beetSolana.publicKey],
+    ['owner', beetSolana.publicKey],
     ['candyGuard', beet.coption(beetSolana.publicKey)],
     ['mint', beetSolana.publicKey],
     ['itemsRedeemed', beet.u64],

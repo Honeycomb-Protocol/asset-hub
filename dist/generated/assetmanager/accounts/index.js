@@ -16,8 +16,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountProviders = void 0;
 __exportStar(require("./Asset"), exports);
-__exportStar(require("./AssetManager"), exports);
-const AssetManager_1 = require("./AssetManager");
 const Asset_1 = require("./Asset");
-exports.accountProviders = { AssetManager: AssetManager_1.AssetManager, Asset: Asset_1.Asset };
+exports.accountProviders = { Asset: Asset_1.Asset };
 //# sourceMappingURL=index.js.map

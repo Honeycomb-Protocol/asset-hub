@@ -10,8 +10,8 @@ pub struct CreateAsset<'info> {
       init,
       payer = owner,
       mint::decimals = 0,
-      mint::authority = asset_manager,
-      mint::freeze_authority = asset_manager,
+      mint::authority = asset,
+      mint::freeze_authority = asset,
     )]
     pub mint: Account<'info, Mint>,
 
@@ -22,7 +22,7 @@ pub struct CreateAsset<'info> {
 
     #[account(
       init, payer = owner,
-      space = DESCRIMINATOR_SIZE + AssetManager::LEN + EXTRA_SIZE,
+      space = DESCRIMINATOR_SIZE + Asset::LEN + EXTRA_SIZE,
       seeds = [
         b"asset".as_ref(),
         mint.key().as_ref(),
@@ -60,30 +60,24 @@ pub struct CreateAssetArgs {
 
 /// Create an asset manager
 pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<()> {
-    let asset_manager = &mut ctx.accounts.asset_manager;
-
     let asset = &mut ctx.accounts.asset;
     asset.bump = ctx.bumps["asset"];
-    asset.owner = ctx.account.owner.key();
+    asset.owner = ctx.accounts.owner.key();
     asset.candy_guard = args.candy_guard;
     asset.mint = ctx.accounts.mint.key();
     asset.items_redeemed = 0;
     asset.uri = args.uri;
 
-    let asset_manager_seeds = &[
-        b"asset_manager".as_ref(),
-        asset_manager.key.as_ref(),
-        &[asset_manager.bump],
-    ];
-    let asset_manager_signer = &[&asset_manager_seeds[..]];
+    let asset_seeds = &[b"asset".as_ref(), asset.mint.as_ref(), &[asset.bump]];
+    let asset_signer = &[&asset_seeds[..]];
 
     let create_metadata = mpl_token_metadata::instruction::create_metadata_accounts_v3(
         ctx.accounts.token_metadata_program.key(),
         ctx.accounts.metadata.key(),
         asset.mint,
-        asset_manager.key(),
-        ctx.accounts.payer.key(),
-        asset_manager.key(),
+        asset.key(),
+        ctx.accounts.owner.key(),
+        asset.key(),
         args.name.clone(),
         args.symbol.clone(),
         asset.uri.clone(),
@@ -106,13 +100,13 @@ pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<
         &[
             ctx.accounts.metadata.clone(),
             ctx.accounts.mint.to_account_info(),
-            asset_manager.to_account_info(),
-            ctx.accounts.payer.to_account_info(),
-            asset_manager.to_account_info(),
+            asset.to_account_info(),
+            ctx.accounts.owner.to_account_info(),
+            asset.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
             ctx.accounts.rent.to_account_info(),
         ],
-        asset_manager_signer,
+        asset_signer,
     )?;
 
     Ok(())
@@ -121,10 +115,6 @@ pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<
 /// Accounts used in the create mint asset instruction
 #[derive(Accounts)]
 pub struct MintAsset<'info> {
-    /// The asset manager state account.
-    #[account()]
-    pub asset_manager: Account<'info, AssetManager>,
-
     /// The asset state account.
     #[account(has_one = mint)]
     pub asset: Account<'info, Asset>,
@@ -152,7 +142,6 @@ pub struct MintAsset<'info> {
 
 /// Mint an asset
 pub fn mint_asset(ctx: Context<MintAsset>, amount: u64) -> Result<()> {
-    let asset_manager = &ctx.accounts.asset_manager;
     let asset = &mut ctx.accounts.asset;
 
     let candy_guard = &ctx.accounts.candy_guard;
@@ -160,16 +149,12 @@ pub fn mint_asset(ctx: Context<MintAsset>, amount: u64) -> Result<()> {
         if !candy_guard.is_signer || candy_guard.key() != asset.candy_guard.unwrap() {
             return Err(ErrorCode::UnauthorizedMint.into());
         }
-    } else if ctx.accounts.wallet.key() != asset_manager.authority {
+    } else if ctx.accounts.wallet.key() != asset.owner {
         return Err(ErrorCode::UnauthorizedMint.into());
     }
 
-    let asset_manager_seeds = &[
-        b"asset_manager".as_ref(),
-        asset_manager.key.as_ref(),
-        &[asset_manager.bump],
-    ];
-    let asset_manager_signer = &[&asset_manager_seeds[..]];
+    let asset_seeds = &[b"asset".as_ref(), asset.mint.as_ref(), &[asset.bump]];
+    let asset_signer = &[&asset_seeds[..]];
 
     token::mint_to(
         CpiContext::new_with_signer(
@@ -177,9 +162,9 @@ pub fn mint_asset(ctx: Context<MintAsset>, amount: u64) -> Result<()> {
             MintTo {
                 mint: ctx.accounts.mint.to_account_info(),
                 to: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.asset_manager.to_account_info(),
+                authority: asset.to_account_info(),
             },
-            asset_manager_signer,
+            asset_signer,
         ),
         amount,
     )?;

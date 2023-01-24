@@ -31,11 +31,10 @@ const mpl_candy_guard_1 = require("@metaplex-foundation/mpl-candy-guard");
 const utils_1 = require("../../utils");
 const generated_1 = require("../../generated");
 const assetmanager_1 = require("../../generated/assetmanager");
-async function createMintAssetTransaction(metaplex, asset, assetAddress, mint, wallet, amount, candyGuardAddress = null, group = null, programId = assetmanager_1.PROGRAM_ID) {
+async function createMintAssetTransaction(metaplex, assetAddress, mint, wallet, amount, candyGuardAddress = null, group = null, programId = assetmanager_1.PROGRAM_ID) {
     var _a;
     const tokenAccount = splToken.getAssociatedTokenAddressSync(mint, wallet);
     const mintInstruction = (0, generated_1.createMintAssetInstruction)({
-        assetManager: asset.manager,
         asset: assetAddress,
         mint,
         tokenAccount,
@@ -48,7 +47,7 @@ async function createMintAssetTransaction(metaplex, asset, assetAddress, mint, w
         const candyGuard = await cmClient.findCandyGuardByAddress({
             address: candyGuardAddress,
         });
-        const parsedMintSettings = cmClient.guards().parseMintSettings(assetAddress, candyGuard, asset.manager, metaplex.identity(), { publicKey: mint }, group
+        const parsedMintSettings = cmClient.guards().parseMintSettings(assetAddress, candyGuard, metaplex.identity().publicKey, metaplex.identity(), { publicKey: mint }, group
             ? (_a = candyGuard.groups.find(({ label }) => label == group)) === null || _a === void 0 ? void 0 : _a.guards
             : candyGuard.guards, group);
         const customArgsLen = Buffer.alloc(2);
@@ -90,7 +89,7 @@ async function mintAsset(connection, wallet, asset, amount) {
     const mx = new js_1.Metaplex(connection);
     mx.use((0, js_1.walletAdapterIdentity)(wallet));
     console.log(assetAccount.candyGuard.toString());
-    const ctx = await createMintAssetTransaction(mx, assetAccount, asset, assetAccount.mint, wallet.publicKey, amount, assetAccount.candyGuard);
+    const ctx = await createMintAssetTransaction(mx, asset, assetAccount.mint, wallet.publicKey, amount, assetAccount.candyGuard);
     const txId = await (0, utils_1.sendAndConfirmTransaction)(ctx.tx, connection, wallet, ctx.signers, { skipPreflight: true });
     return {
         txId,
