@@ -63,6 +63,16 @@ function createCreateAssemblerTransaction(authority, payer, args, programId = as
             tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [collectionMint],
+        accounts: [
+            collectionMint.publicKey,
+            collectionMetadataAccount,
+            collectionMasterEdition,
+            collectionTokenAccount,
+            assembler,
+            authority,
+            payer,
+            utils_1.METADATA_PROGRAM_ID,
+        ],
         assembler,
     };
 }

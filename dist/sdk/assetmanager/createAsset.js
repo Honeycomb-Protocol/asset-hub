@@ -47,6 +47,15 @@ function createCreateAssetTransaction(assetManager, authority, payer, args, prog
             tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
         }, { args })),
         signers: [mintKeypair],
+        accounts: [
+            assetManager,
+            mintKeypair.publicKey,
+            metadata,
+            asset,
+            authority,
+            payer,
+            utils_1.METADATA_PROGRAM_ID,
+        ],
         asset,
     };
 }

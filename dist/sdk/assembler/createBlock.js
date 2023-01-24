@@ -43,6 +43,7 @@ function createCreateBlockTransaction(assembler, authority, payer, args) {
             payer,
         }, { args })),
         signers: [],
+        accounts: [assembler, block, authority, payer],
         block,
     };
 }

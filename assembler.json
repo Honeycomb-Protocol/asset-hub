@@ -1,0 +1,21 @@
+{
+    "name": "Lets Fkin Goooo!",
+    "symbol": "LFG",
+    "description": "Let's Fuckin Go",
+    "assemblingAction": "Freeze",
+    "base_url": "http://example.com",
+    "blocks": [
+        {
+            "name": "Twist",
+            "order": 1,
+            "type": "Enum",
+            "isGraphical": false,
+            "definitions": [
+                {
+                    "value": "Damn!",
+                    "collection": "HHmdzC7eP9H54MeQVycUnbdCKNti86rJPgkFN8WGXgjC"
+                }
+            ]
+        }
+    ]
+}

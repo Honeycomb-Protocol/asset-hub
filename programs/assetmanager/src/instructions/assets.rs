@@ -5,14 +5,10 @@ use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
 /// Accounts used in the create assembler instruction
 #[derive(Accounts)]
 pub struct CreateAsset<'info> {
-    /// The asset manager state account.
-    #[account(has_one = authority)]
-    pub asset_manager: Account<'info, AssetManager>,
-
     /// Mint of the asset
     #[account(
       init,
-      payer = payer,
+      payer = owner,
       mint::decimals = 0,
       mint::authority = asset_manager,
       mint::freeze_authority = asset_manager,
@@ -25,7 +21,7 @@ pub struct CreateAsset<'info> {
     pub metadata: AccountInfo<'info>,
 
     #[account(
-      init, payer = payer,
+      init, payer = owner,
       space = DESCRIMINATOR_SIZE + AssetManager::LEN + EXTRA_SIZE,
       seeds = [
         b"asset".as_ref(),
@@ -35,12 +31,9 @@ pub struct CreateAsset<'info> {
     )]
     pub asset: Account<'info, Asset>,
 
-    /// The wallet holds the complete authority over the asset manager.
-    pub authority: Signer<'info>,
-
     /// The wallet that pays for everything.
     #[account(mut)]
-    pub payer: Signer<'info>,
+    pub owner: Signer<'info>,
 
     /// The system program.
     pub system_program: Program<'info, System>,
@@ -71,7 +64,7 @@ pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<
 
     let asset = &mut ctx.accounts.asset;
     asset.bump = ctx.bumps["asset"];
-    asset.manager = asset_manager.key();
+    asset.owner = ctx.account.owner.key();
     asset.candy_guard = args.candy_guard;
     asset.mint = ctx.accounts.mint.key();
     asset.items_redeemed = 0;

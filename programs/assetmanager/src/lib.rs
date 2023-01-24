@@ -13,14 +13,7 @@ declare_id!("BNGKUeQQHw2MgZc9EqFsCWmnkLEKLCUfu5cw9YFWK3hF");
 pub mod assetmanager {
     use super::*;
 
-    pub fn create_asset_manager(
-        ctx: Context<CreateAssetManager>,
-        args: CreateAssetManagerArgs,
-    ) -> Result<()> {
-        instructions::create_asset_manager(ctx, args)
-    }
-
-    pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<()> {
+   pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<()> {
         instructions::create_asset(ctx, args)
     }
 

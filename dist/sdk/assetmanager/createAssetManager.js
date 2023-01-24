@@ -40,6 +40,7 @@ function createCreateAssetManagerTransaction(treasury, authority, payer, args, p
             payer,
         }, { args })),
         signers: [],
+        accounts: [key, assetManager, treasury, authority, payer],
         assetManager,
     };
 }

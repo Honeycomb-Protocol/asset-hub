@@ -6,3 +6,5 @@ export type TxSignersAccounts = {
   signers: Signer[];
   accounts: web3.PublicKey[];
 };
+
+export * from "./AssemblerConfig"

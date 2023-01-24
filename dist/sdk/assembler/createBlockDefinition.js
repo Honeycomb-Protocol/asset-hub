@@ -44,6 +44,14 @@ function createCreateBlockDefinitionTransaction(assembler, block, blockDefinitio
             payer,
         }, { args })),
         signers: [],
+        accounts: [
+            assembler,
+            block,
+            blockDefinition,
+            blockDefinitionMint,
+            authority,
+            payer,
+        ],
         blockDefinition,
     };
 }
