@@ -13,15 +13,13 @@ export default async function (
   network: "mainnet" | "devnet" = "devnet",
   ...args: string[]
 ) {
-  const { connection, wallet, deployments, setDeployments } = getDependencies(
+  const { connection, wallet, deployments, mx, setDeployments } = getDependencies(
     network,
     "assetmanager"
   );
-
+  console.log(deployments)
   switch (action) {
     case "create-asset":
-      const mx = new Metaplex(connection);
-      mx.use(walletAdapterIdentity(wallet));
       const candyGuardBuilder = mx
         .candyMachines()
         .builders()
@@ -41,17 +39,17 @@ export default async function (
         });
 
       const createAssetCtx = await createAsset(
-        connection,
-        wallet,
-        candyGuardBuilder,
+        mx,
         {
           candyGuard: candyGuardBuilder.getContext().candyGuardAddress,
           name: "Test Asset",
           symbol: "TST",
           uri: "https://example.com",
-        }
+        },
+        candyGuardBuilder,
+
       );
-      console.log("Tx:", createAssetCtx.txId);
+      console.log("Tx:", createAssetCtx.response);
       console.log("Asset: ", createAssetCtx.mint.toString());
       setDeployments({
         ...deployments,
@@ -67,12 +65,11 @@ export default async function (
         );
 
       const mintAssetCtx = await mintAsset(
-        connection,
-        wallet,
+        mx,
         new web3.PublicKey(deployments.asset),
         1
       );
-      console.log("Tx:", mintAssetCtx.txId);
+      console.log("Tx:", mintAssetCtx.response);
 
       break;
 

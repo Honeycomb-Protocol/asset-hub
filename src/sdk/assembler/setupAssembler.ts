@@ -26,6 +26,7 @@ import {
   Metaplex,
   toMetaplexFile,
   keypairIdentity,
+  walletAdapterIdentity,
 } from "@metaplex-foundation/js";
 import { createCreateAssetTransaction } from "../assetmanager";
 
@@ -49,7 +50,7 @@ export async function setupAssembler(
   let accounts: web3.PublicKey[] = [];
 
   const metaplex = new Metaplex(connection);
-  metaplex.use(keypairIdentity(wallet.payer));
+  metaplex.use(walletAdapterIdentity(wallet));
   /// Creating the assembler
 
   let assemblingAction: AssemblingAction;

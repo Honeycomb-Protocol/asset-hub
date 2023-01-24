@@ -1,3 +1,4 @@
+import { Metaplex } from "@metaplex-foundation/js";
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
 import { createSetNftGeneratedInstruction } from "../../generated";
@@ -23,22 +24,34 @@ export function createSetNftGeneratedTransaction(
   };
 }
 
+export async function buildSetNftGenerated(
+  nft: web3.PublicKey,
+  mx: Metaplex
+) {
+  const ctx = createSetNftGeneratedTransaction(nft);
+
+  const blockhash = await mx.connection.getLatestBlockhash();
+
+  ctx.tx.recentBlockhash = blockhash.blockhash;
+
+  return ctx;
+}
+
 export async function createAssembler(
   nft: web3.PublicKey,
-  connection: web3.Connection,
-  wallet: anchor.Wallet
+  mx: Metaplex
 ) {
-  const assemblerTx = createSetNftGeneratedTransaction(nft);
 
-  const txId = await sendAndConfirmTransaction(
-    assemblerTx.tx,
-    connection,
-    wallet,
-    assemblerTx.signers,
-    { skipPreflight: true }
+  const ctx = await buildSetNftGenerated(
+    nft,
+    mx
   );
 
+  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers)
+
+
   return {
-    txId,
+    response,
   };
+
 }

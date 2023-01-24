@@ -1,3 +1,4 @@
+import { Metaplex } from "@metaplex-foundation/js";
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
 import {
@@ -52,34 +53,48 @@ export function createCreateBlockDefinitionTransaction(
   };
 }
 
+export async function buildCreateBlockDefinition(
+  mx: Metaplex, assembler: web3.PublicKey, block: web3.PublicKey,
+  blockDefinitionMint: web3.PublicKey, args: BlockDefinitionValue
+) {
+  const wallet = mx.identity();
+  const ctx = createCreateBlockDefinitionTransaction(
+    assembler,
+    block,
+    blockDefinitionMint,
+    wallet.publicKey,
+    wallet.publicKey,
+    args
+  );
+
+  const blockhash = await mx.connection.getLatestBlockhash();
+
+  ctx.tx.recentBlockhash = blockhash.blockhash;
+
+  return ctx;
+}
+
 export async function createBlockDefinition(
-  connection: web3.Connection,
-  wallet: anchor.Wallet,
+  mx: Metaplex,
   assembler: web3.PublicKey,
   block: web3.PublicKey,
   blockDefinitionMint: web3.PublicKey,
   args: BlockDefinitionValue
 ) {
-  const { tx, signers, blockDefinition } =
-    createCreateBlockDefinitionTransaction(
-      assembler,
-      block,
-      blockDefinitionMint,
-      wallet.publicKey,
-      wallet.publicKey,
-      args
-    );
 
-  const txId = await sendAndConfirmTransaction(
-    tx,
-    connection,
-    wallet,
-    signers,
-    { skipPreflight: true }
+  const ctx = await buildCreateBlockDefinition(
+    mx,
+    assembler,
+    block,
+    blockDefinitionMint,
+    args
   );
 
+  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers)
+
+
   return {
-    txId,
-    blockDefinition,
+    response,
+    blockDefinition: ctx.blockDefinition
   };
 }

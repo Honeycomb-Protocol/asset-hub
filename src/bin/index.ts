@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readConfigFile, saveConfigFile } from "../utils";
+import { readConfigFile, saveConfigFile } from "../node-utils";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { setupAssembler } from "../sdk";

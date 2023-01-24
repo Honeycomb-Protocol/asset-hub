@@ -6,6 +6,7 @@ import { PROGRAM_ID } from "../../generated/assetmanager";
 import { TxSignersAccounts } from "../../types";
 import {
   CreateCandyGuardBuilderContext,
+  Metaplex,
   TransactionBuilder,
 } from "@metaplex-foundation/js";
 
@@ -56,31 +57,39 @@ export function createCreateAssetTransaction(
   };
 }
 
-export async function createAsset(
-  connection: web3.Connection,
-  wallet: anchor.Wallet,
-  candyGuardBuilder: TransactionBuilder<CreateCandyGuardBuilderContext>,
-  args: CreateAssetArgs
+export async function buildCreateAssetCtx(
+  mx: Metaplex,
+  args: CreateAssetArgs,
+  candyGuardBuilder?: TransactionBuilder<CreateCandyGuardBuilderContext>,
 ) {
-  const blockhashCtx = await connection.getLatestBlockhash();
+  let wallet = mx.identity()
 
   const ctx = createCreateAssetTransaction(wallet.publicKey, args);
+  const blockhash = await mx.connection.getLatestBlockhash();
 
-  const tx = new web3.Transaction().add(
-    candyGuardBuilder.toTransaction(blockhashCtx),
-    ctx.tx
-  );
+  if (candyGuardBuilder) {
+    ctx.tx = new web3.Transaction().add(
+      candyGuardBuilder.toTransaction(blockhash),
+      ctx.tx
+    );
+    ctx.signers = [...candyGuardBuilder.getSigners(), ...ctx.signers]
+  }
+  ctx.tx.recentBlockhash = blockhash.blockhash;
+  return ctx;
+}
+export async function createAsset(
+  mx: Metaplex,
+  args: CreateAssetArgs,
+  candyGuardBuilder?: TransactionBuilder<CreateCandyGuardBuilderContext>,
+) {
 
-  const txId = await sendAndConfirmTransaction(
-    tx,
-    connection,
-    wallet,
-    [...ctx.signers, ...candyGuardBuilder.getSigners()],
-    { skipPreflight: true }
-  );
+  const ctx = await buildCreateAssetCtx(mx, args, candyGuardBuilder,);
+
+  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, {skipPreflight: true}, ctx.signers)
+
 
   return {
-    txId,
+    response,
     mint: ctx.mint,
   };
 }

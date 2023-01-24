@@ -18,14 +18,14 @@ export default async function (
   network: "mainnet" | "devnet" = "devnet",
   ...args: string[]
 ) {
-  const { connection, wallet, deployments, setDeployments } = getDependencies(
+  const { connection, wallet, deployments, mx, setDeployments } = getDependencies(
     network,
     "assembler"
   );
 
   switch (action) {
     case "create-assembler":
-      const assemblerAddress = await createAssembler(connection, wallet, {
+      const assemblerTx = await createAssembler(mx, {
         assemblingAction: AssemblingAction.TakeCustody,
         collectionName: "Assembler Test Collection",
         collectionSymbol: "ATC",
@@ -33,8 +33,8 @@ export default async function (
         collectionUri: "https://assembler.test",
         nftBaseUri: "https://api.eboy.dev/u/temp",
       });
-      console.log("Assembler address: ", assemblerAddress.toString());
-      setDeployments({ ...deployments, assembler: assemblerAddress.assembler });
+      console.log("Assembler address: ", assemblerTx.response);
+      setDeployments({ ...deployments, assembler: assemblerTx.assembler });
       break;
 
     case "create-block":
@@ -43,17 +43,16 @@ export default async function (
           "Assembler address not found in deployments, Please create assembler first"
         );
       const blockAddress = await createBlock(
-        connection,
-        wallet,
+        mx,
         new web3.PublicKey(deployments.assembler),
         {
           blockName: "Block 1",
-          blockOrder: 1,
+          blockOrder: 2,
           blockType: BlockType.Enum,
           isGraphical: false,
         }
       );
-      console.log("Block address: ", blockAddress.toString());
+      console.log("Create Block tx: ", blockAddress.response);
       setDeployments({ ...deployments, block: blockAddress.block });
       break;
 
@@ -95,8 +94,7 @@ export default async function (
       }
 
       const blockDefinitionAddress = await createBlockDefinition(
-        connection,
-        wallet,
+        mx,
         blockAccount.assembler,
         block,
         new web3.PublicKey(args[0]),
@@ -104,7 +102,7 @@ export default async function (
       );
       console.log(
         "Block definition address: ",
-        blockDefinitionAddress.toString()
+        blockDefinitionAddress.response
       );
       setDeployments({
         ...deployments,

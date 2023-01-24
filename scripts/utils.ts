@@ -4,6 +4,7 @@ import key from "../key.json";
 import fs from "fs";
 import { PROGRAM_ADDRESS } from "../src";
 import { Config, ProgramName } from "./types";
+import { keypairIdentity, Metaplex } from "@metaplex-foundation/js";
 
 export const METADATA_PROGRAM_ID = new web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -27,7 +28,7 @@ export const getDeployments = (
   let deployments = {};
   try {
     deployments = JSON.parse(fs.readFileSync("./deployments.json").toString());
-  } catch (e) {}
+  } catch (e) { }
 
   if (!Object.keys(deployments).includes(program))
     throw new Error(`Deployment for ${program} not found!`);
@@ -49,7 +50,7 @@ export const setDeployments = (
     deploymentsMap = JSON.parse(
       fs.readFileSync("./deployments.json").toString()
     );
-  } catch (e) {}
+  } catch (e) { }
 
   if (!Object.keys(deploymentsMap).includes(program))
     deploymentsMap[program] = {};
@@ -64,17 +65,19 @@ export const setDeployments = (
     JSON.stringify(deploymentsMap, null, 2)
   );
 };
-
 export const getDependencies = (
   network: "mainnet" | "devnet",
   programName: ProgramName
 ) => {
   const config = network === "mainnet" ? mainnetConfig : devnetConfig;
+  const keypair = web3.Keypair.fromSecretKey(Uint8Array.from(key));
 
   const wallet = new anchor.Wallet(
-    web3.Keypair.fromSecretKey(Uint8Array.from(key))
+    keypair
   );
   const connection = new web3.Connection(config.endpoint);
+  const mx = new Metaplex(connection);
+  mx.use(keypairIdentity(keypair));
 
   const setDeploymentsLocal = (deployments) =>
     setDeployments(programName, network, deployments);
@@ -93,6 +96,7 @@ export const getDependencies = (
     wallet,
     connection,
     deployments,
+    mx,
     setDeployments: setDeploymentsLocal,
   };
 };
@@ -123,3 +127,4 @@ export const sendAndConfirmTransaction = async (
   );
   return txId;
 };
+

@@ -138,17 +138,15 @@ export async function createMintAssetTransaction(
   }
 }
 
-export async function mintAsset(
-  connection: web3.Connection,
-  wallet: anchor.Wallet,
+
+
+export async function buildMintAssetCtx(
+  mx: Metaplex,
   asset: web3.PublicKey,
   amount: number
 ) {
-  const assetAccount = await Asset.fromAccountAddress(connection, asset);
-
-  const mx = new Metaplex(connection);
-  mx.use(walletAdapterIdentity(wallet));
-  console.log(assetAccount.candyGuard.toString());
+  let wallet = mx.identity()
+  const assetAccount = await Asset.fromAccountAddress(mx.connection, asset);
   const ctx = await createMintAssetTransaction(
     mx,
     asset,
@@ -157,16 +155,25 @@ export async function mintAsset(
     amount,
     assetAccount.candyGuard
   );
+  return ctx;
+}
 
-  const txId = await sendAndConfirmTransaction(
-    ctx.tx,
-    connection,
-    wallet,
-    ctx.signers,
-    { skipPreflight: true }
+
+export async function mintAsset(
+  mx: Metaplex,
+  asset: web3.PublicKey,
+  amount: number
+) {
+
+  const ctx = await buildMintAssetCtx(
+    mx,
+    asset,
+    amount
   );
+    
+  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, {skipPreflight: true}, ctx.signers)
 
   return {
-    txId,
+    response,
   };
 }

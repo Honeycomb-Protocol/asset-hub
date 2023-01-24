@@ -1,27 +1,11 @@
-import path from "path";
-import fs from "fs";
+
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
 import { IdentitySigner, Signer } from "@metaplex-foundation/js";
-import { AssemblerConfig } from "./types";
 
 export const METADATA_PROGRAM_ID = new web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 );
-
-export const readConfigFile = (configFile: string): AssemblerConfig => {
-  const configPath = path.join(process.cwd(), configFile);
-  return JSON.parse(fs.readFileSync(configPath).toString());
-};
-
-export const saveConfigFile = (
-  configFile: AssemblerConfig,
-  configFileName: string
-): void => {
-  const configPath = path.join(process.cwd(), configFileName);
-  fs.writeFileSync(configPath, JSON.stringify(configFile, null, 2));
-};
-
 export const sendAndConfirmTransaction = async (
   tx: web3.Transaction,
   connection: web3.Connection,
