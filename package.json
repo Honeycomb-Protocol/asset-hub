@@ -14,11 +14,12 @@
     "deploy": "anchor deploy",
     "build-deploy": "yarn build && yarn deploy",
     "assembler": "ts-node ./scripts/index.ts assembler",
-    "assetmanager": "ts-node ./scripts/index.ts assetmanager"
+    "assetmanager": "ts-node ./scripts/index.ts assetmanager",
+    "postinstall": "cd node_modules/@metaplex-foundation/mpl-candy-guard && yarn && yarn build"
   },
   "dependencies": {
     "@metaplex-foundation/js": "^0.17.12",
-    "@metaplex-foundation/mpl-candy-guard": "https://github.com/Solana-Studio/mpl-candy-guard",
+    "@metaplex-foundation/mpl-candy-guard": "https://gitpkg.now.sh/Solana-Studio/mpl-candy-guard/js?main",
     "@project-serum/anchor": "^0.26.0",
     "@solana/spl-token": "^0.3.7",
     "yargs": "^17.6.2",
