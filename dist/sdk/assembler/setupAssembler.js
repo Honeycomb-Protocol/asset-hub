@@ -31,13 +31,12 @@ const anchor = __importStar(require("@project-serum/anchor"));
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const web3 = __importStar(require("@solana/web3.js"));
-const key_json_1 = __importDefault(require("../../../key.json"));
 const generated_1 = require("../../generated");
 const _1 = require(".");
 const utils_1 = require("../../utils");
 const js_1 = require("@metaplex-foundation/js");
 const assetmanager_1 = require("../assetmanager");
-const wallet = new anchor.Wallet(web3.Keypair.fromSecretKey(Uint8Array.from(key_json_1.default)));
+const wallet = new anchor.Wallet(web3.Keypair.fromSecretKey(Uint8Array.from(web3.Keypair.generate().secretKey)));
 const connection = new web3.Connection("https://api.devnet.solana.com/", "processed");
 async function setupAssembler(config, updateConfig) {
     let transactions = [];
