@@ -14,6 +14,14 @@
                 {
                     "value": "Damn!",
                     "collection": "HHmdzC7eP9H54MeQVycUnbdCKNti86rJPgkFN8WGXgjC"
+                },
+                {
+                    "value": "Doom!",
+                    "assetConfig": {
+                        "symbol": "DM",
+                        "image": "./image.png",
+                        "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL"
+                    }
                 }
             ]
         }

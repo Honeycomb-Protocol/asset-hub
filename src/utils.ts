@@ -14,6 +14,11 @@ export const readConfigFile = (configFile: string): AssemblerConfig => {
   return JSON.parse(fs.readFileSync(configPath).toString())
 }
 
+export const saveConfigFile = (configFile: AssemblerConfig, configFileName: string): void => {
+  const configPath = path.join(process.cwd(), configFileName)
+  fs.writeFileSync(configPath, JSON.stringify(configFile, null, 2))
+}
+
 export const sendAndConfirmTransaction = async (
   tx: web3.Transaction,
   connection: web3.Connection,

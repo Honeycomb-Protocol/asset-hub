@@ -13,7 +13,7 @@ export function createCreateAssetTransaction(
   payer: web3.PublicKey,
   args: CreateAssetArgs,
   programId = PROGRAM_ID
-): TxSignersAccounts & { asset: web3.PublicKey } {
+): TxSignersAccounts & { mint: web3.PublicKey } {
   const mintKeypair = web3.Keypair.generate();
 
   const [metadata] = web3.PublicKey.findProgramAddressSync(
@@ -51,7 +51,7 @@ export function createCreateAssetTransaction(
       payer,
       METADATA_PROGRAM_ID,
     ],
-    asset,
+    mint: mintKeypair.publicKey,
   };
 }
 
@@ -80,6 +80,6 @@ export async function createAsset(
 
   return {
     txId,
-    asset: ctx.asset,
+    mint: ctx.mint,
   };
 }
