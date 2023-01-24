@@ -24,9 +24,9 @@ export type BlockDefinitionConfig = {
     address?: string;
 };
 export type AssetConfig = {
+    symbol: string;
     image: string;
-    metadata: Metadata;
-    uri: string;
+    uri?: string;
+    candyGuard?: string;
     address?: string;
 };
-export type Metadata = any;

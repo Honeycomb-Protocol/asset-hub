@@ -4,6 +4,7 @@ import { Signer } from "@metaplex-foundation/js";
 import { AssemblerConfig } from "./types";
 export declare const METADATA_PROGRAM_ID: web3.PublicKey;
 export declare const readConfigFile: (configFile: string) => AssemblerConfig;
+export declare const saveConfigFile: (configFile: AssemblerConfig, configFileName: string) => void;
 export declare const sendAndConfirmTransaction: (tx: web3.Transaction, connection: web3.Connection, wallet: anchor.Wallet, signers?: Signer[], sendOpts?: web3.SendOptions) => Promise<string>;
 export declare const createV0Tx: (payerKey: web3.PublicKey, latestBlockhash: string, ...txInstructions: web3.TransactionInstruction[]) => web3.VersionedTransaction;
 export declare const createV0TxWithLUT: (connection: web3.Connection, payerKey: web3.PublicKey, lookupTableAddress: web3.PublicKey, ...txInstructions: web3.TransactionInstruction[]) => Promise<web3.VersionedTransaction>;

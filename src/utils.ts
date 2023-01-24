@@ -1,5 +1,5 @@
 import path from "path";
-import fs from "fs"
+import fs from "fs";
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
 import { IdentitySigner, Signer } from "@metaplex-foundation/js";
@@ -10,14 +10,17 @@ export const METADATA_PROGRAM_ID = new web3.PublicKey(
 );
 
 export const readConfigFile = (configFile: string): AssemblerConfig => {
-  const configPath = path.join(process.cwd(), configFile)
-  return JSON.parse(fs.readFileSync(configPath).toString())
-}
+  const configPath = path.join(process.cwd(), configFile);
+  return JSON.parse(fs.readFileSync(configPath).toString());
+};
 
-export const saveConfigFile = (configFile: AssemblerConfig, configFileName: string): void => {
-  const configPath = path.join(process.cwd(), configFileName)
-  fs.writeFileSync(configPath, JSON.stringify(configFile, null, 2))
-}
+export const saveConfigFile = (
+  configFile: AssemblerConfig,
+  configFileName: string
+): void => {
+  const configPath = path.join(process.cwd(), configFileName);
+  fs.writeFileSync(configPath, JSON.stringify(configFile, null, 2));
+};
 
 export const sendAndConfirmTransaction = async (
   tx: web3.Transaction,
@@ -59,8 +62,11 @@ export const sendAndConfirmTransaction = async (
   return txId;
 };
 
-export const createV0Tx = (payerKey: web3.PublicKey, latestBlockhash: string, ...txInstructions: web3.TransactionInstruction[]) => {
-
+export const createV0Tx = (
+  payerKey: web3.PublicKey,
+  latestBlockhash: string,
+  ...txInstructions: web3.TransactionInstruction[]
+) => {
   return new web3.VersionedTransaction(
     new web3.TransactionMessage({
       payerKey,
@@ -90,24 +96,32 @@ export const createV0TxWithLUT = async (
       instructions: txInstructions,
     }).compileToV0Message([lookupTable])
   );
-}
+};
 
-export const createLookupTable = async (connection: web3.Connection, wallet: anchor.Wallet, ...addresses: web3.PublicKey[]) => {
-  const [lookupTableIx, lookupTableAddress] = web3.AddressLookupTableProgram.createLookupTable({
-    authority: wallet.publicKey,
-    payer: wallet.publicKey,
-    recentSlot: await connection.getSlot(),
-  });
-  const txn = await createV0Tx(wallet.publicKey, (await connection.getLatestBlockhash()).blockhash, lookupTableIx);
-  txn.sign([wallet.payer])
-
-  const txId = await connection.sendTransaction(
-    txn,
-    {
-      skipPreflight: true,
-    }
+export const createLookupTable = async (
+  connection: web3.Connection,
+  wallet: anchor.Wallet,
+  ...addresses: web3.PublicKey[]
+) => {
+  const [lookupTableIx, lookupTableAddress] =
+    web3.AddressLookupTableProgram.createLookupTable({
+      authority: wallet.publicKey,
+      payer: wallet.publicKey,
+      recentSlot: await connection.getSlot(),
+    });
+  const txn = await createV0Tx(
+    wallet.publicKey,
+    (
+      await connection.getLatestBlockhash()
+    ).blockhash,
+    lookupTableIx
   );
-  console.log(txId)
+  txn.sign([wallet.payer]);
+
+  const txId = await connection.sendTransaction(txn, {
+    skipPreflight: true,
+  });
+  console.log(txId);
 
   const createTxConfirmation = await connection.confirmTransaction(
     txId,
@@ -116,15 +130,14 @@ export const createLookupTable = async (connection: web3.Connection, wallet: anc
 
   if (createTxConfirmation.value.err) {
     throw new Error(
-      "Lookup table creation error " +
-      createTxConfirmation.value.err.toString()
+      "Lookup table creation error " + createTxConfirmation.value.err.toString()
     );
   }
 
   const transactions: web3.VersionedTransaction[] = [];
   const latestBlockhash = await connection.getLatestBlockhash();
 
-  const batchSize = 30;
+  const batchSize = 20;
   for (let i = 0; i < addresses.length; i += batchSize) {
     transactions.push(
       createV0Tx(
@@ -142,7 +155,7 @@ export const createLookupTable = async (connection: web3.Connection, wallet: anc
   }
   // wallet.signTransaction
   // const signedTransactions = await wallet.signAllTransactions(transactions);
-  transactions.map(tx => tx.sign([wallet.payer]))
+  transactions.map((tx) => tx.sign([wallet.payer]));
   // const signedTransactions = transactions;
   // console.log(transactions.length)
   // const tx0Id = await connection.sendTransaction(
@@ -169,7 +182,6 @@ export const createLookupTable = async (connection: web3.Connection, wallet: anc
     transactions.map((t) =>
       connection.sendTransaction(t, {
         skipPreflight: true,
-
       })
     )
   );
@@ -184,7 +196,6 @@ export const sendAndConfirmV0Transaction = async (
   signers: Signer[] = [],
   sendOpts: web3.SendOptions = {}
 ) => {
-
   let adapterSigners: { [key: string]: IdentitySigner } = {};
   signers.length &&
     signers.forEach((s) => {
@@ -193,7 +204,7 @@ export const sendAndConfirmV0Transaction = async (
       // @ts-ignore
       else if ("_signer" in s) tx.sign([s._signer]);
     });
-  tx.sign([wallet.payer])
+  tx.sign([wallet.payer]);
   let signedTx = tx;
 
   const txId = await connection.sendRawTransaction(signedTx.serialize(), {

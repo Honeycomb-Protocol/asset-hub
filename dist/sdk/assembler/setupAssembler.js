@@ -28,17 +28,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupAssembler = void 0;
 const anchor = __importStar(require("@project-serum/anchor"));
+const promises_1 = __importDefault(require("fs/promises"));
+const path_1 = __importDefault(require("path"));
 const web3 = __importStar(require("@solana/web3.js"));
 const key_json_1 = __importDefault(require("../../../key.json"));
 const generated_1 = require("../../generated");
 const _1 = require(".");
 const utils_1 = require("../../utils");
+const js_1 = require("@metaplex-foundation/js");
+const assetmanager_1 = require("../assetmanager");
 const wallet = new anchor.Wallet(web3.Keypair.fromSecretKey(Uint8Array.from(key_json_1.default)));
-const connection = new web3.Connection("https://api.devnet.solana.com/");
+const connection = new web3.Connection("https://api.devnet.solana.com/", "processed");
 async function setupAssembler(config) {
     let transactions = [];
     let signers = [];
     let accounts = [];
+    const metaplex = new js_1.Metaplex(connection);
+    metaplex.use((0, js_1.keypairIdentity)(wallet.payer));
     let assemblingAction;
     switch (config.assemblingAction) {
         case "Burn":
@@ -65,7 +71,8 @@ async function setupAssembler(config) {
     transactions.push(createAssemblerCtx.tx);
     signers.push(...createAssemblerCtx.signers);
     accounts.push(...createAssemblerCtx.accounts);
-    config.blocks.forEach((block) => {
+    config.assemblerAddress = createAssemblerCtx.assembler.toString();
+    config.blocks = await Promise.all(config.blocks.map(async (block) => {
         let blockType;
         switch (block.type) {
             case "Enum":
@@ -92,7 +99,8 @@ async function setupAssembler(config) {
         transactions.push(createBlockCtx.tx);
         signers.push(...createBlockCtx.signers);
         accounts.push(...createBlockCtx.accounts);
-        block.definitions.forEach((blockDefinition) => {
+        block.address = createBlockCtx.block.toString();
+        block.definitions = await Promise.all(block.definitions.map(async (blockDefinition) => {
             let blockDefArgs;
             if (blockType === generated_1.BlockType.Enum) {
                 blockDefArgs = {
@@ -132,20 +140,51 @@ async function setupAssembler(config) {
                         block.name);
                 }
             }
+            else if (blockDefinition.assetConfig) {
+                let uri = blockDefinition.assetConfig.uri;
+                if (!uri && blockDefinition.assetConfig.image) {
+                    const buffer = await promises_1.default.readFile(path_1.default.resolve(process.cwd(), blockDefinition.assetConfig.image));
+                    const file = (0, js_1.toMetaplexFile)(buffer, blockDefinition.assetConfig.image.slice(blockDefinition.assetConfig.image.lastIndexOf("/") + 1));
+                    const m = await metaplex.nfts().uploadMetadata({
+                        name: "My NFT",
+                        image: file,
+                        symbol: blockDefinition.assetConfig.symbol,
+                    });
+                    uri = blockDefinition.assetConfig.uri = m.uri;
+                }
+                const createAssetCtx = (0, assetmanager_1.createCreateAssetTransaction)(wallet.publicKey, {
+                    name: blockDefinition.value,
+                    candyGuard: blockDefinition.assetConfig.candyGuard
+                        ? new web3.PublicKey(blockDefinition.assetConfig.candyGuard)
+                        : null,
+                    symbol: blockDefinition.assetConfig.symbol,
+                    uri: uri,
+                });
+                transactions.push(createAssetCtx.tx);
+                signers.push(...createAssetCtx.signers);
+                accounts.push(...createAssetCtx.accounts);
+                blockDefinitionMint = createAssetCtx.mint;
+                blockDefinition.mintAddress = createAssetCtx.mint.toString();
+            }
             else {
-                throw new Error("Asset Config not yet implemented");
+                throw new Error("Block definition details not provided properly");
             }
             const createBlockDefinitionCtx = (0, _1.createCreateBlockDefinitionTransaction)(createAssemblerCtx.assembler, createBlockCtx.block, blockDefinitionMint, wallet.publicKey, wallet.publicKey, blockDefArgs);
             transactions.push(createBlockDefinitionCtx.tx);
             signers.push(...createBlockDefinitionCtx.signers);
             accounts.push(...createBlockDefinitionCtx.accounts);
-        });
-    });
+            blockDefinition.address =
+                createBlockDefinitionCtx.blockDefinition.toString();
+            return blockDefinition;
+        }));
+        return block;
+    }));
     accounts = accounts.filter((x, index, self) => index === self.findIndex((y) => x.equals(y)));
     const lookuptable = await (0, utils_1.createLookupTable)(connection, wallet, ...accounts);
     const v0Tx = await (0, utils_1.createV0TxWithLUT)(connection, wallet.publicKey, lookuptable, ...transactions.map((t) => t.instructions).flat());
     const txId = await (0, utils_1.sendAndConfirmV0Transaction)(v0Tx, connection, wallet, signers);
     console.log("Assembler setup tx:", txId);
+    return config;
 }
 exports.setupAssembler = setupAssembler;
 //# sourceMappingURL=setupAssembler.js.map

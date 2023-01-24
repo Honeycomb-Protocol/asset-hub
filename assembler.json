@@ -1,29 +1,34 @@
 {
-    "name": "Lets Fkin Goooo!",
-    "symbol": "LFG",
-    "description": "Let's Fuckin Go",
-    "assemblingAction": "Freeze",
-    "base_url": "http://example.com",
-    "blocks": [
+  "name": "Lets Fkin Goooo!",
+  "symbol": "LFG",
+  "description": "Let's Fuckin Go",
+  "assemblingAction": "Freeze",
+  "base_url": "http://example.com",
+  "blocks": [
+    {
+      "name": "Twist",
+      "order": 1,
+      "type": "Enum",
+      "isGraphical": false,
+      "definitions": [
         {
-            "name": "Twist",
-            "order": 1,
-            "type": "Enum",
-            "isGraphical": false,
-            "definitions": [
-                {
-                    "value": "Damn!",
-                    "collection": "HHmdzC7eP9H54MeQVycUnbdCKNti86rJPgkFN8WGXgjC"
-                },
-                {
-                    "value": "Doom!",
-                    "assetConfig": {
-                        "symbol": "DM",
-                        "image": "./image.png",
-                        "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL"
-                    }
-                }
-            ]
+          "value": "Damn!",
+          "collection": "HHmdzC7eP9H54MeQVycUnbdCKNti86rJPgkFN8WGXgjC",
+          "address": "7HU3byNcpUqATbXt6B8nrhZ4SehWHtFPv4kMLCypM55t"
+        },
+        {
+          "value": "Doom!",
+          "assetConfig": {
+            "symbol": "DM",
+            "uri": "https://api.eboy.dev/metadata/79wsD26RNqZmLrMobvCRirnkhKZfJ4M2x2KGTnRiUmf3.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL"
+          },
+          "mintAddress": "5VhK518LBcFY9yPXu9gFbaQz9nh63dgNSxD21RqQ2QqW",
+          "address": "DhXiMw7BgSrmKdvwx5xCEuQBxKTkbEFjhMmYfjbJ2HcC"
         }
-    ]
+      ],
+      "address": "69PxuVfppbtDizuBR9o2SXyJt6ARsoAZNADPPtvYc8TD"
+    }
+  ],
+  "assemblerAddress": "DXg1j6nkHHeahbiJjwk9djcThxKAXY1zPqWhuELYTJgx"
 }

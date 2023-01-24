@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendAndConfirmV0Transaction = exports.createLookupTable = exports.createV0TxWithLUT = exports.createV0Tx = exports.sendAndConfirmTransaction = exports.readConfigFile = exports.METADATA_PROGRAM_ID = void 0;
+exports.sendAndConfirmV0Transaction = exports.createLookupTable = exports.createV0TxWithLUT = exports.createV0Tx = exports.sendAndConfirmTransaction = exports.saveConfigFile = exports.readConfigFile = exports.METADATA_PROGRAM_ID = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const web3 = __importStar(require("@solana/web3.js"));
@@ -36,6 +36,11 @@ const readConfigFile = (configFile) => {
     return JSON.parse(fs_1.default.readFileSync(configPath).toString());
 };
 exports.readConfigFile = readConfigFile;
+const saveConfigFile = (configFile, configFileName) => {
+    const configPath = path_1.default.join(process.cwd(), configFileName);
+    fs_1.default.writeFileSync(configPath, JSON.stringify(configFile, null, 2));
+};
+exports.saveConfigFile = saveConfigFile;
 const sendAndConfirmTransaction = async (tx, connection, wallet, signers = [], sendOpts = {}) => {
     const block = await connection.getLatestBlockhash();
     tx.recentBlockhash = block.blockhash;

@@ -52,7 +52,7 @@ function createCreateAssetTransaction(payer, args, programId = assetmanager_1.PR
             payer,
             utils_1.METADATA_PROGRAM_ID,
         ],
-        asset,
+        mint: mintKeypair.publicKey,
     };
 }
 exports.createCreateAssetTransaction = createCreateAssetTransaction;
@@ -63,7 +63,7 @@ async function createAsset(connection, wallet, candyGuardBuilder, args) {
     const txId = await (0, utils_1.sendAndConfirmTransaction)(tx, connection, wallet, [...ctx.signers, ...candyGuardBuilder.getSigners()], { skipPreflight: true });
     return {
         txId,
-        asset: ctx.asset,
+        mint: ctx.mint,
     };
 }
 exports.createAsset = createAsset;

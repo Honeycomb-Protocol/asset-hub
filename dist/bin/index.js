@@ -14,7 +14,7 @@ const sdk_1 = require("../sdk");
 })
     .command('lfg', 'Deploy assembler and asset managers', () => { }, (argv) => {
     const config = (0, utils_1.readConfigFile)("assembler.json");
-    (0, sdk_1.setupAssembler)(config);
+    (0, sdk_1.setupAssembler)(config).then(newConf => (0, utils_1.saveConfigFile)(newConf, "assembler.json"));
 })
     .demandCommand(1)
     .parse();
