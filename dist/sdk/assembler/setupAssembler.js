@@ -59,7 +59,8 @@ async function setupAssembler(config, updateConfig) {
         default:
             break;
     }
-    if (!config.assemblerAddress) {
+    let assemblerAddress = config.assemblerAddress;
+    if (!assemblerAddress) {
         const collectionUri = "";
         const createAssemblerCtx = (0, _1.createCreateAssemblerTransaction)(wallet.publicKey, wallet.publicKey, {
             assemblingAction: assemblingAction,
@@ -78,7 +79,7 @@ async function setupAssembler(config, updateConfig) {
         });
         signers.push(...createAssemblerCtx.signers);
         accounts.push(...createAssemblerCtx.accounts);
-        config.assemblerAddress = createAssemblerCtx.assembler.toString();
+        assemblerAddress = createAssemblerCtx.assembler.toString();
     }
     await Promise.all(config.blocks.map(async (block) => {
         let blockType;
@@ -98,8 +99,9 @@ async function setupAssembler(config, updateConfig) {
             default:
                 throw new Error("Invalid Block Type");
         }
-        if (!block.address) {
-            const createBlockCtx = (0, _1.createCreateBlockTransaction)(new web3.PublicKey(config.assemblerAddress), wallet.publicKey, wallet.publicKey, {
+        let blockAddress = block.address;
+        if (!blockAddress) {
+            const createBlockCtx = (0, _1.createCreateBlockTransaction)(new web3.PublicKey(assemblerAddress), wallet.publicKey, wallet.publicKey, {
                 blockName: block.name,
                 blockOrder: block.order,
                 blockType: blockType,
@@ -114,7 +116,7 @@ async function setupAssembler(config, updateConfig) {
             });
             signers.push(...createBlockCtx.signers);
             accounts.push(...createBlockCtx.accounts);
-            block.address = createBlockCtx.block.toString();
+            blockAddress = createBlockCtx.block.toString();
         }
         await Promise.all(block.definitions.map(async (blockDefinition) => {
             if (blockDefinition.address)
@@ -195,7 +197,7 @@ async function setupAssembler(config, updateConfig) {
             else {
                 throw new Error("Block definition details not provided properly");
             }
-            const createBlockDefinitionCtx = (0, _1.createCreateBlockDefinitionTransaction)(new web3.PublicKey(config.assemblerAddress), new web3.PublicKey(block.address), blockDefinitionMint, wallet.publicKey, wallet.publicKey, blockDefArgs);
+            const createBlockDefinitionCtx = (0, _1.createCreateBlockDefinitionTransaction)(new web3.PublicKey(assemblerAddress), new web3.PublicKey(blockAddress), blockDefinitionMint, wallet.publicKey, wallet.publicKey, blockDefArgs);
             transactions.push({
                 ...createBlockDefinitionCtx,
                 postAction() {
@@ -206,8 +208,6 @@ async function setupAssembler(config, updateConfig) {
             });
             signers.push(...createBlockDefinitionCtx.signers);
             accounts.push(...createBlockDefinitionCtx.accounts);
-            blockDefinition.address =
-                createBlockDefinitionCtx.blockDefinition.toString();
             return blockDefinition;
         }));
         return block;
