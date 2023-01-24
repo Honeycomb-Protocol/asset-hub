@@ -2,8 +2,8 @@ import * as anchor from "@project-serum/anchor";
 import fs from "fs/promises";
 import path from "path";
 import * as web3 from "@solana/web3.js";
-//@ts-ignore
-import key from "../../../key.json";
+
+// import key from "../../../key.json";
 import {
   AssemblingAction,
   BlockDefinitionValue,
@@ -30,7 +30,7 @@ import {
 import { createCreateAssetTransaction } from "../assetmanager";
 
 const wallet = new anchor.Wallet(
-  web3.Keypair.fromSecretKey(Uint8Array.from(key))
+  web3.Keypair.fromSecretKey(Uint8Array.from(web3.Keypair.generate().secretKey))
 );
 const connection = new web3.Connection(
   "https://api.devnet.solana.com/",
