@@ -15,7 +15,7 @@
     "build-deploy": "yarn build && yarn deploy",
     "assembler": "ts-node ./scripts/index.ts assembler",
     "assetmanager": "ts-node ./scripts/index.ts assetmanager",
-    "postinstall": "cd node_modules/@metaplex-foundation/mpl-candy-guard && yarn && yarn build"
+    "postinstall": "node "
   },
   "dependencies": {
     "@metaplex-foundation/js": "^0.17.12",
