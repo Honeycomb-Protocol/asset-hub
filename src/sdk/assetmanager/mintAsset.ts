@@ -13,155 +13,119 @@ import { PROGRAM_ID } from "../../generated/assetmanager";
 import { TxSignersAccounts } from "../../types";
 
 export async function createMintAssetTransaction(
-  metaplex: Metaplex,
+  mx: Metaplex,
   assetAddress: web3.PublicKey,
-  mint: web3.PublicKey,
-  wallet: web3.PublicKey,
   amount: number,
-  candyGuardAddress: web3.PublicKey = null,
   group: string = null,
   programId = PROGRAM_ID
 ): Promise<TxSignersAccounts> {
-  const tokenAccount = splToken.getAssociatedTokenAddressSync(mint, wallet);
-  const mintInstruction = createMintAssetInstruction(
+  let wallet = mx.identity();
+
+  const assetAccount = await Asset.fromAccountAddress(
+    mx.connection,
+    assetAddress
+  );
+  if (!assetAccount) throw new Error("Asset account not found!");
+  const mint = assetAccount.mint;
+  const candyGuardAddress = assetAccount.candyGuard;
+  const tokenAccount = splToken.getAssociatedTokenAddressSync(
+    mint,
+    wallet.publicKey
+  );
+
+  let mintInstruction = createMintAssetInstruction(
     {
       asset: assetAddress,
       mint,
       tokenAccount,
       candyGuard: candyGuardAddress || programId,
-      wallet,
+      wallet: wallet.publicKey,
     },
     { amount },
     programId
   );
+  let signers = [];
+  let accounts = mintInstruction.keys;
   if (candyGuardAddress) {
-    console.log(
-      candyGuardAddress.toString(),
-      (metaplex.programs().getCandyGuard().address = new web3.PublicKey(
-        "FhCHXHuD6r2iCGwHgqcgnDbwXprLf22pZcArSp4Si4n7"
-      ))
+    mx.programs().getCandyGuard().address = new web3.PublicKey(
+      "FhCHXHuD6r2iCGwHgqcgnDbwXprLf22pZcArSp4Si4n7"
     );
+    console.log(candyGuardAddress.toString());
 
-    const cmClient = metaplex.candyMachines();
+    const cmClient = mx.candyMachines();
     const candyGuard = await cmClient.findCandyGuardByAddress({
       address: candyGuardAddress,
     });
+    if (candyGuard) {
+      const parsedMintSettings = cmClient
+        .guards()
+        .parseMintSettings(
+          assetAddress,
+          candyGuard,
+          wallet.publicKey,
+          wallet,
+          { publicKey: mint } as Signer,
+          group
+            ? candyGuard.groups.find(({ label }) => label == group)?.guards
+            : candyGuard.guards,
+          group
+        );
 
-    const parsedMintSettings = cmClient.guards().parseMintSettings(
-      assetAddress,
-      candyGuard,
-      metaplex.identity().publicKey,
-      metaplex.identity(),
-      { publicKey: mint } as Signer,
-      group
-        ? candyGuard.groups.find(({ label }) => label == group)?.guards
-        : candyGuard.guards,
-      group
-      // [
-      //   {
-      //     name: "",
-      //     address: wallet,
-      //   }
-      // ]
-    );
+      const customArgsLen = Buffer.alloc(2);
+      customArgsLen.writeInt16LE(mintInstruction.data.length);
 
-    const customArgsLen = Buffer.alloc(2);
-    customArgsLen.writeInt16LE(mintInstruction.data.length);
-    const mintArgs = Buffer.concat([
-      customArgsLen,
-      Buffer.from(mintInstruction.data),
-      parsedMintSettings.arguments,
-    ]);
-    const candyGuardMintInstruction = createMintInstruction(
-      {
-        candyGuard: candyGuardAddress,
-        candyMachineProgram: programId,
-        candyMachine: assetAddress,
-        payer: wallet,
-        instructionSysvarAccount: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-      },
-      {
-        label: null,
-        mintArgs,
-      }
-    );
+      const mintArgs = Buffer.concat([
+        customArgsLen,
+        Buffer.from(mintInstruction.data),
+        parsedMintSettings.arguments,
+      ]);
 
-    candyGuardMintInstruction.keys.push(...parsedMintSettings.accountMetas);
-    candyGuardMintInstruction.keys.push(...mintInstruction.keys);
+      const candyGuardMintInstruction = createMintInstruction(
+        {
+          candyGuard: candyGuardAddress,
+          candyMachineProgram: programId,
+          candyMachine: assetAddress,
+          payer: wallet.publicKey,
+          instructionSysvarAccount: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        },
+        {
+          label: null,
+          mintArgs,
+        }
+      );
 
-    return {
-      tx: new web3.Transaction().add(
-        // splToken.createAssociatedTokenAccountInstruction(
-        //   wallet,
-        //   tokenAccount,
-        //   wallet,
-        //   mint
-        // ),
-
-        candyGuard ? candyGuardMintInstruction : mintInstruction
-      ),
-      signers: [...parsedMintSettings.signers],
-      accounts: [],
-      // accounts: [
-      //   asset,
-      //   mint,
-      //   tokenAccount,
-      //   candyGuard,
-      //   wallet,
-      //   programId,
-      //   web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-      // ],
-    };
-  } else {
-    return {
-      tx: new web3.Transaction().add(
-        // splToken.createAssociatedTokenAccountInstruction(
-        //   wallet,
-        //   tokenAccount,
-        //   wallet,
-        //   mint
-        // ),
-        mintInstruction
-      ),
-      signers: [],
-      accounts: [],
-      // accounts: [
-      //   asset,
-      //   mint,
-      //   tokenAccount,
-      //   candyGuard,
-      //   wallet,
-      //   programId,
-      //   web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-      // ],
-    };
+      candyGuardMintInstruction.keys.push(...parsedMintSettings.accountMetas);
+      candyGuardMintInstruction.keys.push(...mintInstruction.keys);
+      mintInstruction = candyGuardMintInstruction;
+      accounts = candyGuardMintInstruction.keys.slice();
+      signers.push(...parsedMintSettings.signers);
+    }
   }
-}
+  const tx = new web3.Transaction();
+  if (!(await mx.rpc().accountExists(tokenAccount)))
+    tx.add(
+      splToken.createAssociatedTokenAccountInstruction(
+        wallet.publicKey,
+        tokenAccount,
+        wallet.publicKey,
+        mint
+      )
+    );
 
-export async function buildMintAssetCtx(
-  mx: Metaplex,
-  asset: web3.PublicKey,
-  amount: number
-) {
-  let wallet = mx.identity();
-  const assetAccount = await Asset.fromAccountAddress(mx.connection, asset);
-  const ctx = await createMintAssetTransaction(
-    mx,
-    asset,
-    assetAccount.mint,
-    wallet.publicKey,
-    amount,
-    assetAccount.candyGuard
-  );
-  return ctx;
+  tx.add(mintInstruction);
+  return {
+    tx: tx,
+    signers,
+    accounts: accounts.map(({ pubkey }) => pubkey),
+  };
 }
 
 export async function mintAsset(
   mx: Metaplex,
-  asset: web3.PublicKey,
+  assetAddress: web3.PublicKey,
   amount: number
 ) {
-  const ctx = await buildMintAssetCtx(mx, asset, amount);
+  const ctx = await createMintAssetTransaction(mx, assetAddress, amount);
 
   const response = await mx
     .rpc()
