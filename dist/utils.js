@@ -64,37 +64,40 @@ const createV0Tx = (payerKey, latestBlockhash, ...txInstructions) => {
     }).compileToV0Message());
 };
 exports.createV0Tx = createV0Tx;
-const createV0TxWithLUT = async (connection, payerKey, lookupTableAddress, ...txInstructions) => {
-    const latestBlockhash = await connection.getLatestBlockhash();
-    const lookupTable = (await connection.getAddressLookupTable(lookupTableAddress)).value;
+const createV0TxWithLUT = async (mx, lookupTableAddress, ...txInstructions) => {
+    const latestBlockhash = await mx.connection.getLatestBlockhash();
+    const lookupTable = (await mx.connection.getAddressLookupTable(lookupTableAddress)).value;
     if (!lookupTable)
         throw new Error("Lookup table not found");
     return await new web3.VersionedTransaction(new web3.TransactionMessage({
-        payerKey,
+        payerKey: mx.identity().publicKey,
         recentBlockhash: latestBlockhash.blockhash,
         instructions: txInstructions,
     }).compileToV0Message([lookupTable]));
 };
 exports.createV0TxWithLUT = createV0TxWithLUT;
-const createLookupTable = async (connection, wallet, ...addresses) => {
+const createLookupTable = async (mx, addresses) => {
+    const wallet = mx.identity();
     const [lookupTableIx, lookupTableAddress] = web3.AddressLookupTableProgram.createLookupTable({
         authority: wallet.publicKey,
         payer: wallet.publicKey,
-        recentSlot: await connection.getSlot(),
+        recentSlot: await mx.connection.getSlot(),
     });
-    const txn = await (0, exports.createV0Tx)(wallet.publicKey, (await connection.getLatestBlockhash()).blockhash, lookupTableIx);
-    txn.sign([wallet.payer]);
-    const txId = await connection.sendTransaction(txn, {
+    const latestBlockhash = await mx.connection.getLatestBlockhash();
+    let creationTx = (0, exports.createV0Tx)(wallet.publicKey, latestBlockhash.blockhash, lookupTableIx);
+    creationTx = await wallet.signTransaction(creationTx);
+    const createTxConfirmation = await mx
+        .rpc()
+        .sendAndConfirmTransaction(creationTx, {
         skipPreflight: true,
+        commitment: "processed",
     });
-    console.log(txId);
-    const createTxConfirmation = await connection.confirmTransaction(txId, "finalized");
-    if (createTxConfirmation.value.err) {
-        throw new Error("Lookup table creation error " + createTxConfirmation.value.err.toString());
+    if (createTxConfirmation.confirmResponse.value.err) {
+        throw new Error("Lookup table creation error " +
+            createTxConfirmation.confirmResponse.value.err.toString());
     }
     const transactions = [];
-    const latestBlockhash = await connection.getLatestBlockhash();
-    const batchSize = 25;
+    const batchSize = 30;
     for (let i = 0; i < addresses.length; i += batchSize) {
         transactions.push((0, exports.createV0Tx)(wallet.publicKey, latestBlockhash.blockhash, web3.AddressLookupTableProgram.extendLookupTable({
             payer: wallet.publicKey,
@@ -103,8 +106,8 @@ const createLookupTable = async (connection, wallet, ...addresses) => {
             addresses: addresses.slice(i, i + batchSize),
         })));
     }
-    transactions.map((tx) => tx.sign([wallet.payer]));
-    const sigs = await Promise.all(transactions.map((t) => connection.sendTransaction(t, {
+    const signedTransactions = await wallet.signAllTransactions(transactions);
+    await Promise.all(signedTransactions.map(async (t) => mx.rpc().sendTransaction(t, {
         skipPreflight: true,
     })));
     return lookupTableAddress;
