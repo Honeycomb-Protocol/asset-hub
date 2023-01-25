@@ -51,7 +51,7 @@ export function createCreateBlockDefinitionTransaction(
   };
 }
 
-export async function buildCreateBlockDefinition(
+export async function createBlockDefinition(
   mx: Metaplex,
   assembler: web3.PublicKey,
   block: web3.PublicKey,
@@ -71,24 +71,6 @@ export async function buildCreateBlockDefinition(
   const blockhash = await mx.connection.getLatestBlockhash();
 
   ctx.tx.recentBlockhash = blockhash.blockhash;
-
-  return ctx;
-}
-
-export async function createBlockDefinition(
-  mx: Metaplex,
-  assembler: web3.PublicKey,
-  block: web3.PublicKey,
-  blockDefinitionMint: web3.PublicKey,
-  args: BlockDefinitionValue
-) {
-  const ctx = await buildCreateBlockDefinition(
-    mx,
-    assembler,
-    block,
-    blockDefinitionMint,
-    args
-  );
 
   const response = await mx
     .rpc()

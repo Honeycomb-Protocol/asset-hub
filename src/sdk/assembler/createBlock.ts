@@ -38,7 +38,7 @@ export function createCreateBlockTransaction(
   };
 }
 
-export async function buildCreateBlockCtx(
+export async function createBlock(
   mx: Metaplex,
   assembler: web3.PublicKey,
   args: CreateBlockArgs
@@ -54,17 +54,6 @@ export async function buildCreateBlockCtx(
   const blockhash = await mx.connection.getLatestBlockhash();
 
   ctx.tx.recentBlockhash = blockhash.blockhash;
-
-  return ctx;
-}
-
-export async function createBlock(
-  mx: Metaplex,
-  assembler: web3.PublicKey,
-  args: CreateBlockArgs
-) {
-  const ctx = await buildCreateBlockCtx(mx, assembler, args);
-
   // console.log(errorFromCode(0))
   const response = await mx
     .rpc()
