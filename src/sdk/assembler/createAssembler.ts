@@ -8,7 +8,7 @@ import {
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
-import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../../utils";
+import { METADATA_PROGRAM_ID } from "../../utils";
 import { Metaplex } from "@metaplex-foundation/js";
 
 export function createCreateAssemblerTransaction(
@@ -99,9 +99,7 @@ export function createCreateAssemblerTransaction(
   };
 }
 
-export async function buildCreateAssemblerCtx(
-  mx: Metaplex, args: CreateAssemblerArgs
-) {
+export async function createAssembler(mx: Metaplex, args: CreateAssemblerArgs) {
   const wallet = mx.identity();
   const ctx = createCreateAssemblerTransaction(
     wallet.publicKey,
@@ -112,23 +110,12 @@ export async function buildCreateAssemblerCtx(
   const blockhash = await mx.connection.getLatestBlockhash();
 
   ctx.tx.recentBlockhash = blockhash.blockhash;
-  
-  return ctx;
-}
-
-export async function createAssembler(
-  mx: Metaplex, args: CreateAssemblerArgs
-) {
-  const ctx = await buildCreateAssemblerCtx(
-    mx,
-    args
-  );
-
-  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers)
-
+  const response = await mx
+    .rpc()
+    .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
 
   return {
     response,
-    assembler: ctx.assembler
+    assembler: ctx.assembler,
   };
 }

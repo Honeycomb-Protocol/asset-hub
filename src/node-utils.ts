@@ -4,7 +4,7 @@ import fs from "fs";
 import { AssemblerConfig } from "./types";
 
 
-export const readConfigFile = (configFile: string): AssemblerConfig => {
+export const readConfigFile = (configFile: string): AssemblerConfig | any => {
     const configPath = path.join(process.cwd(), configFile);
     return JSON.parse(fs.readFileSync(configPath).toString());
 };

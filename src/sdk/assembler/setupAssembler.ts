@@ -1,6 +1,4 @@
 import * as anchor from "@project-serum/anchor";
-import fs from "fs/promises";
-import path from "path";
 import * as web3 from "@solana/web3.js";
 // //@ts-ignore
 // import key from "../../../key.json";
@@ -15,44 +13,29 @@ import {
   createCreateBlockTransaction,
   createCreateBlockDefinitionTransaction,
 } from ".";
-import {
-  createLookupTable,
-  createV0TxWithLUT,
-  sendAndConfirmTransaction,
-  sendAndConfirmV0Transaction,
-} from "../../utils";
+import { sendAndConfirmTransaction } from "../../utils";
 import {
   Signer,
   Metaplex,
-  toMetaplexFile,
-  keypairIdentity,
   walletAdapterIdentity,
+  MetaplexFile,
 } from "@metaplex-foundation/js";
 import { createCreateAssetTransaction } from "../assetmanager";
 
-const wallet = new anchor.Wallet(
-  // web3.Keypair.fromSecretKey(Uint8Array.from(key))
-  web3.Keypair.fromSecretKey(Uint8Array.from(web3.Keypair.generate().secretKey))
-);
-const connection = new web3.Connection(
-  "https://api.devnet.solana.com/",
-  "processed"
-);
-
 export async function setupAssembler(
+  mx: Metaplex,
   config: AssemblerConfig,
-  updateConfig: (cfg: AssemblerConfig) => void
+  updateConfig: (cfg: AssemblerConfig) => void,
+  readFile: (path: string) => Promise<MetaplexFile>
 ) {
   let transactions: (TxSignersAccounts & {
     postAction: (...args: any[]) => any;
   })[] = [];
+  const wallet = mx.identity();
   let signers: Signer[] = [];
   let accounts: web3.PublicKey[] = [];
 
-  const metaplex = new Metaplex(connection);
-  metaplex.use(walletAdapterIdentity(wallet));
   /// Creating the assembler
-
   let assemblingAction: AssemblingAction;
 
   switch (config.assemblingAction) {
@@ -193,19 +176,12 @@ export async function setupAssembler(
           } else if (blockDefinition.assetConfig) {
             let uri = blockDefinition.assetConfig.uri;
             if (!uri && blockDefinition.assetConfig.image) {
-              const buffer = await fs.readFile(
-                path.resolve(process.cwd(), blockDefinition.assetConfig.image)
-              );
-              const file = toMetaplexFile(
-                buffer,
-                blockDefinition.assetConfig.image.slice(
-                  blockDefinition.assetConfig.image.lastIndexOf("/") + 1
-                )
-              );
-              const m = await metaplex.nfts().uploadMetadata({
-                name: "My NFT",
+              const file = await readFile(blockDefinition.assetConfig.image);
+              const m = await mx.nfts().uploadMetadata({
+                name: "HoneyComb SFT",
                 image: file,
                 symbol: blockDefinition.assetConfig.symbol,
+                ...(blockDefinition.assetConfig.json || {}),
               });
               uri = blockDefinition.assetConfig.uri = m.uri;
               updateConfig(config);
@@ -278,9 +254,15 @@ export async function setupAssembler(
   // const lookuptable = await createLookupTable(connection, wallet, ...accounts);
   let i = 0;
   for (let t of transactions) {
-    await sendAndConfirmTransaction(t.tx, connection, wallet, t.signers, {
-      skipPreflight: true,
-    })
+    await mx
+      .rpc()
+      .sendAndConfirmTransaction(
+        t.tx,
+        {
+          skipPreflight: true,
+        },
+        t.signers
+      )
       .then((txId) => {
         if (t.postAction) t.postAction();
         console.log(

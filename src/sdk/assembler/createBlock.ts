@@ -1,9 +1,8 @@
 import { Metaplex } from "@metaplex-foundation/js";
 import * as web3 from "@solana/web3.js";
 import { createCreateBlockInstruction, CreateBlockArgs } from "../../generated";
-import { PROGRAM_ID, errorFromCode } from "../../generated/assembler";
+import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
-import { sendAndConfirmTransaction } from "../../utils";
 
 export function createCreateBlockTransaction(
   assembler: web3.PublicKey,
@@ -39,7 +38,11 @@ export function createCreateBlockTransaction(
   };
 }
 
-export async function buildCreateBlockCtx(mx: Metaplex, assembler: web3.PublicKey, args: CreateBlockArgs) {
+export async function buildCreateBlockCtx(
+  mx: Metaplex,
+  assembler: web3.PublicKey,
+  args: CreateBlockArgs
+) {
   const wallet = mx.identity();
   const ctx = createCreateBlockTransaction(
     assembler,
@@ -56,17 +59,16 @@ export async function buildCreateBlockCtx(mx: Metaplex, assembler: web3.PublicKe
 }
 
 export async function createBlock(
-  mx: Metaplex, assembler: web3.PublicKey, args: CreateBlockArgs
+  mx: Metaplex,
+  assembler: web3.PublicKey,
+  args: CreateBlockArgs
 ) {
-  const ctx = await buildCreateBlockCtx(
-    mx,
-    assembler,
-    args
-  );
-  
-  // console.log(errorFromCode(0))
-  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers)
+  const ctx = await buildCreateBlockCtx(mx, assembler, args);
 
+  // console.log(errorFromCode(0))
+  const response = await mx
+    .rpc()
+    .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
 
   return {
     response,

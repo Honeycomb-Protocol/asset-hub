@@ -24,34 +24,18 @@ export function createSetNftGeneratedTransaction(
   };
 }
 
-export async function buildSetNftGenerated(
-  nft: web3.PublicKey,
-  mx: Metaplex
-) {
-  const ctx = createSetNftGeneratedTransaction(nft);
+export async function setNftGenerated(nft: web3.PublicKey, mx: Metaplex) {
+  const ctx = await createSetNftGeneratedTransaction(nft);
 
   const blockhash = await mx.connection.getLatestBlockhash();
 
   ctx.tx.recentBlockhash = blockhash.blockhash;
 
-  return ctx;
-}
-
-export async function createAssembler(
-  nft: web3.PublicKey,
-  mx: Metaplex
-) {
-
-  const ctx = await buildSetNftGenerated(
-    nft,
-    mx
-  );
-
-  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers)
-
+  const response = await mx
+    .rpc()
+    .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
 
   return {
     response,
   };
-
 }

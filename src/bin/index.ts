@@ -1,9 +1,17 @@
 #!/usr/bin/env node
 
 import { readConfigFile, saveConfigFile } from "../node-utils";
+import fs from "fs/promises";
+import path from "path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { setupAssembler } from "../sdk";
+import {
+  keypairIdentity,
+  Metaplex,
+  toMetaplexFile,
+} from "@metaplex-foundation/js";
+import { web3 } from "@project-serum/anchor";
 
 yargs(hideBin(process.argv))
   .command(
@@ -19,11 +27,34 @@ yargs(hideBin(process.argv))
     "Deploy assembler and asset managers",
     () => {},
     (argv) => {
+      const connection = new web3.Connection(
+        "https://api.devnet.solana.com/",
+        "processed"
+      );
+
+      const metaplex = new Metaplex(connection);
+      metaplex.use(
+        keypairIdentity(
+          web3.Keypair.fromSecretKey(
+            Uint8Array.from(readConfigFile("key.json"))
+          )
+        )
+      );
+
       const config = readConfigFile("assembler.json");
-      setupAssembler(config, (cfg) => {
-        // ...
-        saveConfigFile(cfg, "assembler.json");
-      }); //.then((newConf) => saveConfigFile(newConf, "assembler.json"));
+
+      setupAssembler(
+        metaplex,
+        config,
+        (cfg) => {
+          // ...
+          saveConfigFile(cfg, "assembler.json");
+        },
+        async (file) => {
+          const buffer = await fs.readFile(path.resolve(process.cwd(), file));
+          return toMetaplexFile(buffer, file.slice(file.lastIndexOf("/") + 1));
+        }
+      );
     }
   )
   .demandCommand(1)

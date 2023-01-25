@@ -18,10 +18,8 @@ export default async function (
   network: "mainnet" | "devnet" = "devnet",
   ...args: string[]
 ) {
-  const { connection, wallet, deployments, mx, setDeployments } = getDependencies(
-    network,
-    "assembler"
-  );
+  const { connection, wallet, deployments, mx, setDeployments } =
+    getDependencies(network, "assembler");
 
   switch (action) {
     case "create-assembler":
@@ -122,27 +120,26 @@ export default async function (
           "Dependencies not found in deployments, Please create assembler, block and block definition first"
         );
 
-      const mint = await createAndMintNft(
-        connection,
-        wallet,
-        new web3.PublicKey(deployments.assembler),
-        {
+      const mint = await createAndMintNft({
+        mx,
+        assembler: new web3.PublicKey(deployments.assembler),
+        args: {
           name: "Test NFT",
           symbol: "TNFT",
           description: "This is a test NFT",
         },
-        [
+        blocks: [
           {
             block: new web3.PublicKey(deployments.block),
             blockDefinition: new web3.PublicKey(deployments.blockDefinition),
             tokenMint: new web3.PublicKey(deployments.blockDefinitionMint),
           },
-        ]
-      );
-      console.log("Mint address: ", mint.toString());
+        ],
+      });
+      console.log("Mint response: ", mint.response);
       setDeployments({
         ...deployments,
-        nftMint: mint.mint,
+        nftMint: mint.nftMint,
       });
       break;
 
