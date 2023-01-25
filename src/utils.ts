@@ -1,7 +1,6 @@
-
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import { IdentitySigner, Signer } from "@metaplex-foundation/js";
+import { IdentitySigner, Metaplex, Signer } from "@metaplex-foundation/js";
 
 export const METADATA_PROGRAM_ID = new web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -61,21 +60,20 @@ export const createV0Tx = (
 };
 
 export const createV0TxWithLUT = async (
-  connection: web3.Connection,
-  payerKey: web3.PublicKey,
+  mx: Metaplex,
   lookupTableAddress: web3.PublicKey,
   ...txInstructions: web3.TransactionInstruction[]
 ) => {
-  const latestBlockhash = await connection.getLatestBlockhash();
+  const latestBlockhash = await mx.connection.getLatestBlockhash();
 
   const lookupTable = (
-    await connection.getAddressLookupTable(lookupTableAddress)
+    await mx.connection.getAddressLookupTable(lookupTableAddress)
   ).value;
   if (!lookupTable) throw new Error("Lookup table not found");
 
   return await new web3.VersionedTransaction(
     new web3.TransactionMessage({
-      payerKey,
+      payerKey: mx.identity().publicKey,
       recentBlockhash: latestBlockhash.blockhash,
       instructions: txInstructions,
     }).compileToV0Message([lookupTable])
@@ -83,45 +81,39 @@ export const createV0TxWithLUT = async (
 };
 
 export const createLookupTable = async (
-  connection: web3.Connection,
-  wallet: anchor.Wallet,
-  ...addresses: web3.PublicKey[]
+  mx: Metaplex,
+  addresses: web3.PublicKey[]
 ) => {
+  const wallet = mx.identity();
   const [lookupTableIx, lookupTableAddress] =
     web3.AddressLookupTableProgram.createLookupTable({
       authority: wallet.publicKey,
       payer: wallet.publicKey,
-      recentSlot: await connection.getSlot(),
+      recentSlot: await mx.connection.getSlot(),
     });
-  const txn = await createV0Tx(
+  const latestBlockhash = await mx.connection.getLatestBlockhash();
+  let creationTx = createV0Tx(
     wallet.publicKey,
-    (
-      await connection.getLatestBlockhash()
-    ).blockhash,
+    latestBlockhash.blockhash,
     lookupTableIx
-  );
-  txn.sign([wallet.payer]);
+  ) as any as web3.Transaction;
+  creationTx = await wallet.signTransaction(creationTx);
+  const createTxConfirmation = await mx
+    .rpc()
+    .sendAndConfirmTransaction(creationTx, {
+      skipPreflight: true,
+      commitment: "processed",
+    });
 
-  const txId = await connection.sendTransaction(txn, {
-    skipPreflight: true,
-  });
-  console.log(txId);
-
-  const createTxConfirmation = await connection.confirmTransaction(
-    txId,
-    "finalized"
-  );
-
-  if (createTxConfirmation.value.err) {
+  if (createTxConfirmation.confirmResponse.value.err) {
     throw new Error(
-      "Lookup table creation error " + createTxConfirmation.value.err.toString()
+      "Lookup table creation error " +
+        createTxConfirmation.confirmResponse.value.err.toString()
     );
   }
 
-  const transactions: web3.VersionedTransaction[] = [];
-  const latestBlockhash = await connection.getLatestBlockhash();
-
-  const batchSize = 25;
+  const transactions: web3.Transaction[] = [];
+  const batchSize = 30;
   for (let i = 0; i < addresses.length; i += batchSize) {
     transactions.push(
       createV0Tx(
@@ -133,38 +125,14 @@ export const createLookupTable = async (
           lookupTable: lookupTableAddress,
           addresses: addresses.slice(i, i + batchSize),
         })
-      )
+      ) as any as web3.Transaction
     );
-    // console.log(addresses.slice(i, i + batchSize).length, addresses.length)
   }
-  // wallet.signTransaction
-  // const signedTransactions = await wallet.signAllTransactions(transactions);
-  transactions.map((tx) => tx.sign([wallet.payer]));
-  // const signedTransactions = transactions;
-  // console.log(transactions.length)
-  // const tx0Id = await connection.sendTransaction(
-  //   transactions[0],
-  //   {
-  //     skipPreflight: true,
-  //   }
-  // );
-  // console.log(tx0Id)
 
-  // const createTx0Confirmation = await connection.confirmTransaction(
-  //   tx0Id,
-  //   "finalized"
-  // );
-
-  // if (createTx0Confirmation.value.err) {
-  //   throw new Error(
-  //     "Lookup table creation error " +
-  //     createTx0Confirmation.value.err.toString()
-  //   );
-  // }
-
-  const sigs = await Promise.all(
-    transactions.map((t) =>
-      connection.sendTransaction(t, {
+  const signedTransactions = await wallet.signAllTransactions(transactions);
+  await Promise.all(
+    signedTransactions.map(async (t) =>
+      mx.rpc().sendTransaction(t, {
         skipPreflight: true,
       })
     )
