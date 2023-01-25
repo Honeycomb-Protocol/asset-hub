@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAndMintNft = exports.createMintNftTransaction = exports.createAddBlockTransaction = exports.createCreateNftTransaction = void 0;
+exports.createAndMintNft = exports.buildCreateAndMintNftCtx = exports.createMintNftTransaction = exports.createAddBlockTransaction = exports.createCreateNftTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
@@ -147,23 +147,32 @@ function createMintNftTransaction(assembler, nftMint, authority, payer, programI
     };
 }
 exports.createMintNftTransaction = createMintNftTransaction;
-async function createAndMintNft(connection, wallet, assembler, args, blocks) {
-    const assemblerAccount = await generated_1.Assembler.fromAccountAddress(connection, assembler);
-    const nftCreateTx = createCreateNftTransaction(assembler, assemblerAccount.collection, wallet.publicKey, wallet.publicKey, args);
-    const mintNftTx = createMintNftTransaction(assembler, nftCreateTx.nftMint, wallet.publicKey, wallet.publicKey);
-    let signers = [...nftCreateTx.signers, ...mintNftTx.signers];
-    let accounts = [...nftCreateTx.accounts, ...mintNftTx.accounts];
-    const tx = new web3.Transaction().add(nftCreateTx.tx, ...(await Promise.all(blocks.map(async (blockT) => {
-        const { tx, accounts: acc, signers: sigs, } = createAddBlockTransaction(assembler, nftCreateTx.nft, nftCreateTx.nftMint, blockT.block, blockT.blockDefinition, blockT.tokenMint, wallet.publicKey, wallet.publicKey, assemblerAccount.assemblingAction);
-        signers = [...signers, ...sigs];
-        accounts = [...accounts, ...acc];
-        return tx;
-    }))), mintNftTx.tx);
-    accounts = accounts.filter((x, index, self) => index === self.findIndex((y) => x.equals(y)));
-    const txId = await (0, utils_1.sendAndConfirmTransaction)(tx, connection, wallet, signers, { skipPreflight: true });
+async function buildCreateAndMintNftCtx({ mx, assembler, args, blocks, }) {
+    const wallet = mx.identity();
+    const txns = [];
+    const assemblerAccount = await generated_1.Assembler.fromAccountAddress(mx.connection, assembler);
+    const { nft, nftMint, ...nftCreateCtx } = createCreateNftTransaction(assembler, assemblerAccount.collection, wallet.publicKey, wallet.publicKey, args);
+    txns.push(nftCreateCtx);
+    blocks.forEach((block) => {
+        txns.push(createAddBlockTransaction(assembler, nft, nftMint, block.block, block.blockDefinition, block.tokenMint, wallet.publicKey, wallet.publicKey, assemblerAccount.assemblingAction));
+    });
+    txns.push(createMintNftTransaction(assembler, nftMint, wallet.publicKey, wallet.publicKey));
     return {
-        txId,
-        mint: nftCreateTx.nftMint,
+        txns,
+        nftMint: nftMint,
+        nft: nft,
+    };
+}
+exports.buildCreateAndMintNftCtx = buildCreateAndMintNftCtx;
+async function createAndMintNft({ mx, assembler, args, blocks, }) {
+    const ctx = await buildCreateAndMintNftCtx({ mx, assembler, args, blocks });
+    const response = mx
+        .rpc()
+        .sendAndConfirmTransaction(new web3.Transaction().add(...ctx.txns.map(({ tx }) => tx)), { skipPreflight: true }, ctx.txns.map(({ signers }) => signers).flat());
+    return {
+        response,
+        nftMint: ctx.nftMint,
+        nft: ctx.nft,
     };
 }
 exports.createAndMintNft = createAndMintNft;

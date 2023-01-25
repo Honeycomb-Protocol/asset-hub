@@ -4,7 +4,6 @@ import * as web3 from "@solana/web3.js";
 import { createSetNftGeneratedInstruction } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
-import { sendAndConfirmTransaction } from "../../utils";
 
 export function createSetNftGeneratedTransaction(
   nft: web3.PublicKey,

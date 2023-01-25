@@ -110,6 +110,7 @@ export async function createAssembler(mx: Metaplex, args: CreateAssemblerArgs) {
   const blockhash = await mx.connection.getLatestBlockhash();
 
   ctx.tx.recentBlockhash = blockhash.blockhash;
+
   const response = await mx
     .rpc()
     .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);

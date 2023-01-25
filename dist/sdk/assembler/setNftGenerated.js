@@ -23,11 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAssembler = exports.createSetNftGeneratedTransaction = void 0;
+exports.setNftGenerated = exports.createSetNftGeneratedTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
-const utils_1 = require("../../utils");
 function createSetNftGeneratedTransaction(nft, programId = assembler_1.PROGRAM_ID) {
     return {
         tx: new web3.Transaction().add((0, generated_1.createSetNftGeneratedInstruction)({
@@ -38,12 +37,16 @@ function createSetNftGeneratedTransaction(nft, programId = assembler_1.PROGRAM_I
     };
 }
 exports.createSetNftGeneratedTransaction = createSetNftGeneratedTransaction;
-async function createAssembler(nft, connection, wallet) {
-    const assemblerTx = createSetNftGeneratedTransaction(nft);
-    const txId = await (0, utils_1.sendAndConfirmTransaction)(assemblerTx.tx, connection, wallet, assemblerTx.signers, { skipPreflight: true });
+async function setNftGenerated(nft, mx) {
+    const ctx = await createSetNftGeneratedTransaction(nft);
+    const blockhash = await mx.connection.getLatestBlockhash();
+    ctx.tx.recentBlockhash = blockhash.blockhash;
+    const response = await mx
+        .rpc()
+        .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
     return {
-        txId,
+        response,
     };
 }
-exports.createAssembler = createAssembler;
+exports.setNftGenerated = setNftGenerated;
 //# sourceMappingURL=setNftGenerated.js.map

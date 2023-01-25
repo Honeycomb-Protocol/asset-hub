@@ -15,7 +15,7 @@
     "build-deploy": "yarn build && yarn deploy",
     "assembler": "ts-node ./scripts/index.ts assembler",
     "assetmanager": "ts-node ./scripts/index.ts assetmanager",
-    "postinstall": "node "
+    "postinstall": "node scripts/postinstall.js"
   },
   "dependencies": {
     "@metaplex-foundation/js": "^0.17.12",

@@ -178,7 +178,7 @@ export async function setupAssembler(
             if (!uri && blockDefinition.assetConfig.image) {
               const file = await readFile(blockDefinition.assetConfig.image);
               const m = await mx.nfts().uploadMetadata({
-                name: "HoneyComb SFT",
+                name: "HoneyComb Asset",
                 image: file,
                 symbol: blockDefinition.assetConfig.symbol,
                 ...(blockDefinition.assetConfig.json || {}),

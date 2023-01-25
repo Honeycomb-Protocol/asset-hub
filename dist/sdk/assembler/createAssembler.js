@@ -77,12 +77,17 @@ function createCreateAssemblerTransaction(authority, payer, args, programId = as
     };
 }
 exports.createCreateAssemblerTransaction = createCreateAssemblerTransaction;
-async function createAssembler(connection, wallet, args) {
-    const assemblerTx = createCreateAssemblerTransaction(wallet.publicKey, wallet.publicKey, args);
-    const txId = await (0, utils_1.sendAndConfirmTransaction)(assemblerTx.tx, connection, wallet, assemblerTx.signers, { skipPreflight: true });
+async function createAssembler(mx, args) {
+    const wallet = mx.identity();
+    const ctx = createCreateAssemblerTransaction(wallet.publicKey, wallet.publicKey, args);
+    const blockhash = await mx.connection.getLatestBlockhash();
+    ctx.tx.recentBlockhash = blockhash.blockhash;
+    const response = await mx
+        .rpc()
+        .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
     return {
-        txId,
-        assembler: assemblerTx.assembler,
+        response,
+        assembler: ctx.assembler,
     };
 }
 exports.createAssembler = createAssembler;

@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAsset = exports.createCreateAssetTransaction = void 0;
+exports.createAsset = exports.buildCreateAssetCtx = exports.createCreateAssetTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const utils_1 = require("../../utils");
 const generated_1 = require("../../generated");
@@ -57,13 +57,25 @@ function createCreateAssetTransaction(payer, args, programId = assetmanager_1.PR
     };
 }
 exports.createCreateAssetTransaction = createCreateAssetTransaction;
-async function createAsset(connection, wallet, candyGuardBuilder, args) {
-    const blockhashCtx = await connection.getLatestBlockhash();
+async function buildCreateAssetCtx(mx, args, candyGuardBuilder) {
+    let wallet = mx.identity();
     const ctx = createCreateAssetTransaction(wallet.publicKey, args);
-    const tx = new web3.Transaction().add(candyGuardBuilder.toTransaction(blockhashCtx), ctx.tx);
-    const txId = await (0, utils_1.sendAndConfirmTransaction)(tx, connection, wallet, [...ctx.signers, ...candyGuardBuilder.getSigners()], { skipPreflight: true });
+    const blockhash = await mx.connection.getLatestBlockhash();
+    if (candyGuardBuilder) {
+        ctx.tx = new web3.Transaction().add(candyGuardBuilder.toTransaction(blockhash), ctx.tx);
+        ctx.signers = [...candyGuardBuilder.getSigners(), ...ctx.signers];
+    }
+    ctx.tx.recentBlockhash = blockhash.blockhash;
+    return ctx;
+}
+exports.buildCreateAssetCtx = buildCreateAssetCtx;
+async function createAsset(mx, args, candyGuardBuilder) {
+    const ctx = await buildCreateAssetCtx(mx, args, candyGuardBuilder);
+    const response = await mx
+        .rpc()
+        .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
     return {
-        txId,
+        response,
         mint: ctx.mint,
     };
 }

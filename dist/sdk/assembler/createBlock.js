@@ -23,11 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createBlock = exports.createCreateBlockTransaction = void 0;
+exports.createBlock = exports.buildCreateBlockCtx = exports.createCreateBlockTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
-const utils_1 = require("../../utils");
 function createCreateBlockTransaction(assembler, authority, payer, args) {
     const [block] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("block"),
@@ -48,12 +47,22 @@ function createCreateBlockTransaction(assembler, authority, payer, args) {
     };
 }
 exports.createCreateBlockTransaction = createCreateBlockTransaction;
-async function createBlock(connection, wallet, assembler, args) {
-    const { tx, signers, block } = createCreateBlockTransaction(assembler, wallet.publicKey, wallet.publicKey, args);
-    const txId = await (0, utils_1.sendAndConfirmTransaction)(tx, connection, wallet, signers, { skipPreflight: true });
+async function buildCreateBlockCtx(mx, assembler, args) {
+    const wallet = mx.identity();
+    const ctx = createCreateBlockTransaction(assembler, wallet.publicKey, wallet.publicKey, args);
+    const blockhash = await mx.connection.getLatestBlockhash();
+    ctx.tx.recentBlockhash = blockhash.blockhash;
+    return ctx;
+}
+exports.buildCreateBlockCtx = buildCreateBlockCtx;
+async function createBlock(mx, assembler, args) {
+    const ctx = await buildCreateBlockCtx(mx, assembler, args);
+    const response = await mx
+        .rpc()
+        .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
     return {
-        txId,
-        block,
+        response,
+        block: ctx.block,
     };
 }
 exports.createBlock = createBlock;

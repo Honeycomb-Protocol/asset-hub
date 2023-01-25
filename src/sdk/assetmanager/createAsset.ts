@@ -60,9 +60,9 @@ export function createCreateAssetTransaction(
 export async function buildCreateAssetCtx(
   mx: Metaplex,
   args: CreateAssetArgs,
-  candyGuardBuilder?: TransactionBuilder<CreateCandyGuardBuilderContext>,
+  candyGuardBuilder?: TransactionBuilder<CreateCandyGuardBuilderContext>
 ) {
-  let wallet = mx.identity()
+  let wallet = mx.identity();
 
   const ctx = createCreateAssetTransaction(wallet.publicKey, args);
   const blockhash = await mx.connection.getLatestBlockhash();
@@ -72,7 +72,7 @@ export async function buildCreateAssetCtx(
       candyGuardBuilder.toTransaction(blockhash),
       ctx.tx
     );
-    ctx.signers = [...candyGuardBuilder.getSigners(), ...ctx.signers]
+    ctx.signers = [...candyGuardBuilder.getSigners(), ...ctx.signers];
   }
   ctx.tx.recentBlockhash = blockhash.blockhash;
   return ctx;
@@ -80,13 +80,13 @@ export async function buildCreateAssetCtx(
 export async function createAsset(
   mx: Metaplex,
   args: CreateAssetArgs,
-  candyGuardBuilder?: TransactionBuilder<CreateCandyGuardBuilderContext>,
+  candyGuardBuilder?: TransactionBuilder<CreateCandyGuardBuilderContext>
 ) {
+  const ctx = await buildCreateAssetCtx(mx, args, candyGuardBuilder);
 
-  const ctx = await buildCreateAssetCtx(mx, args, candyGuardBuilder,);
-
-  const response = await mx.rpc().sendAndConfirmTransaction(ctx.tx, {skipPreflight: true}, ctx.signers)
-
+  const response = await mx
+    .rpc()
+    .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
 
   return {
     response,

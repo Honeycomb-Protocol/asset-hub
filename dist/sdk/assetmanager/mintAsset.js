@@ -23,12 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mintAsset = exports.createMintAssetTransaction = void 0;
+exports.mintAsset = exports.buildMintAssetCtx = exports.createMintAssetTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
-const js_1 = require("@metaplex-foundation/js");
 const mpl_candy_guard_1 = require("@metaplex-foundation/mpl-candy-guard");
-const utils_1 = require("../../utils");
 const generated_1 = require("../../generated");
 const assetmanager_1 = require("../../generated/assetmanager");
 async function createMintAssetTransaction(metaplex, assetAddress, mint, wallet, amount, candyGuardAddress = null, group = null, programId = assetmanager_1.PROGRAM_ID) {
@@ -84,15 +82,20 @@ async function createMintAssetTransaction(metaplex, assetAddress, mint, wallet, 
     }
 }
 exports.createMintAssetTransaction = createMintAssetTransaction;
-async function mintAsset(connection, wallet, asset, amount) {
-    const assetAccount = await generated_1.Asset.fromAccountAddress(connection, asset);
-    const mx = new js_1.Metaplex(connection);
-    mx.use((0, js_1.walletAdapterIdentity)(wallet));
-    console.log(assetAccount.candyGuard.toString());
+async function buildMintAssetCtx(mx, asset, amount) {
+    let wallet = mx.identity();
+    const assetAccount = await generated_1.Asset.fromAccountAddress(mx.connection, asset);
     const ctx = await createMintAssetTransaction(mx, asset, assetAccount.mint, wallet.publicKey, amount, assetAccount.candyGuard);
-    const txId = await (0, utils_1.sendAndConfirmTransaction)(ctx.tx, connection, wallet, ctx.signers, { skipPreflight: true });
+    return ctx;
+}
+exports.buildMintAssetCtx = buildMintAssetCtx;
+async function mintAsset(mx, asset, amount) {
+    const ctx = await buildMintAssetCtx(mx, asset, amount);
+    const response = await mx
+        .rpc()
+        .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
     return {
-        txId,
+        response,
     };
 }
 exports.mintAsset = mintAsset;

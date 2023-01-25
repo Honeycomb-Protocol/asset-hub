@@ -22,28 +22,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupAssembler = void 0;
-const anchor = __importStar(require("@project-serum/anchor"));
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const _1 = require(".");
-const utils_1 = require("../../utils");
-const js_1 = require("@metaplex-foundation/js");
 const assetmanager_1 = require("../assetmanager");
-const wallet = new anchor.Wallet(web3.Keypair.fromSecretKey(Uint8Array.from(web3.Keypair.generate().secretKey)));
-const connection = new web3.Connection("https://api.devnet.solana.com/", "processed");
-async function setupAssembler(config, updateConfig) {
+async function setupAssembler(mx, config, updateConfig, readFile) {
     let transactions = [];
+    const wallet = mx.identity();
     let signers = [];
     let accounts = [];
-    const metaplex = new js_1.Metaplex(connection);
-    metaplex.use((0, js_1.keypairIdentity)(wallet.payer));
     let assemblingAction;
     switch (config.assemblingAction) {
         case "Burn":
@@ -162,12 +151,12 @@ async function setupAssembler(config, updateConfig) {
             else if (blockDefinition.assetConfig) {
                 let uri = blockDefinition.assetConfig.uri;
                 if (!uri && blockDefinition.assetConfig.image) {
-                    const buffer = await promises_1.default.readFile(path_1.default.resolve(process.cwd(), blockDefinition.assetConfig.image));
-                    const file = (0, js_1.toMetaplexFile)(buffer, blockDefinition.assetConfig.image.slice(blockDefinition.assetConfig.image.lastIndexOf("/") + 1));
-                    const m = await metaplex.nfts().uploadMetadata({
-                        name: "My NFT",
+                    const file = await readFile(blockDefinition.assetConfig.image);
+                    const m = await mx.nfts().uploadMetadata({
+                        name: "HoneyComb Asset",
                         image: file,
                         symbol: blockDefinition.assetConfig.symbol,
+                        ...(blockDefinition.assetConfig.json || {}),
                     });
                     uri = blockDefinition.assetConfig.uri = m.uri;
                     updateConfig(config);
@@ -214,9 +203,11 @@ async function setupAssembler(config, updateConfig) {
     accounts = accounts.filter((x, index, self) => index === self.findIndex((y) => x.equals(y)));
     let i = 0;
     for (let t of transactions) {
-        await (0, utils_1.sendAndConfirmTransaction)(t.tx, connection, wallet, t.signers, {
+        await mx
+            .rpc()
+            .sendAndConfirmTransaction(t.tx, {
             skipPreflight: true,
-        })
+        }, t.signers)
             .then((txId) => {
             if (t.postAction)
                 t.postAction();

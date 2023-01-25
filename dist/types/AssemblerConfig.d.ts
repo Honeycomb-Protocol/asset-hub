@@ -25,7 +25,8 @@ export type BlockDefinitionConfig = {
 };
 export type AssetConfig = {
     symbol: string;
-    image: string;
+    image?: string;
+    json?: any;
     uri?: string;
     candyGuard?: string;
     address?: string;
