@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createBlock = exports.buildCreateBlockCtx = exports.createCreateBlockTransaction = void 0;
+exports.createBlock = exports.createCreateBlockTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
@@ -47,16 +47,11 @@ function createCreateBlockTransaction(assembler, authority, payer, args) {
     };
 }
 exports.createCreateBlockTransaction = createCreateBlockTransaction;
-async function buildCreateBlockCtx(mx, assembler, args) {
+async function createBlock(mx, assembler, args) {
     const wallet = mx.identity();
     const ctx = createCreateBlockTransaction(assembler, wallet.publicKey, wallet.publicKey, args);
     const blockhash = await mx.connection.getLatestBlockhash();
     ctx.tx.recentBlockhash = blockhash.blockhash;
-    return ctx;
-}
-exports.buildCreateBlockCtx = buildCreateBlockCtx;
-async function createBlock(mx, assembler, args) {
-    const ctx = await buildCreateBlockCtx(mx, assembler, args);
     const response = await mx
         .rpc()
         .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
