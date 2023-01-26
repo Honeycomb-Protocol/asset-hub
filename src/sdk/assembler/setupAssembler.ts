@@ -254,6 +254,8 @@ export async function setupAssembler(
   // const lookuptable = await createLookupTable(connection, wallet, ...accounts);
   let i = 0;
   for (let t of transactions) {
+    const blockhash = await mx.rpc().getLatestBlockhash();
+    t.tx.recentBlockhash = blockhash.blockhash;
     await mx
       .rpc()
       .sendAndConfirmTransaction(
@@ -266,7 +268,8 @@ export async function setupAssembler(
       .then((txId) => {
         if (t.postAction) t.postAction();
         console.log(
-          `Assembler setup tx: ${txId}, (${++i}/${transactions.length})`
+          `Assembler setup tx: (${++i}/${transactions.length})`,
+          txId.signature
         );
       })
       .catch((e) => {

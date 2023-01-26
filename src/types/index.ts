@@ -2,9 +2,16 @@ import { Metaplex, Signer } from "@metaplex-foundation/js";
 import * as web3 from "@solana/web3.js";
 import { CreateNFTArgs } from "src/generated";
 
+export type Wallet = {
+  publicKey: web3.PublicKey;
+  signAllTransactions: (
+    txns: web3.VersionedTransaction[]
+  ) => web3.VersionedTransaction[];
+};
+
 export type TxSignersAccounts = {
   tx: web3.Transaction;
-  signers: Signer[];
+  signers: web3.Signer[];
   accounts: web3.PublicKey[];
 };
 
