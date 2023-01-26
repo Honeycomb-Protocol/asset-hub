@@ -1086,6 +1086,13 @@
             "type": "publicKey"
           },
           {
+            "name": "order",
+            "docs": [
+              "The order this attribute is to be place on"
+            ],
+            "type": "u8"
+          },
+          {
             "name": "attributeName",
             "docs": [
               "Attribute name"
@@ -1321,6 +1328,18 @@
           }
         ]
       }
+    }
+  ],
+  "events": [
+    {
+      "name": "NFTMinted",
+      "fields": [
+        {
+          "name": "nft",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [

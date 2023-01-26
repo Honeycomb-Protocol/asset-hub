@@ -2,7 +2,7 @@ use crate::{
     errors::ErrorCode,
     structs::{
         Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue, NFTAttribute,
-        NFTAttributeValue, NFT,
+        NFTAttributeValue, NFTMinted, NFT,
     },
     utils::EXTRA_SIZE,
 };
@@ -475,6 +475,8 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
     )?;
 
     nft.minted = true;
+
+    emit!(NFTMinted { nft: nft.key() });
 
     Ok(())
 }

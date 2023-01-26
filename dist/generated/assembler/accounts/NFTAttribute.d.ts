@@ -9,6 +9,7 @@ export type NFTAttributeArgs = {
     block: web3.PublicKey;
     blockDefinition: web3.PublicKey;
     mint: web3.PublicKey;
+    order: number;
     attributeName: string;
     attributeValue: NFTAttributeValue;
 };
@@ -19,6 +20,7 @@ export declare class NFTAttribute implements NFTAttributeArgs {
     readonly block: web3.PublicKey;
     readonly blockDefinition: web3.PublicKey;
     readonly mint: web3.PublicKey;
+    readonly order: number;
     readonly attributeName: string;
     readonly attributeValue: NFTAttributeValue;
     private constructor();
@@ -38,6 +40,7 @@ export declare class NFTAttribute implements NFTAttributeArgs {
         block: string;
         blockDefinition: string;
         mint: string;
+        order: number;
         attributeName: string;
         attributeValue: "Boolean" | "Number" | "String";
     };
