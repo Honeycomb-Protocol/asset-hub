@@ -1,10 +1,6 @@
 import * as beet from '@metaplex-foundation/beet';
 import * as web3 from '@solana/web3.js';
-import { CreateNFTArgs } from '../types/CreateNFTArgs';
-export type CreateNftInstructionArgs = {
-    args: CreateNFTArgs;
-};
-export declare const createNftStruct: beet.FixableBeetArgsStruct<CreateNftInstructionArgs & {
+export declare const createNftStruct: beet.BeetArgsStruct<{
     instructionDiscriminator: number[];
 }>;
 export type CreateNftInstructionAccounts = {
@@ -24,4 +20,4 @@ export type CreateNftInstructionAccounts = {
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
 export declare const createNftInstructionDiscriminator: number[];
-export declare function createCreateNftInstruction(accounts: CreateNftInstructionAccounts, args: CreateNftInstructionArgs, programId?: web3.PublicKey): web3.TransactionInstruction;
+export declare function createCreateNftInstruction(accounts: CreateNftInstructionAccounts, programId?: web3.PublicKey): web3.TransactionInstruction;

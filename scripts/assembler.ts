@@ -128,11 +128,6 @@ export default async function (
         connection,
         wallet,
         new web3.PublicKey(deployments.assembler),
-        {
-          name: "Test NFT",
-          symbol: "TNFT",
-          description: "This is a test NFT",
-        },
         [
           {
             block: new web3.PublicKey(deployments.block),
