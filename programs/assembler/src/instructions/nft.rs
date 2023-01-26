@@ -283,6 +283,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
     nft_attribute.nft = ctx.accounts.nft.key();
     nft_attribute.block = block.key();
     nft_attribute.mint = token_mint.key();
+    nft_attribute.order = block.block_order;
     nft_attribute.attribute_name = block.block_name.clone();
     nft_attribute.block_definition = block_definition.key();
 
