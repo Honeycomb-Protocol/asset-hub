@@ -98,7 +98,7 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
     nft.authority = ctx.accounts.authority.key();
     nft.collection_address = assembler.collection;
     nft.mint = ctx.accounts.nft_mint.key();
-    nft.name = format!("{} #{}", assembler.collection_name, nft.id);
+    nft.name = format!("{} #{}", assembler.collection_name, assembler.nfts);
     nft.symbol = assembler.collection_symbol.clone();
     nft.description = assembler.collection_description.clone();
     nft.minted = false;
