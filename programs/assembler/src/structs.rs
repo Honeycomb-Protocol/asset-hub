@@ -257,7 +257,7 @@ pub struct NFTAttribute {
     pub attribute_value: NFTAttributeValue,
 }
 impl NFTAttribute {
-    pub const LEN: usize = 192;
+    pub const LEN: usize = 192 - 1;
 }
 
 #[event]
