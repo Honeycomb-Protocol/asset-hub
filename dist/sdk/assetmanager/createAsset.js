@@ -63,7 +63,10 @@ async function buildCreateAssetCtx(mx, args, candyGuardBuilder) {
     const blockhash = await mx.connection.getLatestBlockhash();
     if (candyGuardBuilder) {
         ctx.tx = new web3.Transaction().add(candyGuardBuilder.toTransaction(blockhash), ctx.tx);
-        ctx.signers = [...candyGuardBuilder.getSigners(), ...ctx.signers];
+        ctx.signers = [
+            ...candyGuardBuilder.getSigners(),
+            ...ctx.signers,
+        ];
     }
     ctx.tx.recentBlockhash = blockhash.blockhash;
     return ctx;

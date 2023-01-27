@@ -7,7 +7,7 @@ import {
   Assembler,
   AssemblingAction,
 } from "../../generated";
-import { CreateNFTArgs, PROGRAM_ID } from "../../generated/assembler";
+import { PROGRAM_ID } from "../../generated/assembler";
 import { CreateAndMintNftArgs, TxSignersAccounts } from "../../types";
 import { METADATA_PROGRAM_ID } from "../../utils";
 
@@ -16,7 +16,6 @@ export function createCreateNftTransaction(
   collectionMint: web3.PublicKey,
   authority: web3.PublicKey,
   payer: web3.PublicKey,
-  args: CreateNFTArgs,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts & {
   nft: web3.PublicKey;
@@ -72,7 +71,6 @@ export function createCreateNftTransaction(
           payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
-        { args },
         programId
       )
     ),
@@ -228,7 +226,6 @@ export function createMintNftTransaction(
 export async function buildCreateAndMintNftCtx({
   mx,
   assembler,
-  args,
   blocks,
 }: CreateAndMintNftArgs): Promise<{
   txns: TxSignersAccounts[];
@@ -246,8 +243,7 @@ export async function buildCreateAndMintNftCtx({
     assembler,
     assemblerAccount.collection,
     wallet.publicKey,
-    wallet.publicKey,
-    args
+    wallet.publicKey
   );
   txns.push(nftCreateCtx);
 
@@ -286,10 +282,9 @@ export async function buildCreateAndMintNftCtx({
 export async function createAndMintNft({
   mx,
   assembler,
-  args,
   blocks,
 }: CreateAndMintNftArgs) {
-  const ctx = await buildCreateAndMintNftCtx({ mx, assembler, args, blocks });
+  const ctx = await buildCreateAndMintNftCtx({ mx, assembler, blocks });
 
   const response = mx
     .rpc()

@@ -72,7 +72,10 @@ export async function buildCreateAssetCtx(
       candyGuardBuilder.toTransaction(blockhash),
       ctx.tx
     );
-    ctx.signers = [...candyGuardBuilder.getSigners(), ...ctx.signers];
+    ctx.signers = [
+      ...(candyGuardBuilder.getSigners() as web3.Signer[]),
+      ...ctx.signers,
+    ];
   }
   ctx.tx.recentBlockhash = blockhash.blockhash;
   return ctx;

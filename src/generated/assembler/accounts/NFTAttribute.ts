@@ -24,6 +24,7 @@ export type NFTAttributeArgs = {
   block: web3.PublicKey
   blockDefinition: web3.PublicKey
   mint: web3.PublicKey
+  order: number
   attributeName: string
   attributeValue: NFTAttributeValue
 }
@@ -43,6 +44,7 @@ export class NFTAttribute implements NFTAttributeArgs {
     readonly block: web3.PublicKey,
     readonly blockDefinition: web3.PublicKey,
     readonly mint: web3.PublicKey,
+    readonly order: number,
     readonly attributeName: string,
     readonly attributeValue: NFTAttributeValue
   ) {}
@@ -57,6 +59,7 @@ export class NFTAttribute implements NFTAttributeArgs {
       args.block,
       args.blockDefinition,
       args.mint,
+      args.order,
       args.attributeName,
       args.attributeValue
     )
@@ -172,6 +175,7 @@ export class NFTAttribute implements NFTAttributeArgs {
       block: this.block.toBase58(),
       blockDefinition: this.blockDefinition.toBase58(),
       mint: this.mint.toBase58(),
+      order: this.order,
       attributeName: this.attributeName,
       attributeValue: this.attributeValue.__kind,
     }
@@ -195,6 +199,7 @@ export const nFTAttributeBeet = new beet.FixableBeetStruct<
     ['block', beetSolana.publicKey],
     ['blockDefinition', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
+    ['order', beet.u8],
     ['attributeName', beet.utf8String],
     ['attributeValue', nFTAttributeValueBeet],
   ],

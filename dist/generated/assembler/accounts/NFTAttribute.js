@@ -30,17 +30,18 @@ const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const NFTAttributeValue_1 = require("../types/NFTAttributeValue");
 exports.nFTAttributeDiscriminator = [161, 3, 226, 65, 113, 87, 24, 132];
 class NFTAttribute {
-    constructor(bump, nft, block, blockDefinition, mint, attributeName, attributeValue) {
+    constructor(bump, nft, block, blockDefinition, mint, order, attributeName, attributeValue) {
         this.bump = bump;
         this.nft = nft;
         this.block = block;
         this.blockDefinition = blockDefinition;
         this.mint = mint;
+        this.order = order;
         this.attributeName = attributeName;
         this.attributeValue = attributeValue;
     }
     static fromArgs(args) {
-        return new NFTAttribute(args.bump, args.nft, args.block, args.blockDefinition, args.mint, args.attributeName, args.attributeValue);
+        return new NFTAttribute(args.bump, args.nft, args.block, args.blockDefinition, args.mint, args.order, args.attributeName, args.attributeValue);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return NFTAttribute.deserialize(accountInfo.data, offset);
@@ -81,6 +82,7 @@ class NFTAttribute {
             block: this.block.toBase58(),
             blockDefinition: this.blockDefinition.toBase58(),
             mint: this.mint.toBase58(),
+            order: this.order,
             attributeName: this.attributeName,
             attributeValue: this.attributeValue.__kind,
         };
@@ -94,6 +96,7 @@ exports.nFTAttributeBeet = new beet.FixableBeetStruct([
     ['block', beetSolana.publicKey],
     ['blockDefinition', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
+    ['order', beet.u8],
     ['attributeName', beet.utf8String],
     ['attributeValue', NFTAttributeValue_1.nFTAttributeValueBeet],
 ], NFTAttribute.fromArgs, 'NFTAttribute');

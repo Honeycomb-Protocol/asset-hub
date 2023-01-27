@@ -203,6 +203,8 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
     accounts = accounts.filter((x, index, self) => index === self.findIndex((y) => x.equals(y)));
     let i = 0;
     for (let t of transactions) {
+        const blockhash = await mx.rpc().getLatestBlockhash();
+        t.tx.recentBlockhash = blockhash.blockhash;
         await mx
             .rpc()
             .sendAndConfirmTransaction(t.tx, {
@@ -211,7 +213,7 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
             .then((txId) => {
             if (t.postAction)
                 t.postAction();
-            console.log(`Assembler setup tx: ${txId}, (${++i}/${transactions.length})`);
+            console.log(`Assembler setup tx: (${++i}/${transactions.length})`, txId.signature);
         })
             .catch((e) => {
             console.error(e);

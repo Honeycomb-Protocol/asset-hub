@@ -247,6 +247,9 @@ pub struct NFTAttribute {
     /// The token mint associated with this attribute
     pub mint: Pubkey,
 
+    /// The order this attribute is to be place on
+    pub order: u8,
+
     /// Attribute name
     pub attribute_name: String,
 
@@ -254,5 +257,10 @@ pub struct NFTAttribute {
     pub attribute_value: NFTAttributeValue,
 }
 impl NFTAttribute {
-    pub const LEN: usize = 192;
+    pub const LEN: usize = 192 - 1;
+}
+
+#[event]
+pub struct NFTMinted {
+    pub nft: Pubkey,
 }

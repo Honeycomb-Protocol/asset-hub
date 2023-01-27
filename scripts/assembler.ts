@@ -123,11 +123,6 @@ export default async function (
       const mint = await createAndMintNft({
         mx,
         assembler: new web3.PublicKey(deployments.assembler),
-        args: {
-          name: "Test NFT",
-          symbol: "TNFT",
-          description: "This is a test NFT",
-        },
         blocks: [
           {
             block: new web3.PublicKey(deployments.block),

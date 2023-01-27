@@ -29,7 +29,7 @@ const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
 const utils_1 = require("../../utils");
-function createCreateNftTransaction(assembler, collectionMint, authority, payer, args, programId = assembler_1.PROGRAM_ID) {
+function createCreateNftTransaction(assembler, collectionMint, authority, payer, programId = assembler_1.PROGRAM_ID) {
     const [collectionMetadataAccount] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
         utils_1.METADATA_PROGRAM_ID.toBuffer(),
@@ -60,7 +60,7 @@ function createCreateNftTransaction(assembler, collectionMint, authority, payer,
             authority,
             payer,
             tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
-        }, { args }, programId)),
+        }, programId)),
         signers: [nftMint],
         accounts: [
             assembler,
@@ -147,11 +147,11 @@ function createMintNftTransaction(assembler, nftMint, authority, payer, programI
     };
 }
 exports.createMintNftTransaction = createMintNftTransaction;
-async function buildCreateAndMintNftCtx({ mx, assembler, args, blocks, }) {
+async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
     const wallet = mx.identity();
     const txns = [];
     const assemblerAccount = await generated_1.Assembler.fromAccountAddress(mx.connection, assembler);
-    const { nft, nftMint, ...nftCreateCtx } = createCreateNftTransaction(assembler, assemblerAccount.collection, wallet.publicKey, wallet.publicKey, args);
+    const { nft, nftMint, ...nftCreateCtx } = createCreateNftTransaction(assembler, assemblerAccount.collection, wallet.publicKey, wallet.publicKey);
     txns.push(nftCreateCtx);
     blocks.forEach((block) => {
         txns.push(createAddBlockTransaction(assembler, nft, nftMint, block.block, block.blockDefinition, block.tokenMint, wallet.publicKey, wallet.publicKey, assemblerAccount.assemblingAction));
@@ -164,8 +164,8 @@ async function buildCreateAndMintNftCtx({ mx, assembler, args, blocks, }) {
     };
 }
 exports.buildCreateAndMintNftCtx = buildCreateAndMintNftCtx;
-async function createAndMintNft({ mx, assembler, args, blocks, }) {
-    const ctx = await buildCreateAndMintNftCtx({ mx, assembler, args, blocks });
+async function createAndMintNft({ mx, assembler, blocks, }) {
+    const ctx = await buildCreateAndMintNftCtx({ mx, assembler, blocks });
     const response = mx
         .rpc()
         .sendAndConfirmTransaction(new web3.Transaction().add(...ctx.txns.map(({ tx }) => tx)), { skipPreflight: true }, ctx.txns.map(({ signers }) => signers).flat());
