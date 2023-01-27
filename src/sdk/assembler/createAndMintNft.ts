@@ -8,8 +8,15 @@ import {
   AssemblingAction,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
-import { CreateAndMintNftArgs, TxSignersAccounts } from "../../types";
-import { METADATA_PROGRAM_ID } from "../../utils";
+import { CreateAndMintNftArgs, TxSignersAccounts, Wallet } from "../../types";
+import {
+  confirmBulkTransactions,
+  createLookupTable,
+  devideAndSignV0Txns,
+  getOrFetchLoockupTable,
+  METADATA_PROGRAM_ID,
+  sendBulkTransactions,
+} from "../../utils";
 
 export function createCreateNftTransaction(
   assembler: web3.PublicKey,
@@ -284,19 +291,60 @@ export async function createAndMintNft({
   assembler,
   blocks,
 }: CreateAndMintNftArgs) {
-  const ctx = await buildCreateAndMintNftCtx({ mx, assembler, blocks });
+  const { txns, nftMint, nft } = await buildCreateAndMintNftCtx({
+    mx,
+    assembler,
+    blocks,
+  });
+  const wallet: Wallet = mx.identity() as any;
+  let addressesDir: { [key: string]: web3.PublicKey } = {};
 
-  const response = mx
-    .rpc()
-    .sendAndConfirmTransaction(
-      new web3.Transaction().add(...ctx.txns.map(({ tx }) => tx)),
-      { skipPreflight: true },
-      ctx.txns.map(({ signers }) => signers).flat()
-    );
+  txns
+    // .concat(assemblerTxns)
+    .forEach(({ accounts }, i) => {
+      accounts.forEach((acc) => {
+        addressesDir[acc.toString()] = acc;
+      });
+    });
 
+  const addresses = Object.values(addressesDir);
+
+  // alert("first");
+  const lookupTableAddress = await createLookupTable(
+    wallet,
+    mx.connection,
+    addresses
+  );
+
+  const lookupTable = await getOrFetchLoockupTable(
+    mx.connection,
+    lookupTableAddress
+  );
+
+  const mintNftTxns = await devideAndSignV0Txns(
+    wallet,
+    mx.connection,
+    lookupTable,
+    txns
+  );
+
+  console.log(mintNftTxns);
+
+  if (!mintNftTxns) return;
+
+  await wallet.signAllTransactions([...mintNftTxns]);
+
+  const responses = await confirmBulkTransactions(
+    mx.connection,
+    await sendBulkTransactions(
+      mx.connection,
+      // signedTransactions.slice(purchaseTraitsTxns.length)
+      mintNftTxns
+    )
+  );
   return {
-    response,
-    nftMint: ctx.nftMint,
-    nft: ctx.nft,
+    responses,
+    nftMint,
+    nft,
   };
 }
