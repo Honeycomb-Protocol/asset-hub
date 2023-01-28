@@ -16,6 +16,7 @@ import {
   getOrFetchLoockupTable,
   METADATA_PROGRAM_ID,
   sendBulkTransactions,
+  sendBulkTransactionsNew,
 } from "../../utils";
 
 export function createCreateNftTransaction(
@@ -189,14 +190,53 @@ export function createAddBlockTransaction(
 
 export function createMintNftTransaction(
   assembler: web3.PublicKey,
+  collectionMint: web3.PublicKey,
   nftMint: web3.PublicKey,
   authority: web3.PublicKey,
   payer: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
+  const [collectionMetadata] = web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      METADATA_PROGRAM_ID.toBuffer(),
+      collectionMint.toBuffer(),
+    ],
+    METADATA_PROGRAM_ID
+  );
+
+  const [collectionMasterEdition] = web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      METADATA_PROGRAM_ID.toBuffer(),
+      collectionMint.toBuffer(),
+      Buffer.from("edition"),
+    ],
+    METADATA_PROGRAM_ID
+  );
+
   const [nft] = web3.PublicKey.findProgramAddressSync(
     [Buffer.from("nft"), nftMint.toBuffer()],
     programId
+  );
+
+  const [nftMetadata] = web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      METADATA_PROGRAM_ID.toBuffer(),
+      nftMint.toBuffer(),
+    ],
+    METADATA_PROGRAM_ID
+  );
+
+  const [nftMasterEdition] = web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      METADATA_PROGRAM_ID.toBuffer(),
+      nftMint.toBuffer(),
+      Buffer.from("edition"),
+    ],
+    METADATA_PROGRAM_ID
   );
 
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
@@ -216,11 +256,17 @@ export function createMintNftTransaction(
       createMintNftInstruction(
         {
           assembler,
+          collectionMint,
+          collectionMetadata,
+          collectionMasterEdition,
           nft,
           nftMint,
+          nftMetadata,
+          nftMasterEdition,
           tokenAccount,
           authority,
           payer,
+          tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
         programId
       )
@@ -273,6 +319,7 @@ export async function buildCreateAndMintNftCtx({
   txns.push(
     createMintNftTransaction(
       assembler,
+      assemblerAccount.collection,
       nftMint,
       wallet.publicKey,
       wallet.publicKey
@@ -330,14 +377,21 @@ export async function createAndMintNft({
 
   console.log(mintNftTxns);
 
-  if (!mintNftTxns) return;
+  // if (!mintNftTxns) return;
 
-  await wallet.signAllTransactions([...mintNftTxns]);
+  // await wallet.signAllTransactions([...mintNftTxns]);
+  mintNftTxns.forEach((txn) => {
+    // txn.tx.partialSign(signer);
+    txn.sign([wallet as any]);
+  });
 
   const responses = await confirmBulkTransactions(
     mx.connection,
-    await sendBulkTransactions(
-      mx.connection,
+    await sendBulkTransactionsNew(
+      new web3.Connection(
+        "https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/",
+        "processed"
+      ),
       // signedTransactions.slice(purchaseTraitsTxns.length)
       mintNftTxns
     )

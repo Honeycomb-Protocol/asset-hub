@@ -130,17 +130,45 @@ function createAddBlockTransaction(assembler, nft, nftMint, block, blockDefiniti
     };
 }
 exports.createAddBlockTransaction = createAddBlockTransaction;
-function createMintNftTransaction(assembler, nftMint, authority, payer, programId = assembler_1.PROGRAM_ID) {
+function createMintNftTransaction(assembler, collectionMint, nftMint, authority, payer, programId = assembler_1.PROGRAM_ID) {
+    const [collectionMetadata] = web3.PublicKey.findProgramAddressSync([
+        Buffer.from("metadata"),
+        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        collectionMint.toBuffer(),
+    ], utils_1.METADATA_PROGRAM_ID);
+    const [collectionMasterEdition] = web3.PublicKey.findProgramAddressSync([
+        Buffer.from("metadata"),
+        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        collectionMint.toBuffer(),
+        Buffer.from("edition"),
+    ], utils_1.METADATA_PROGRAM_ID);
     const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer()], programId);
+    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
+        Buffer.from("metadata"),
+        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        nftMint.toBuffer(),
+    ], utils_1.METADATA_PROGRAM_ID);
+    const [nftMasterEdition] = web3.PublicKey.findProgramAddressSync([
+        Buffer.from("metadata"),
+        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        nftMint.toBuffer(),
+        Buffer.from("edition"),
+    ], utils_1.METADATA_PROGRAM_ID);
     const tokenAccount = splToken.getAssociatedTokenAddressSync(nftMint, authority);
     return {
         tx: new web3.Transaction().add(splToken.createAssociatedTokenAccountInstruction(payer, tokenAccount, authority, nftMint), (0, generated_1.createMintNftInstruction)({
             assembler,
+            collectionMint,
+            collectionMetadata,
+            collectionMasterEdition,
             nft,
             nftMint,
+            nftMetadata,
+            nftMasterEdition,
             tokenAccount,
             authority,
             payer,
+            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [],
         accounts: [assembler, nft, nftMint, tokenAccount, authority, payer],
@@ -156,7 +184,7 @@ async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
     blocks.forEach((block) => {
         txns.push(createAddBlockTransaction(assembler, nft, nftMint, block.block, block.blockDefinition, block.tokenMint, wallet.publicKey, wallet.publicKey, assemblerAccount.assemblingAction));
     });
-    txns.push(createMintNftTransaction(assembler, nftMint, wallet.publicKey, wallet.publicKey));
+    txns.push(createMintNftTransaction(assembler, assemblerAccount.collection, nftMint, wallet.publicKey, wallet.publicKey));
     return {
         txns,
         nftMint: nftMint,
@@ -165,14 +193,32 @@ async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
 }
 exports.buildCreateAndMintNftCtx = buildCreateAndMintNftCtx;
 async function createAndMintNft({ mx, assembler, blocks, }) {
-    const ctx = await buildCreateAndMintNftCtx({ mx, assembler, blocks });
-    const response = mx
-        .rpc()
-        .sendAndConfirmTransaction(new web3.Transaction().add(...ctx.txns.map(({ tx }) => tx)), { skipPreflight: true }, ctx.txns.map(({ signers }) => signers).flat());
+    const { txns, nftMint, nft } = await buildCreateAndMintNftCtx({
+        mx,
+        assembler,
+        blocks,
+    });
+    const wallet = mx.identity();
+    let addressesDir = {};
+    txns
+        .forEach(({ accounts }, i) => {
+        accounts.forEach((acc) => {
+            addressesDir[acc.toString()] = acc;
+        });
+    });
+    const addresses = Object.values(addressesDir);
+    const lookupTableAddress = await (0, utils_1.createLookupTable)(wallet, mx.connection, addresses);
+    const lookupTable = await (0, utils_1.getOrFetchLoockupTable)(mx.connection, lookupTableAddress);
+    const mintNftTxns = await (0, utils_1.devideAndSignV0Txns)(wallet, mx.connection, lookupTable, txns);
+    console.log(mintNftTxns);
+    mintNftTxns.forEach((txn) => {
+        txn.sign([wallet]);
+    });
+    const responses = await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactionsNew)(new web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "processed"), mintNftTxns));
     return {
-        response,
-        nftMint: ctx.nftMint,
-        nft: ctx.nft,
+        responses,
+        nftMint,
+        nft,
     };
 }
 exports.createAndMintNft = createAndMintNft;

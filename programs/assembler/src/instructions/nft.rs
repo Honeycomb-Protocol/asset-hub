@@ -2,7 +2,7 @@ use crate::{
     errors::ErrorCode,
     structs::{
         Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue, NFTAttribute,
-        NFTAttributeValue, NFTMinted, NFT,
+        NFTAttributeValue, NFT,
     },
     utils::EXTRA_SIZE,
 };
@@ -127,10 +127,11 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
         0,
         false,
         true,
-        Some(mpl_token_metadata::state::Collection {
-            key: assembler.collection,
-            verified: false,
-        }),
+        None,
+        // Some(mpl_token_metadata::state::Collection {
+        //     key: assembler.collection,
+        //     verified: false,
+        // }),
         None,
         None,
     );
@@ -148,32 +149,6 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
         ],
         assembler_signer,
     )?;
-    // @TODO: Add the nft to the collection code below is not working for some reason
-    // mpl_token_metadata::instruction::verify_collection(
-    //     ctx.accounts.token_metadata_program.key(),
-    //     ctx.accounts.nft_metadata.key(),
-    //     assembler_key,
-    //     ctx.accounts.payer.key(),
-    //     assembler_key,
-    //     // ctx.accounts.collection_mint.key(),
-    //     ctx.accounts.collection_metadata_account.key(),
-    //     ctx.accounts.collection_master_edition.key(),
-    //     None,
-    // );
-
-    // solana_program::program::invoke_signed(
-    //     &create_metadata,
-    //     &[
-    //         ctx.accounts.nft_metadata.clone(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.payer.to_account_info(),
-    //         assembler.to_account_info(),
-    //         // ctx.accounts.collection_mint.to_account_info(),
-    //         ctx.accounts.collection_metadata_account.clone(),
-    //         ctx.accounts.collection_master_edition.clone(),
-    //     ],
-    //     assembler_signer,
-    // )?;
 
     Ok(())
 }
@@ -415,6 +390,20 @@ pub struct MintNFT<'info> {
     #[account()]
     pub assembler: Account<'info, Assembler>,
 
+    /// The collection mint of the assembler
+    #[account(mut, constraint = collection_mint.key() == assembler.collection)]
+    pub collection_mint: Account<'info, Mint>,
+
+    /// Metadata account of the collection
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub collection_metadata: AccountInfo<'info>,
+
+    /// Master Edition account of the collection
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub collection_master_edition: AccountInfo<'info>,
+
     /// NFT account
     #[account( mut, has_one = authority, has_one = assembler )]
     pub nft: Account<'info, NFT>,
@@ -423,9 +412,19 @@ pub struct MintNFT<'info> {
     #[account(mut, constraint = nft_mint.key() == nft.mint)]
     pub nft_mint: Account<'info, Mint>,
 
+    /// Metadata account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_metadata: AccountInfo<'info>,
+
+    /// Master Edition account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_master_edition: AccountInfo<'info>,
+
     /// NFT token account
     #[account(mut, constraint = token_account.mint == nft_mint.key() && token_account.owner == authority.key())]
-    pub token_account: Account<'info, TokenAccount>,
+    pub token_account: Box<Account<'info, TokenAccount>>,
 
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
@@ -435,9 +434,19 @@ pub struct MintNFT<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// NATIVE SYSTEM PROGRAM
+    pub system_program: Program<'info, System>,
+
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// METAPLEX TOKEN METADATA PROGRAM
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub token_metadata_program: UncheckedAccount<'info>,
+
+    /// SYSVAR RENT
+    pub rent: Sysvar<'info, Rent>,
 }
 
 /// Create a new nft
@@ -471,7 +480,57 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
 
     nft.minted = true;
 
-    emit!(NFTMinted { nft: nft.key() });
+    let create_master_edition = mpl_token_metadata::instruction::create_master_edition_v3(
+        ctx.accounts.token_metadata_program.key(),
+        ctx.accounts.nft_master_edition.key(),
+        ctx.accounts.nft_mint.key(),
+        assembler.key(),
+        assembler.key(),
+        ctx.accounts.nft_metadata.key(),
+        ctx.accounts.payer.key(),
+        Some(0),
+    );
+
+    solana_program::program::invoke_signed(
+        &create_master_edition,
+        &[
+            ctx.accounts.nft_master_edition.clone(),
+            ctx.accounts.nft_mint.to_account_info(),
+            assembler.to_account_info(),
+            assembler.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.nft_metadata.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.rent.to_account_info(),
+        ],
+        assembler_signer,
+    )?;
+
+    let verify_collection = mpl_token_metadata::instruction::set_and_verify_collection(
+        ctx.accounts.token_metadata_program.key(),
+        ctx.accounts.nft_metadata.key(),
+        assembler.key(),
+        ctx.accounts.payer.key(),
+        assembler.key(),
+        ctx.accounts.collection_mint.key(),
+        ctx.accounts.collection_metadata.key(),
+        ctx.accounts.collection_master_edition.key(),
+        None,
+    );
+
+    solana_program::program::invoke_signed(
+        &verify_collection,
+        &[
+            ctx.accounts.nft_metadata.clone(),
+            assembler.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.collection_mint.to_account_info(),
+            ctx.accounts.collection_metadata.clone(),
+            ctx.accounts.collection_master_edition.clone(),
+        ],
+        assembler_signer,
+    )?;
 
     Ok(())
 }

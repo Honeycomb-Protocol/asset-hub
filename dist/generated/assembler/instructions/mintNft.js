@@ -32,7 +32,7 @@ exports.mintNftInstructionDiscriminator = [
     211, 57, 6, 167, 15, 219, 35, 251,
 ];
 function createMintNftInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
-    var _a;
+    var _a, _b, _c;
     const [data] = exports.mintNftStruct.serialize({
         instructionDiscriminator: exports.mintNftInstructionDiscriminator,
     });
@@ -43,12 +43,37 @@ function createMintNftInstruction(accounts, programId = new web3.PublicKey('AXX2
             isSigner: false,
         },
         {
+            pubkey: accounts.collectionMint,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.collectionMetadata,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.collectionMasterEdition,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.nft,
             isWritable: true,
             isSigner: false,
         },
         {
             pubkey: accounts.nftMint,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.nftMetadata,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.nftMasterEdition,
             isWritable: true,
             isSigner: false,
         },
@@ -68,7 +93,22 @@ function createMintNftInstruction(accounts, programId = new web3.PublicKey('AXX2
             isSigner: true,
         },
         {
-            pubkey: (_a = accounts.tokenProgram) !== null && _a !== void 0 ? _a : splToken.TOKEN_PROGRAM_ID,
+            pubkey: (_a = accounts.systemProgram) !== null && _a !== void 0 ? _a : web3.SystemProgram.programId,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: (_b = accounts.tokenProgram) !== null && _b !== void 0 ? _b : splToken.TOKEN_PROGRAM_ID,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.tokenMetadataProgram,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: (_c = accounts.rent) !== null && _c !== void 0 ? _c : web3.SYSVAR_RENT_PUBKEY,
             isWritable: false,
             isSigner: false,
         },

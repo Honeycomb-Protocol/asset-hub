@@ -24,23 +24,37 @@ export const mintNftStruct = new beet.BeetArgsStruct<{
  * Accounts required by the _mintNft_ instruction
  *
  * @property [] assembler
+ * @property [_writable_] collectionMint
+ * @property [_writable_] collectionMetadata
+ * @property [_writable_] collectionMasterEdition
  * @property [_writable_] nft
  * @property [_writable_] nftMint
+ * @property [_writable_] nftMetadata
+ * @property [_writable_] nftMasterEdition
  * @property [_writable_] tokenAccount
  * @property [_writable_, **signer**] authority
  * @property [_writable_, **signer**] payer
+ * @property [] tokenMetadataProgram
  * @category Instructions
  * @category MintNft
  * @category generated
  */
 export type MintNftInstructionAccounts = {
   assembler: web3.PublicKey
+  collectionMint: web3.PublicKey
+  collectionMetadata: web3.PublicKey
+  collectionMasterEdition: web3.PublicKey
   nft: web3.PublicKey
   nftMint: web3.PublicKey
+  nftMetadata: web3.PublicKey
+  nftMasterEdition: web3.PublicKey
   tokenAccount: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  tokenMetadataProgram: web3.PublicKey
+  rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -70,12 +84,37 @@ export function createMintNftInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.collectionMint,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.collectionMetadata,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.collectionMasterEdition,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.nft,
       isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.nftMint,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.nftMetadata,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.nftMasterEdition,
       isWritable: true,
       isSigner: false,
     },
@@ -95,7 +134,22 @@ export function createMintNftInstruction(
       isSigner: true,
     },
     {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenMetadataProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },

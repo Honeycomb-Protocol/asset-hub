@@ -24,7 +24,7 @@ export default async function (
   switch (action) {
     case "create-assembler":
       const assemblerTx = await createAssembler(mx, {
-        assemblingAction: AssemblingAction.TakeCustody,
+        assemblingAction: AssemblingAction.Freeze,
         collectionName: "Assembler Test Collection",
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",
@@ -131,7 +131,7 @@ export default async function (
           },
         ],
       });
-      console.log("Mint response: ", mint.response);
+      console.log("Mint response: ", mint.responses);
       setDeployments({
         ...deployments,
         nftMint: mint.nftMint,

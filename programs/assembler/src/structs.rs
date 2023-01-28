@@ -259,8 +259,3 @@ pub struct NFTAttribute {
 impl NFTAttribute {
     pub const LEN: usize = 192 - 1;
 }
-
-#[event]
-pub struct NFTMinted {
-    pub nft: Pubkey,
-}

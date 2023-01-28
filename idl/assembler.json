@@ -552,6 +552,30 @@
           ]
         },
         {
+          "name": "collectionMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The collection mint of the assembler"
+          ]
+        },
+        {
+          "name": "collectionMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata account of the collection"
+          ]
+        },
+        {
+          "name": "collectionMasterEdition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Master Edition account of the collection"
+          ]
+        },
+        {
           "name": "nft",
           "isMut": true,
           "isSigner": false,
@@ -565,6 +589,22 @@
           "isSigner": false,
           "docs": [
             "NFT mint account"
+          ]
+        },
+        {
+          "name": "nftMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata account of the NFT"
+          ]
+        },
+        {
+          "name": "nftMasterEdition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Master Edition account of the NFT"
           ]
         },
         {
@@ -592,11 +632,35 @@
           ]
         },
         {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SYSVAR RENT"
           ]
         }
       ],
@@ -1298,18 +1362,6 @@
           }
         ]
       }
-    }
-  ],
-  "events": [
-    {
-      "name": "NFTMinted",
-      "fields": [
-        {
-          "name": "nft",
-          "type": "publicKey",
-          "index": false
-        }
-      ]
     }
   ],
   "errors": [

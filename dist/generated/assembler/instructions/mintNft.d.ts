@@ -5,12 +5,20 @@ export declare const mintNftStruct: beet.BeetArgsStruct<{
 }>;
 export type MintNftInstructionAccounts = {
     assembler: web3.PublicKey;
+    collectionMint: web3.PublicKey;
+    collectionMetadata: web3.PublicKey;
+    collectionMasterEdition: web3.PublicKey;
     nft: web3.PublicKey;
     nftMint: web3.PublicKey;
+    nftMetadata: web3.PublicKey;
+    nftMasterEdition: web3.PublicKey;
     tokenAccount: web3.PublicKey;
     authority: web3.PublicKey;
     payer: web3.PublicKey;
+    systemProgram?: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
+    tokenMetadataProgram: web3.PublicKey;
+    rent?: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
 export declare const mintNftInstructionDiscriminator: number[];

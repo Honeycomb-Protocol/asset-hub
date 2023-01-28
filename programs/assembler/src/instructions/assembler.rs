@@ -212,7 +212,7 @@ pub fn create_assembler_collection_master_edition(
         assembler_key,
         ctx.accounts.collection_metadata_account.key(),
         ctx.accounts.payer.key(),
-        None,
+        Some(0),
     );
 
     solana_program::program::invoke_signed(

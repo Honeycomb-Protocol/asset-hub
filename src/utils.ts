@@ -1,6 +1,11 @@
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import { IdentitySigner, Metaplex, Signer } from "@metaplex-foundation/js";
+import {
+  IdentityClient,
+  IdentitySigner,
+  Metaplex,
+  Signer,
+} from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
 
 export const METADATA_PROGRAM_ID = new web3.PublicKey(
@@ -189,7 +194,7 @@ export const devideAndSignV0Txns = async (
   return txns;
 };
 export const createLookupTable = async (
-  wallet: Wallet,
+  wallet: Wallet | IdentityClient,
   connection: web3.Connection,
   addresses: web3.PublicKey[]
 ) => {
@@ -224,12 +229,18 @@ export const createLookupTable = async (
       )
     );
   }
-
-  [creationTx, ...transactions] = await wallet.signAllTransactions([
-    creationTx,
-    ...transactions,
-  ]);
-
+  if ("secretKey" in wallet) {
+    creationTx.sign([wallet]);
+    transactions.forEach((txn) => {
+      // txn.tx.partialSign(signer);
+      txn.sign([wallet]);
+    });
+  } else {
+    [creationTx, ...transactions] = await wallet.signAllTransactions([
+      creationTx,
+      ...transactions,
+    ]);
+  }
   const createTxSignature = await connection.sendTransaction(creationTx, {
     skipPreflight: true,
   });
@@ -274,6 +285,18 @@ export const sendBulkTransactions = (
           skipPreflight: true,
         }
       )
+    )
+  );
+};
+export const sendBulkTransactionsNew = (
+  connection: web3.Connection,
+  transactions: web3.VersionedTransaction[]
+) => {
+  return Promise.all(
+    transactions.map((t) =>
+      connection.sendTransaction(t, {
+        skipPreflight: true,
+      })
     )
   );
 };
