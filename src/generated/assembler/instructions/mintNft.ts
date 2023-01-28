@@ -24,9 +24,6 @@ export const mintNftStruct = new beet.BeetArgsStruct<{
  * Accounts required by the _mintNft_ instruction
  *
  * @property [] assembler
- * @property [_writable_] collectionMint
- * @property [_writable_] collectionMetadata
- * @property [_writable_] collectionMasterEdition
  * @property [_writable_] nft
  * @property [_writable_] nftMint
  * @property [_writable_] nftMetadata
@@ -41,9 +38,6 @@ export const mintNftStruct = new beet.BeetArgsStruct<{
  */
 export type MintNftInstructionAccounts = {
   assembler: web3.PublicKey
-  collectionMint: web3.PublicKey
-  collectionMetadata: web3.PublicKey
-  collectionMasterEdition: web3.PublicKey
   nft: web3.PublicKey
   nftMint: web3.PublicKey
   nftMetadata: web3.PublicKey
@@ -81,21 +75,6 @@ export function createMintNftInstruction(
     {
       pubkey: accounts.assembler,
       isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collectionMint,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collectionMetadata,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collectionMasterEdition,
-      isWritable: true,
       isSigner: false,
     },
     {

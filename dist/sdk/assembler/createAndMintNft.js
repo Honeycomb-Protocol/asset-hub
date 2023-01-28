@@ -130,18 +130,7 @@ function createAddBlockTransaction(assembler, nft, nftMint, block, blockDefiniti
     };
 }
 exports.createAddBlockTransaction = createAddBlockTransaction;
-function createMintNftTransaction(assembler, collectionMint, nftMint, authority, payer, programId = assembler_1.PROGRAM_ID) {
-    const [collectionMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        collectionMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [collectionMasterEdition] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        collectionMint.toBuffer(),
-        Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
+function createMintNftTransaction(assembler, nftMint, authority, payer, programId = assembler_1.PROGRAM_ID) {
     const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer()], programId);
     const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
@@ -158,9 +147,6 @@ function createMintNftTransaction(assembler, collectionMint, nftMint, authority,
     return {
         tx: new web3.Transaction().add(splToken.createAssociatedTokenAccountInstruction(payer, tokenAccount, authority, nftMint), (0, generated_1.createMintNftInstruction)({
             assembler,
-            collectionMint,
-            collectionMetadata,
-            collectionMasterEdition,
             nft,
             nftMint,
             nftMetadata,
@@ -184,7 +170,7 @@ async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
     blocks.forEach((block) => {
         txns.push(createAddBlockTransaction(assembler, nft, nftMint, block.block, block.blockDefinition, block.tokenMint, wallet.publicKey, wallet.publicKey, assemblerAccount.assemblingAction));
     });
-    txns.push(createMintNftTransaction(assembler, assemblerAccount.collection, nftMint, wallet.publicKey, wallet.publicKey));
+    txns.push(createMintNftTransaction(assembler, nftMint, wallet.publicKey, wallet.publicKey));
     return {
         txns,
         nftMint: nftMint,

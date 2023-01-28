@@ -43,21 +43,6 @@ function createMintNftInstruction(accounts, programId = new web3.PublicKey('AXX2
             isSigner: false,
         },
         {
-            pubkey: accounts.collectionMint,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.collectionMetadata,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.collectionMasterEdition,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
             pubkey: accounts.nft,
             isWritable: true,
             isSigner: false,

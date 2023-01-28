@@ -190,31 +190,11 @@ export function createAddBlockTransaction(
 
 export function createMintNftTransaction(
   assembler: web3.PublicKey,
-  collectionMint: web3.PublicKey,
   nftMint: web3.PublicKey,
   authority: web3.PublicKey,
   payer: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
-  const [collectionMetadata] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      collectionMint.toBuffer(),
-    ],
-    METADATA_PROGRAM_ID
-  );
-
-  const [collectionMasterEdition] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      collectionMint.toBuffer(),
-      Buffer.from("edition"),
-    ],
-    METADATA_PROGRAM_ID
-  );
-
   const [nft] = web3.PublicKey.findProgramAddressSync(
     [Buffer.from("nft"), nftMint.toBuffer()],
     programId
@@ -256,9 +236,6 @@ export function createMintNftTransaction(
       createMintNftInstruction(
         {
           assembler,
-          collectionMint,
-          collectionMetadata,
-          collectionMasterEdition,
           nft,
           nftMint,
           nftMetadata,
@@ -319,7 +296,6 @@ export async function buildCreateAndMintNftCtx({
   txns.push(
     createMintNftTransaction(
       assembler,
-      assemblerAccount.collection,
       nftMint,
       wallet.publicKey,
       wallet.publicKey

@@ -552,30 +552,6 @@
           ]
         },
         {
-          "name": "collectionMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The collection mint of the assembler"
-          ]
-        },
-        {
-          "name": "collectionMetadata",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Metadata account of the collection"
-          ]
-        },
-        {
-          "name": "collectionMasterEdition",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Master Edition account of the collection"
-          ]
-        },
-        {
           "name": "nft",
           "isMut": true,
           "isSigner": false,

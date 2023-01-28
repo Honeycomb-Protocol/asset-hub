@@ -5,9 +5,6 @@ export declare const mintNftStruct: beet.BeetArgsStruct<{
 }>;
 export type MintNftInstructionAccounts = {
     assembler: web3.PublicKey;
-    collectionMint: web3.PublicKey;
-    collectionMetadata: web3.PublicKey;
-    collectionMasterEdition: web3.PublicKey;
     nft: web3.PublicKey;
     nftMint: web3.PublicKey;
     nftMetadata: web3.PublicKey;
