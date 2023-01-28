@@ -20,6 +20,9 @@ export type BlockDefinitionConfig = {
     value: string;
     mintAddress?: string;
     collection?: string;
+    caches?: {
+        image: string;
+    };
     assetConfig?: AssetConfig;
     address?: string;
 };
