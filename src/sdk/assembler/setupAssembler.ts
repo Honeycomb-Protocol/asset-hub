@@ -1,7 +1,5 @@
-import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
-// //@ts-ignore
-// import key from "../../../key.json";
+
 import {
   AssemblingAction,
   BlockDefinitionValue,
@@ -13,45 +11,38 @@ import {
   createCreateBlockTransaction,
   createCreateBlockDefinitionTransaction,
 } from ".";
-import { sendAndConfirmTransaction } from "../../utils";
-import {
-  Signer,
-  Metaplex,
-  walletAdapterIdentity,
-  MetaplexFile,
-} from "@metaplex-foundation/js";
+import { Signer, Metaplex, MetaplexFile } from "@metaplex-foundation/js";
 import { createCreateAssetTransaction } from "../assetmanager";
-
+import {
+  bulkLutTransactions,
+  confirmBulkTransactions,
+  devideAndSignTxns,
+  devideAndSignV0Txns,
+  sendBulkTransactions,
+  sendBulkTransactionsLegacy,
+} from "../../utils";
+import { Wallet } from "@project-serum/anchor";
+type TransactionGroup = {
+  txns: TxSignersAccounts[];
+  postActions: ((...args: any[]) => any)[];
+};
 export async function setupAssembler(
   mx: Metaplex,
   config: AssemblerConfig,
   updateConfig: (cfg: AssemblerConfig) => void,
   readFile: (path: string) => Promise<MetaplexFile>
 ) {
-  let transactions: (TxSignersAccounts & {
-    postAction: (...args: any[]) => any;
-  })[] = [];
-  const wallet = mx.identity();
-  let signers: Signer[] = [];
-  let accounts: web3.PublicKey[] = [];
-
+  const transactionGroups: TransactionGroup[] = [
+    {
+      txns: [],
+      postActions: [],
+    },
+  ];
+  const wallet: Wallet = mx.identity() as any;
+  if (!config.destroyableLookupTables) config.destroyableLookupTables = [];
   /// Creating the assembler
-  let assemblingAction: AssemblingAction;
-
-  switch (config.assemblingAction) {
-    case "Burn":
-      assemblingAction = AssemblingAction.Burn;
-      break;
-    case "Freeze":
-      assemblingAction = AssemblingAction.Freeze;
-      break;
-    case "TakeCustody":
-      assemblingAction = AssemblingAction.TakeCustody;
-      break;
-
-    default:
-      break;
-  }
+  const assemblingAction: AssemblingAction =
+    AssemblingAction[config.assemblingAction] || AssemblingAction.Burn;
 
   let assemblerAddress = config.assemblerAddress;
   if (!assemblerAddress) {
@@ -68,38 +59,18 @@ export async function setupAssembler(
         nftBaseUri: config.base_url,
       }
     );
-    transactions.push({
-      ...createAssemblerCtx,
-      postAction() {
-        config.assemblerAddress = createAssemblerCtx.assembler.toString();
-        updateConfig(config);
-      },
+    transactionGroups[0].txns.push(createAssemblerCtx);
+    transactionGroups[0].postActions.push(() => {
+      config.assemblerAddress = createAssemblerCtx.assembler.toString();
+      updateConfig(config);
     });
-    signers.push(...createAssemblerCtx.signers);
-    accounts.push(...createAssemblerCtx.accounts);
     assemblerAddress = createAssemblerCtx.assembler.toString();
   }
+
   /// Creating blocks
-  // config.blocks =
   await Promise.all(
     config.blocks.map(async (block) => {
-      let blockType: BlockType;
-      switch (block.type) {
-        case "Enum":
-          blockType = BlockType.Enum;
-          break;
-        case "Boolean":
-          blockType = BlockType.Boolean;
-          break;
-        case "Random":
-          blockType = BlockType.Random;
-          break;
-        case "Computed":
-          blockType = BlockType.Computed;
-          break;
-        default:
-          throw new Error("Invalid Block Type");
-      }
+      const blockType: BlockType = BlockType[block.type] || BlockType.Enum;
 
       let blockAddress = block.address;
       if (!blockAddress) {
@@ -114,20 +85,20 @@ export async function setupAssembler(
             isGraphical: block.isGraphical,
           }
         );
-        transactions.push({
-          ...createBlockCtx,
-          postAction() {
-            block.address = createBlockCtx.block.toString();
-            updateConfig(config);
-          },
+        transactionGroups[0].txns.push(createBlockCtx);
+        transactionGroups[0].postActions.push(() => {
+          block.address = createBlockCtx.block.toString();
+          updateConfig(config);
         });
-        signers.push(...createBlockCtx.signers);
-        accounts.push(...createBlockCtx.accounts);
         blockAddress = createBlockCtx.block.toString();
       }
+      const transactionGroup: TransactionGroup = {
+        txns: [],
+        postActions: [],
+      };
+      transactionGroups.push(transactionGroup);
 
       /// Creating block definitions
-      // block.definitions =
       await Promise.all(
         block.definitions.map(async (blockDefinition) => {
           if (blockDefinition.address) return;
@@ -183,6 +154,11 @@ export async function setupAssembler(
                 symbol: blockDefinition.assetConfig.symbol,
                 ...(blockDefinition.assetConfig.json || {}),
               });
+              if (!blockDefinition.caches)
+                blockDefinition.caches = {
+                  image: blockDefinition.assetConfig.image,
+                };
+              blockDefinition.caches.image = blockDefinition.assetConfig.image;
               uri = blockDefinition.assetConfig.uri = m.uri;
               updateConfig(config);
             }
@@ -198,20 +174,14 @@ export async function setupAssembler(
                 uri: uri,
               }
             );
-            transactions.push({
-              ...createAssetCtx,
-              postAction() {
-                blockDefinition.assetConfig.address =
-                  createAssetCtx.asset.toString();
-                blockDefinition.mintAddress = createAssetCtx.mint.toString();
-                updateConfig(config);
-              },
+            transactionGroup.txns.push(createAssetCtx);
+            transactionGroup.postActions.push(() => {
+              blockDefinition.assetConfig.address =
+                createAssetCtx.asset.toString();
+              blockDefinition.mintAddress = createAssetCtx.mint.toString();
+              updateConfig(config);
             });
-            // transactions.push(createAssetCtx);
-            signers.push(...createAssetCtx.signers);
-            accounts.push(...createAssetCtx.accounts);
             blockDefinitionMint = createAssetCtx.mint;
-            // blockDefinition.mintAddress = createAssetCtx.mint.toString();
           } else {
             throw new Error("Block definition details not provided properly");
           }
@@ -225,19 +195,14 @@ export async function setupAssembler(
               wallet.publicKey,
               blockDefArgs
             );
-          transactions.push({
-            ...createBlockDefinitionCtx,
-            postAction() {
-              blockDefinition.address =
-                createBlockDefinitionCtx.blockDefinition.toString();
-              updateConfig(config);
-            },
+
+          transactionGroup.txns.push(createBlockDefinitionCtx);
+          transactionGroup.postActions.push(() => {
+            blockDefinition.address =
+              createBlockDefinitionCtx.blockDefinition.toString();
+            updateConfig(config);
           });
-          // transactions.push(createBlockDefinitionCtx);
-          signers.push(...createBlockDefinitionCtx.signers);
-          accounts.push(...createBlockDefinitionCtx.accounts);
-          // blockDefinition.address =
-          //   createBlockDefinitionCtx.blockDefinition.toString();
+
           return blockDefinition;
         })
       );
@@ -245,36 +210,37 @@ export async function setupAssembler(
       return block;
     })
   );
+  for (let tg of transactionGroups) {
+    if (tg.txns.length) {
+      console.log(tg.txns.length);
+      const { txns, lookupTableAddress } = await bulkLutTransactions(
+        mx,
+        tg.txns
+      );
 
-  /// Remove duplicate accounts
-  accounts = accounts.filter(
-    (x, index, self) => index === self.findIndex((y) => x.equals(y))
-  );
+      // console.log(txns);
+      // console.log(txns.map((tx) => tx.serialize().byteLength));
 
-  // const lookuptable = await createLookupTable(connection, wallet, ...accounts);
-  let i = 0;
-  for (let t of transactions) {
-    const blockhash = await mx.rpc().getLatestBlockhash();
-    t.tx.recentBlockhash = blockhash.blockhash;
-    await mx
-      .rpc()
-      .sendAndConfirmTransaction(
-        t.tx,
-        {
-          skipPreflight: true,
-        },
-        t.signers
-      )
-      .then((txId) => {
-        if (t.postAction) t.postAction();
-        console.log(
-          `Assembler setup tx: (${++i}/${transactions.length})`,
-          txId.signature
-        );
-      })
-      .catch((e) => {
-        console.error(e);
+      txns.forEach((txn) => {
+        txn.sign([wallet as any]);
       });
+
+      // console.log(txns.map((tx) => tx.serialize().byteLength));
+      const processedConnection = new web3.Connection(
+        mx.connection.rpcEndpoint,
+        "processed"
+      );
+      const responses = await confirmBulkTransactions(
+        mx.connection,
+        await sendBulkTransactions(processedConnection, txns)
+      );
+      config.destroyableLookupTables.push(lookupTableAddress.toString());
+      updateConfig(config);
+      // console.log(responses);
+    }
+    tg.postActions.forEach((action) => {
+      action();
+    });
     // await createV0TxWithLUT(
     //   connection,
     //   wallet.publicKey,
@@ -290,6 +256,34 @@ export async function setupAssembler(
     //     )
     //   );
   }
+  const destroyableLookupTables: web3.PublicKey[] =
+    config.destroyableLookupTables.map((str) => new web3.PublicKey(str));
 
+  if (false && destroyableLookupTables.length) {
+    const latestBlockhash = await mx.connection.getLatestBlockhash();
+    const destroyTransactions = destroyableLookupTables.map((address) =>
+      new web3.Transaction({
+        feePayer: wallet.publicKey,
+        recentBlockhash: latestBlockhash.blockhash,
+      }).add(
+        web3.AddressLookupTableProgram.closeLookupTable({
+          authority: wallet.publicKey,
+          lookupTable: address,
+          recipient: wallet.publicKey,
+        })
+      )
+    );
+
+    wallet.signAllTransactions(destroyTransactions);
+    // txns.forEach((txn) => {
+    //   txn.sign([wallet as any]);
+    // });
+    // console.log(txns.map((tx) => tx.serialize().byteLength));
+
+    await confirmBulkTransactions(
+      mx.connection,
+      await sendBulkTransactionsLegacy(mx, destroyTransactions)
+    );
+  }
   return config;
 }

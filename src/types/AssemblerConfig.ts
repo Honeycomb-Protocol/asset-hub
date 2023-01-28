@@ -7,6 +7,7 @@ export type AssemblerConfig = {
   blocks: BlockConfig[];
   assemblerAddress?: string;
   assetProject?: string;
+  destroyableLookupTables?: string[];
 };
 
 export type BlockConfig = {

@@ -10,13 +10,13 @@ import {
 import { PROGRAM_ID } from "../../generated/assembler";
 import { CreateAndMintNftArgs, TxSignersAccounts, Wallet } from "../../types";
 import {
+  bulkLutTransactions,
   confirmBulkTransactions,
   createLookupTable,
   devideAndSignV0Txns,
   getOrFetchLoockupTable,
   METADATA_PROGRAM_ID,
   sendBulkTransactions,
-  sendBulkTransactionsNew,
 } from "../../utils";
 
 export function createCreateNftTransaction(
@@ -320,42 +320,13 @@ export async function createAndMintNft({
     blocks,
   });
   const wallet: Wallet = mx.identity() as any;
-  let addressesDir: { [key: string]: web3.PublicKey } = {};
-
-  txns
-    // .concat(assemblerTxns)
-    .forEach(({ accounts }, i) => {
-      accounts.forEach((acc) => {
-        addressesDir[acc.toString()] = acc;
-      });
-    });
-
-  const addresses = Object.values(addressesDir);
-
-  // alert("first");
-  const lookupTableAddress = await createLookupTable(
-    wallet,
-    mx.connection,
-    addresses
-  );
-
-  const lookupTable = await getOrFetchLoockupTable(
-    mx.connection,
-    lookupTableAddress
-  );
-
-  const mintNftTxns = await devideAndSignV0Txns(
-    wallet,
-    mx.connection,
-    lookupTable,
+  const { txns: mintNftTxns, lookupTableAddress } = await bulkLutTransactions(
+    mx,
     txns
   );
 
-  console.log(mintNftTxns);
+  // console.log(mintNftTxns);
 
-  // if (!mintNftTxns) return;
-
-  // await wallet.signAllTransactions([...mintNftTxns]);
   mintNftTxns.forEach((txn) => {
     // txn.tx.partialSign(signer);
     txn.sign([wallet as any]);
@@ -363,7 +334,7 @@ export async function createAndMintNft({
 
   const responses = await confirmBulkTransactions(
     mx.connection,
-    await sendBulkTransactionsNew(
+    await sendBulkTransactions(
       new web3.Connection(
         "https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/",
         "processed"

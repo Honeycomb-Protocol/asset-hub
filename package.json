@@ -12,6 +12,7 @@
     "build:sdk": "solita && tsc",
     "build": "yarn build:program & yarn build:sdk",
     "deploy": "anchor deploy",
+    "honeycomb:dev": "ts-node src/bin/index.ts",
     "build-deploy": "yarn build && yarn deploy",
     "assembler": "ts-node ./scripts/index.ts assembler",
     "assetmanager": "ts-node ./scripts/index.ts assetmanager",
