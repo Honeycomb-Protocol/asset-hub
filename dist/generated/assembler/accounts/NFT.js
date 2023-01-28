@@ -27,9 +27,10 @@ exports.nFTBeet = exports.NFT = exports.nFTDiscriminator = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
+const NFTAttribute_1 = require("../types/NFTAttribute");
 exports.nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217];
 class NFT {
-    constructor(bump, assembler, authority, collectionAddress, mint, name, symbol, description, minted, id, uri, isGenerated) {
+    constructor(bump, assembler, authority, collectionAddress, mint, name, symbol, description, minted, id, uri, isGenerated, attributes) {
         this.bump = bump;
         this.assembler = assembler;
         this.authority = authority;
@@ -42,9 +43,10 @@ class NFT {
         this.id = id;
         this.uri = uri;
         this.isGenerated = isGenerated;
+        this.attributes = attributes;
     }
     static fromArgs(args) {
-        return new NFT(args.bump, args.assembler, args.authority, args.collectionAddress, args.mint, args.name, args.symbol, args.description, args.minted, args.id, args.uri, args.isGenerated);
+        return new NFT(args.bump, args.assembler, args.authority, args.collectionAddress, args.mint, args.name, args.symbol, args.description, args.minted, args.id, args.uri, args.isGenerated, args.attributes);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return NFT.deserialize(accountInfo.data, offset);
@@ -56,7 +58,7 @@ class NFT {
         }
         return NFT.fromAccountInfo(accountInfo, 0)[0];
     }
-    static gpaBuilder(programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+    static gpaBuilder(programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
         return beetSolana.GpaBuilder.fromStruct(programId, exports.nFTBeet);
     }
     static deserialize(buf, offset = 0) {
@@ -92,6 +94,7 @@ class NFT {
             id: this.id,
             uri: this.uri,
             isGenerated: this.isGenerated,
+            attributes: this.attributes,
         };
     }
 }
@@ -110,5 +113,6 @@ exports.nFTBeet = new beet.FixableBeetStruct([
     ['id', beet.u16],
     ['uri', beet.utf8String],
     ['isGenerated', beet.bool],
+    ['attributes', beet.array(NFTAttribute_1.nFTAttributeBeet)],
 ], NFT.fromArgs, 'NFT');
 //# sourceMappingURL=NFT.js.map

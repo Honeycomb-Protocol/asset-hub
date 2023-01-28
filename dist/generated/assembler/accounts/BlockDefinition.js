@@ -49,7 +49,7 @@ class BlockDefinition {
         }
         return BlockDefinition.fromAccountInfo(accountInfo, 0)[0];
     }
-    static gpaBuilder(programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+    static gpaBuilder(programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
         return beetSolana.GpaBuilder.fromStruct(programId, exports.blockDefinitionBeet);
     }
     static deserialize(buf, offset = 0) {

@@ -34,7 +34,7 @@ exports.createBlockDefinitionStruct = new beet.FixableBeetArgsStruct([
 exports.createBlockDefinitionInstructionDiscriminator = [
     84, 173, 223, 150, 100, 247, 106, 4,
 ];
-function createCreateBlockDefinitionInstruction(accounts, args, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+function createCreateBlockDefinitionInstruction(accounts, args, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     var _a;
     const [data] = exports.createBlockDefinitionStruct.serialize({
         instructionDiscriminator: exports.createBlockDefinitionInstructionDiscriminator,

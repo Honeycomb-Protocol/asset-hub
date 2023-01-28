@@ -136,13 +136,8 @@ export function createAddBlockTransaction(
     METADATA_PROGRAM_ID
   );
 
-  const [nftAttribute] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("nft_attribute"), block.toBuffer(), nftMint.toBuffer()],
-    programId
-  );
-
   const [depositAccount] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("deposit"), tokenMint.toBuffer()],
+    [Buffer.from("deposit"), tokenMint.toBuffer(), nftMint.toBuffer()],
     programId
   );
 
@@ -162,7 +157,7 @@ export function createAddBlockTransaction(
             assemblingAction === AssemblingAction.TakeCustody
               ? depositAccount
               : programId,
-          nftAttribute,
+          // nftAttribute,
           authority,
           payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
@@ -180,7 +175,6 @@ export function createAddBlockTransaction(
       tokenAccount,
       tokenMetadata,
       tokenEdition,
-      nftAttribute,
       authority,
       payer,
       METADATA_PROGRAM_ID,
@@ -191,6 +185,7 @@ export function createAddBlockTransaction(
 export function createMintNftTransaction(
   assembler: web3.PublicKey,
   nftMint: web3.PublicKey,
+  uniqueConstraint: web3.PublicKey | null,
   authority: web3.PublicKey,
   payer: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
@@ -224,6 +219,8 @@ export function createMintNftTransaction(
     authority
   );
 
+  console.log("uniqueConstraint", uniqueConstraint.toString());
+
   return {
     tx: new web3.Transaction().add(
       splToken.createAssociatedTokenAccountInstruction(
@@ -241,6 +238,7 @@ export function createMintNftTransaction(
           nftMetadata,
           nftMasterEdition,
           tokenAccount,
+          uniqueConstraint: uniqueConstraint || programId,
           authority,
           payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
@@ -277,6 +275,8 @@ export async function buildCreateAndMintNftCtx({
   );
   txns.push(nftCreateCtx);
 
+  const uniqueConstraintSeeds: Buffer[] = [];
+
   blocks.forEach((block) => {
     txns.push(
       createAddBlockTransaction(
@@ -291,12 +291,26 @@ export async function buildCreateAndMintNftCtx({
         assemblerAccount.assemblingAction
       )
     );
+
+    if (!assemblerAccount.allowDuplicates) {
+      uniqueConstraintSeeds.push(block.blockDefinition.toBuffer());
+      uniqueConstraintSeeds.push(block.tokenMint.toBuffer());
+    }
   });
+
+  let uniqueConstraint: web3.PublicKey | null = null;
+  if (uniqueConstraintSeeds.length) {
+    uniqueConstraint = web3.PublicKey.findProgramAddressSync(
+      [...uniqueConstraintSeeds],
+      PROGRAM_ID
+    )[0];
+  }
 
   txns.push(
     createMintNftTransaction(
       assembler,
       nftMint,
+      uniqueConstraint,
       wallet.publicKey,
       wallet.publicKey
     )

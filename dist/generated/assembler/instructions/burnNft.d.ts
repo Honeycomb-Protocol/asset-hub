@@ -8,6 +8,7 @@ export type BurnNftInstructionAccounts = {
     nft: web3.PublicKey;
     nftMint: web3.PublicKey;
     tokenAccount: web3.PublicKey;
+    uniqueConstraint: web3.PublicKey;
     authority: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];

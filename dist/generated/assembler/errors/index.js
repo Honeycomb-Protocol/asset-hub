@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorFromName = exports.errorFromCode = exports.NFTNotBurnableError = exports.NFTNotMintedError = exports.DepositAccountNotProvidedError = exports.NFTAlreadyMintedError = exports.InvalidTokenForBlockDefinitionError = exports.InvalidMetadataError = exports.InvalidBlockDefinitionError = exports.InvalidBlockTypeError = exports.RequiredBlockImageError = exports.BlockTypeMismatchError = exports.OverflowError = void 0;
+exports.errorFromName = exports.errorFromCode = exports.NFTNotBurnableError = exports.NFTNotMintedError = exports.DepositAccountNotProvidedError = exports.UniqueConstraintNotProvidedError = exports.InvalidUniqueConstraintError = exports.BlockDoesNotExistsForNFTError = exports.BlockExistsForNFTError = exports.NFTAlreadyMintedError = exports.InvalidTokenForBlockDefinitionError = exports.InvalidMetadataError = exports.InvalidBlockDefinitionError = exports.InvalidBlockTypeError = exports.RequiredBlockImageError = exports.BlockTypeMismatchError = exports.OverflowError = void 0;
 const createErrorFromCodeLookup = new Map();
 const createErrorFromNameLookup = new Map();
 class OverflowError extends Error {
@@ -107,10 +107,62 @@ class NFTAlreadyMintedError extends Error {
 exports.NFTAlreadyMintedError = NFTAlreadyMintedError;
 createErrorFromCodeLookup.set(0x1777, () => new NFTAlreadyMintedError());
 createErrorFromNameLookup.set('NFTAlreadyMinted', () => new NFTAlreadyMintedError());
+class BlockExistsForNFTError extends Error {
+    constructor() {
+        super('NFT attribute is already present for this block');
+        this.code = 0x1778;
+        this.name = 'BlockExistsForNFT';
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, BlockExistsForNFTError);
+        }
+    }
+}
+exports.BlockExistsForNFTError = BlockExistsForNFTError;
+createErrorFromCodeLookup.set(0x1778, () => new BlockExistsForNFTError());
+createErrorFromNameLookup.set('BlockExistsForNFT', () => new BlockExistsForNFTError());
+class BlockDoesNotExistsForNFTError extends Error {
+    constructor() {
+        super('NFT does not have attribute for this block');
+        this.code = 0x1779;
+        this.name = 'BlockDoesNotExistsForNFT';
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, BlockDoesNotExistsForNFTError);
+        }
+    }
+}
+exports.BlockDoesNotExistsForNFTError = BlockDoesNotExistsForNFTError;
+createErrorFromCodeLookup.set(0x1779, () => new BlockDoesNotExistsForNFTError());
+createErrorFromNameLookup.set('BlockDoesNotExistsForNFT', () => new BlockDoesNotExistsForNFTError());
+class InvalidUniqueConstraintError extends Error {
+    constructor() {
+        super('Unique constraint is not valid');
+        this.code = 0x177a;
+        this.name = 'InvalidUniqueConstraint';
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, InvalidUniqueConstraintError);
+        }
+    }
+}
+exports.InvalidUniqueConstraintError = InvalidUniqueConstraintError;
+createErrorFromCodeLookup.set(0x177a, () => new InvalidUniqueConstraintError());
+createErrorFromNameLookup.set('InvalidUniqueConstraint', () => new InvalidUniqueConstraintError());
+class UniqueConstraintNotProvidedError extends Error {
+    constructor() {
+        super('Unique constraint is not provided');
+        this.code = 0x177b;
+        this.name = 'UniqueConstraintNotProvided';
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, UniqueConstraintNotProvidedError);
+        }
+    }
+}
+exports.UniqueConstraintNotProvidedError = UniqueConstraintNotProvidedError;
+createErrorFromCodeLookup.set(0x177b, () => new UniqueConstraintNotProvidedError());
+createErrorFromNameLookup.set('UniqueConstraintNotProvided', () => new UniqueConstraintNotProvidedError());
 class DepositAccountNotProvidedError extends Error {
     constructor() {
         super('Deposit account is not provided');
-        this.code = 0x1778;
+        this.code = 0x177c;
         this.name = 'DepositAccountNotProvided';
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, DepositAccountNotProvidedError);
@@ -118,12 +170,12 @@ class DepositAccountNotProvidedError extends Error {
     }
 }
 exports.DepositAccountNotProvidedError = DepositAccountNotProvidedError;
-createErrorFromCodeLookup.set(0x1778, () => new DepositAccountNotProvidedError());
+createErrorFromCodeLookup.set(0x177c, () => new DepositAccountNotProvidedError());
 createErrorFromNameLookup.set('DepositAccountNotProvided', () => new DepositAccountNotProvidedError());
 class NFTNotMintedError extends Error {
     constructor() {
         super('The NFT is not minted');
-        this.code = 0x1779;
+        this.code = 0x177d;
         this.name = 'NFTNotMinted';
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, NFTNotMintedError);
@@ -131,12 +183,12 @@ class NFTNotMintedError extends Error {
     }
 }
 exports.NFTNotMintedError = NFTNotMintedError;
-createErrorFromCodeLookup.set(0x1779, () => new NFTNotMintedError());
+createErrorFromCodeLookup.set(0x177d, () => new NFTNotMintedError());
 createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError());
 class NFTNotBurnableError extends Error {
     constructor() {
         super('The NFT is cannot be burned');
-        this.code = 0x177a;
+        this.code = 0x177e;
         this.name = 'NFTNotBurnable';
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, NFTNotBurnableError);
@@ -144,7 +196,7 @@ class NFTNotBurnableError extends Error {
     }
 }
 exports.NFTNotBurnableError = NFTNotBurnableError;
-createErrorFromCodeLookup.set(0x177a, () => new NFTNotBurnableError());
+createErrorFromCodeLookup.set(0x177e, () => new NFTNotBurnableError());
 createErrorFromNameLookup.set('NFTNotBurnable', () => new NFTNotBurnableError());
 function errorFromCode(code) {
     const createError = createErrorFromCodeLookup.get(code);

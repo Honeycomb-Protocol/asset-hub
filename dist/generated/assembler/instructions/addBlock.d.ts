@@ -13,12 +13,12 @@ export type AddBlockInstructionAccounts = {
     tokenMetadata: web3.PublicKey;
     tokenEdition: web3.PublicKey;
     depositAccount: web3.PublicKey;
-    nftAttribute: web3.PublicKey;
     authority: web3.PublicKey;
     payer: web3.PublicKey;
     systemProgram?: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;
+    rent?: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
 export declare const addBlockInstructionDiscriminator: number[];

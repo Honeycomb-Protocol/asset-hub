@@ -23,75 +23,63 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blockBeet = exports.Block = exports.blockDiscriminator = void 0;
+exports.nFTUniqueConstraintBeet = exports.NFTUniqueConstraint = exports.nFTUniqueConstraintDiscriminator = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
-const BlockType_1 = require("../types/BlockType");
-exports.blockDiscriminator = [12, 72, 207, 108, 1, 228, 167, 221];
-class Block {
-    constructor(bump, assembler, blockOrder, isGraphical, blockType, blockName) {
+exports.nFTUniqueConstraintDiscriminator = [
+    75, 203, 174, 40, 209, 200, 19, 215,
+];
+class NFTUniqueConstraint {
+    constructor(bump, nft) {
         this.bump = bump;
-        this.assembler = assembler;
-        this.blockOrder = blockOrder;
-        this.isGraphical = isGraphical;
-        this.blockType = blockType;
-        this.blockName = blockName;
+        this.nft = nft;
     }
     static fromArgs(args) {
-        return new Block(args.bump, args.assembler, args.blockOrder, args.isGraphical, args.blockType, args.blockName);
+        return new NFTUniqueConstraint(args.bump, args.nft);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
-        return Block.deserialize(accountInfo.data, offset);
+        return NFTUniqueConstraint.deserialize(accountInfo.data, offset);
     }
     static async fromAccountAddress(connection, address, commitmentOrConfig) {
         const accountInfo = await connection.getAccountInfo(address, commitmentOrConfig);
         if (accountInfo == null) {
-            throw new Error(`Unable to find Block account at ${address}`);
+            throw new Error(`Unable to find NFTUniqueConstraint account at ${address}`);
         }
-        return Block.fromAccountInfo(accountInfo, 0)[0];
+        return NFTUniqueConstraint.fromAccountInfo(accountInfo, 0)[0];
     }
     static gpaBuilder(programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
-        return beetSolana.GpaBuilder.fromStruct(programId, exports.blockBeet);
+        return beetSolana.GpaBuilder.fromStruct(programId, exports.nFTUniqueConstraintBeet);
     }
     static deserialize(buf, offset = 0) {
-        return exports.blockBeet.deserialize(buf, offset);
+        return exports.nFTUniqueConstraintBeet.deserialize(buf, offset);
     }
     serialize() {
-        return exports.blockBeet.serialize({
-            accountDiscriminator: exports.blockDiscriminator,
+        return exports.nFTUniqueConstraintBeet.serialize({
+            accountDiscriminator: exports.nFTUniqueConstraintDiscriminator,
             ...this,
         });
     }
-    static byteSize(args) {
-        const instance = Block.fromArgs(args);
-        return exports.blockBeet.toFixedFromValue({
-            accountDiscriminator: exports.blockDiscriminator,
-            ...instance,
-        }).byteSize;
+    static get byteSize() {
+        return exports.nFTUniqueConstraintBeet.byteSize;
     }
-    static async getMinimumBalanceForRentExemption(args, connection, commitment) {
-        return connection.getMinimumBalanceForRentExemption(Block.byteSize(args), commitment);
+    static async getMinimumBalanceForRentExemption(connection, commitment) {
+        return connection.getMinimumBalanceForRentExemption(NFTUniqueConstraint.byteSize, commitment);
+    }
+    static hasCorrectByteSize(buf, offset = 0) {
+        return buf.byteLength - offset === NFTUniqueConstraint.byteSize;
     }
     pretty() {
         return {
             bump: this.bump,
-            assembler: this.assembler.toBase58(),
-            blockOrder: this.blockOrder,
-            isGraphical: this.isGraphical,
-            blockType: 'BlockType.' + BlockType_1.BlockType[this.blockType],
-            blockName: this.blockName,
+            nft: this.nft.toBase58(),
         };
     }
 }
-exports.Block = Block;
-exports.blockBeet = new beet.FixableBeetStruct([
+exports.NFTUniqueConstraint = NFTUniqueConstraint;
+exports.nFTUniqueConstraintBeet = new beet.BeetStruct([
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['bump', beet.u8],
-    ['assembler', beetSolana.publicKey],
-    ['blockOrder', beet.u8],
-    ['isGraphical', beet.bool],
-    ['blockType', BlockType_1.blockTypeBeet],
-    ['blockName', beet.utf8String],
-], Block.fromArgs, 'Block');
-//# sourceMappingURL=Block.js.map
+    ['nft', beetSolana.publicKey],
+], NFTUniqueConstraint.fromArgs, 'NFTUniqueConstraint');
+//# sourceMappingURL=NFTUniqueConstraint.js.map

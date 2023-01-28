@@ -24,7 +24,7 @@ export const removeBlockStruct = new beet.BeetArgsStruct<{
  * Accounts required by the _removeBlock_ instruction
  *
  * @property [_writable_] assembler
- * @property [] nft
+ * @property [_writable_] nft
  * @property [] block
  * @property [] blockDefinition
  * @property [_writable_] tokenMint
@@ -32,7 +32,6 @@ export const removeBlockStruct = new beet.BeetArgsStruct<{
  * @property [] tokenMetadata
  * @property [] tokenEdition
  * @property [_writable_] depositAccount
- * @property [_writable_] nftAttribute
  * @property [_writable_, **signer**] authority
  * @property [] tokenMetadataProgram
  * @category Instructions
@@ -49,10 +48,11 @@ export type RemoveBlockInstructionAccounts = {
   tokenMetadata: web3.PublicKey
   tokenEdition: web3.PublicKey
   depositAccount: web3.PublicKey
-  nftAttribute: web3.PublicKey
   authority: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
+  systemProgram?: web3.PublicKey
+  rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -70,7 +70,7 @@ export const removeBlockInstructionDiscriminator = [
  */
 export function createRemoveBlockInstruction(
   accounts: RemoveBlockInstructionAccounts,
-  programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')
+  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = removeBlockStruct.serialize({
     instructionDiscriminator: removeBlockInstructionDiscriminator,
@@ -83,7 +83,7 @@ export function createRemoveBlockInstruction(
     },
     {
       pubkey: accounts.nft,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -122,11 +122,6 @@ export function createRemoveBlockInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.nftAttribute,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.authority,
       isWritable: true,
       isSigner: true,
@@ -138,6 +133,16 @@ export function createRemoveBlockInstruction(
     },
     {
       pubkey: accounts.tokenMetadataProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },

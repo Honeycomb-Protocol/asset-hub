@@ -3,5 +3,5 @@ export * from './accounts';
 export * from './errors';
 export * from './instructions';
 export * from './types';
-export declare const PROGRAM_ADDRESS = "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT";
+export declare const PROGRAM_ADDRESS = "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz";
 export declare const PROGRAM_ID: PublicKey;

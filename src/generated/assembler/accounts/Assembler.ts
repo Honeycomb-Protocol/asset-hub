@@ -28,6 +28,7 @@ export type AssemblerArgs = {
   nftBaseUri: string
   assemblingAction: AssemblingAction
   nfts: number
+  allowDuplicates: boolean
 }
 
 export const assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95]
@@ -48,7 +49,8 @@ export class Assembler implements AssemblerArgs {
     readonly collectionDescription: string,
     readonly nftBaseUri: string,
     readonly assemblingAction: AssemblingAction,
-    readonly nfts: number
+    readonly nfts: number,
+    readonly allowDuplicates: boolean
   ) {}
 
   /**
@@ -64,7 +66,8 @@ export class Assembler implements AssemblerArgs {
       args.collectionDescription,
       args.nftBaseUri,
       args.assemblingAction,
-      args.nfts
+      args.nfts,
+      args.allowDuplicates
     )
   }
 
@@ -108,7 +111,7 @@ export class Assembler implements AssemblerArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT'
+      'Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, assemblerBeet)
@@ -183,6 +186,7 @@ export class Assembler implements AssemblerArgs {
       assemblingAction:
         'AssemblingAction.' + AssemblingAction[this.assemblingAction],
       nfts: this.nfts,
+      allowDuplicates: this.allowDuplicates,
     }
   }
 }
@@ -208,6 +212,7 @@ export const assemblerBeet = new beet.FixableBeetStruct<
     ['nftBaseUri', beet.utf8String],
     ['assemblingAction', assemblingActionBeet],
     ['nfts', beet.u16],
+    ['allowDuplicates', beet.bool],
   ],
   Assembler.fromArgs,
   'Assembler'

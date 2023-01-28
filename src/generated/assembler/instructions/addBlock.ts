@@ -24,7 +24,7 @@ export const addBlockStruct = new beet.BeetArgsStruct<{
  * Accounts required by the _addBlock_ instruction
  *
  * @property [] assembler
- * @property [] nft
+ * @property [_writable_] nft
  * @property [] block
  * @property [] blockDefinition
  * @property [_writable_] tokenMint
@@ -32,7 +32,6 @@ export const addBlockStruct = new beet.BeetArgsStruct<{
  * @property [] tokenMetadata
  * @property [] tokenEdition
  * @property [_writable_] depositAccount
- * @property [_writable_] nftAttribute
  * @property [_writable_, **signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [] tokenMetadataProgram
@@ -50,12 +49,12 @@ export type AddBlockInstructionAccounts = {
   tokenMetadata: web3.PublicKey
   tokenEdition: web3.PublicKey
   depositAccount: web3.PublicKey
-  nftAttribute: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
+  rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -73,7 +72,7 @@ export const addBlockInstructionDiscriminator = [
  */
 export function createAddBlockInstruction(
   accounts: AddBlockInstructionAccounts,
-  programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')
+  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = addBlockStruct.serialize({
     instructionDiscriminator: addBlockInstructionDiscriminator,
@@ -86,7 +85,7 @@ export function createAddBlockInstruction(
     },
     {
       pubkey: accounts.nft,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -125,11 +124,6 @@ export function createAddBlockInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.nftAttribute,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.authority,
       isWritable: true,
       isSigner: true,
@@ -151,6 +145,11 @@ export function createAddBlockInstruction(
     },
     {
       pubkey: accounts.tokenMetadataProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },

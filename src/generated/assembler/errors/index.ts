@@ -198,13 +198,108 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * BlockExistsForNFT: 'NFT attribute is already present for this block'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class BlockExistsForNFTError extends Error {
+  readonly code: number = 0x1778
+  readonly name: string = 'BlockExistsForNFT'
+  constructor() {
+    super('NFT attribute is already present for this block')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, BlockExistsForNFTError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1778, () => new BlockExistsForNFTError())
+createErrorFromNameLookup.set(
+  'BlockExistsForNFT',
+  () => new BlockExistsForNFTError()
+)
+
+/**
+ * BlockDoesNotExistsForNFT: 'NFT does not have attribute for this block'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class BlockDoesNotExistsForNFTError extends Error {
+  readonly code: number = 0x1779
+  readonly name: string = 'BlockDoesNotExistsForNFT'
+  constructor() {
+    super('NFT does not have attribute for this block')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, BlockDoesNotExistsForNFTError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1779, () => new BlockDoesNotExistsForNFTError())
+createErrorFromNameLookup.set(
+  'BlockDoesNotExistsForNFT',
+  () => new BlockDoesNotExistsForNFTError()
+)
+
+/**
+ * InvalidUniqueConstraint: 'Unique constraint is not valid'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class InvalidUniqueConstraintError extends Error {
+  readonly code: number = 0x177a
+  readonly name: string = 'InvalidUniqueConstraint'
+  constructor() {
+    super('Unique constraint is not valid')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, InvalidUniqueConstraintError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x177a, () => new InvalidUniqueConstraintError())
+createErrorFromNameLookup.set(
+  'InvalidUniqueConstraint',
+  () => new InvalidUniqueConstraintError()
+)
+
+/**
+ * UniqueConstraintNotProvided: 'Unique constraint is not provided'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class UniqueConstraintNotProvidedError extends Error {
+  readonly code: number = 0x177b
+  readonly name: string = 'UniqueConstraintNotProvided'
+  constructor() {
+    super('Unique constraint is not provided')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, UniqueConstraintNotProvidedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(
+  0x177b,
+  () => new UniqueConstraintNotProvidedError()
+)
+createErrorFromNameLookup.set(
+  'UniqueConstraintNotProvided',
+  () => new UniqueConstraintNotProvidedError()
+)
+
+/**
  * DepositAccountNotProvided: 'Deposit account is not provided'
  *
  * @category Errors
  * @category generated
  */
 export class DepositAccountNotProvidedError extends Error {
-  readonly code: number = 0x1778
+  readonly code: number = 0x177c
   readonly name: string = 'DepositAccountNotProvided'
   constructor() {
     super('Deposit account is not provided')
@@ -215,7 +310,7 @@ export class DepositAccountNotProvidedError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1778,
+  0x177c,
   () => new DepositAccountNotProvidedError()
 )
 createErrorFromNameLookup.set(
@@ -230,7 +325,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class NFTNotMintedError extends Error {
-  readonly code: number = 0x1779
+  readonly code: number = 0x177d
   readonly name: string = 'NFTNotMinted'
   constructor() {
     super('The NFT is not minted')
@@ -240,7 +335,7 @@ export class NFTNotMintedError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1779, () => new NFTNotMintedError())
+createErrorFromCodeLookup.set(0x177d, () => new NFTNotMintedError())
 createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError())
 
 /**
@@ -250,7 +345,7 @@ createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError())
  * @category generated
  */
 export class NFTNotBurnableError extends Error {
-  readonly code: number = 0x177a
+  readonly code: number = 0x177e
   readonly name: string = 'NFTNotBurnable'
   constructor() {
     super('The NFT is cannot be burned')
@@ -260,7 +355,7 @@ export class NFTNotBurnableError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x177a, () => new NFTNotBurnableError())
+createErrorFromCodeLookup.set(0x177e, () => new NFTNotBurnableError())
 createErrorFromNameLookup.set('NFTNotBurnable', () => new NFTNotBurnableError())
 
 /**

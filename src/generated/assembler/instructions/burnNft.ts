@@ -27,6 +27,7 @@ export const burnNftStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] nft
  * @property [_writable_] nftMint
  * @property [_writable_] tokenAccount
+ * @property [_writable_] uniqueConstraint
  * @property [**signer**] authority
  * @category Instructions
  * @category BurnNft
@@ -37,6 +38,7 @@ export type BurnNftInstructionAccounts = {
   nft: web3.PublicKey
   nftMint: web3.PublicKey
   tokenAccount: web3.PublicKey
+  uniqueConstraint: web3.PublicKey
   authority: web3.PublicKey
   tokenProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -56,7 +58,7 @@ export const burnNftInstructionDiscriminator = [
  */
 export function createBurnNftInstruction(
   accounts: BurnNftInstructionAccounts,
-  programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')
+  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = burnNftStruct.serialize({
     instructionDiscriminator: burnNftInstructionDiscriminator,
@@ -79,6 +81,11 @@ export function createBurnNftInstruction(
     },
     {
       pubkey: accounts.tokenAccount,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.uniqueConstraint,
       isWritable: true,
       isSigner: false,
     },

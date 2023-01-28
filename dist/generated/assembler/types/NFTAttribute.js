@@ -23,16 +23,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAssemblerArgsBeet = void 0;
+exports.nFTAttributeBeet = void 0;
+const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
-const AssemblingAction_1 = require("./AssemblingAction");
-exports.createAssemblerArgsBeet = new beet.FixableBeetArgsStruct([
-    ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
-    ['collectionName', beet.utf8String],
-    ['collectionSymbol', beet.utf8String],
-    ['collectionUri', beet.utf8String],
-    ['collectionDescription', beet.utf8String],
-    ['nftBaseUri', beet.utf8String],
-    ['allowDuplicates', beet.coption(beet.bool)],
-], 'CreateAssemblerArgs');
-//# sourceMappingURL=CreateAssemblerArgs.js.map
+const NFTAttributeValue_1 = require("./NFTAttributeValue");
+exports.nFTAttributeBeet = new beet.FixableBeetArgsStruct([
+    ['block', beetSolana.publicKey],
+    ['blockDefinition', beetSolana.publicKey],
+    ['mint', beetSolana.publicKey],
+    ['order', beet.u8],
+    ['attributeName', beet.utf8String],
+    ['attributeValue', NFTAttributeValue_1.nFTAttributeValueBeet],
+], 'NFTAttribute');
+//# sourceMappingURL=NFTAttribute.js.map

@@ -14,6 +14,7 @@ export type CreateAssemblerArgs = {
   collectionUri: string
   collectionDescription: string
   nftBaseUri: string
+  allowDuplicates: beet.COption<boolean>
 }
 
 /**
@@ -29,6 +30,7 @@ export const createAssemblerArgsBeet =
       ['collectionUri', beet.utf8String],
       ['collectionDescription', beet.utf8String],
       ['nftBaseUri', beet.utf8String],
+      ['allowDuplicates', beet.coption(beet.bool)],
     ],
     'CreateAssemblerArgs'
   )

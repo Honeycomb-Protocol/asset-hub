@@ -24,12 +24,13 @@ export default async function (
   switch (action) {
     case "create-assembler":
       const assemblerTx = await createAssembler(mx, {
-        assemblingAction: AssemblingAction.Freeze,
+        assemblingAction: AssemblingAction.TakeCustody,
         collectionName: "Assembler Test Collection",
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",
         collectionUri: "https://assembler.test",
         nftBaseUri: "https://api.eboy.dev/u/temp",
+        allowDuplicates: false,
       });
       console.log("Assembler address: ", assemblerTx.response);
       setDeployments({ ...deployments, assembler: assemblerTx.assembler });
@@ -70,7 +71,7 @@ export default async function (
         blockDefArgs = {
           __kind: "Enum",
           value: "test",
-          isCollection: true,
+          isCollection: false,
           image: null,
         };
       } else if (blockAccount.blockType === BlockType.Boolean) {

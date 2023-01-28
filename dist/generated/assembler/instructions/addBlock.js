@@ -31,8 +31,8 @@ exports.addBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator', b
 exports.addBlockInstructionDiscriminator = [
     208, 84, 156, 155, 72, 188, 114, 37,
 ];
-function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
-    var _a, _b;
+function createAddBlockInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+    var _a, _b, _c;
     const [data] = exports.addBlockStruct.serialize({
         instructionDiscriminator: exports.addBlockInstructionDiscriminator,
     });
@@ -44,7 +44,7 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
         },
         {
             pubkey: accounts.nft,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {
@@ -83,11 +83,6 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
             isSigner: false,
         },
         {
-            pubkey: accounts.nftAttribute,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
             pubkey: accounts.authority,
             isWritable: true,
             isSigner: true,
@@ -109,6 +104,11 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('AXX
         },
         {
             pubkey: accounts.tokenMetadataProgram,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: (_c = accounts.rent) !== null && _c !== void 0 ? _c : web3.SYSVAR_RENT_PUBKEY,
             isWritable: false,
             isSigner: false,
         },

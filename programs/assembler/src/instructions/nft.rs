@@ -1,18 +1,20 @@
-use crate::{
-    errors::ErrorCode,
-    structs::{
-        Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue, NFTAttribute,
-        NFTAttributeValue, NFT,
+use {
+    crate::{
+        bpf_writer::BpfWriter,
+        errors::ErrorCode,
+        structs::{
+            Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue,
+            NFTAttribute, NFTAttributeValue, NFTUniqueConstraint, NFT,
+        },
     },
-    utils::EXTRA_SIZE,
-};
-use anchor_lang::{prelude::*, solana_program};
-use anchor_spl::token::{
-    self, Approve, Burn, CloseAccount, Mint, MintTo, Revoke, Token, TokenAccount, Transfer,
-};
-use mpl_token_metadata::{
-    self,
-    state::{Metadata, TokenMetadataAccount},
+    anchor_lang::{prelude::*, solana_program},
+    anchor_spl::token::{
+        self, Approve, Burn, CloseAccount, Mint, MintTo, Revoke, Token, TokenAccount, Transfer,
+    },
+    mpl_token_metadata::{
+        self,
+        state::{Metadata, TokenMetadataAccount},
+    },
 };
 
 /// Accounts used in the create nft instruction
@@ -54,7 +56,7 @@ pub struct CreateNFT<'info> {
     /// NFT account
     #[account(
         init, payer = payer,
-        space = EXTRA_SIZE + NFT::LEN,
+        space = NFT::LEN,
         seeds = [
             b"nft".as_ref(),
             nft_mint.key().as_ref(),
@@ -186,7 +188,7 @@ pub struct AddBlock<'info> {
     pub assembler: Account<'info, Assembler>,
 
     /// NFT account
-    #[account(has_one = assembler, has_one = authority)]
+    #[account(mut, has_one = assembler, has_one = authority)]
     pub nft: Account<'info, NFT>,
 
     /// Block account
@@ -221,7 +223,8 @@ pub struct AddBlock<'info> {
         payer = payer,
         seeds = [
             b"deposit",
-            token_mint.key().as_ref()
+            token_mint.key().as_ref(),
+            nft.mint.as_ref(),
         ],
         bump,
         token::mint = token_mint,
@@ -229,19 +232,18 @@ pub struct AddBlock<'info> {
     )]
     pub deposit_account: Option<Account<'info, TokenAccount>>,
 
-    /// NFT Attribute
-    #[account(
-        init, payer = payer,
-        space = EXTRA_SIZE + NFTAttribute::LEN,
-        seeds = [
-            b"nft_attribute".as_ref(),
-            block.key().as_ref(),
-            nft.mint.as_ref(),
-        ],
-        bump,
-    )]
-    pub nft_attribute: Box<Account<'info, NFTAttribute>>,
-
+    // /// NFT Attribute
+    // #[account(
+    //     init, payer = payer,
+    //     space = NFTAttribute::LEN,
+    //     seeds = [
+    //         b"nft_attribute".as_ref(),
+    //         block.key().as_ref(),
+    //         nft.mint.as_ref(),
+    //     ],
+    //     bump,
+    // )]
+    // pub nft_attribute: Box<Account<'info, NFTAttribute>>,
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -259,28 +261,29 @@ pub struct AddBlock<'info> {
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: UncheckedAccount<'info>,
+
+    /// SYSVAR RENT
+    pub rent: Sysvar<'info, Rent>,
 }
 
 /// Create a new nft
 pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
-    if ctx.accounts.nft.minted {
-        return Err(ErrorCode::NFTAlreadyMinted.into());
-    }
-
     let assembler = &ctx.accounts.assembler;
     let block = &ctx.accounts.block;
     let block_definition = &ctx.accounts.block_definition;
     let token_mint = &ctx.accounts.token_mint;
+    let nft = &mut ctx.accounts.nft;
 
-    let nft_attribute = &mut ctx.accounts.nft_attribute;
-    nft_attribute.bump = ctx.bumps["nft_attribute"];
-    nft_attribute.nft = ctx.accounts.nft.key();
-    nft_attribute.block = block.key();
-    nft_attribute.mint = token_mint.key();
-    nft_attribute.order = block.block_order;
-    nft_attribute.attribute_name = block.block_name.clone();
-    nft_attribute.block_definition = block_definition.key();
+    if nft.minted {
+        return Err(ErrorCode::NFTAlreadyMinted.into());
+    }
 
+    let index = nft.attributes.iter().position(|r| r.block == block.key());
+    if let Some(_) = index {
+        return Err(ErrorCode::BlockExistsForNFT.into());
+    }
+
+    let attribute_value: NFTAttributeValue;
     match &block_definition.value {
         BlockDefinitionValue::Enum {
             is_collection,
@@ -311,7 +314,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 }
             }
 
-            nft_attribute.attribute_value = NFTAttributeValue::String {
+            attribute_value = NFTAttributeValue::String {
                 value: value.clone(),
             };
         }
@@ -321,14 +324,14 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
             }
 
             let value = (min + max) / 2;
-            nft_attribute.attribute_value = NFTAttributeValue::Number { value };
+            attribute_value = NFTAttributeValue::Number { value };
         }
         BlockDefinitionValue::Boolean { value } => {
             if block_definition.mint != token_mint.key() {
                 return Err(ErrorCode::InvalidTokenForBlockDefinition.into());
             }
 
-            nft_attribute.attribute_value = NFTAttributeValue::Boolean {
+            attribute_value = NFTAttributeValue::Boolean {
                 value: value.clone(),
             };
         }
@@ -397,13 +400,62 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                             authority: ctx.accounts.authority.to_account_info(),
                         },
                     ),
-                    1,
+                    1 * 10u64.pow(token_mint.decimals.into()),
                 )?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
             }
         }
     }
+
+    // nft_attribute.bump = ctx.bumps["nft_attribute"];
+    // nft_attribute.nft = ctx.accounts.nft.key();
+    // nft_attribute.block = block.key();
+    // nft_attribute.mint = token_mint.key();
+    // nft_attribute.order = block.block_order;
+    // nft_attribute.attribute_name = block.block_name.clone();
+    // nft_attribute.block_definition = block_definition.key();
+
+    let nft_attribute = NFTAttribute {
+        block: block.key(),
+        mint: token_mint.key(),
+        order: block.block_order,
+        attribute_name: block.block_name.clone(),
+        block_definition: block_definition.key(),
+        attribute_value,
+    };
+
+    NFT::reallocate(
+        isize::try_from(NFTAttribute::LEN).unwrap(),
+        nft.to_account_info(),
+        ctx.accounts.payer.to_account_info(),
+        &ctx.accounts.rent,
+        &ctx.accounts.system_program,
+    )?;
+
+    // let nft_info = nft.to_account_info();
+    // let curr_len = nft_info.data_len();
+    // let new_len = curr_len + NFTAttribute::LEN;
+    // let curr_rent = ctx.accounts.rent.minimum_balance(curr_len);
+    // let new_rent = ctx.accounts.rent.minimum_balance(new_len);
+    // let rent_diff = new_rent - curr_rent;
+    // if rent_diff > 0 {
+    //     solana_program::program::invoke(
+    //         &solana_program::system_instruction::transfer(
+    //             &ctx.accounts.payer.key(),
+    //             &nft_info.key(),
+    //             rent_diff,
+    //         ),
+    //         &[
+    //             ctx.accounts.payer.to_account_info(),
+    //             nft.to_account_info(),
+    //             ctx.accounts.system_program.to_account_info(),
+    //         ],
+    //     )?;
+    // }
+    // nft_info.realloc(new_len, false)?;
+
+    nft.attributes.push(nft_attribute);
 
     Ok(())
 }
@@ -437,6 +489,17 @@ pub struct MintNFT<'info> {
     #[account(mut, constraint = token_account.mint == nft_mint.key() && token_account.owner == authority.key())]
     pub token_account: Box<Account<'info, TokenAccount>>,
 
+    /// NFT unique constraint
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub unique_constraint: Option<AccountInfo<'info>>,
+    // #[account(
+    //     init, payer = payer,
+    //     space = NFTUniqueConstraint::LEN,
+    //     seeds = nft.attributes.iter().map(|x| x.mint.as_ref()).collect::<Vec<_>>()[..],
+    //     bump,
+    // )]
+    // pub unique_constraint: Option<Account<'info, NFTUniqueConstraint>>,
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -462,13 +525,76 @@ pub struct MintNFT<'info> {
 
 /// Create a new nft
 pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
+    let assembler = &ctx.accounts.assembler;
     let nft = &mut ctx.accounts.nft;
 
     if nft.minted {
         return Err(ErrorCode::NFTAlreadyMinted.into());
     }
 
-    let assembler = &ctx.accounts.assembler;
+    if !assembler.allow_duplicates {
+        if let Some(unique_constraint_info) = &mut ctx.accounts.unique_constraint {
+            if unique_constraint_info.data_len() > 0 {
+                msg!("Unique constraint account is not empty");
+                return Err(ErrorCode::InvalidUniqueConstraint.into());
+            }
+
+            let mut seeds = nft
+                .attributes
+                .iter()
+                .map(|x| [x.block_definition.as_ref(), x.mint.as_ref()])
+                .flatten()
+                .collect::<Vec<_>>();
+
+            let (gen_unique_constraint_key, bump) =
+                Pubkey::find_program_address(&seeds[..], ctx.program_id);
+
+            if gen_unique_constraint_key != unique_constraint_info.key() {
+                msg!("Different unique constraint key generated");
+                msg!("Expected: {}", gen_unique_constraint_key);
+                msg!("Found: {}", unique_constraint_info.key());
+                return Err(ErrorCode::InvalidUniqueConstraint.into());
+            }
+
+            let seed_bump = &[bump];
+            seeds.push(seed_bump);
+            let pda_signer = &seeds[..];
+            let signers = &[pda_signer];
+
+            anchor_lang::system_program::create_account(
+                anchor_lang::context::CpiContext::new_with_signer(
+                    ctx.accounts.system_program.to_account_info(),
+                    anchor_lang::system_program::CreateAccount {
+                        from: ctx.accounts.payer.to_account_info(),
+                        to: unique_constraint_info.to_account_info(),
+                    },
+                    signers,
+                ),
+                ctx.accounts.rent.minimum_balance(NFTUniqueConstraint::LEN),
+                NFTUniqueConstraint::LEN as u64,
+                ctx.program_id,
+            )?;
+
+            let mut dst_ref = unique_constraint_info.try_borrow_mut_data()?;
+            let dst = dst_ref.as_mut();
+            let mut writer = BpfWriter::new(dst);
+
+            let unique_constraint = NFTUniqueConstraint {
+                bump,
+                nft: nft.key(),
+            };
+
+            unique_constraint.try_serialize(&mut writer)?;
+
+            // let new_data = &unique_constraint.try_to_vec()?[..];
+            // let mut dst_ref = unique_constraint_info.try_borrow_mut_data()?;
+            // let dst = dst_ref.as_mut();
+            // solana_program::program_memory::sol_memcpy(dst, new_data, NFTUniqueConstraint::LEN)
+        } else {
+            return Err(ErrorCode::UniqueConstraintNotProvided.into());
+        }
+    }
+
     let assembler_seeds = &[
         b"assembler".as_ref(),
         assembler.collection.as_ref(),
@@ -540,6 +666,10 @@ pub struct BurnNFT<'info> {
     #[account(mut, constraint = token_account.mint == nft_mint.key() && token_account.owner == authority.key())]
     pub token_account: Account<'info, TokenAccount>,
 
+    /// NFT unique constraint
+    #[account(mut, has_one = nft, close = authority)]
+    pub unique_constraint: Option<Account<'info, NFTUniqueConstraint>>,
+
     /// The wallet that holds the pre mint authority over this NFT
     pub authority: Signer<'info>,
 
@@ -550,13 +680,14 @@ pub struct BurnNFT<'info> {
 
 /// Burn a nft
 pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
+    let assembler = &ctx.accounts.assembler;
     let nft = &mut ctx.accounts.nft;
 
     if !nft.minted {
         return Err(ErrorCode::NFTNotMinted.into());
     }
 
-    if ctx.accounts.assembler.assembling_action == AssemblingAction::Burn {
+    if assembler.assembling_action == AssemblingAction::Burn {
         return Err(ErrorCode::NFTNotBurnable.into());
     }
 
@@ -585,16 +716,16 @@ pub struct RemoveBlock<'info> {
     pub assembler: Account<'info, Assembler>,
 
     /// NFT account
-    #[account(has_one = assembler, has_one = authority)]
+    #[account(mut, has_one = assembler, has_one = authority)]
     pub nft: Account<'info, NFT>,
 
     /// Block account
     #[account(has_one = assembler)]
-    pub block: Account<'info, Block>,
+    pub block: Box<Account<'info, Block>>,
 
     /// Block definition account
     #[account(has_one = block)]
-    pub block_definition: Account<'info, BlockDefinition>,
+    pub block_definition: Box<Account<'info, BlockDefinition>>,
 
     /// Burning token mint
     #[account(mut)]
@@ -619,7 +750,8 @@ pub struct RemoveBlock<'info> {
         mut,
         seeds = [
             b"deposit",
-            token_mint.key().as_ref()
+            token_mint.key().as_ref(),
+            nft.mint.as_ref(),
         ],
         bump,
         token::mint = token_mint,
@@ -627,10 +759,9 @@ pub struct RemoveBlock<'info> {
     )]
     pub deposit_account: Option<Account<'info, TokenAccount>>,
 
-    /// NFT Attribute
-    #[account(mut, has_one = nft)]
-    pub nft_attribute: Box<Account<'info, NFTAttribute>>,
-
+    // /// NFT Attribute
+    // #[account(mut, has_one = nft)]
+    // pub nft_attribute: Box<Account<'info, NFTAttribute>>,
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -641,15 +772,23 @@ pub struct RemoveBlock<'info> {
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: UncheckedAccount<'info>,
+
+    /// SYSTEM PROGRAM
+    pub system_program: Program<'info, System>,
+
+    /// RENT PROGRAM
+    pub rent: Sysvar<'info, Rent>,
 }
 
 /// Create a new nft
 pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
     let assembler = &ctx.accounts.assembler;
+    let nft = &mut ctx.accounts.nft;
+    let block = &ctx.accounts.block;
     let block_definition = &ctx.accounts.block_definition;
     let token_mint = &ctx.accounts.token_mint;
 
-    if ctx.accounts.nft.minted {
+    if nft.minted {
         return Err(ErrorCode::NFTAlreadyMinted.into());
     }
 
@@ -741,7 +880,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                         },
                         assembler_signer,
                     ),
-                    1,
+                    1 * 10u64.pow(token_mint.decimals.into()),
                 )?;
 
                 token::close_account(CpiContext::new_with_signer(
@@ -759,19 +898,34 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
         }
     }
 
-    // Close nft attribute
-    let source = ctx.accounts.nft_attribute.to_account_info();
-    let destination = ctx.accounts.authority.to_account_info();
+    let index = nft.attributes.iter().position(|r| r.block == block.key());
+    if let Some(index) = index {
+        NFT::reallocate(
+            isize::try_from(NFTAttribute::LEN).unwrap() * -1,
+            nft.to_account_info(),
+            ctx.accounts.authority.to_account_info(),
+            &ctx.accounts.rent,
+            &ctx.accounts.system_program,
+        )?;
 
-    **destination.lamports.borrow_mut() = destination
-        .lamports()
-        .checked_add(source.lamports())
-        .ok_or(ErrorCode::Overflow)?;
+        nft.attributes.remove(index);
+    } else {
+        return Err(ErrorCode::BlockDoesNotExistsForNFT.into());
+    }
 
-    let mut source_account_data = source.data.borrow_mut();
-    **source.lamports.borrow_mut() = 0;
-    let data_len = source_account_data.len();
-    solana_program::program_memory::sol_memset(*source_account_data, 0, data_len);
+    // // Close nft attribute
+    // let source = ctx.accounts.nft_attribute.to_account_info();
+    // let destination = ctx.accounts.authority.to_account_info();
+
+    // **destination.lamports.borrow_mut() = destination
+    //     .lamports()
+    //     .checked_add(source.lamports())
+    //     .ok_or(ErrorCode::Overflow)?;
+
+    // let mut source_account_data = source.data.borrow_mut();
+    // **source.lamports.borrow_mut() = 0;
+    // let data_len = source_account_data.len();
+    // solana_program::program_memory::sol_memset(*source_account_data, 0, data_len);
 
     Ok(())
 }

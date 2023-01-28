@@ -1,7 +1,4 @@
-use crate::{
-    structs::{Assembler, AssemblingAction},
-    utils::EXTRA_SIZE,
-};
+use crate::structs::{Assembler, AssemblingAction};
 use anchor_lang::{prelude::*, solana_program};
 use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
 
@@ -26,7 +23,7 @@ pub struct CreateAssembler<'info> {
     /// Assembler state account
     #[account(
       init, payer = payer,
-      space = EXTRA_SIZE + Assembler::LEN ,
+      space = Assembler::LEN ,
       seeds = [
         b"assembler".as_ref(),
         collection_mint.key().as_ref(),
@@ -66,6 +63,7 @@ pub struct CreateAssemblerArgs {
     collection_uri: String,
     collection_description: String,
     nft_base_uri: String,
+    allow_duplicates: Option<bool>,
 }
 
 /// Create a new assembler
@@ -81,6 +79,7 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
     assembler.nft_base_uri = args.nft_base_uri;
     assembler.assembling_action = args.assembling_action;
     assembler.nfts = 0;
+    assembler.allow_duplicates = args.allow_duplicates.unwrap_or(false);
 
     let assembler_seeds = &[
         b"assembler".as_ref(),

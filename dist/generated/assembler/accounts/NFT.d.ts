@@ -2,6 +2,7 @@
 import * as web3 from '@solana/web3.js';
 import * as beet from '@metaplex-foundation/beet';
 import * as beetSolana from '@metaplex-foundation/beet-solana';
+import { NFTAttribute } from '../types/NFTAttribute';
 export type NFTArgs = {
     bump: number;
     assembler: web3.PublicKey;
@@ -15,6 +16,7 @@ export type NFTArgs = {
     id: number;
     uri: string;
     isGenerated: boolean;
+    attributes: NFTAttribute[];
 };
 export declare const nFTDiscriminator: number[];
 export declare class NFT implements NFTArgs {
@@ -30,6 +32,7 @@ export declare class NFT implements NFTArgs {
     readonly id: number;
     readonly uri: string;
     readonly isGenerated: boolean;
+    readonly attributes: NFTAttribute[];
     private constructor();
     static fromArgs(args: NFTArgs): NFT;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [NFT, number];
@@ -54,6 +57,7 @@ export declare class NFT implements NFTArgs {
         id: number;
         uri: string;
         isGenerated: boolean;
+        attributes: NFTAttribute[];
     };
 }
 export declare const nFTBeet: beet.FixableBeetStruct<NFT, NFTArgs & {

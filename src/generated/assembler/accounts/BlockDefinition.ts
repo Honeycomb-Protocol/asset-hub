@@ -88,7 +88,7 @@ export class BlockDefinition implements BlockDefinitionArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT'
+      'Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, blockDefinitionBeet)

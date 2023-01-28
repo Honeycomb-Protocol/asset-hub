@@ -30,7 +30,7 @@ exports.setNftGeneratedStruct = new beet.BeetArgsStruct([['instructionDiscrimina
 exports.setNftGeneratedInstructionDiscriminator = [
     19, 33, 138, 249, 8, 87, 27, 176,
 ];
-function createSetNftGeneratedInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+function createSetNftGeneratedInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     const [data] = exports.setNftGeneratedStruct.serialize({
         instructionDiscriminator: exports.setNftGeneratedInstructionDiscriminator,
     });

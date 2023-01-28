@@ -1,7 +1,6 @@
 use crate::{
     errors::ErrorCode,
     structs::{Assembler, Block, BlockDefinition, BlockDefinitionValue, BlockType},
-    utils::EXTRA_SIZE,
 };
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
@@ -17,7 +16,7 @@ pub struct CreateBlock<'info> {
     /// Block account
     #[account(
       init, payer = payer,
-      space = EXTRA_SIZE + Block::LEN,
+      space = Block::LEN,
       seeds = [
         b"block".as_ref(),
         args.block_name.as_bytes(),
@@ -74,7 +73,7 @@ pub struct CreateBlockDefinition<'info> {
     /// Block Definition account
     #[account(
       init, payer = payer,
-      space = EXTRA_SIZE + BlockDefinition::LEN,
+      space = BlockDefinition::LEN,
       seeds = [
         b"block_definition".as_ref(),
         block.key().as_ref(),
@@ -160,7 +159,7 @@ pub fn create_block_definition(
 //     /// Block Definition account
 //     #[account(
 //       init, payer = payer,
-//       space = EXTRA_SIZE + BlockDefinitionEnum::LEN,
+//       space = BlockDefinitionEnum::LEN,
 //       seeds = [
 //         b"block_definition".as_ref(),
 //         args.value.as_bytes(),
@@ -233,7 +232,7 @@ pub fn create_block_definition(
 //     /// Block Definition account
 //     #[account(
 //       init, payer = payer,
-//       space = EXTRA_SIZE + BlockDefinitionNumber::LEN,
+//       space = BlockDefinitionNumber::LEN,
 //       seeds = [
 //         b"block_definition".as_ref(),
 //         b"number".as_ref(),
@@ -295,7 +294,7 @@ pub fn create_block_definition(
 //     /// Block Definition account
 //     #[account(
 //       init, payer = payer,
-//       space = EXTRA_SIZE + BlockDefinitionBoolean::LEN,
+//       space = BlockDefinitionBoolean::LEN,
 //       seeds = [
 //         b"block_definition".as_ref(),
 //         b"boolean".as_ref(),

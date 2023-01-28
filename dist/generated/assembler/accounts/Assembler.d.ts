@@ -13,6 +13,7 @@ export type AssemblerArgs = {
     nftBaseUri: string;
     assemblingAction: AssemblingAction;
     nfts: number;
+    allowDuplicates: boolean;
 };
 export declare const assemblerDiscriminator: number[];
 export declare class Assembler implements AssemblerArgs {
@@ -25,6 +26,7 @@ export declare class Assembler implements AssemblerArgs {
     readonly nftBaseUri: string;
     readonly assemblingAction: AssemblingAction;
     readonly nfts: number;
+    readonly allowDuplicates: boolean;
     private constructor();
     static fromArgs(args: AssemblerArgs): Assembler;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [Assembler, number];
@@ -46,6 +48,7 @@ export declare class Assembler implements AssemblerArgs {
         nftBaseUri: string;
         assemblingAction: string;
         nfts: number;
+        allowDuplicates: boolean;
     };
 }
 export declare const assemblerBeet: beet.FixableBeetStruct<Assembler, AssemblerArgs & {

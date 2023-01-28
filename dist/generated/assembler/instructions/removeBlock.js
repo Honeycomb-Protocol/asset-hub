@@ -31,8 +31,8 @@ exports.removeBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator'
 exports.removeBlockInstructionDiscriminator = [
     145, 94, 239, 114, 4, 117, 167, 145,
 ];
-function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
-    var _a;
+function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+    var _a, _b, _c;
     const [data] = exports.removeBlockStruct.serialize({
         instructionDiscriminator: exports.removeBlockInstructionDiscriminator,
     });
@@ -44,7 +44,7 @@ function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('
         },
         {
             pubkey: accounts.nft,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {
@@ -83,11 +83,6 @@ function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('
             isSigner: false,
         },
         {
-            pubkey: accounts.nftAttribute,
-            isWritable: true,
-            isSigner: false,
-        },
-        {
             pubkey: accounts.authority,
             isWritable: true,
             isSigner: true,
@@ -99,6 +94,16 @@ function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('
         },
         {
             pubkey: accounts.tokenMetadataProgram,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: (_b = accounts.systemProgram) !== null && _b !== void 0 ? _b : web3.SystemProgram.programId,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: (_c = accounts.rent) !== null && _c !== void 0 ? _c : web3.SYSVAR_RENT_PUBKEY,
             isWritable: false,
             isSigner: false,
         },

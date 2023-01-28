@@ -8,6 +8,7 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
+import { NFTAttribute, nFTAttributeBeet } from '../types/NFTAttribute'
 
 /**
  * Arguments used to create {@link NFT}
@@ -27,6 +28,7 @@ export type NFTArgs = {
   id: number
   uri: string
   isGenerated: boolean
+  attributes: NFTAttribute[]
 }
 
 export const nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217]
@@ -50,7 +52,8 @@ export class NFT implements NFTArgs {
     readonly minted: boolean,
     readonly id: number,
     readonly uri: string,
-    readonly isGenerated: boolean
+    readonly isGenerated: boolean,
+    readonly attributes: NFTAttribute[]
   ) {}
 
   /**
@@ -69,7 +72,8 @@ export class NFT implements NFTArgs {
       args.minted,
       args.id,
       args.uri,
-      args.isGenerated
+      args.isGenerated,
+      args.attributes
     )
   }
 
@@ -113,7 +117,7 @@ export class NFT implements NFTArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT'
+      'Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, nFTBeet)
@@ -190,6 +194,7 @@ export class NFT implements NFTArgs {
       id: this.id,
       uri: this.uri,
       isGenerated: this.isGenerated,
+      attributes: this.attributes,
     }
   }
 }
@@ -218,6 +223,7 @@ export const nFTBeet = new beet.FixableBeetStruct<
     ['id', beet.u16],
     ['uri', beet.utf8String],
     ['isGenerated', beet.bool],
+    ['attributes', beet.array(nFTAttributeBeet)],
   ],
   NFT.fromArgs,
   'NFT'

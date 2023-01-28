@@ -29,7 +29,7 @@ const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
 const utils_1 = require("../../utils");
-function createBurnNFTTransaction(assembler, nft, nftMint, authority, programId = assembler_1.PROGRAM_ID) {
+function createBurnNFTTransaction(assembler, nft, nftMint, uniqueConstraint, authority, programId = assembler_1.PROGRAM_ID) {
     const tokenAccount = splToken.getAssociatedTokenAddressSync(nftMint, authority);
     return {
         tx: new web3.Transaction().add((0, generated_1.createBurnNftInstruction)({
@@ -37,6 +37,7 @@ function createBurnNFTTransaction(assembler, nft, nftMint, authority, programId 
             nft,
             nftMint,
             tokenAccount,
+            uniqueConstraint,
             authority,
         }, programId)),
         signers: [],
@@ -57,8 +58,7 @@ function createRemoveBlockTransaction(assembler, nft, nftMint, block, blockDefin
         tokenMint.toBuffer(),
         Buffer.from("edition"),
     ], utils_1.METADATA_PROGRAM_ID);
-    const [nftAttribute] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft_attribute"), block.toBuffer(), nftMint.toBuffer()], programId);
-    const [depositAccount] = web3.PublicKey.findProgramAddressSync([Buffer.from("deposit"), tokenMint.toBuffer()], programId);
+    const [depositAccount] = web3.PublicKey.findProgramAddressSync([Buffer.from("deposit"), tokenMint.toBuffer(), nftMint.toBuffer()], programId);
     return {
         tx: new web3.Transaction().add((0, generated_1.createRemoveBlockInstruction)({
             assembler,
@@ -72,7 +72,6 @@ function createRemoveBlockTransaction(assembler, nft, nftMint, block, blockDefin
             depositAccount: assemblingAction === generated_1.AssemblingAction.TakeCustody
                 ? depositAccount
                 : programId,
-            nftAttribute,
             authority,
             tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
         }, programId)),
@@ -85,7 +84,6 @@ function createRemoveBlockTransaction(assembler, nft, nftMint, block, blockDefin
             tokenMint,
             tokenAccount,
             tokenMetadata,
-            nftAttribute,
             authority,
             utils_1.METADATA_PROGRAM_ID,
         ],
@@ -96,14 +94,16 @@ async function disbandNft(connection, wallet, nftMint) {
     const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer()], assembler_1.PROGRAM_ID);
     const nftAccount = await generated_1.NFT.fromAccountAddress(connection, nft);
     const assemblerAccount = await generated_1.Assembler.fromAccountAddress(connection, nftAccount.assembler);
-    const attributes = await generated_1.NFTAttribute.gpaBuilder()
-        .addFilter("nft", nft)
-        .run(connection)
-        .then((x) => x.map((y) => ({ ...y, ...generated_1.NFTAttribute.fromAccountInfo(y.account)[0] })));
-    const nftBurnTx = createBurnNFTTransaction(nftAccount.assembler, nft, nftMint, wallet.publicKey);
+    let uniqueConstraint = null;
+    if (!assemblerAccount.allowDuplicates) {
+        uniqueConstraint = web3.PublicKey.findProgramAddressSync(nftAccount.attributes
+            .map((x) => [x.blockDefinition.toBuffer(), x.mint.toBuffer()])
+            .flat(), assembler_1.PROGRAM_ID)[0];
+    }
+    const nftBurnTx = createBurnNFTTransaction(nftAccount.assembler, nft, nftMint, uniqueConstraint, wallet.publicKey);
     let signers = [...nftBurnTx.signers];
     let accounts = [...nftBurnTx.accounts];
-    const tx = new web3.Transaction().add(nftBurnTx.tx, ...(await Promise.all(attributes.map(async (attribute) => {
+    const tx = new web3.Transaction().add(nftBurnTx.tx, ...(await Promise.all(nftAccount.attributes.map(async (attribute) => {
         if (!attribute.mint)
             return null;
         const { tx, accounts: acc, signers: sigs, } = createRemoveBlockTransaction(nftAccount.assembler, nft, nftMint, attribute.block, attribute.blockDefinition, attribute.mint, wallet.publicKey, assemblerAccount.assemblingAction);

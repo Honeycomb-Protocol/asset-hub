@@ -7,5 +7,6 @@ export type CreateAssemblerArgs = {
     collectionUri: string;
     collectionDescription: string;
     nftBaseUri: string;
+    allowDuplicates: beet.COption<boolean>;
 };
 export declare const createAssemblerArgsBeet: beet.FixableBeetArgsStruct<CreateAssemblerArgs>;

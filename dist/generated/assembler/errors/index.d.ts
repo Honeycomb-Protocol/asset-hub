@@ -42,6 +42,26 @@ export declare class NFTAlreadyMintedError extends Error {
     readonly name: string;
     constructor();
 }
+export declare class BlockExistsForNFTError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
+export declare class BlockDoesNotExistsForNFTError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
+export declare class InvalidUniqueConstraintError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
+export declare class UniqueConstraintNotProvidedError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
 export declare class DepositAccountNotProvidedError extends Error {
     readonly code: number;
     readonly name: string;

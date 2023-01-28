@@ -26,6 +26,18 @@ pub enum ErrorCode {
     #[msg("The NFT is already minted")]
     NFTAlreadyMinted,
 
+    #[msg("NFT attribute is already present for this block")]
+    BlockExistsForNFT,
+
+    #[msg("NFT does not have attribute for this block")]
+    BlockDoesNotExistsForNFT,
+
+    #[msg("Unique constraint is not valid")]
+    InvalidUniqueConstraint,
+
+    #[msg("Unique constraint is not provided")]
+    UniqueConstraintNotProvided,
+
     #[msg("Deposit account is not provided")]
     DepositAccountNotProvided,
 

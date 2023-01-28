@@ -31,7 +31,7 @@ exports.createAssemblerCollectionMasterEditionStruct = new beet.BeetArgsStruct([
 exports.createAssemblerCollectionMasterEditionInstructionDiscriminator = [
     118, 223, 229, 93, 58, 180, 110, 79,
 ];
-function createCreateAssemblerCollectionMasterEditionInstruction(accounts, programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+function createCreateAssemblerCollectionMasterEditionInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     var _a, _b, _c;
     const [data] = exports.createAssemblerCollectionMasterEditionStruct.serialize({
         instructionDiscriminator: exports.createAssemblerCollectionMasterEditionInstructionDiscriminator,

@@ -17,6 +17,7 @@ export function createBurnNFTTransaction(
   assembler: web3.PublicKey,
   nft: web3.PublicKey,
   nftMint: web3.PublicKey,
+  uniqueConstraint: web3.PublicKey | null,
   authority: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
@@ -33,6 +34,7 @@ export function createBurnNFTTransaction(
           nft,
           nftMint,
           tokenAccount,
+          uniqueConstraint,
           authority,
         },
         programId
@@ -78,13 +80,8 @@ export function createRemoveBlockTransaction(
     METADATA_PROGRAM_ID
   );
 
-  const [nftAttribute] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("nft_attribute"), block.toBuffer(), nftMint.toBuffer()],
-    programId
-  );
-
   const [depositAccount] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("deposit"), tokenMint.toBuffer()],
+    [Buffer.from("deposit"), tokenMint.toBuffer(), nftMint.toBuffer()],
     programId
   );
 
@@ -104,7 +101,6 @@ export function createRemoveBlockTransaction(
             assemblingAction === AssemblingAction.TakeCustody
               ? depositAccount
               : programId,
-          nftAttribute,
           authority,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
@@ -120,7 +116,6 @@ export function createRemoveBlockTransaction(
       tokenMint,
       tokenAccount,
       tokenMetadata,
-      nftAttribute,
       authority,
       METADATA_PROGRAM_ID,
     ],
@@ -145,18 +140,29 @@ export async function disbandNft(
   );
 
   //@ts-ignore
-  const attributes: (NFTAttribute & { pubkey: web3.PublicKey })[] =
-    await NFTAttribute.gpaBuilder()
-      .addFilter("nft", nft)
-      .run(connection)
-      .then((x) =>
-        x.map((y) => ({ ...y, ...NFTAttribute.fromAccountInfo(y.account)[0] }))
-      );
+  // const attributes: (NFTAttribute & { pubkey: web3.PublicKey })[] =
+  //   await NFTAttribute.gpaBuilder()
+  //     .addFilter("nft", nft)
+  //     .run(connection)
+  //     .then((x) =>
+  //       x.map((y) => ({ ...y, ...NFTAttribute.fromAccountInfo(y.account)[0] }))
+  //     );
+
+  let uniqueConstraint: web3.PublicKey | null = null;
+  if (!assemblerAccount.allowDuplicates) {
+    uniqueConstraint = web3.PublicKey.findProgramAddressSync(
+      nftAccount.attributes
+        .map((x) => [x.blockDefinition.toBuffer(), x.mint.toBuffer()])
+        .flat(),
+      PROGRAM_ID
+    )[0];
+  }
 
   const nftBurnTx = createBurnNFTTransaction(
     nftAccount.assembler,
     nft,
     nftMint,
+    uniqueConstraint,
     wallet.publicKey
   );
 
@@ -166,7 +172,7 @@ export async function disbandNft(
   const tx = new web3.Transaction().add(
     nftBurnTx.tx,
     ...(await Promise.all(
-      attributes.map(async (attribute) => {
+      nftAccount.attributes.map(async (attribute) => {
         if (!attribute.mint) return null;
         const {
           tx,

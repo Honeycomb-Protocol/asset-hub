@@ -19,17 +19,17 @@ __exportStar(require("./Assembler"), exports);
 __exportStar(require("./Block"), exports);
 __exportStar(require("./BlockDefinition"), exports);
 __exportStar(require("./NFT"), exports);
-__exportStar(require("./NFTAttribute"), exports);
+__exportStar(require("./NFTUniqueConstraint"), exports);
 const Assembler_1 = require("./Assembler");
 const Block_1 = require("./Block");
 const BlockDefinition_1 = require("./BlockDefinition");
 const NFT_1 = require("./NFT");
-const NFTAttribute_1 = require("./NFTAttribute");
+const NFTUniqueConstraint_1 = require("./NFTUniqueConstraint");
 exports.accountProviders = {
     Assembler: Assembler_1.Assembler,
     Block: Block_1.Block,
     BlockDefinition: BlockDefinition_1.BlockDefinition,
     NFT: NFT_1.NFT,
-    NFTAttribute: NFTAttribute_1.NFTAttribute,
+    NFTUniqueConstraint: NFTUniqueConstraint_1.NFTUniqueConstraint,
 };
 //# sourceMappingURL=index.js.map

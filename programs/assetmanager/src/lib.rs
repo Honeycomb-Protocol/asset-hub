@@ -7,13 +7,13 @@ pub mod utils;
 
 use instructions::*;
 
-declare_id!("BNGKUeQQHw2MgZc9EqFsCWmnkLEKLCUfu5cw9YFWK3hF");
+declare_id!("7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd");
 
 #[program]
 pub mod assetmanager {
     use super::*;
 
-   pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<()> {
+    pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<()> {
         instructions::create_asset(ctx, args)
     }
 

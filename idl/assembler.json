@@ -426,7 +426,7 @@
         },
         {
           "name": "nft",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "NFT account"
@@ -490,14 +490,6 @@
           ]
         },
         {
-          "name": "nftAttribute",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "NFT Attribute"
-          ]
-        },
-        {
           "name": "authority",
           "isMut": true,
           "isSigner": true,
@@ -535,6 +527,14 @@
           "isSigner": false,
           "docs": [
             "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SYSVAR RENT"
           ]
         }
       ],
@@ -589,6 +589,15 @@
           "isSigner": false,
           "docs": [
             "NFT token account"
+          ]
+        },
+        {
+          "name": "uniqueConstraint",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "NFT unique constraint"
           ]
         },
         {
@@ -678,6 +687,15 @@
           ]
         },
         {
+          "name": "uniqueConstraint",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "NFT unique constraint"
+          ]
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
@@ -709,7 +727,7 @@
         },
         {
           "name": "nft",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "NFT account"
@@ -773,14 +791,6 @@
           ]
         },
         {
-          "name": "nftAttribute",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "NFT Attribute"
-          ]
-        },
-        {
           "name": "authority",
           "isMut": true,
           "isSigner": true,
@@ -802,6 +812,22 @@
           "isSigner": false,
           "docs": [
             "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "RENT PROGRAM"
           ]
         }
       ],
@@ -892,6 +918,13 @@
               "The number of NFTs created by this assembler"
             ],
             "type": "u16"
+          },
+          {
+            "name": "allowDuplicates",
+            "docs": [
+              "Should this assembler allow duplicate NFTs"
+            ],
+            "type": "bool"
           }
         ]
       }
@@ -1074,6 +1107,107 @@
               "Flag if the image for this nft is already generated"
             ],
             "type": "bool"
+          },
+          {
+            "name": "attributes",
+            "docs": [
+              "NFT Attributes"
+            ],
+            "type": {
+              "vec": {
+                "defined": "NFTAttribute"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NFTUniqueConstraint",
+      "docs": [
+        "NFT Unique Constraint account"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "nft",
+            "docs": [
+              "The NFT this constraint is associated to"
+            ],
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateAssemblerArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "assemblingAction",
+            "type": {
+              "defined": "AssemblingAction"
+            }
+          },
+          {
+            "name": "collectionName",
+            "type": "string"
+          },
+          {
+            "name": "collectionSymbol",
+            "type": "string"
+          },
+          {
+            "name": "collectionUri",
+            "type": "string"
+          },
+          {
+            "name": "collectionDescription",
+            "type": "string"
+          },
+          {
+            "name": "nftBaseUri",
+            "type": "string"
+          },
+          {
+            "name": "allowDuplicates",
+            "type": {
+              "option": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateBlockArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "blockOrder",
+            "type": "u8"
+          },
+          {
+            "name": "isGraphical",
+            "type": "bool"
+          },
+          {
+            "name": "blockType",
+            "type": {
+              "defined": "BlockType"
+            }
+          },
+          {
+            "name": "blockName",
+            "type": "string"
           }
         ]
       }
@@ -1086,17 +1220,6 @@
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "nft",
-            "docs": [
-              "The NFT this attribute is associated to"
-            ],
-            "type": "publicKey"
-          },
           {
             "name": "block",
             "docs": [
@@ -1140,68 +1263,6 @@
             "type": {
               "defined": "NFTAttributeValue"
             }
-          }
-        ]
-      }
-    }
-  ],
-  "types": [
-    {
-      "name": "CreateAssemblerArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "assemblingAction",
-            "type": {
-              "defined": "AssemblingAction"
-            }
-          },
-          {
-            "name": "collectionName",
-            "type": "string"
-          },
-          {
-            "name": "collectionSymbol",
-            "type": "string"
-          },
-          {
-            "name": "collectionUri",
-            "type": "string"
-          },
-          {
-            "name": "collectionDescription",
-            "type": "string"
-          },
-          {
-            "name": "nftBaseUri",
-            "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CreateBlockArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "blockOrder",
-            "type": "u8"
-          },
-          {
-            "name": "isGraphical",
-            "type": "bool"
-          },
-          {
-            "name": "blockType",
-            "type": {
-              "defined": "BlockType"
-            }
-          },
-          {
-            "name": "blockName",
-            "type": "string"
           }
         ]
       }
@@ -1383,22 +1444,42 @@
     },
     {
       "code": 6008,
+      "name": "BlockExistsForNFT",
+      "msg": "NFT attribute is already present for this block"
+    },
+    {
+      "code": 6009,
+      "name": "BlockDoesNotExistsForNFT",
+      "msg": "NFT does not have attribute for this block"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidUniqueConstraint",
+      "msg": "Unique constraint is not valid"
+    },
+    {
+      "code": 6011,
+      "name": "UniqueConstraintNotProvided",
+      "msg": "Unique constraint is not provided"
+    },
+    {
+      "code": 6012,
       "name": "DepositAccountNotProvided",
       "msg": "Deposit account is not provided"
     },
     {
-      "code": 6009,
+      "code": 6013,
       "name": "NFTNotMinted",
       "msg": "The NFT is not minted"
     },
     {
-      "code": 6010,
+      "code": 6014,
       "name": "NFTNotBurnable",
       "msg": "The NFT is cannot be burned"
     }
   ],
   "metadata": {
-    "address": "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT",
+    "address": "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz",
     "origin": "anchor",
     "binaryVersion": "0.26.0",
     "libVersion": "0.26.0"

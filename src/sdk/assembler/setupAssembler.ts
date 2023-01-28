@@ -57,6 +57,7 @@ export async function setupAssembler(
         collectionUri,
         collectionDescription: config.description,
         nftBaseUri: config.base_url,
+        allowDuplicates: config.allowDuplicates || null,
       }
     );
     transactionGroups[0].txns.push(createAssemblerCtx);

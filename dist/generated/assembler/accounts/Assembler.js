@@ -30,7 +30,7 @@ const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const AssemblingAction_1 = require("../types/AssemblingAction");
 exports.assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95];
 class Assembler {
-    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, nftBaseUri, assemblingAction, nfts) {
+    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, nftBaseUri, assemblingAction, nfts, allowDuplicates) {
         this.bump = bump;
         this.authority = authority;
         this.collection = collection;
@@ -40,9 +40,10 @@ class Assembler {
         this.nftBaseUri = nftBaseUri;
         this.assemblingAction = assemblingAction;
         this.nfts = nfts;
+        this.allowDuplicates = allowDuplicates;
     }
     static fromArgs(args) {
-        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.nftBaseUri, args.assemblingAction, args.nfts);
+        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.nftBaseUri, args.assemblingAction, args.nfts, args.allowDuplicates);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Assembler.deserialize(accountInfo.data, offset);
@@ -54,7 +55,7 @@ class Assembler {
         }
         return Assembler.fromAccountInfo(accountInfo, 0)[0];
     }
-    static gpaBuilder(programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')) {
+    static gpaBuilder(programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
         return beetSolana.GpaBuilder.fromStruct(programId, exports.assemblerBeet);
     }
     static deserialize(buf, offset = 0) {
@@ -87,6 +88,7 @@ class Assembler {
             nftBaseUri: this.nftBaseUri,
             assemblingAction: 'AssemblingAction.' + AssemblingAction_1.AssemblingAction[this.assemblingAction],
             nfts: this.nfts,
+            allowDuplicates: this.allowDuplicates,
         };
     }
 }
@@ -102,5 +104,6 @@ exports.assemblerBeet = new beet.FixableBeetStruct([
     ['nftBaseUri', beet.utf8String],
     ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
     ['nfts', beet.u16],
+    ['allowDuplicates', beet.bool],
 ], Assembler.fromArgs, 'Assembler');
 //# sourceMappingURL=Assembler.js.map

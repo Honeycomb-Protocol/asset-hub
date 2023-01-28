@@ -29,6 +29,7 @@ export const mintNftStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] nftMetadata
  * @property [_writable_] nftMasterEdition
  * @property [_writable_] tokenAccount
+ * @property [_writable_] uniqueConstraint
  * @property [_writable_, **signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [] tokenMetadataProgram
@@ -43,6 +44,7 @@ export type MintNftInstructionAccounts = {
   nftMetadata: web3.PublicKey
   nftMasterEdition: web3.PublicKey
   tokenAccount: web3.PublicKey
+  uniqueConstraint: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -66,7 +68,7 @@ export const mintNftInstructionDiscriminator = [
  */
 export function createMintNftInstruction(
   accounts: MintNftInstructionAccounts,
-  programId = new web3.PublicKey('AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT')
+  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = mintNftStruct.serialize({
     instructionDiscriminator: mintNftInstructionDiscriminator,
@@ -99,6 +101,11 @@ export function createMintNftInstruction(
     },
     {
       pubkey: accounts.tokenAccount,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.uniqueConstraint,
       isWritable: true,
       isSigner: false,
     },

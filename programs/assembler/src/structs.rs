@@ -1,4 +1,5 @@
-use anchor_lang::prelude::*;
+use crate::{errors::ErrorCode, utils::EXTRA_SIZE};
+use anchor_lang::{prelude::*, solana_program};
 
 /// Assembler state account
 #[account]
@@ -28,9 +29,12 @@ pub struct Assembler {
 
     /// The number of NFTs created by this assembler
     pub nfts: u16,
+
+    /// Should this assembler allow duplicate NFTs
+    pub allow_duplicates: bool,
 }
 impl Assembler {
-    pub const LEN: usize = 144;
+    pub const LEN: usize = 144 + EXTRA_SIZE;
 }
 
 /// Assembling Action
@@ -104,7 +108,7 @@ pub struct Block {
     pub block_name: String,
 }
 impl Block {
-    pub const LEN: usize = 64;
+    pub const LEN: usize = 64 + EXTRA_SIZE;
 }
 
 /// Block Definition Value
@@ -172,7 +176,7 @@ pub struct BlockDefinition {
     pub value: BlockDefinitionValue,
 }
 impl BlockDefinition {
-    pub const LEN: usize = 128;
+    pub const LEN: usize = 128 + EXTRA_SIZE;
 }
 
 /// NFT state account
@@ -212,9 +216,62 @@ pub struct NFT {
 
     /// Flag if the image for this nft is already generated
     pub is_generated: bool,
+
+    /// NFT Attributes
+    pub attributes: Vec<NFTAttribute>,
 }
 impl NFT {
-    pub const LEN: usize = 232;
+    pub const LEN: usize = 232 + EXTRA_SIZE;
+
+    /// Reallocate NFT size
+    pub fn reallocate<'info>(
+        len: isize,
+        nft_info: AccountInfo<'info>,
+        payer_info: AccountInfo<'info>,
+        rent_sysvar: &Sysvar<'info, Rent>,
+        system_program: &Program<'info, System>,
+    ) -> Result<()> {
+        let curr_len = isize::try_from(nft_info.data_len()).unwrap();
+        let new_len = curr_len + len;
+        let curr_rent = rent_sysvar.minimum_balance(usize::try_from(curr_len).unwrap());
+        let new_rent = rent_sysvar.minimum_balance(usize::try_from(new_len).unwrap());
+        let rent_diff: isize =
+            isize::try_from(new_rent).unwrap() - isize::try_from(curr_rent).unwrap();
+
+        let nft_info_borrow = nft_info.clone();
+        if rent_diff > 0 {
+            solana_program::program::invoke(
+                &solana_program::system_instruction::transfer(
+                    payer_info.key,
+                    nft_info_borrow.key,
+                    u64::try_from(rent_diff).unwrap(),
+                ),
+                &[
+                    payer_info,
+                    nft_info_borrow,
+                    system_program.to_account_info(),
+                ],
+            )?;
+        } else if rent_diff < 0 {
+            let parsed_rent_diff = u64::try_from(rent_diff * -1).unwrap();
+
+            **payer_info.lamports.borrow_mut() = payer_info
+                .lamports()
+                .checked_add(parsed_rent_diff)
+                .ok_or(ErrorCode::Overflow)?;
+
+            **nft_info.lamports.borrow_mut() = nft_info
+                .lamports()
+                .checked_sub(parsed_rent_diff)
+                .ok_or(ErrorCode::Overflow)?;
+        } else {
+            return Ok(());
+        }
+
+        nft_info
+            .realloc(usize::try_from(new_len).unwrap(), false)
+            .map_err(Into::into)
+    }
 }
 
 /// NFT Attribute Value
@@ -231,13 +288,8 @@ pub enum NFTAttributeValue {
 }
 
 /// NFT Attribute
-#[account]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct NFTAttribute {
-    pub bump: u8,
-
-    /// The NFT this attribute is associated to
-    pub nft: Pubkey,
-
     /// The block account
     pub block: Pubkey,
 
@@ -257,5 +309,17 @@ pub struct NFTAttribute {
     pub attribute_value: NFTAttributeValue,
 }
 impl NFTAttribute {
-    pub const LEN: usize = 192 - 1;
+    pub const LEN: usize = 192;
+}
+
+/// NFT Unique Constraint account
+#[account]
+pub struct NFTUniqueConstraint {
+    pub bump: u8,
+
+    /// The NFT this constraint is associated to
+    pub nft: Pubkey,
+}
+impl NFTUniqueConstraint {
+    pub const LEN: usize = 33 + EXTRA_SIZE;
 }

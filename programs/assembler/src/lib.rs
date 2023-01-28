@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 
+pub mod bpf_writer;
 pub mod errors;
 pub mod instructions;
 pub mod structs;
@@ -8,7 +9,7 @@ pub mod utils;
 use instructions::*;
 use structs::*;
 
-declare_id!("AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT");
+declare_id!("Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz");
 
 #[program]
 pub mod assembler {
