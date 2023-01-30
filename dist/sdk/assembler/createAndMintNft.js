@@ -193,22 +193,11 @@ async function createAndMintNft({ mx, assembler, blocks, }) {
         blocks,
     });
     const wallet = mx.identity();
-    let addressesDir = {};
-    txns
-        .forEach(({ accounts }, i) => {
-        accounts.forEach((acc) => {
-            addressesDir[acc.toString()] = acc;
-        });
-    });
-    const addresses = Object.values(addressesDir);
-    const lookupTableAddress = await (0, utils_1.createLookupTable)(wallet, mx.connection, addresses);
-    const lookupTable = await (0, utils_1.getOrFetchLoockupTable)(mx.connection, lookupTableAddress);
-    const mintNftTxns = await (0, utils_1.devideAndSignV0Txns)(wallet, mx.connection, lookupTable, txns);
-    console.log(mintNftTxns);
+    const { txns: mintNftTxns, lookupTableAddress } = await (0, utils_1.bulkLutTransactions)(mx, txns);
     mintNftTxns.forEach((txn) => {
         txn.sign([wallet]);
     });
-    const responses = await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactionsNew)(new web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "processed"), mintNftTxns));
+    const responses = await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactions)(new web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "processed"), mintNftTxns));
     return {
         responses,
         nftMint,

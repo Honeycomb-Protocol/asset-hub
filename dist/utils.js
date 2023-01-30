@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmBulkTransactions = exports.sendBulkTransactionsNew = exports.sendBulkTransactions = exports.createLookupTable = exports.devideAndSignV0Txns = exports.getOrFetchLoockupTable = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = exports.METADATA_PROGRAM_ID = void 0;
+exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = exports.METADATA_PROGRAM_ID = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 exports.METADATA_PROGRAM_ID = new web3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 const sendAndConfirmTransaction = async (tx, connection, wallet, signers = [], sendOpts = {}) => {
@@ -90,7 +90,46 @@ const getOrFetchLoockupTable = async (connection, lookupTableAddress) => {
         })).value;
 };
 exports.getOrFetchLoockupTable = getOrFetchLoockupTable;
-const devideAndSignV0Txns = async (wallet, connection, lookupTableAddress, rawTxns, mextByteSizeOfAGroup = 1600) => {
+const devideAndSignTxns = async (wallet, connection, rawTxns, mextByteSizeOfAGroup = 1232) => {
+    const publicKey = wallet.publicKey;
+    if (!publicKey || !wallet.signAllTransactions)
+        return;
+    const instructionsGroups = [];
+    const latestBlockhash = await connection.getLatestBlockhash();
+    rawTxns.forEach((rawTx) => {
+        var _a;
+        const instructions = rawTx.tx.instructions;
+        const tx = new web3.Transaction().add(...(((_a = instructionsGroups[instructionsGroups.length - 1]) === null || _a === void 0 ? void 0 : _a.instrunctions) ||
+            []), ...instructions);
+        tx.recentBlockhash = latestBlockhash.blockhash;
+        tx.feePayer = wallet.publicKey;
+        let newTransactionSize = 0;
+        try {
+            newTransactionSize = tx.serialize().byteLength;
+        }
+        catch (e) {
+            console.error(e);
+            console.log("this transaction failed to serialize", tx);
+        }
+        if (!instructionsGroups.length ||
+            newTransactionSize > mextByteSizeOfAGroup ||
+            (!newTransactionSize && instructionsGroups.length)) {
+            instructionsGroups.push({
+                tx,
+                instrunctions: [...instructions],
+                signers: [...rawTx.signers],
+            });
+        }
+        else {
+            instructionsGroups[instructionsGroups.length - 1].tx = tx;
+            instructionsGroups[instructionsGroups.length - 1].instrunctions.push(...instructions);
+            instructionsGroups[instructionsGroups.length - 1].signers.push(...rawTx.signers);
+        }
+    });
+    return instructionsGroups;
+};
+exports.devideAndSignTxns = devideAndSignTxns;
+const devideAndSignV0Txns = async (wallet, connection, lookupTableAddress, rawTxns, mextByteSizeOfAGroup = 1232) => {
     const publicKey = wallet.publicKey;
     if (!publicKey || !wallet.signAllTransactions)
         return;
@@ -101,7 +140,7 @@ const devideAndSignV0Txns = async (wallet, connection, lookupTableAddress, rawTx
     lookupTable.state.addresses.forEach((add) => {
         addressedInLoockupTables[add.toString()] = true;
     });
-    console.log("addressedInLoockupTablesCount", Object.keys(addressedInLoockupTables).length, "addressedInLoockupTables", Object.keys(addressedInLoockupTables));
+    console.log("AddressCount", Object.keys(addressedInLoockupTables).length);
     const instructionsGroups = [];
     const latestBlockhash = await connection.getLatestBlockhash();
     rawTxns.forEach((rawTx) => {
@@ -121,10 +160,6 @@ const devideAndSignV0Txns = async (wallet, connection, lookupTableAddress, rawTx
             console.error(e);
             console.log("this transaction failed to serialize", tx);
         }
-        console.log({
-            newTransactionSize,
-            mextByteSizeOfAGroup,
-        });
         if (!instructionsGroups.length ||
             newTransactionSize > mextByteSizeOfAGroup ||
             (!newTransactionSize && instructionsGroups.length)) {
@@ -150,7 +185,6 @@ exports.devideAndSignV0Txns = devideAndSignV0Txns;
 const createLookupTable = async (wallet, connection, addresses) => {
     if (!wallet.publicKey || !wallet.signAllTransactions)
         return;
-    console.log(wallet.publicKey.toString());
     const [lookupTableIx, lookupTableAddress] = web3.AddressLookupTableProgram.createLookupTable({
         authority: wallet.publicKey,
         payer: wallet.publicKey,
@@ -197,6 +231,7 @@ const createLookupTable = async (wallet, connection, addresses) => {
 };
 exports.createLookupTable = createLookupTable;
 const sendBulkTransactions = (connection, transactions) => {
+    console.log(transactions.map((tx) => tx.serialize().byteLength));
     return Promise.all(transactions.map((t) => connection.sendTransaction(t, {
         skipPreflight: true,
     }, {
@@ -204,14 +239,33 @@ const sendBulkTransactions = (connection, transactions) => {
     })));
 };
 exports.sendBulkTransactions = sendBulkTransactions;
-const sendBulkTransactionsNew = (connection, transactions) => {
-    return Promise.all(transactions.map((t) => connection.sendTransaction(t, {
+const sendBulkTransactionsLegacy = (mx, transactions) => {
+    return Promise.all(transactions.map((t) => mx.rpc().sendTransaction(t, {
         skipPreflight: true,
     })));
 };
-exports.sendBulkTransactionsNew = sendBulkTransactionsNew;
+exports.sendBulkTransactionsLegacy = sendBulkTransactionsLegacy;
 const confirmBulkTransactions = (connection, transactions, commitment = "processed") => {
     return Promise.all(transactions.map((t) => connection.confirmTransaction(t, commitment)));
 };
 exports.confirmBulkTransactions = confirmBulkTransactions;
+const bulkLutTransactions = async (mx, txns) => {
+    const wallet = mx.identity();
+    let addressesDir = {};
+    txns.forEach(({ accounts }) => {
+        accounts.forEach((acc) => {
+            addressesDir[acc.toString()] = acc;
+        });
+    });
+    const addresses = Object.values(addressesDir);
+    const lookupTableAddress = await (0, exports.createLookupTable)(wallet, mx.connection, addresses);
+    const lookupTable = await (0, exports.getOrFetchLoockupTable)(mx.connection, lookupTableAddress);
+    const lutTxns = await (0, exports.devideAndSignV0Txns)(wallet, mx.connection, lookupTable, txns);
+    console.log(lutTxns.map((tx) => tx.serialize().byteLength));
+    return {
+        txns: lutTxns,
+        lookupTableAddress,
+    };
+};
+exports.bulkLutTransactions = bulkLutTransactions;
 //# sourceMappingURL=utils.js.map

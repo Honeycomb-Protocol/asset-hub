@@ -28,25 +28,18 @@ const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const _1 = require(".");
 const assetmanager_1 = require("../assetmanager");
+const utils_1 = require("../../utils");
 async function setupAssembler(mx, config, updateConfig, readFile) {
-    let transactions = [];
+    const transactionGroups = [
+        {
+            txns: [],
+            postActions: [],
+        },
+    ];
     const wallet = mx.identity();
-    let signers = [];
-    let accounts = [];
-    let assemblingAction;
-    switch (config.assemblingAction) {
-        case "Burn":
-            assemblingAction = generated_1.AssemblingAction.Burn;
-            break;
-        case "Freeze":
-            assemblingAction = generated_1.AssemblingAction.Freeze;
-            break;
-        case "TakeCustody":
-            assemblingAction = generated_1.AssemblingAction.TakeCustody;
-            break;
-        default:
-            break;
-    }
+    if (!config.destroyableLookupTables)
+        config.destroyableLookupTables = [];
+    const assemblingAction = generated_1.AssemblingAction[config.assemblingAction] || generated_1.AssemblingAction.Burn;
     let assemblerAddress = config.assemblerAddress;
     if (!assemblerAddress) {
         const collectionUri = "";
@@ -59,35 +52,15 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
             nftBaseUri: config.base_url,
             allowDuplicates: config.allowDuplicates || null,
         });
-        transactions.push({
-            ...createAssemblerCtx,
-            postAction() {
-                config.assemblerAddress = createAssemblerCtx.assembler.toString();
-                updateConfig(config);
-            },
+        transactionGroups[0].txns.push(createAssemblerCtx);
+        transactionGroups[0].postActions.push(() => {
+            config.assemblerAddress = createAssemblerCtx.assembler.toString();
+            updateConfig(config);
         });
-        signers.push(...createAssemblerCtx.signers);
-        accounts.push(...createAssemblerCtx.accounts);
         assemblerAddress = createAssemblerCtx.assembler.toString();
     }
     await Promise.all(config.blocks.map(async (block) => {
-        let blockType;
-        switch (block.type) {
-            case "Enum":
-                blockType = generated_1.BlockType.Enum;
-                break;
-            case "Boolean":
-                blockType = generated_1.BlockType.Boolean;
-                break;
-            case "Random":
-                blockType = generated_1.BlockType.Random;
-                break;
-            case "Computed":
-                blockType = generated_1.BlockType.Computed;
-                break;
-            default:
-                throw new Error("Invalid Block Type");
-        }
+        const blockType = generated_1.BlockType[block.type] || generated_1.BlockType.Enum;
         let blockAddress = block.address;
         if (!blockAddress) {
             const createBlockCtx = (0, _1.createCreateBlockTransaction)(new web3.PublicKey(assemblerAddress), wallet.publicKey, wallet.publicKey, {
@@ -96,17 +69,18 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
                 blockType: blockType,
                 isGraphical: block.isGraphical,
             });
-            transactions.push({
-                ...createBlockCtx,
-                postAction() {
-                    block.address = createBlockCtx.block.toString();
-                    updateConfig(config);
-                },
+            transactionGroups[0].txns.push(createBlockCtx);
+            transactionGroups[0].postActions.push(() => {
+                block.address = createBlockCtx.block.toString();
+                updateConfig(config);
             });
-            signers.push(...createBlockCtx.signers);
-            accounts.push(...createBlockCtx.accounts);
             blockAddress = createBlockCtx.block.toString();
         }
+        const transactionGroup = {
+            txns: [],
+            postActions: [],
+        };
+        transactionGroups.push(transactionGroup);
         await Promise.all(block.definitions.map(async (blockDefinition) => {
             if (blockDefinition.address)
                 return;
@@ -159,6 +133,11 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
                         symbol: blockDefinition.assetConfig.symbol,
                         ...(blockDefinition.assetConfig.json || {}),
                     });
+                    if (!blockDefinition.caches)
+                        blockDefinition.caches = {
+                            image: blockDefinition.assetConfig.image,
+                        };
+                    blockDefinition.caches.image = blockDefinition.assetConfig.image;
                     uri = blockDefinition.assetConfig.uri = m.uri;
                     updateConfig(config);
                 }
@@ -170,55 +149,58 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
                     symbol: blockDefinition.assetConfig.symbol,
                     uri: uri,
                 });
-                transactions.push({
-                    ...createAssetCtx,
-                    postAction() {
-                        blockDefinition.assetConfig.address =
-                            createAssetCtx.asset.toString();
-                        blockDefinition.mintAddress = createAssetCtx.mint.toString();
-                        updateConfig(config);
-                    },
+                transactionGroup.txns.push(createAssetCtx);
+                transactionGroup.postActions.push(() => {
+                    blockDefinition.assetConfig.address =
+                        createAssetCtx.asset.toString();
+                    blockDefinition.mintAddress = createAssetCtx.mint.toString();
+                    updateConfig(config);
                 });
-                signers.push(...createAssetCtx.signers);
-                accounts.push(...createAssetCtx.accounts);
                 blockDefinitionMint = createAssetCtx.mint;
             }
             else {
                 throw new Error("Block definition details not provided properly");
             }
             const createBlockDefinitionCtx = (0, _1.createCreateBlockDefinitionTransaction)(new web3.PublicKey(assemblerAddress), new web3.PublicKey(blockAddress), blockDefinitionMint, wallet.publicKey, wallet.publicKey, blockDefArgs);
-            transactions.push({
-                ...createBlockDefinitionCtx,
-                postAction() {
-                    blockDefinition.address =
-                        createBlockDefinitionCtx.blockDefinition.toString();
-                    updateConfig(config);
-                },
+            transactionGroup.txns.push(createBlockDefinitionCtx);
+            transactionGroup.postActions.push(() => {
+                blockDefinition.address =
+                    createBlockDefinitionCtx.blockDefinition.toString();
+                updateConfig(config);
             });
-            signers.push(...createBlockDefinitionCtx.signers);
-            accounts.push(...createBlockDefinitionCtx.accounts);
             return blockDefinition;
         }));
         return block;
     }));
-    accounts = accounts.filter((x, index, self) => index === self.findIndex((y) => x.equals(y)));
-    let i = 0;
-    for (let t of transactions) {
-        const blockhash = await mx.rpc().getLatestBlockhash();
-        t.tx.recentBlockhash = blockhash.blockhash;
-        await mx
-            .rpc()
-            .sendAndConfirmTransaction(t.tx, {
-            skipPreflight: true,
-        }, t.signers)
-            .then((txId) => {
-            if (t.postAction)
-                t.postAction();
-            console.log(`Assembler setup tx: (${++i}/${transactions.length})`, txId.signature);
-        })
-            .catch((e) => {
-            console.error(e);
+    for (let tg of transactionGroups) {
+        if (tg.txns.length) {
+            console.log(tg.txns.length);
+            const { txns, lookupTableAddress } = await (0, utils_1.bulkLutTransactions)(mx, tg.txns);
+            txns.forEach((txn) => {
+                txn.sign([wallet]);
+            });
+            const processedConnection = new web3.Connection(mx.connection.rpcEndpoint, "processed");
+            const responses = await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactions)(processedConnection, txns));
+            config.destroyableLookupTables.push(lookupTableAddress.toString());
+            updateConfig(config);
+        }
+        tg.postActions.forEach((action) => {
+            action();
         });
+    }
+    const destroyableLookupTables = config.destroyableLookupTables.map((str) => new web3.PublicKey(str));
+    if (false && destroyableLookupTables.length) {
+        const latestBlockhash = await mx.connection.getLatestBlockhash();
+        const destroyTransactions = destroyableLookupTables.map((address) => new web3.Transaction({
+            feePayer: wallet.publicKey,
+            recentBlockhash: latestBlockhash.blockhash,
+        }).add(web3.AddressLookupTableProgram.closeLookupTable({
+            authority: wallet.publicKey,
+            lookupTable: address,
+            recipient: wallet.publicKey,
+        })));
+        wallet.signAllTransactions(destroyTransactions);
+        await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactionsLegacy)(mx, destroyTransactions));
     }
     return config;
 }
