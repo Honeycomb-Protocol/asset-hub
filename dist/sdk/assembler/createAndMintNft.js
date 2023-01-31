@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAndMintNft = exports.buildCreateAndMintNftCtx = exports.createMintNftTransaction = exports.createAddBlockTransaction = exports.createCreateNftTransaction = void 0;
+exports.createAndMintNft = exports.buildCreateAndMintNftCtx = exports.getUniqueConstraintPda = exports.createMintNftTransaction = exports.createAddBlockTransaction = exports.createCreateNftTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
@@ -160,6 +160,16 @@ function createMintNftTransaction(assembler, nftMint, uniqueConstraint, authorit
     };
 }
 exports.createMintNftTransaction = createMintNftTransaction;
+function getUniqueConstraintPda(blocks) {
+    const uniqueConstraintSeeds = blocks
+        .map(({ blockDefinition, tokenMint }) => [
+        blockDefinition.toBuffer(),
+        tokenMint.toBuffer(),
+    ])
+        .flat();
+    return web3.PublicKey.findProgramAddressSync([...uniqueConstraintSeeds], assembler_1.PROGRAM_ID)[0];
+}
+exports.getUniqueConstraintPda = getUniqueConstraintPda;
 async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
     const wallet = mx.identity();
     const txns = [];
@@ -169,14 +179,10 @@ async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
     const uniqueConstraintSeeds = [];
     blocks.forEach((block) => {
         txns.push(createAddBlockTransaction(assembler, nft, nftMint, block.block, block.blockDefinition, block.tokenMint, wallet.publicKey, wallet.publicKey, assemblerAccount.assemblingAction));
-        if (!assemblerAccount.allowDuplicates) {
-            uniqueConstraintSeeds.push(block.blockDefinition.toBuffer());
-            uniqueConstraintSeeds.push(block.tokenMint.toBuffer());
-        }
     });
     let uniqueConstraint = null;
-    if (uniqueConstraintSeeds.length) {
-        uniqueConstraint = web3.PublicKey.findProgramAddressSync([...uniqueConstraintSeeds], assembler_1.PROGRAM_ID)[0];
+    if (!assemblerAccount.allowDuplicates) {
+        uniqueConstraint = getUniqueConstraintPda(blocks);
     }
     txns.push(createMintNftTransaction(assembler, nftMint, uniqueConstraint, wallet.publicKey, wallet.publicKey));
     return {

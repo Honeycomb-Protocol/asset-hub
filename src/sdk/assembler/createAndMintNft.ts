@@ -249,7 +249,19 @@ export function createMintNftTransaction(
     ),
   };
 }
+export function getUniqueConstraintPda(blocks: CreateAndMintNftArgs["blocks"]) {
+  const uniqueConstraintSeeds = blocks
+    .map(({ blockDefinition, tokenMint }) => [
+      blockDefinition.toBuffer(),
+      tokenMint.toBuffer(),
+    ])
+    .flat();
 
+  return web3.PublicKey.findProgramAddressSync(
+    [...uniqueConstraintSeeds],
+    PROGRAM_ID
+  )[0];
+}
 export async function buildCreateAndMintNftCtx({
   mx,
   assembler,
@@ -290,19 +302,11 @@ export async function buildCreateAndMintNftCtx({
         assemblerAccount.assemblingAction
       )
     );
-
-    if (!assemblerAccount.allowDuplicates) {
-      uniqueConstraintSeeds.push(block.blockDefinition.toBuffer());
-      uniqueConstraintSeeds.push(block.tokenMint.toBuffer());
-    }
   });
-
   let uniqueConstraint: web3.PublicKey | null = null;
-  if (uniqueConstraintSeeds.length) {
-    uniqueConstraint = web3.PublicKey.findProgramAddressSync(
-      [...uniqueConstraintSeeds],
-      PROGRAM_ID
-    )[0];
+
+  if (!assemblerAccount.allowDuplicates) {
+    uniqueConstraint = getUniqueConstraintPda(blocks);
   }
 
   txns.push(
