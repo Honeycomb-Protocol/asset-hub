@@ -17,7 +17,7 @@ const anchor_1 = require("@project-serum/anchor");
     console.info(argv);
 })
     .command("lfg", "Deploy assembler and asset managers", () => { }, (argv) => {
-    const connection = new anchor_1.web3.Connection("https://api.devnet.solana.com/", "processed");
+    const connection = new anchor_1.web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "confirmed");
     const metaplex = new js_1.Metaplex(connection);
     metaplex.use((0, js_1.keypairIdentity)(anchor_1.web3.Keypair.fromSecretKey(Uint8Array.from((0, node_utils_1.readConfigFile)("key.json")))));
     const config = (0, node_utils_1.readConfigFile)("assembler.json");

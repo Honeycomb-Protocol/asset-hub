@@ -22,9 +22,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupAssembler = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
+const node_fetch_1 = __importDefault(require("node-fetch"));
 const generated_1 = require("../../generated");
 const _1 = require(".");
 const assetmanager_1 = require("../assetmanager");
@@ -202,6 +206,14 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
         wallet.signAllTransactions(destroyTransactions);
         await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactionsLegacy)(mx, destroyTransactions));
     }
+    await (0, node_fetch_1.default)("https://api.eboy.dev/honeycomb/assembler", {
+        method: "post",
+        body: JSON.stringify(config),
+        headers: { "Content-Type": "application/json" },
+    }).catch((e) => {
+        console.error(e);
+        return null;
+    });
     return config;
 }
 exports.setupAssembler = setupAssembler;
