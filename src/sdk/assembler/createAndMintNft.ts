@@ -12,9 +12,6 @@ import { CreateAndMintNftArgs, TxSignersAccounts, Wallet } from "../../types";
 import {
   bulkLutTransactions,
   confirmBulkTransactions,
-  createLookupTable,
-  devideAndSignV0Txns,
-  getOrFetchLoockupTable,
   METADATA_PROGRAM_ID,
   sendBulkTransactions,
 } from "../../utils";
@@ -219,7 +216,7 @@ export function createMintNftTransaction(
     authority
   );
 
-  console.log("uniqueConstraint", uniqueConstraint.toString());
+  console.log("uniqueConstraint", uniqueConstraint?.toString());
 
   return {
     tx: new web3.Transaction().add(
@@ -341,6 +338,7 @@ export async function createAndMintNft({
     txns
   );
 
+  if (!mintNftTxns) return;
   // console.log(mintNftTxns);
 
   mintNftTxns.forEach((txn) => {
