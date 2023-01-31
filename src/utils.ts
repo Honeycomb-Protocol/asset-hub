@@ -5,6 +5,7 @@ import {
   IdentitySigner,
   Metaplex,
   Signer,
+  isKeypairSigner,
 } from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
 
@@ -320,15 +321,20 @@ export const createLookupTable = async (
       )
     );
   }
-  if ("secretKey" in wallet) {
+  if (isKeypairSigner(wallet)) {
+    // @ts-ignore
     creationTx.sign([wallet]);
     transactions.forEach((txn) => {
       // txn.tx.partialSign(signer);
+      // @ts-ignore
       txn.sign([wallet]);
     });
   } else {
+    // @ts-ignore
     [creationTx, ...transactions] = await wallet.signAllTransactions([
+      // @ts-ignore
       creationTx,
+      // @ts-ignore
       ...transactions,
     ]);
   }
@@ -422,11 +428,13 @@ export const bulkLutTransactions = async (
     mx.connection,
     addresses
   );
-
+  if (!lookupTableAddress) throw new Error("Lookup Table creation failed!");
   const lookupTable = await getOrFetchLoockupTable(
     mx.connection,
     lookupTableAddress
   );
+
+  if (!lookupTable) throw new Error("Lookup Table validation failed!");
 
   const lutTxns = await devideAndSignV0Txns(
     wallet,
@@ -434,6 +442,7 @@ export const bulkLutTransactions = async (
     lookupTable,
     txns
   );
+  if (!lutTxns) throw new Error("DevideAndSignV0Txns creation failed!");
 
   console.log(lutTxns.map((tx) => tx.serialize().byteLength));
 
