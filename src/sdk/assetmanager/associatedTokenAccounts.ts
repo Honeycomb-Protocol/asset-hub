@@ -1,6 +1,7 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { Metaplex } from "@metaplex-foundation/js";
+import { TxSignersAccounts } from "../../types";
 // import { Asset } from "../../generated";
 
 // export const makeSureAsset = (
@@ -15,12 +16,12 @@ export async function getAssociatedTokenAccountIntructions(
   mx: Metaplex,
   mints: web3.PublicKey[]
 ): Promise<{
-  preInstructions: web3.TransactionInstruction[];
-  postTransactions: web3.TransactionInstruction[];
+  preTxns: TxSignersAccounts[];
+  postTxns: TxSignersAccounts[];
 }> {
   let wallet = mx.identity();
-  const preInstructions: web3.TransactionInstruction[] = [];
-  const postTransactions: web3.TransactionInstruction[] = [];
+  const preTxns: TxSignersAccounts[] = [];
+  const postTxns: TxSignersAccounts[] = [];
   for (let index = 0; index < mints.length; index++) {
     const mint = mints[index];
     const tokenAccountAddress = splToken.getAssociatedTokenAddressSync(
@@ -32,27 +33,45 @@ export async function getAssociatedTokenAccountIntructions(
       .catch((e) => null);
 
     if (!tokenAccount)
-      preInstructions.push(
-        splToken.createAssociatedTokenAccountInstruction(
+      preTxns.push({
+        tx: new web3.Transaction().add(
+          splToken.createAssociatedTokenAccountInstruction(
+            wallet.publicKey,
+            tokenAccountAddress,
+            wallet.publicKey,
+            mint
+          )
+        ),
+        accounts: [
+          web3.SystemProgram.programId,
           wallet.publicKey,
           tokenAccountAddress,
-          wallet.publicKey,
-          mint
-        )
-      );
+          mint,
+        ],
+        signers: [],
+      });
 
     if (!tokenAccount || !Number(tokenAccount.amount))
-      postTransactions.push(
-        splToken.createCloseAccountInstruction(
-          tokenAccountAddress,
+      postTxns.push({
+        tx: new web3.Transaction().add(
+          splToken.createCloseAccountInstruction(
+            tokenAccountAddress,
+            wallet.publicKey,
+            wallet.publicKey
+          )
+        ),
+        accounts: [
+          web3.SystemProgram.programId,
           wallet.publicKey,
-          wallet.publicKey
-        )
-      );
+          tokenAccountAddress,
+          mint,
+        ],
+        signers: [],
+      });
   }
 
   return {
-    preInstructions,
-    postTransactions,
+    preTxns,
+    postTxns,
   };
 }

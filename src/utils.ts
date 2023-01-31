@@ -1,11 +1,10 @@
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import {
+import _mx_js, {
   IdentityClient,
   IdentitySigner,
   Metaplex,
   Signer,
-  isKeypairSigner,
 } from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
 
@@ -321,7 +320,7 @@ export const createLookupTable = async (
       )
     );
   }
-  if (isKeypairSigner(wallet)) {
+  if (_mx_js.isKeypairSigner(wallet)) {
     // @ts-ignore
     creationTx.sign([wallet]);
     transactions.forEach((txn) => {

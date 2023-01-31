@@ -24,11 +24,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAssociatedTokenAccountIntructions = void 0;
+const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
 async function getAssociatedTokenAccountIntructions(mx, mints) {
     let wallet = mx.identity();
-    const preInstructions = [];
-    const postTransactions = [];
+    const preTxns = [];
+    const postTxns = [];
     for (let index = 0; index < mints.length; index++) {
         const mint = mints[index];
         const tokenAccountAddress = splToken.getAssociatedTokenAddressSync(mint, wallet.publicKey);
@@ -36,13 +37,31 @@ async function getAssociatedTokenAccountIntructions(mx, mints) {
             .getAccount(mx.connection, tokenAccountAddress)
             .catch((e) => null);
         if (!tokenAccount)
-            preInstructions.push(splToken.createAssociatedTokenAccountInstruction(wallet.publicKey, tokenAccountAddress, wallet.publicKey, mint));
+            preTxns.push({
+                tx: new web3.Transaction().add(splToken.createAssociatedTokenAccountInstruction(wallet.publicKey, tokenAccountAddress, wallet.publicKey, mint)),
+                accounts: [
+                    web3.SystemProgram.programId,
+                    wallet.publicKey,
+                    tokenAccountAddress,
+                    mint,
+                ],
+                signers: [],
+            });
         if (!tokenAccount || !Number(tokenAccount.amount))
-            postTransactions.push(splToken.createCloseAccountInstruction(tokenAccountAddress, wallet.publicKey, wallet.publicKey));
+            postTxns.push({
+                tx: new web3.Transaction().add(splToken.createCloseAccountInstruction(tokenAccountAddress, wallet.publicKey, wallet.publicKey)),
+                accounts: [
+                    web3.SystemProgram.programId,
+                    wallet.publicKey,
+                    tokenAccountAddress,
+                    mint,
+                ],
+                signers: [],
+            });
     }
     return {
-        preInstructions,
-        postTransactions,
+        preTxns,
+        postTxns,
     };
 }
 exports.getAssociatedTokenAccountIntructions = getAssociatedTokenAccountIntructions;

@@ -1,6 +1,7 @@
 import * as web3 from "@solana/web3.js";
 import { Metaplex } from "@metaplex-foundation/js";
+import { TxSignersAccounts } from "../../types";
 export declare function getAssociatedTokenAccountIntructions(mx: Metaplex, mints: web3.PublicKey[]): Promise<{
-    preInstructions: web3.TransactionInstruction[];
-    postTransactions: web3.TransactionInstruction[];
+    preTxns: TxSignersAccounts[];
+    postTxns: TxSignersAccounts[];
 }>;
