@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import { IdentityClient, Metaplex, Signer } from "@metaplex-foundation/js";
+import { IdentityClient, KeypairSigner, Metaplex, Signer } from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
 export declare const METADATA_PROGRAM_ID: web3.PublicKey;
 export declare const sendAndConfirmTransaction: (tx: web3.Transaction, connection: web3.Connection, wallet: anchor.Wallet, signers?: Signer[], sendOpts?: web3.SendOptions) => Promise<string>;
@@ -19,6 +19,8 @@ export declare const devideAndSignTxns: (wallet: Wallet, connection: web3.Connec
     signers: web3.Signer[];
 }[]>;
 export declare const devideAndSignV0Txns: (wallet: Wallet, connection: web3.Connection, lookupTableAddress: web3.PublicKey | web3.AddressLookupTableAccount, rawTxns: TxSignersAccounts[], mextByteSizeOfAGroup?: number) => Promise<web3.VersionedTransaction[]>;
+export declare const isSigner: (input: any) => input is Signer;
+export declare const isKeypairSigner: (input: any) => input is KeypairSigner;
 export declare const createLookupTable: (wallet: Wallet | IdentityClient, connection: web3.Connection, addresses: web3.PublicKey[]) => Promise<web3.PublicKey>;
 export declare const sendBulkTransactions: (connection: web3.Connection, transactions: (web3.VersionedTransaction | web3.Transaction)[]) => Promise<string[]>;
 export declare const sendBulkTransactionsLegacy: (mx: Metaplex, transactions: web3.Transaction[]) => Promise<string[]>;
