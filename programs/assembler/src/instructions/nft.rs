@@ -943,11 +943,53 @@ pub struct SetNFTGenerated<'info> {
         bump,
     )]
     pub nft: Account<'info, NFT>,
+    /// Assembler state account
+    #[account(mut)]
+    pub assembler: Account<'info, Assembler>,
+    /// Metadata account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_metadata: AccountInfo<'info>,
+    /// METAPLEX TOKEN METADATA PROGRAM
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub token_metadata_program: UncheckedAccount<'info>,
 }
 
 /// Set NFT is generated
-pub fn set_nft_generated(ctx: Context<SetNFTGenerated>) -> Result<()> {
+pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, new_uri: String) -> Result<()> {
+    let assembler = &mut ctx.accounts.assembler;
+    let assembler_key = assembler.key();
     let nft = &mut ctx.accounts.nft;
     nft.is_generated = true;
+    if !(new_uri.len() > 0) {
+        nft.uri = new_uri;
+        let metadata_account_info = &ctx.accounts.nft_metadata;
+        let mut metadata: Metadata = Metadata::from_account_info(metadata_account_info)?;
+        metadata.data.uri = nft.uri.clone();
+        let update_metadata = mpl_token_metadata::instruction::update_metadata_accounts(
+            ctx.accounts.token_metadata_program.key(),
+            ctx.accounts.nft_metadata.key(),
+            assembler_key,
+            None,
+            Some(metadata.data),
+            Some(true),
+        );
+
+        let assembler_seeds = &[
+            b"assembler".as_ref(),
+            assembler.collection.as_ref(),
+            &[assembler.bump],
+        ];
+        let assembler_signer = &[&assembler_seeds[..]];
+
+        solana_program::program::invoke_signed(
+            &update_metadata,
+            &[
+                ctx.accounts.nft_metadata.clone(),
+                assembler.to_account_info(),
+            ],
+            assembler_signer,
+        )?;
+    }
     Ok(())
 }

@@ -59,8 +59,8 @@ pub mod assembler {
         instructions::remove_block(ctx)
     }
 
-    pub fn set_nft_generated(ctx: Context<SetNFTGenerated>) -> Result<()> {
-        instructions::set_nft_generated(ctx)
+    pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, new_uri: String) -> Result<()> {
+        instructions::set_nft_generated(ctx, new_uri)
     }
 
     pub fn update_assembler(
