@@ -156,7 +156,7 @@ function createMintNftTransaction(assembler, nftMint, uniqueConstraint, authorit
             tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [],
-        accounts: [assembler, nft, nftMint, tokenAccount, authority, payer],
+        accounts: [assembler, nft, nftMint, tokenAccount, authority, payer].concat(uniqueConstraint ? [uniqueConstraint] : []),
     };
 }
 exports.createMintNftTransaction = createMintNftTransaction;
