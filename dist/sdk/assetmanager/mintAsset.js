@@ -29,7 +29,7 @@ const splToken = __importStar(require("@solana/spl-token"));
 const mpl_candy_guard_1 = require("@metaplex-foundation/mpl-candy-guard");
 const generated_1 = require("../../generated");
 const assetmanager_1 = require("../../generated/assetmanager");
-async function createMintAssetTransaction(mx, assetAddress, amount, group = null, programId = assetmanager_1.PROGRAM_ID) {
+async function createMintAssetTransaction(mx, assetAddress, amount, checkAssociatedTokenAccount = true, group = null, programId = assetmanager_1.PROGRAM_ID) {
     var _a;
     let wallet = mx.identity();
     const assetAccount = await generated_1.Asset.fromAccountAddress(mx.connection, assetAddress);
@@ -85,8 +85,10 @@ async function createMintAssetTransaction(mx, assetAddress, amount, group = null
         }
     }
     const tx = new web3.Transaction();
-    if (!(await mx.rpc().accountExists(tokenAccount)))
-        tx.add(splToken.createAssociatedTokenAccountInstruction(wallet.publicKey, tokenAccount, wallet.publicKey, mint));
+    if (checkAssociatedTokenAccount) {
+        if (!(await mx.rpc().accountExists(tokenAccount)))
+            tx.add(splToken.createAssociatedTokenAccountInstruction(wallet.publicKey, tokenAccount, wallet.publicKey, mint));
+    }
     tx.add(mintInstruction);
     return {
         tx: tx,
