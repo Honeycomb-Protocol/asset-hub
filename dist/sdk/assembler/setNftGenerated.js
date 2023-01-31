@@ -48,9 +48,11 @@ function createSetNftGeneratedTransaction(assembler, nft, nftMint, args, program
     };
 }
 exports.createSetNftGeneratedTransaction = createSetNftGeneratedTransaction;
-async function setNftGenerated(mx, nft, args) {
-    const nftAccount = await assembler_1.NFT.fromAccountAddress(mx.connection, nft);
-    const ctx = await createSetNftGeneratedTransaction(nftAccount.assembler, nft, nftAccount.mint, args);
+async function setNftGenerated(mx, nft, args, nftArgs) {
+    const nftAccount = nftArgs
+        ? null
+        : await assembler_1.NFT.fromAccountAddress(mx.connection, nft);
+    const ctx = await createSetNftGeneratedTransaction((nftAccount === null || nftAccount === void 0 ? void 0 : nftAccount.assembler) || nftArgs.assembler, nft, (nftAccount === null || nftAccount === void 0 ? void 0 : nftAccount.mint) || nftArgs.mint, args);
     const blockhash = await mx.connection.getLatestBlockhash();
     ctx.tx.recentBlockhash = blockhash.blockhash;
     const response = await mx

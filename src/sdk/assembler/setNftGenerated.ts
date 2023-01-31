@@ -4,6 +4,7 @@ import { METADATA_PROGRAM_ID } from "src/utils";
 import { createSetNftGeneratedInstruction } from "../../generated";
 import {
   NFT,
+  NFTArgs,
   PROGRAM_ID,
   SetNFTGeneratedArgs,
 } from "../../generated/assembler";
@@ -48,13 +49,16 @@ export function createSetNftGeneratedTransaction(
 export async function setNftGenerated(
   mx: Metaplex,
   nft: web3.PublicKey,
-  args: SetNFTGeneratedArgs
+  args: SetNFTGeneratedArgs,
+  nftArgs?: NFTArgs
 ) {
-  const nftAccount = await NFT.fromAccountAddress(mx.connection, nft);
+  const nftAccount = nftArgs
+    ? null
+    : await NFT.fromAccountAddress(mx.connection, nft);
   const ctx = await createSetNftGeneratedTransaction(
-    nftAccount.assembler,
+    nftAccount?.assembler || nftArgs.assembler,
     nft,
-    nftAccount.mint,
+    nftAccount?.mint || nftArgs.mint,
     args
   );
 
