@@ -1,8 +1,9 @@
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import _mx_js, {
+import {
   IdentityClient,
   IdentitySigner,
+  KeypairSigner,
   Metaplex,
   Signer,
 } from "@metaplex-foundation/js";
@@ -284,6 +285,19 @@ export const devideAndSignV0Txns = async (
   // console.log(txns.map((tx) => tx.serialize().byteLength));
   return txns;
 };
+
+export const isSigner = (input: any): input is Signer => {
+  return (
+    typeof input === "object" &&
+    "publicKey" in input &&
+    ("secretKey" in input || "signTransaction" in input)
+  );
+};
+
+export const isKeypairSigner = (input: any): input is KeypairSigner => {
+  return isSigner(input) && "secretKey" in input && input.secretKey != null;
+};
+
 export const createLookupTable = async (
   wallet: Wallet | IdentityClient,
   connection: web3.Connection,
@@ -320,7 +334,7 @@ export const createLookupTable = async (
       )
     );
   }
-  if (_mx_js.isKeypairSigner(wallet)) {
+  if (isKeypairSigner(wallet)) {
     // @ts-ignore
     creationTx.sign([wallet]);
     transactions.forEach((txn) => {
