@@ -846,6 +846,52 @@ export type Assembler = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "updateAssembler",
+      "accounts": [
+        {
+          "name": "assembler",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Assembler state account"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "newAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateAssemblerArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1172,6 +1218,30 @@ export type Assembler = {
           {
             "name": "collectionDescription",
             "type": "string"
+          },
+          {
+            "name": "nftBaseUri",
+            "type": "string"
+          },
+          {
+            "name": "allowDuplicates",
+            "type": {
+              "option": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateAssemblerArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "assemblingAction",
+            "type": {
+              "defined": "AssemblingAction"
+            }
           },
           {
             "name": "nftBaseUri",
@@ -2328,6 +2398,52 @@ export const IDL: Assembler = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "updateAssembler",
+      "accounts": [
+        {
+          "name": "assembler",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Assembler state account"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "newAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateAssemblerArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -2654,6 +2770,30 @@ export const IDL: Assembler = {
           {
             "name": "collectionDescription",
             "type": "string"
+          },
+          {
+            "name": "nftBaseUri",
+            "type": "string"
+          },
+          {
+            "name": "allowDuplicates",
+            "type": {
+              "option": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateAssemblerArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "assemblingAction",
+            "type": {
+              "defined": "AssemblingAction"
+            }
           },
           {
             "name": "nftBaseUri",

@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = exports.METADATA_PROGRAM_ID = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
+const js_1 = require("@metaplex-foundation/js");
 exports.METADATA_PROGRAM_ID = new web3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 const sendAndConfirmTransaction = async (tx, connection, wallet, signers = [], sendOpts = {}) => {
     const block = await connection.getLatestBlockhash();
@@ -202,7 +203,7 @@ const createLookupTable = async (wallet, connection, addresses) => {
             addresses: addresses.slice(i, i + batchSize),
         })));
     }
-    if ("secretKey" in wallet) {
+    if ((0, js_1.isKeypairSigner)(wallet)) {
         creationTx.sign([wallet]);
         transactions.forEach((txn) => {
             txn.sign([wallet]);
@@ -259,8 +260,14 @@ const bulkLutTransactions = async (mx, txns) => {
     });
     const addresses = Object.values(addressesDir);
     const lookupTableAddress = await (0, exports.createLookupTable)(wallet, mx.connection, addresses);
+    if (!lookupTableAddress)
+        throw new Error("Lookup Table creation failed!");
     const lookupTable = await (0, exports.getOrFetchLoockupTable)(mx.connection, lookupTableAddress);
+    if (!lookupTable)
+        throw new Error("Lookup Table validation failed!");
     const lutTxns = await (0, exports.devideAndSignV0Txns)(wallet, mx.connection, lookupTable, txns);
+    if (!lutTxns)
+        throw new Error("DevideAndSignV0Txns creation failed!");
     console.log(lutTxns.map((tx) => tx.serialize().byteLength));
     return {
         txns: lutTxns,

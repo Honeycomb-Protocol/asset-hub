@@ -18,5 +18,4 @@ __exportStar(require("./generated"), exports);
 __exportStar(require("./sdk"), exports);
 __exportStar(require("./types"), exports);
 __exportStar(require("./utils"), exports);
-__exportStar(require("./idl"), exports);
 //# sourceMappingURL=index.js.map

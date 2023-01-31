@@ -21,4 +21,5 @@ __exportStar(require("./CreateAssemblerArgs"), exports);
 __exportStar(require("./CreateBlockArgs"), exports);
 __exportStar(require("./NFTAttribute"), exports);
 __exportStar(require("./NFTAttributeValue"), exports);
+__exportStar(require("./UpdateAssemblerArgs"), exports);
 //# sourceMappingURL=index.js.map

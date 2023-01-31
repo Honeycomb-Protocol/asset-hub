@@ -8,3 +8,4 @@ export * from './createNft';
 export * from './mintNft';
 export * from './removeBlock';
 export * from './setNftGenerated';
+export * from './updateAssembler';

@@ -141,7 +141,7 @@ function createMintNftTransaction(assembler, nftMint, uniqueConstraint, authorit
         Buffer.from("edition"),
     ], utils_1.METADATA_PROGRAM_ID);
     const tokenAccount = splToken.getAssociatedTokenAddressSync(nftMint, authority);
-    console.log("uniqueConstraint", uniqueConstraint.toString());
+    console.log("uniqueConstraint", uniqueConstraint === null || uniqueConstraint === void 0 ? void 0 : uniqueConstraint.toString());
     return {
         tx: new web3.Transaction().add(splToken.createAssociatedTokenAccountInstruction(payer, tokenAccount, authority, nftMint), (0, generated_1.createMintNftInstruction)({
             assembler,
@@ -194,10 +194,20 @@ async function createAndMintNft({ mx, assembler, blocks, }) {
     });
     const wallet = mx.identity();
     const { txns: mintNftTxns, lookupTableAddress } = await (0, utils_1.bulkLutTransactions)(mx, txns);
+    if (!mintNftTxns)
+        return;
     mintNftTxns.forEach((txn) => {
         txn.sign([wallet]);
     });
     const responses = await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactions)(new web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "processed"), mintNftTxns));
+    let errorCount = 0;
+    responses.forEach((element) => {
+        var _a;
+        if ((_a = element.value) === null || _a === void 0 ? void 0 : _a.err) {
+            errorCount++;
+            console.error(element.value.err);
+        }
+    });
     return {
         responses,
         nftMint,
