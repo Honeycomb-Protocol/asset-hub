@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setNftGenerated = exports.createSetNftGeneratedTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
-const utils_1 = require("src/utils");
+const utils_1 = require("../../utils");
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
 function createSetNftGeneratedTransaction(assembler, nft, nftMint, args, programId = assembler_1.PROGRAM_ID) {
