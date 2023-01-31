@@ -62,4 +62,11 @@ pub mod assembler {
     pub fn set_nft_generated(ctx: Context<SetNFTGenerated>) -> Result<()> {
         instructions::set_nft_generated(ctx)
     }
+
+    pub fn update_assembler(
+        ctx: Context<UpdateAssembler>,
+        args: UpdateAssemblerArgs,
+    ) -> Result<()> {
+        instructions::update_assembler(ctx, args)
+    }
 }

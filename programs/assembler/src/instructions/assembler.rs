@@ -232,3 +232,50 @@ pub fn create_assembler_collection_master_edition(
 
     Ok(())
 }
+
+/// Accounts used in the create assembler instruction
+#[derive(Accounts)]
+pub struct UpdateAssembler<'info> {
+    /// Assembler state account
+    #[account(mut, has_one = authority)]
+    pub assembler: Account<'info, Assembler>,
+
+    /// The wallet that holds the authority over the assembler
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub authority: Signer<'info>,
+
+    /// The wallet that holds the authority over the assembler
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub new_authority: Option<AccountInfo<'info>>,
+
+    /// The wallet that pays for the rent
+    #[account(mut)]
+    pub payer: Signer<'info>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct UpdateAssemblerArgs {
+    assembling_action: AssemblingAction,
+    nft_base_uri: String,
+    allow_duplicates: Option<bool>,
+}
+
+/// Update an assembler
+pub fn update_assembler(ctx: Context<UpdateAssembler>, args: UpdateAssemblerArgs) -> Result<()> {
+    let assembler = &mut ctx.accounts.assembler;
+    assembler.bump = ctx.bumps["assembler"];
+
+    assembler.nft_base_uri = args.nft_base_uri;
+    assembler.assembling_action = args.assembling_action;
+    let allow_duplicates = &args.allow_duplicates;
+    if let Some(allow_duplicates) = allow_duplicates {
+        assembler.allow_duplicates = allow_duplicates.clone();
+    }
+
+    let new_authority = &ctx.accounts.new_authority;
+    if let Some(new_authority) = new_authority {
+        assembler.authority = new_authority.key();
+    }
+
+    Ok(())
+}
