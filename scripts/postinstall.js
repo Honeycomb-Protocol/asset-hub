@@ -17,4 +17,4 @@ if (
     cwd: "../@metaplex-foundation/mpl-candy-guard/",
   });
 }
-spawnSync("yarn", ["run build"], { stdio: "inherit" });
+spawnSync("yarn", ["run build:sdk"], { stdio: "inherit" });

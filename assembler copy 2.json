@@ -1,0 +1,726 @@
+{
+  "name": "Honey Badger!",
+  "symbol": "HCP-DEV",
+  "description": "Let's Fuckin Go",
+  "assemblingAction": "Freeze",
+  "base_url": "https://api.eboy.dev/u/badger",
+  "blocks": [
+    {
+      "name": "Fur",
+      "order": 1,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "Black",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Fur/Black.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Fur/Black.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "FHNwJs5XGNNFEWY7KNUWtm95YVfunLf8ASQGQrePVT1C"
+          },
+          "mintAddress": "7MExxSPSgmvm3YAWEtNZgAQRhqeDNtvL1KSa4Bhwc28L",
+          "address": "AtmfDFJURnK7zoCeaZ7Vs3CDfgp2N83AkELkSLeB2BMG"
+        },
+        {
+          "value": "Blue Exoskeleton",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Fur/Blue Exoskeleton.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Fur/Blue Exoskeleton.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "76L2MLzmJqctYpzmtT1LDbwwwRWxZejeN9i3w8z4iWfn"
+          },
+          "mintAddress": "58j468xWQd12CNtYXkRH9odEoxgJ9d6BqV9sRZeHJaMh",
+          "address": "F9ezMKutyd2ho3meBz18s9GFL5ZzPgM4tx61zvSbMTde"
+        },
+        {
+          "value": "Brown",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Fur/Brown.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Fur/Brown.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "4ZbiBgtBaRQJzNzoComF1A4w9kvsE4uZpL3m5M7Up8a1"
+          },
+          "mintAddress": "HR29JnbT9bwfDUU4Pkfq6hh7efzuAssayXi5SK1Zrit1",
+          "address": "8ij1cGa74HNKXPZ53VG75vts2nwKjqauPy1aC8oG7Cuz"
+        },
+        {
+          "value": "Radioactive Glow_1",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Fur/Radioactive Glow_1.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Fur/Radioactive Glow_1.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "GDgefuTnZ74a2C9Ywo5BL9xVf6VFzdpb2HZVVMAAUpzz"
+          },
+          "mintAddress": "3akehDJiZgkmHBh7RW8PkXBVkos5Xh9uYoweuAGqj2RV",
+          "address": "42hTjy28uitwsQHhKCfjDrKNDzZUEPnvhWWRcXH3nPLJ"
+        },
+        {
+          "value": "Wall E Robot",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Fur/Wall E Robot.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Fur/Wall E Robot.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "6d8Q3dPDjyWUshfUWR6oFdFLng2gnWJ1tv8nxbYsqSyV"
+          },
+          "mintAddress": "FmaAciV372zXyUALZjezdPRnjgztofNC6mk74dm9cLs1",
+          "address": "5vi6XHkVWvgSanBsEEJV152PdB21w8UGinLqbZqKmTRq"
+        },
+        {
+          "value": "Zombie",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Fur/Zombie.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Fur/Zombie.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "GeoU7has4fjtf8QmYUyYTJsf5z2tVBBziE1UAMnfYuq9"
+          },
+          "mintAddress": "6nvS7E7pLVK4hF5Yy6e8ZxuzD4sVXxexRhc2Et1zsEx4",
+          "address": "BcBtjMyxeF49HnpAbXXhRZ4znBL7FNHovDa3bfkKAxBJ"
+        }
+      ],
+      "address": "tSf6XvZYRqcrkfYC5JbYtyKjfksrkji6r7W7SpEf4Dd"
+    },
+    {
+      "name": "Clothes",
+      "order": 2,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "Astronaut",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Clothes/Astronaut.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Clothes/Astronaut.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "76AkkmXvXKNXP4mV6m5Sqwuf8dtsZMHMq6cK26FebGsX"
+          },
+          "mintAddress": "Gk4sNc5fvhQD4dMpe6StePb1bV8krQGLutuvE1JzPpTc",
+          "address": "SHZHZonNSYM5CTVJaftn43RtCLHzY95pPvSEi2cLm5c"
+        },
+        {
+          "value": "Bandit",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Clothes/Bandit.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Clothes/Bandit.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "H3Te7za1coCWinGXzzxQ7G2dqMztQNkn7RDph7n351hK"
+          },
+          "mintAddress": "8S7fywckpuXHQaZpUnfTjxh6A4Kt39FNaHUG9owZYPFW",
+          "address": "3pu4hFVJmsxwpoYNWU8X4mUsA4nWxvPPMeiaTkfU1Gvx"
+        },
+        {
+          "value": "Bomber Jacket",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Clothes/Bomber Jacket.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Clothes/Bomber Jacket.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "FRZ3j5fzjzHfZswSgAuizABKSiJk9QyzvNT8GkvXzEHx"
+          },
+          "mintAddress": "2nxgpvvzGUsGinvViQjXMeHycLrt4fcnXXD6VA8Jaeq6",
+          "address": "4tN6e8NHHJ4PM11aNf14H6GV2yrJ7KyJxemfDCkrrBau"
+        },
+        {
+          "value": "Captain Jacket",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Clothes/Captain Jacket.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Clothes/Captain Jacket.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "5zn4WY1tKrx4C98YPnSmy5oe36RSdwtCrucAbwo6FL1u"
+          },
+          "mintAddress": "933P53JtC9sN5up2i8aTG3t8cCLZ857PTkjwBd8YBgRG",
+          "address": "CJ4tgxbzDUDf2d2pzCGUbdAAGToLMEU9f8NWzwYYJQWx"
+        },
+        {
+          "value": "Desert Rags",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Clothes/Desert Rags.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Clothes/Desert Rags.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "BTV41F9944RtExZ2mUUKYEKYrfUz4kUauZvY4N9SRVGW"
+          },
+          "mintAddress": "GCSUDXfarmxTGeJMBaNiEiNKYp6GCLLBNRgmfPVdMuVN",
+          "address": "8aR4n3Jy2HAez5JYqAbHudrfkDKztbugGo35Wis13VtN"
+        }
+      ],
+      "address": "HdsSuRsQktPoSa4uKpQX2XPpCTFtGgtK27eY5S8RteMv"
+    },
+    {
+      "name": "Eyes",
+      "order": 3,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "2 Tone",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Eyes/2 Tone.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Eyes/2 Tone.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "5nppSWVtiqCWgxWoPYiG9EujuF4RdTqW77CfQE4ctkr1"
+          },
+          "mintAddress": "Gue1BgxRtnmQqeGnG6L6hkvcYhxThUqq3wW1rNikMDAL",
+          "address": "F46tYKYDhuXkJyqBiuKXW3Kuwk8Mnv7LpiqoWCNQiQcd"
+        },
+        {
+          "value": "Assymetrical Eye Wear",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Eyes/Assymetrical Eye Wear.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Eyes/Assymetrical Eye Wear.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "DzjRxFjGQV2xGRorWmsPsDyFPCcjUH3B42nLLiZGAKmk"
+          },
+          "mintAddress": "CExhxR5FiBJ1CQzvpdhiY6EBqyHaaZ75UD5SBh6sgrHx",
+          "address": "2o1vLZWhSitoYxF3J1zdb3MA6YAfXTpcZeC59X4Qr4L2"
+        },
+        {
+          "value": "Black Aviators",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Eyes/Black Aviators.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Eyes/Black Aviators.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "HFnZsuHCTpn3bp4Wrm5QqUZMhbSq9z54ZAgtbCU2pqeG"
+          },
+          "mintAddress": "CoNdnUVX1pYWuyN2ky5p71uUt6NhJET61GHk2XS7Th4s",
+          "address": "5whnkAqqzriRYP2Sbb2fwZtnEAZtk9S8haoSeUmyyQZu"
+        },
+        {
+          "value": "Blue Eyes",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Eyes/Blue Eyes.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Eyes/Blue Eyes.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "44uUoqYHz9SHSNbZXsrxrzxai73cbdCzwTgXAojczvNG"
+          },
+          "mintAddress": "5LyuvvUKzfqFwH2wNtm9zSpqfKKiEGPhbFV6wjZHeua1",
+          "address": "H6grMtNzWrm35HaL9z75hzj2guhxZfKbtzKseaWhU8Bj"
+        },
+        {
+          "value": "Cheerful",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Eyes/Cheerful.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Eyes/Cheerful.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "a15jSMwfAFsVvTGK7q8LB3ieRQ1bdW9cgAgLRUoW3CN"
+          },
+          "mintAddress": "DZnmqctvftP11gfiWPDboLAG4WbvknH3SWKuonAk5PuQ",
+          "address": "2rNs7QLUZCmnsHBUuCCNdCocCFszG36bHjNiVrSAPAZU"
+        }
+      ],
+      "address": "BRrLGKgCUd27QB55QysYfEQUdGV6F6g3Zbe3MaaX44ru"
+    },
+    {
+      "name": "Gauntlets",
+      "order": 4,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "Bronze Watch",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Gauntlets/Bronze Watch.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Gauntlets/Bronze Watch.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "Hq6EadngRyNkwh2FnUBzAeT79bFHNVyEJtCLuZeGks15"
+          },
+          "mintAddress": "5ThdmZQeeV86j5zRknJr3KN2rReKxpUdCCuhXgB2M7TC",
+          "address": "5R6mDvteieRCx95yUTdFQudveM7jSxetKcRythMkXcyp"
+        },
+        {
+          "value": "Cyborg Red",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Gauntlets/Cyborg Red.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Gauntlets/Cyborg Red.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "9ykM4nvLfvaBHSBY3jJdCizkLyREUrrXMQ1qRJByDGEK"
+          },
+          "mintAddress": "FZvC8BQsBmDzvcc7u9hX74aTjtXtSHh8zJcnbmGG5bb6",
+          "address": "DkPzmrgVGNiV2dyvMBq8hg78nEDLFoWdHDPMrkJiuo9v"
+        },
+        {
+          "value": "Energy Hand",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Gauntlets/Energy Hand.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Gauntlets/Energy Hand.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "31UBBSH1i8z1YHKUdofFvpcSUZFkJus7m2biphgdWxQq"
+          },
+          "mintAddress": "7wnkHZTiLwnJMhbZsiZStpLxU84zSYdSSnfUFnNwZkEK",
+          "address": "8PosjNhrqHU46QehSAui1KsBFgDgQSKHuVBNKZjzBjwa"
+        },
+        {
+          "value": "Gold Watch",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Gauntlets/Gold Watch.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Gauntlets/Gold Watch.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "AtvzQqgo3aWJhf4HpfB496fpWGVGtvVkC3fAmjgQQs3q"
+          },
+          "mintAddress": "76U2k4hRdap698Tf2TvchEXNCjTFcipdSTNsScZotcfk",
+          "address": "4ik6T8PrzyfWE3dkk3fH8qvxxHnHouYZXae7K3rQk3CB"
+        }
+      ],
+      "address": "GjdiPbeDgUB1YMYNTzU77bivpZ6fJtGZf7T2vj33ARGf"
+    },
+    {
+      "name": "Mouth",
+      "order": 5,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "Agitated",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Mouth/Agitated.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Mouth/Agitated.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "6NrtqZzV8HTEmS34AiaPM6BwvTWjLHitztsaJ4KTqLxG"
+          },
+          "mintAddress": "FvjhVgFbKtVQvh7RkvumnUdQWTGe7vhHqC9cm4ir6gRR",
+          "address": "6PEBqhXTkuDK9wQP9xfb8ddrhTB2yR9gKCf6k4r1FiFf"
+        },
+        {
+          "value": "Black Bandana",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Mouth/Black Bandana.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Mouth/Black Bandana.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "EAxvo7mB6U86tEnQh95H5gs8PuQGunYDAH4Ay2EjYWgW"
+          },
+          "mintAddress": "E6turx13wvctKFJDcmsDC4ewZwzwHWLL57t5T7w8i2JZ",
+          "address": "3Mm5h9v315WZSxWSv32XqJuip3oJv6SMAosH9KEYYXLk"
+        },
+        {
+          "value": "Bubblegum",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Mouth/Bubblegum.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Mouth/Bubblegum.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "HuRa239W889Ny9s3pgySiqFbgaBzVDZW85ZusEg5FhhU"
+          },
+          "mintAddress": "97Eu5nMnLJoh9AUYiSHnk5mmSP8jn7HLqXxCKdpWLKMm",
+          "address": "H3Tw7cXLarUNYNwNtQqcimCB44yxxMJhaEddRo3kEp7X"
+        },
+        {
+          "value": "Cigarette",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Mouth/Cigarette.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Mouth/Cigarette.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "AK6m4U5h5CNmwfPdkim6L3Qf7JU2ChSNi653yH8rhsUo"
+          },
+          "mintAddress": "Gag9cW5iBiDm5W5FgE3r5HoCJ3Lp9fRvrWH5PzWCozMh",
+          "address": "JWVN3htQf4mis2CvCFm434F6tTmRps1SxY4WRxq1au4"
+        },
+        {
+          "value": "Contented",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Mouth/Contented.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Mouth/Contented.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "F1mr3RXpVKBj5BLeUeXrVMzk65BBsXqf3cLzvHpAkR49"
+          },
+          "mintAddress": "HJLAkHiFuiuMMuTYyTfhLo6xifoYyuSwbtsjnk9kJLCy",
+          "address": "B58rCXG9AMpg12muLMBBwkTYxYTAX2Ji3XJQn59Weeoo"
+        },
+        {
+          "value": "Golden Teeth",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Mouth/Golden Teeth.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Mouth/Golden Teeth.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "76LAE4SuhuXVsf9hKF69nVjqn3yd6uTga698BrDRkm23"
+          },
+          "mintAddress": "HvSXNzmmt6szbP5mW7tFSiD7CrwuxFyHp4CptLAFqUvc",
+          "address": "DCUJZS94t4EsjQG33CTu3spQMjQY27JyrsZ4QDDwqZtU"
+        }
+      ],
+      "address": "9ndW9hVUQHR9kBTjLNhAAHL9zjVQB1VUehivBXHtnpwm"
+    },
+    {
+      "name": "Hats",
+      "order": 6,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "Astronaut Helm",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Astronaut Helm.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Astronaut Helm.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "9KBudHMRz3v2wjiFyDVrx28tjGgF97a6JYkzbdA2uhNd"
+          },
+          "mintAddress": "3Efd46BfKq26zbZ2XgmRSCgD5tLhF2vGDkTXXjXP6SCC",
+          "address": "D4aktTNntGCkkTZgGfE97vUxvpfbemkfeFRdaKFHbWck"
+        },
+        {
+          "value": "Black Beanie",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Black Beanie.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Black Beanie.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "H6ry73fGAEGBe2Byvpb4FCDQkTFNfHpdDyhCs44NUrdV"
+          },
+          "mintAddress": "C2WRq1bgqyEhuzYu48UqGuLT4UH2mhVmuzSdBfgfTCwV",
+          "address": "7ZpxTKdr4ZaCUykgk76VJBVXBoWDnWxBKFjXNvsbFdff"
+        },
+        {
+          "value": "Black Headband",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Black Headband.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Black Headband.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "EKLnUhy3FR5LDHuEbhw9jBPVFHHTGq4jWNmtVtinmqvM"
+          },
+          "mintAddress": "ExqaoVqsr19mw2dBn9q1Vv5fAtiTooCKq72q6tquG2F9",
+          "address": "Hk8eE82TXPaf8poSSK2eb293y1RPmn7RxNfQz6tYR9wL"
+        },
+        {
+          "value": "Bullet Mohawk",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Bullet Mohawk.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Bullet Mohawk.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "G4i3dSi4nAPnq5VQzP5U3bPmYg4R3zCJ48oVTwMmzywJ"
+          },
+          "mintAddress": "pQ5sh3FpLoe3rHY9XFbLXQsLXJKGAJxAn4st7uY922i",
+          "address": "BVEVfwFfHU2eMk1gdiXCKfw3XEDbGMZsz7HNpEaoWMaD"
+        },
+        {
+          "value": "Cowboy Hat",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Cowboy Hat.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Cowboy Hat.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "9mExGfoMcDQikpaKTNB2cfWdvgEmRcQ1FHmA5r3RimE8"
+          },
+          "mintAddress": "CqnNWEFVsi2ejVB5L6VPS9jMG12HDKSAGZKBuwFzw7uY",
+          "address": "8yVfR8XyVggH8W8WKV5h9xN1YRpBSEjXmZtpZ19FJ3Wa"
+        },
+        {
+          "value": "Cyberninja Ears",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Cyberninja Ears.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Cyberninja Ears.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "9nvxiStRjRX8nRL343ZmAsErxUomWSZzomtfKCCHudPC"
+          },
+          "mintAddress": "A6BZSWNEw51SRz2yzhNUS2PYsSeYiwTePWzJzEzjL2PS",
+          "address": "2utweqVmA1gvu5sTyLgWr8U2pwLaKh5abGbtNTPCRTqR"
+        },
+        {
+          "value": "Diamond Ears",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Diamond Ears.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Diamond Ears.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "5SRBSxrHmKEEJTkE82V8cr5haqFE7ca5NArF8JVdQu7Q"
+          },
+          "mintAddress": "Eq24CEpNSYszDaTTsxm5JVXeYUvxA6rLQ2sS1WgBTHbq",
+          "address": "AQCQQ1er9PPMYmsW1tC1EoZsSYWfQQfH9m8v45Z9ew6M"
+        },
+        {
+          "value": "Evil Halo",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Evil Halo.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Evil Halo.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "8hpjjWq2vFa4kvjLBDj7UftdKaGVBSjkjfNWUXW9eBtV"
+          },
+          "mintAddress": "GAHtU2xevWuYiFpTHiVZ1ftkTox3HUa9q7suU8Vw5NB9",
+          "address": "6X74wi2WnKPA71PWUPVfufvCMFuFpqbjxNnMLWt8EX8N"
+        },
+        {
+          "value": "Flat Brim Cap",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Hats/Flat Brim Cap.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Hats/Flat Brim Cap.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "H9BWmrfZi2jAAd7f3FQyVtQixwijCkVG55ZF3kxYB61q"
+          },
+          "mintAddress": "EvNxqAQ9U4ptmtyVjtzmbYACKou5airzs7Skvf3XWxmV",
+          "address": "ABHvN4SFrhJZbwJMxamVabDiZbsHNk2QYDP7wsCwhyx6"
+        }
+      ],
+      "address": "8xvtXv7Hek3sZFakTsVwXN71JKujHstwwXhEa8QTj8hd"
+    },
+    {
+      "name": "Back Weapons",
+      "order": 7,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "Backpack With Map",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Back Weapons/Backpack With Map.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Back Weapons/Backpack With Map.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "7msHdjZAajzDAU8nFWDQEhtWXZx78bbzdcGomw1XXCic"
+          },
+          "mintAddress": "6943awGD4NN2zauM5aNXuqCJN71mXYqS4qJ33zNGYw8k",
+          "address": "D7pRmko77DNwQLguLpzJQkyWkz5XEffyfM47ZucdCeZA"
+        },
+        {
+          "value": "Baton",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Back Weapons/Baton.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Back Weapons/Baton.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "913MbRuQeQQjrS3Pzt61wFN6MZuMEcmpmjvYwqfG23RM"
+          },
+          "mintAddress": "4FnE8QcwBuuoUKeoNBF5KrNAysrrF7u7b5dg4sLDPH9Z",
+          "address": "5934Bp2GaakLWXMHLsbocLQ8WbC7nnSNbteirHCKxjDj"
+        },
+        {
+          "value": "Battle Axe",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Back Weapons/Battle Axe.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Back Weapons/Battle Axe.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "AT67Czo915HoqovbodeCiTsGPciXzEerGHVHfdBQkxii"
+          },
+          "mintAddress": "DFKszS8vpkLMVw2QLbYTi8h2rCN3LcyVhfjLrFLPo5DE",
+          "address": "3BSn1Xie18M3SAMNzFkFu1owjEC8PA9s681MVg77tFry"
+        },
+        {
+          "value": "Greatsword",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Back Weapons/Greatsword.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Back Weapons/Greatsword.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "Crz9FxDnNWnLAj8r5hV2Ln9QQkygHC19V1JxB4SBLeij"
+          },
+          "mintAddress": "6NVyYkR6Sehbkkb7sTCg8c933Yxbf562s3WdKjSHtSkm",
+          "address": "8xASU7QvTGidFPpZgwkTYZKuCF7ZWCPzApwRXR8DwefW"
+        }
+      ],
+      "address": "9QKMa4H3ybFpELPquEes7XTnrGvgqF3xCqqRrJX48sAp"
+    },
+    {
+      "name": "Weapons",
+      "order": 8,
+      "type": "Enum",
+      "isGraphical": true,
+      "definitions": [
+        {
+          "value": "Barbaric Club",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Weapons/Barbaric Club.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Weapons/Barbaric Club.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "3NNx74JUx5oVJ9K62PKHVetf9yudM15tNrEYr9uHxkbd"
+          },
+          "mintAddress": "GjS2d9P3X44ZeVvQLhtqwhdwrSZwkRjMCWrP1MBwRinB",
+          "address": "Ae9hm7byFvvphetJg5Qh8p7CYyEyW6oFoBYEsH7fMczw"
+        },
+        {
+          "value": "Bazooka",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Weapons/Bazooka.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Weapons/Bazooka.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "A4iY4pcTD3QsS31LxfFFgttP59otJ1vwqNWvUSS919Bb"
+          },
+          "mintAddress": "2Qk5tXvxWurQxaANTxvzcATfPbemRgo9qRFF4qvTZz1C",
+          "address": "9tqF32gbsqW5BCTToXH3hgK83YqucEzUHf7CpS1q3gjY"
+        },
+        {
+          "value": "Bo Staff",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Weapons/Bo Staff.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Weapons/Bo Staff.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "6jWFU4HupiEUNdY69MeR5UmXG16GDAihAqF1xTW65awM"
+          },
+          "mintAddress": "9soC79n6A7NaHYZyhNsk6PRFA3TQ2RMaTzFM8JVuVHgq",
+          "address": "B364moGAyhLVrxCkcZksnTY2bwBti4apKBsTUEU8oQbv"
+        },
+        {
+          "value": "Bone Saw",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Weapons/Bone Saw.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Weapons/Bone Saw.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "3bTapaUWsrLGxtFYx4QT3RmLBvKemwb2ucmTJFKvEyUJ"
+          },
+          "mintAddress": "9yvUGXJj4ZyM6tNSdu89UuvsKycq8bNHkpJPcj3VG7jE",
+          "address": "FLqXzqgg6vKkqDb6xAD9xmpUgNdHdaAegAYmCxEHBecS"
+        },
+        {
+          "value": "Boomerang",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Weapons/Boomerang.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Weapons/Boomerang.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "9XSEAcHbqJPt7mpJH2eU8SKDQDnGw6E7W3Az7F6xnbZm"
+          },
+          "mintAddress": "BwUFhYoAuHstxGoRNTRfnufkJTnm7qUK5TXZH4PRmRSN",
+          "address": "37ZQ2XhkHhq9wz5RuPLqTtHAB57VtLMQJ2xAm4JMgA1f"
+        },
+        {
+          "value": "Steel War Axe",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Weapons/Steel War Axe.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Weapons/Steel War Axe.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "5JHhvfGbpKa4MFio2uDz6WrshbDnnn1xdBLofz7q3S4C"
+          },
+          "mintAddress": "DJyKgmSoJZvWKmAeV5zgJKktTW7HSZgyR4uQRMjXYF9n",
+          "address": "4s7qHXemPzNL2ouRqy2ogi3tmYUqcWhjp72rfi4xT6su"
+        },
+        {
+          "value": "Tactical Knife",
+          "caches": {
+            "image": "https://api.eboy.dev/badger/Weapons/Tactical Knife.png"
+          },
+          "assetConfig": {
+            "symbol": "Honey",
+            "uri": "https://api.eboy.dev/badger/Weapons/Tactical Knife.json",
+            "candyGuard": "6AJrrKGhejCQTT7UjBtjv9GpUbiYBzTZwzqRcvBsP4dL",
+            "address": "3BiCZdNWTo1K5PYK1dpBAFrcGiQ2sMcadoBhRDkAYTj4"
+          },
+          "mintAddress": "58vmSe9JmnYg96DCLTx89kqpSfW1TmWznAfQMt4EguSA",
+          "address": "34fePh4P2UAoL9YNJoeSHqFuBxNb6NdiYp1pmHUXPbyL"
+        }
+      ],
+      "address": "DxVW4ro8fd1ZDdtCY4QsjGjz2obZF2WiX4wPuTAKA4Kp"
+    }
+  ],
+  "assemblerAddress": "5Vewfq5SJvTSNiHN4Xa46JEUpmyFJ7Gars9WQx9pPLmx"
+}

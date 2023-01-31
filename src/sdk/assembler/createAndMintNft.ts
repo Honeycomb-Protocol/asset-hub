@@ -357,6 +357,15 @@ export async function createAndMintNft({
       mintNftTxns
     )
   );
+
+  let errorCount = 0;
+  responses.forEach((element) => {
+    if (element.value?.err) {
+      errorCount++;
+      console.error(element.value.err);
+    }
+  });
+
   return {
     responses,
     nftMint,
