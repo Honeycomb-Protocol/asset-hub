@@ -9,6 +9,7 @@ export type ProgramName = "assembler" | "assetmanager";
 
 export type AssemblerProgramAction =
   | "create-assembler"
+  | "update-assembler"
   | "create-block"
   | "create-block-definition"
   | "create-and-mint-nft"

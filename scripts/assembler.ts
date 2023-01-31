@@ -3,6 +3,7 @@ import { AssemblerProgramAction } from "./types";
 import { getDependencies } from "./utils";
 import {
   createAssembler,
+  updateAssembler,
   createBlock,
   createBlockDefinition,
   createAndMintNft,
@@ -34,6 +35,22 @@ export default async function (
       });
       console.log("Assembler address: ", assemblerTx.response);
       setDeployments({ ...deployments, assembler: assemblerTx.assembler });
+      break;
+    case "update-assembler":
+      if (!deployments.assembler)
+        throw new Error(
+          "Assembler address not found in deployments, Please create assembler first"
+        );
+      const updateAssemblerTx = await updateAssembler(
+        mx,
+        new web3.PublicKey(deployments.assembler),
+        {
+          assemblingAction: AssemblingAction.Burn,
+          nftBaseUri: "https://api.eboy.dev/u/loading.json",
+          allowDuplicates: false,
+        }
+      );
+      console.log("Assembler address: ", updateAssemblerTx.response);
       break;
 
     case "create-block":
@@ -132,6 +149,7 @@ export default async function (
           },
         ],
       });
+      if (!mint) throw new Error("Mint txns failed!");
       console.log("Mint response: ", mint.responses);
       setDeployments({
         ...deployments,
