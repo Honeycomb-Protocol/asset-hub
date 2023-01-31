@@ -16,6 +16,7 @@ export async function createMintAssetTransaction(
   mx: Metaplex,
   assetAddress: web3.PublicKey,
   amount: number,
+  checkAssociatedTokenAccount: boolean = true,
   group: string = null,
   programId = PROGRAM_ID
 ): Promise<TxSignersAccounts> {
@@ -102,15 +103,18 @@ export async function createMintAssetTransaction(
     }
   }
   const tx = new web3.Transaction();
-  if (!(await mx.rpc().accountExists(tokenAccount)))
-    tx.add(
-      splToken.createAssociatedTokenAccountInstruction(
-        wallet.publicKey,
-        tokenAccount,
-        wallet.publicKey,
-        mint
-      )
-    );
+
+  if (checkAssociatedTokenAccount) {
+    if (!(await mx.rpc().accountExists(tokenAccount)))
+      tx.add(
+        splToken.createAssociatedTokenAccountInstruction(
+          wallet.publicKey,
+          tokenAccount,
+          wallet.publicKey,
+          mint
+        )
+      );
+  }
 
   tx.add(mintInstruction);
   return {
