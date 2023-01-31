@@ -247,7 +247,9 @@ export function createMintNftTransaction(
       )
     ),
     signers: [],
-    accounts: [assembler, nft, nftMint, tokenAccount, authority, payer],
+    accounts: [assembler, nft, nftMint, tokenAccount, authority, payer].concat(
+      uniqueConstraint ? [uniqueConstraint] : []
+    ),
   };
 }
 

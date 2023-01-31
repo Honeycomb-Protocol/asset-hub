@@ -1,4 +1,5 @@
 import * as web3 from "@solana/web3.js";
+import fetch from "node-fetch";
 
 import {
   AssemblingAction,
@@ -286,5 +287,14 @@ export async function setupAssembler(
       await sendBulkTransactionsLegacy(mx, destroyTransactions)
     );
   }
+  await fetch("https://api.eboy.dev/honeycomb/assembler", {
+    method: "post",
+    body: JSON.stringify(config),
+    headers: { "Content-Type": "application/json" },
+  }).catch((e) => {
+    console.error(e);
+    return null;
+  });
+
   return config;
 }

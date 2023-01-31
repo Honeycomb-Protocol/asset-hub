@@ -28,8 +28,8 @@ yargs(hideBin(process.argv))
     () => {},
     (argv) => {
       const connection = new web3.Connection(
-        "https://api.devnet.solana.com/",
-        "processed"
+        "https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/",
+        "confirmed"
       );
 
       const metaplex = new Metaplex(connection);
