@@ -185,6 +185,52 @@ exports.IDL = {
             "args": []
         },
         {
+            "name": "updateAssembler",
+            "accounts": [
+                {
+                    "name": "assembler",
+                    "isMut": true,
+                    "isSigner": false,
+                    "docs": [
+                        "Assembler state account"
+                    ]
+                },
+                {
+                    "name": "authority",
+                    "isMut": false,
+                    "isSigner": true,
+                    "docs": [
+                        "The wallet that holds the authority over the assembler"
+                    ]
+                },
+                {
+                    "name": "newAuthority",
+                    "isMut": false,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "The wallet that holds the authority over the assembler"
+                    ]
+                },
+                {
+                    "name": "payer",
+                    "isMut": true,
+                    "isSigner": true,
+                    "docs": [
+                        "The wallet that pays for the rent"
+                    ]
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": "UpdateAssemblerArgs"
+                    }
+                }
+            ]
+        },
+        {
             "name": "createBlock",
             "accounts": [
                 {
@@ -682,6 +728,14 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "nftMetadata",
+                    "isMut": true,
+                    "isSigner": false,
+                    "docs": [
+                        "Metadata account of the NFT"
+                    ]
+                },
+                {
                     "name": "tokenAccount",
                     "isMut": true,
                     "isSigner": false,
@@ -712,6 +766,14 @@ exports.IDL = {
                     "isSigner": false,
                     "docs": [
                         "SPL TOKEN PROGRAM"
+                    ]
+                },
+                {
+                    "name": "tokenMetadataProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "METAPLEX TOKEN METADATA PROGRAM"
                     ]
                 }
             ],
@@ -840,20 +902,6 @@ exports.IDL = {
             "name": "setNftGenerated",
             "accounts": [
                 {
-                    "name": "nft",
-                    "isMut": true,
-                    "isSigner": false,
-                    "docs": [
-                        "The nft account"
-                    ]
-                }
-            ],
-            "args": []
-        },
-        {
-            "name": "updateAssembler",
-            "accounts": [
-                {
                     "name": "assembler",
                     "isMut": true,
                     "isSigner": false,
@@ -862,28 +910,27 @@ exports.IDL = {
                     ]
                 },
                 {
-                    "name": "authority",
-                    "isMut": false,
-                    "isSigner": true,
+                    "name": "nft",
+                    "isMut": true,
+                    "isSigner": false,
                     "docs": [
-                        "The wallet that holds the authority over the assembler"
+                        "The nft account"
                     ]
                 },
                 {
-                    "name": "newAuthority",
+                    "name": "nftMetadata",
+                    "isMut": true,
+                    "isSigner": false,
+                    "docs": [
+                        "Metadata account of the NFT"
+                    ]
+                },
+                {
+                    "name": "tokenMetadataProgram",
                     "isMut": false,
                     "isSigner": false,
-                    "isOptional": true,
                     "docs": [
-                        "The wallet that holds the authority over the assembler"
-                    ]
-                },
-                {
-                    "name": "payer",
-                    "isMut": true,
-                    "isSigner": true,
-                    "docs": [
-                        "The wallet that pays for the rent"
+                        "METAPLEX TOKEN METADATA PROGRAM"
                     ]
                 }
             ],
@@ -891,7 +938,7 @@ exports.IDL = {
                 {
                     "name": "args",
                     "type": {
-                        "defined": "UpdateAssemblerArgs"
+                        "defined": "SetNFTGeneratedArgs"
                     }
                 }
             ]
@@ -1281,6 +1328,20 @@ exports.IDL = {
                     {
                         "name": "blockName",
                         "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "SetNFTGeneratedArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "newUri",
+                        "type": {
+                            "option": "string"
+                        }
                     }
                 ]
             }

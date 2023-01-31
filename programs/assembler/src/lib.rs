@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 
-pub mod bpf_writer;
 pub mod errors;
 pub mod instructions;
 pub mod structs;
@@ -26,6 +25,13 @@ pub mod assembler {
         ctx: Context<CreateAssemblerCollectionMasterEdition>,
     ) -> Result<()> {
         instructions::create_assembler_collection_master_edition(ctx)
+    }
+
+    pub fn update_assembler(
+        ctx: Context<UpdateAssembler>,
+        args: UpdateAssemblerArgs,
+    ) -> Result<()> {
+        instructions::update_assembler(ctx, args)
     }
 
     pub fn create_block(ctx: Context<CreateBlock>, args: CreateBlockArgs) -> Result<()> {
@@ -59,14 +65,10 @@ pub mod assembler {
         instructions::remove_block(ctx)
     }
 
-    pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, new_uri: String) -> Result<()> {
-        instructions::set_nft_generated(ctx, new_uri)
-    }
-
-    pub fn update_assembler(
-        ctx: Context<UpdateAssembler>,
-        args: UpdateAssemblerArgs,
+    pub fn set_nft_generated(
+        ctx: Context<SetNFTGenerated>,
+        args: SetNFTGeneratedArgs,
     ) -> Result<()> {
-        instructions::update_assembler(ctx, args)
+        instructions::set_nft_generated(ctx, args)
     }
 }

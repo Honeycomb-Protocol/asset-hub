@@ -7,10 +7,12 @@ export type BurnNftInstructionAccounts = {
     assembler: web3.PublicKey;
     nft: web3.PublicKey;
     nftMint: web3.PublicKey;
+    nftMetadata: web3.PublicKey;
     tokenAccount: web3.PublicKey;
     uniqueConstraint: web3.PublicKey;
     authority: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
+    tokenMetadataProgram: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
 export declare const burnNftInstructionDiscriminator: number[];

@@ -7,28 +7,51 @@
 
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import {
+  SetNFTGeneratedArgs,
+  setNFTGeneratedArgsBeet,
+} from '../types/SetNFTGeneratedArgs'
 
 /**
  * @category Instructions
  * @category SetNftGenerated
  * @category generated
  */
-export const setNftGeneratedStruct = new beet.BeetArgsStruct<{
-  instructionDiscriminator: number[] /* size: 8 */
-}>(
-  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
+export type SetNftGeneratedInstructionArgs = {
+  args: SetNFTGeneratedArgs
+}
+/**
+ * @category Instructions
+ * @category SetNftGenerated
+ * @category generated
+ */
+export const setNftGeneratedStruct = new beet.FixableBeetArgsStruct<
+  SetNftGeneratedInstructionArgs & {
+    instructionDiscriminator: number[] /* size: 8 */
+  }
+>(
+  [
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['args', setNFTGeneratedArgsBeet],
+  ],
   'SetNftGeneratedInstructionArgs'
 )
 /**
  * Accounts required by the _setNftGenerated_ instruction
  *
+ * @property [_writable_] assembler
  * @property [_writable_] nft
+ * @property [_writable_] nftMetadata
+ * @property [] tokenMetadataProgram
  * @category Instructions
  * @category SetNftGenerated
  * @category generated
  */
 export type SetNftGeneratedInstructionAccounts = {
+  assembler: web3.PublicKey
   nft: web3.PublicKey
+  nftMetadata: web3.PublicKey
+  tokenMetadataProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -40,21 +63,40 @@ export const setNftGeneratedInstructionDiscriminator = [
  * Creates a _SetNftGenerated_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
+ * @param args to provide as instruction data to the program
+ *
  * @category Instructions
  * @category SetNftGenerated
  * @category generated
  */
 export function createSetNftGeneratedInstruction(
   accounts: SetNftGeneratedInstructionAccounts,
+  args: SetNftGeneratedInstructionArgs,
   programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = setNftGeneratedStruct.serialize({
     instructionDiscriminator: setNftGeneratedInstructionDiscriminator,
+    ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.assembler,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.nft,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.nftMetadata,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenMetadataProgram,
+      isWritable: false,
       isSigner: false,
     },
   ]

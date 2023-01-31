@@ -53,6 +53,11 @@ function createBurnNftInstruction(accounts, programId = new web3.PublicKey('Gq13
             isSigner: false,
         },
         {
+            pubkey: accounts.nftMetadata,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.tokenAccount,
             isWritable: true,
             isSigner: false,
@@ -69,6 +74,11 @@ function createBurnNftInstruction(accounts, programId = new web3.PublicKey('Gq13
         },
         {
             pubkey: (_a = accounts.tokenProgram) !== null && _a !== void 0 ? _a : splToken.TOKEN_PROGRAM_ID,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.tokenMetadataProgram,
             isWritable: false,
             isSigner: false,
         },

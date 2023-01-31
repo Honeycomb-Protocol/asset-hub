@@ -26,9 +26,11 @@ export const burnNftStruct = new beet.BeetArgsStruct<{
  * @property [] assembler
  * @property [_writable_] nft
  * @property [_writable_] nftMint
+ * @property [_writable_] nftMetadata
  * @property [_writable_] tokenAccount
  * @property [_writable_] uniqueConstraint
  * @property [**signer**] authority
+ * @property [] tokenMetadataProgram
  * @category Instructions
  * @category BurnNft
  * @category generated
@@ -37,10 +39,12 @@ export type BurnNftInstructionAccounts = {
   assembler: web3.PublicKey
   nft: web3.PublicKey
   nftMint: web3.PublicKey
+  nftMetadata: web3.PublicKey
   tokenAccount: web3.PublicKey
   uniqueConstraint: web3.PublicKey
   authority: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  tokenMetadataProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -80,6 +84,11 @@ export function createBurnNftInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.nftMetadata,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.tokenAccount,
       isWritable: true,
       isSigner: false,
@@ -96,6 +105,11 @@ export function createBurnNftInstruction(
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenMetadataProgram,
       isWritable: false,
       isSigner: false,
     },

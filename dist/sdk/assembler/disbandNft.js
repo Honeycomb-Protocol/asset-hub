@@ -31,14 +31,21 @@ const assembler_1 = require("../../generated/assembler");
 const utils_1 = require("../../utils");
 function createBurnNFTTransaction(assembler, nft, nftMint, uniqueConstraint, authority, programId = assembler_1.PROGRAM_ID) {
     const tokenAccount = splToken.getAssociatedTokenAddressSync(nftMint, authority);
+    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
+        Buffer.from("metadata"),
+        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        nftMint.toBuffer(),
+    ], utils_1.METADATA_PROGRAM_ID);
     return {
         tx: new web3.Transaction().add((0, generated_1.createBurnNftInstruction)({
             assembler,
             nft,
             nftMint,
+            nftMetadata,
             tokenAccount,
             uniqueConstraint,
             authority,
+            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [],
         accounts: [assembler, nft, nftMint, tokenAccount, authority],

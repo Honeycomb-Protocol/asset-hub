@@ -26,18 +26,38 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createSetNftGeneratedInstruction = exports.setNftGeneratedInstructionDiscriminator = exports.setNftGeneratedStruct = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const web3 = __importStar(require("@solana/web3.js"));
-exports.setNftGeneratedStruct = new beet.BeetArgsStruct([['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]], 'SetNftGeneratedInstructionArgs');
+const SetNFTGeneratedArgs_1 = require("../types/SetNFTGeneratedArgs");
+exports.setNftGeneratedStruct = new beet.FixableBeetArgsStruct([
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['args', SetNFTGeneratedArgs_1.setNFTGeneratedArgsBeet],
+], 'SetNftGeneratedInstructionArgs');
 exports.setNftGeneratedInstructionDiscriminator = [
     19, 33, 138, 249, 8, 87, 27, 176,
 ];
-function createSetNftGeneratedInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+function createSetNftGeneratedInstruction(accounts, args, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     const [data] = exports.setNftGeneratedStruct.serialize({
         instructionDiscriminator: exports.setNftGeneratedInstructionDiscriminator,
+        ...args,
     });
     const keys = [
         {
+            pubkey: accounts.assembler,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.nft,
             isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.nftMetadata,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.tokenMetadataProgram,
+            isWritable: false,
             isSigner: false,
         },
     ];

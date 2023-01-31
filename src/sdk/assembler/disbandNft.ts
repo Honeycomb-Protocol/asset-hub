@@ -5,7 +5,6 @@ import {
   createBurnNftInstruction,
   createRemoveBlockInstruction,
   NFT,
-  NFTAttribute,
   AssemblingAction,
   Assembler,
 } from "../../generated";
@@ -26,6 +25,15 @@ export function createBurnNFTTransaction(
     authority
   );
 
+  const [nftMetadata] = web3.PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      METADATA_PROGRAM_ID.toBuffer(),
+      nftMint.toBuffer(),
+    ],
+    METADATA_PROGRAM_ID
+  );
+
   return {
     tx: new web3.Transaction().add(
       createBurnNftInstruction(
@@ -33,9 +41,11 @@ export function createBurnNFTTransaction(
           assembler,
           nft,
           nftMint,
+          nftMetadata,
           tokenAccount,
           uniqueConstraint,
           authority,
+          tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
         programId
       )

@@ -25,20 +25,32 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setNftGenerated = exports.createSetNftGeneratedTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
+const utils_1 = require("src/utils");
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
-function createSetNftGeneratedTransaction(nft, programId = assembler_1.PROGRAM_ID) {
+function createSetNftGeneratedTransaction(assembler, nft, nftMint, args, programId = assembler_1.PROGRAM_ID) {
+    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
+        Buffer.from("metadata"),
+        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        nftMint.toBuffer(),
+    ], utils_1.METADATA_PROGRAM_ID);
     return {
         tx: new web3.Transaction().add((0, generated_1.createSetNftGeneratedInstruction)({
+            assembler,
             nft,
+            nftMetadata,
+            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+        }, {
+            args,
         }, programId)),
         signers: [],
         accounts: [nft],
     };
 }
 exports.createSetNftGeneratedTransaction = createSetNftGeneratedTransaction;
-async function setNftGenerated(nft, mx) {
-    const ctx = await createSetNftGeneratedTransaction(nft);
+async function setNftGenerated(mx, nft, args) {
+    const nftAccount = await assembler_1.NFT.fromAccountAddress(mx.connection, nft);
+    const ctx = await createSetNftGeneratedTransaction(nftAccount.assembler, nft, nftAccount.mint, args);
     const blockhash = await mx.connection.getLatestBlockhash();
     ctx.tx.recentBlockhash = blockhash.blockhash;
     const response = await mx

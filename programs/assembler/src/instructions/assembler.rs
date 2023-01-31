@@ -1,6 +1,11 @@
-use crate::structs::{Assembler, AssemblingAction};
-use anchor_lang::{prelude::*, solana_program};
-use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
+use {
+    crate::{
+        structs::{Assembler, AssemblingAction},
+        utils::{create_master_edition, create_metadata},
+    },
+    anchor_lang::prelude::*,
+    anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount},
+};
 
 /// Accounts used in the create assembler instruction
 #[derive(Accounts)]
@@ -49,7 +54,7 @@ pub struct CreateAssembler<'info> {
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
-    pub token_metadata_program: UncheckedAccount<'info>,
+    pub token_metadata_program: AccountInfo<'info>,
 
     /// SYSVAR RENT
     pub rent: Sysvar<'info, Rent>,
@@ -69,7 +74,6 @@ pub struct CreateAssemblerArgs {
 /// Create a new assembler
 pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs) -> Result<()> {
     let assembler = &mut ctx.accounts.assembler;
-    let assembler_key = assembler.key();
     assembler.bump = ctx.bumps["assembler"];
     assembler.authority = ctx.accounts.authority.key();
     assembler.collection = ctx.accounts.collection_mint.key();
@@ -88,43 +92,74 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    let create_metadata = mpl_token_metadata::instruction::create_metadata_accounts_v3(
-        ctx.accounts.token_metadata_program.key(),
-        ctx.accounts.collection_metadata_account.key(),
-        assembler.collection,
-        assembler_key,
-        ctx.accounts.payer.key(),
-        assembler_key,
+    create_metadata(
         assembler.collection_name.clone(),
         assembler.collection_symbol.clone(),
         args.collection_uri,
+        0,
         None,
         // Some(vec![mpl_token_metadata::state::Creator {
         //     address: assembler.authority,
         //     verified: true,
         //     share: 100,
         // }]),
-        0,
-        false,
-        true,
         None,
         None,
         None,
-    );
-
-    solana_program::program::invoke_signed(
-        &create_metadata,
-        &[
-            ctx.accounts.collection_metadata_account.clone(),
-            ctx.accounts.collection_mint.to_account_info(),
-            assembler.to_account_info(),
-            ctx.accounts.payer.to_account_info(),
-            assembler.to_account_info(),
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.rent.to_account_info(),
-        ],
-        assembler_signer,
+        assembler.to_account_info(),
+        ctx.accounts.payer.to_account_info(),
+        ctx.accounts.collection_mint.to_account_info(),
+        ctx.accounts.collection_metadata_account.clone(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.token_metadata_program.to_account_info(),
+        ctx.accounts.rent.to_account_info(),
+        Some(assembler_signer),
     )?;
+
+    // let assembler_seeds = &[
+    //     b"assembler".as_ref(),
+    //     assembler.collection.as_ref(),
+    //     &[assembler.bump],
+    // ];
+    // let assembler_signer = &[&assembler_seeds[..]];
+
+    // let create_metadata = mpl_token_metadata::instruction::create_metadata_accounts_v3(
+    //     ctx.accounts.token_metadata_program.key(),
+    //     ctx.accounts.collection_metadata_account.key(),
+    //     assembler.collection,
+    //     assembler_key,
+    //     ctx.accounts.payer.key(),
+    //     assembler_key,
+    //     assembler.collection_name.clone(),
+    //     assembler.collection_symbol.clone(),
+    //     args.collection_uri,
+    //     None,
+    //     // Some(vec![mpl_token_metadata::state::Creator {
+    //     //     address: assembler.authority,
+    //     //     verified: true,
+    //     //     share: 100,
+    //     // }]),
+    //     0,
+    //     false,
+    //     true,
+    //     None,
+    //     None,
+    //     None,
+    // );
+
+    // solana_program::program::invoke_signed(
+    //     &create_metadata,
+    //     &[
+    //         ctx.accounts.collection_metadata_account.clone(),
+    //         ctx.accounts.collection_mint.to_account_info(),
+    //         assembler.to_account_info(),
+    //         ctx.accounts.payer.to_account_info(),
+    //         assembler.to_account_info(),
+    //         ctx.accounts.system_program.to_account_info(),
+    //         ctx.accounts.rent.to_account_info(),
+    //     ],
+    //     assembler_signer,
+    // )?;
 
     Ok(())
 }
@@ -155,7 +190,6 @@ pub struct CreateAssemblerCollectionMasterEdition<'info> {
     pub assembler: Account<'info, Assembler>,
 
     /// The wallet that holds the authority over the assembler
-    /// CHECK: This is not dangerous because we don't read or write from this account
     pub authority: Signer<'info>,
 
     /// The wallet that pays for the rent
@@ -171,7 +205,7 @@ pub struct CreateAssemblerCollectionMasterEdition<'info> {
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
-    pub token_metadata_program: UncheckedAccount<'info>,
+    pub token_metadata_program: AccountInfo<'info>,
 
     /// SYSVAR RENT
     pub rent: Sysvar<'info, Rent>,
@@ -182,7 +216,6 @@ pub fn create_assembler_collection_master_edition(
     ctx: Context<CreateAssemblerCollectionMasterEdition>,
 ) -> Result<()> {
     let assembler = &mut ctx.accounts.assembler;
-    let assembler_key = assembler.key();
     let assembler_seeds = &[
         b"assembler".as_ref(),
         assembler.collection.as_ref(),
@@ -203,32 +236,45 @@ pub fn create_assembler_collection_master_edition(
         1,
     )?;
 
-    let create_master_edition = mpl_token_metadata::instruction::create_master_edition_v3(
-        ctx.accounts.token_metadata_program.key(),
-        ctx.accounts.collection_master_edition.key(),
-        ctx.accounts.collection_mint.key(),
-        assembler_key,
-        assembler_key,
-        ctx.accounts.collection_metadata_account.key(),
-        ctx.accounts.payer.key(),
-        Some(0),
-    );
-
-    solana_program::program::invoke_signed(
-        &create_master_edition,
-        &[
-            ctx.accounts.collection_master_edition.clone(),
-            ctx.accounts.collection_mint.to_account_info(),
-            assembler.to_account_info(),
-            assembler.to_account_info(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.collection_metadata_account.to_account_info(),
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.rent.to_account_info(),
-        ],
-        assembler_signer,
+    create_master_edition(
+        ctx.accounts.collection_mint.to_account_info(),
+        ctx.accounts.collection_metadata_account.to_account_info(),
+        ctx.accounts.collection_master_edition.clone(),
+        assembler.to_account_info(),
+        ctx.accounts.payer.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_metadata_program.clone(),
+        ctx.accounts.rent.to_account_info(),
+        Some(assembler_signer),
     )?;
+
+    // let create_master_edition = mpl_token_metadata::instruction::create_master_edition_v3(
+    //     ctx.accounts.token_metadata_program.key(),
+    //     ctx.accounts.collection_master_edition.key(),
+    //     ctx.accounts.collection_mint.key(),
+    //     assembler_key,
+    //     assembler_key,
+    //     ctx.accounts.collection_metadata_account.key(),
+    //     ctx.accounts.payer.key(),
+    //     Some(0),
+    // );
+
+    // solana_program::program::invoke_signed(
+    //     &create_master_edition,
+    //     &[
+    //         ctx.accounts.collection_master_edition.clone(),
+    //         ctx.accounts.collection_mint.to_account_info(),
+    //         assembler.to_account_info(),
+    //         assembler.to_account_info(),
+    //         ctx.accounts.payer.to_account_info(),
+    //         ctx.accounts.collection_metadata_account.to_account_info(),
+    //         ctx.accounts.token_program.to_account_info(),
+    //         ctx.accounts.system_program.to_account_info(),
+    //         ctx.accounts.rent.to_account_info(),
+    //     ],
+    //     assembler_signer,
+    // )?;
 
     Ok(())
 }
@@ -241,7 +287,6 @@ pub struct UpdateAssembler<'info> {
     pub assembler: Account<'info, Assembler>,
 
     /// The wallet that holds the authority over the assembler
-    /// CHECK: This is not dangerous because we don't read or write from this account
     pub authority: Signer<'info>,
 
     /// The wallet that holds the authority over the assembler
@@ -263,14 +308,9 @@ pub struct UpdateAssemblerArgs {
 /// Update an assembler
 pub fn update_assembler(ctx: Context<UpdateAssembler>, args: UpdateAssemblerArgs) -> Result<()> {
     let assembler = &mut ctx.accounts.assembler;
-    assembler.bump = ctx.bumps["assembler"];
-
     assembler.nft_base_uri = args.nft_base_uri;
     assembler.assembling_action = args.assembling_action;
-    let allow_duplicates = &args.allow_duplicates;
-    if let Some(allow_duplicates) = allow_duplicates {
-        assembler.allow_duplicates = allow_duplicates.clone();
-    }
+    assembler.allow_duplicates = args.allow_duplicates.unwrap_or(assembler.allow_duplicates);
 
     let new_authority = &ctx.accounts.new_authority;
     if let Some(new_authority) = new_authority {
