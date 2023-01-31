@@ -4,3 +4,4 @@ export * from "./createBlockDefinition";
 export * from "./createAndMintNft";
 export * from "./disbandNft";
 export * from "./setupAssembler";
+export * from "./setNftGenerated";
