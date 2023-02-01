@@ -30,7 +30,7 @@ const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const AssemblingAction_1 = require("../types/AssemblingAction");
 exports.assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95];
 class Assembler {
-    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, nftBaseUri, assemblingAction, nfts, allowDuplicates) {
+    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, nftBaseUri, assemblingAction, nfts, allowDuplicates, defaultRoyalty) {
         this.bump = bump;
         this.authority = authority;
         this.collection = collection;
@@ -41,9 +41,10 @@ class Assembler {
         this.assemblingAction = assemblingAction;
         this.nfts = nfts;
         this.allowDuplicates = allowDuplicates;
+        this.defaultRoyalty = defaultRoyalty;
     }
     static fromArgs(args) {
-        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.nftBaseUri, args.assemblingAction, args.nfts, args.allowDuplicates);
+        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.nftBaseUri, args.assemblingAction, args.nfts, args.allowDuplicates, args.defaultRoyalty);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Assembler.deserialize(accountInfo.data, offset);
@@ -89,6 +90,7 @@ class Assembler {
             assemblingAction: 'AssemblingAction.' + AssemblingAction_1.AssemblingAction[this.assemblingAction],
             nfts: this.nfts,
             allowDuplicates: this.allowDuplicates,
+            defaultRoyalty: this.defaultRoyalty,
         };
     }
 }
@@ -105,5 +107,6 @@ exports.assemblerBeet = new beet.FixableBeetStruct([
     ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
     ['nfts', beet.u16],
     ['allowDuplicates', beet.bool],
+    ['defaultRoyalty', beet.u16],
 ], Assembler.fromArgs, 'Assembler');
 //# sourceMappingURL=Assembler.js.map

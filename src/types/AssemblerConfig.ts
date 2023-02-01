@@ -5,6 +5,7 @@ export type AssemblerConfig = {
   assemblingAction: string;
   base_url: string;
   allowDuplicates?: boolean;
+  defaultRoyalty?: number;
   blocks: BlockConfig[];
   assemblerAddress?: string;
   assetProject?: string;

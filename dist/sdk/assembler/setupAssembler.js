@@ -55,6 +55,7 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
             collectionDescription: config.description,
             nftBaseUri: config.base_url,
             allowDuplicates: config.allowDuplicates || null,
+            defaultRoyalty: config.defaultRoyalty || null,
         });
         transactionGroups[0].txns.push(createAssemblerCtx);
         transactionGroups[0].postActions.push(() => {

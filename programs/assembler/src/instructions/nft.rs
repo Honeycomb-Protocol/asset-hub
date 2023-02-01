@@ -1,3 +1,5 @@
+use crate::structs::Creator;
+
 use {
     crate::{
         errors::ErrorCode,
@@ -6,8 +8,7 @@ use {
             NFTAttribute, NFTAttributeValue, NFTUniqueConstraint, NFT,
         },
         utils::{
-            create_master_edition, create_metadata, set_and_verify_collection, update_metadata,
-            BpfWriter,
+            self, create_master_edition, create_metadata, set_and_verify_collection, BpfWriter,
         },
     },
     anchor_lang::{prelude::*, solana_program},
@@ -121,7 +122,7 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
         nft.name.clone(),
         nft.symbol.clone(),
         nft.uri.clone(),
-        0,
+        assembler.default_royalty,
         None,
         // Some(vec![mpl_token_metadata::state::Creator {
         //     address: assembler.authority,
@@ -151,68 +152,6 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
         ctx.accounts.token_metadata_program.clone(),
         Some(assembler_signer),
     )?;
-
-    // let create_metadata = mpl_token_metadata::instruction::create_metadata_accounts_v3(
-    //     ctx.accounts.token_metadata_program.key(),
-    //     ctx.accounts.nft_metadata.key(),
-    //     nft.mint,
-    //     assembler_key,
-    //     ctx.accounts.payer.key(),
-    //     assembler_key,
-    //     nft.name.clone(),
-    //     nft.symbol.clone(),
-    //     nft.uri.clone(),
-    //     None,
-    //     0,
-    //     false,
-    //     true,
-    //     None,
-    //     // Some(mpl_token_metadata::state::Collection {
-    //     //     key: assembler.collection,
-    //     //     verified: false,
-    //     // }),
-    //     None,
-    //     None,
-    // );
-
-    // solana_program::program::invoke_signed(
-    //     &create_metadata,
-    //     &[
-    //         ctx.accounts.nft_metadata.clone(),
-    //         ctx.accounts.nft_mint.to_account_info(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.payer.to_account_info(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.system_program.to_account_info(),
-    //         ctx.accounts.rent.to_account_info(),
-    //     ],
-    //     assembler_signer,
-    // )?;
-
-    // let verify_collection = mpl_token_metadata::instruction::set_and_verify_collection(
-    //     ctx.accounts.token_metadata_program.key(),
-    //     ctx.accounts.nft_metadata.key(),
-    //     assembler.key(),
-    //     ctx.accounts.payer.key(),
-    //     assembler.key(),
-    //     ctx.accounts.collection_mint.key(),
-    //     ctx.accounts.collection_metadata_account.key(),
-    //     ctx.accounts.collection_master_edition.key(),
-    //     None,
-    // );
-
-    // solana_program::program::invoke_signed(
-    //     &verify_collection,
-    //     &[
-    //         ctx.accounts.nft_metadata.clone(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.payer.to_account_info(),
-    //         ctx.accounts.collection_mint.to_account_info(),
-    //         ctx.accounts.collection_metadata_account.clone(),
-    //         ctx.accounts.collection_master_edition.clone(),
-    //     ],
-    //     assembler_signer,
-    // )?;
 
     Ok(())
 }
@@ -488,13 +427,7 @@ pub struct MintNFT<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     pub unique_constraint: Option<AccountInfo<'info>>,
-    // #[account(
-    //     init, payer = payer,
-    //     space = NFTUniqueConstraint::LEN,
-    //     seeds = nft.attributes.iter().map(|x| x.mint.as_ref()).collect::<Vec<_>>()[..],
-    //     bump,
-    // )]
-    // pub unique_constraint: Option<Account<'info, NFTUniqueConstraint>>,
+
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -570,21 +503,16 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
                 ctx.program_id,
             )?;
 
-            let mut dst_ref = unique_constraint_info.try_borrow_mut_data()?;
-            let dst = dst_ref.as_mut();
-            let mut writer = BpfWriter::new(dst);
-
             let unique_constraint = NFTUniqueConstraint {
                 bump,
                 nft: nft.key(),
             };
 
-            unique_constraint.try_serialize(&mut writer)?;
+            let mut dst_ref = unique_constraint_info.try_borrow_mut_data()?;
+            let dst = dst_ref.as_mut();
+            let mut writer = BpfWriter::new(dst);
 
-            // let new_data = &unique_constraint.try_to_vec()?[..];
-            // let mut dst_ref = unique_constraint_info.try_borrow_mut_data()?;
-            // let dst = dst_ref.as_mut();
-            // solana_program::program_memory::sol_memcpy(dst, new_data, NFTUniqueConstraint::LEN)
+            unique_constraint.try_serialize(&mut writer)?;
         } else {
             return Err(ErrorCode::UniqueConstraintNotProvided.into());
         }
@@ -626,33 +554,6 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
             Some(assembler_signer),
         )?;
     }
-
-    // let create_master_edition = mpl_token_metadata::instruction::create_master_edition_v3(
-    //     ctx.accounts.token_metadata_program.key(),
-    //     ctx.accounts.nft_master_edition.key(),
-    //     ctx.accounts.nft_mint.key(),
-    //     assembler.key(),
-    //     assembler.key(),
-    //     ctx.accounts.nft_metadata.key(),
-    //     ctx.accounts.payer.key(),
-    //     Some(0),
-    // );
-
-    // solana_program::program::invoke_signed(
-    //     &create_master_edition,
-    //     &[
-    //         ctx.accounts.nft_master_edition.clone(),
-    //         ctx.accounts.nft_mint.to_account_info(),
-    //         assembler.to_account_info(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.payer.to_account_info(),
-    //         ctx.accounts.nft_metadata.to_account_info(),
-    //         ctx.accounts.token_program.to_account_info(),
-    //         ctx.accounts.system_program.to_account_info(),
-    //         ctx.accounts.rent.to_account_info(),
-    //     ],
-    //     assembler_signer,
-    // )?;
 
     Ok(())
 }
@@ -733,7 +634,7 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    update_metadata(
+    utils::update_metadata(
         Some(metadata.data),
         metadata_account_info.clone(),
         assembler.to_account_info(),
@@ -798,9 +699,6 @@ pub struct RemoveBlock<'info> {
     )]
     pub deposit_account: Option<Account<'info, TokenAccount>>,
 
-    // /// NFT Attribute
-    // #[account(mut, has_one = nft)]
-    // pub nft_attribute: Box<Account<'info, NFTAttribute>>,
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -952,20 +850,6 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
         return Err(ErrorCode::BlockDoesNotExistsForNFT.into());
     }
 
-    // // Close nft attribute
-    // let source = ctx.accounts.nft_attribute.to_account_info();
-    // let destination = ctx.accounts.authority.to_account_info();
-
-    // **destination.lamports.borrow_mut() = destination
-    //     .lamports()
-    //     .checked_add(source.lamports())
-    //     .ok_or(ErrorCode::Overflow)?;
-
-    // let mut source_account_data = source.data.borrow_mut();
-    // **source.lamports.borrow_mut() = 0;
-    // let data_len = source_account_data.len();
-    // solana_program::program_memory::sol_memset(*source_account_data, 0, data_len);
-
     Ok(())
 }
 
@@ -1022,7 +906,7 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
         ];
         let assembler_signer = &[&assembler_seeds[..]];
 
-        update_metadata(
+        utils::update_metadata(
             Some(metadata.data),
             metadata_account_info.clone(),
             assembler.to_account_info(),
@@ -1030,24 +914,84 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
             ctx.accounts.token_metadata_program.clone(),
             Some(assembler_signer),
         )?;
-
-        // let update_metadata = mpl_token_metadata::instruction::update_metadata_accounts(
-        //     ctx.accounts.token_metadata_program.key(),
-        //     ctx.accounts.nft_metadata.key(),
-        //     assembler.key(),
-        //     None,
-        //     Some(metadata.data),
-        //     Some(true),
-        // );
-
-        // solana_program::program::invoke_signed(
-        //     &update_metadata,
-        //     &[
-        //         ctx.accounts.nft_metadata.clone(),
-        //         assembler.to_account_info(),
-        //     ],
-        //     assembler_signer,
-        // )?;
     }
+    Ok(())
+}
+
+/// Accounts used in update metadata
+#[derive(Accounts)]
+pub struct UpdateMetadata<'info> {
+    /// Assembler state account
+    #[account(mut, has_one = authority)]
+    pub assembler: Account<'info, Assembler>,
+
+    /// The nft account
+    #[account( has_one = assembler )]
+    pub nft: Account<'info, NFT>,
+
+    /// Metadata account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub metadata: AccountInfo<'info>,
+
+    /// The wallet that holds the authority over the assembler
+    pub authority: Signer<'info>,
+
+    /// METAPLEX TOKEN METADATA PROGRAM
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub token_metadata_program: AccountInfo<'info>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct UpdateMetadataArgs {
+    /// The name of the asset
+    pub name: String,
+    /// The symbol for the asset
+    pub symbol: String,
+    /// URI pointing to JSON representing the asset
+    pub uri: String,
+    /// Royalty basis points that goes to creators in secondary sales (0-10000)
+    pub seller_fee_basis_points: u16,
+    /// Array of creators, optional
+    pub creators: Option<Vec<Creator>>,
+}
+
+/// Update metadata
+pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -> Result<()> {
+    let assembler_seeds = &[
+        b"assembler".as_ref(),
+        ctx.accounts.assembler.collection.as_ref(),
+        &[ctx.accounts.assembler.bump],
+    ];
+    let assembler_signer = &[&assembler_seeds[..]];
+
+    let mut creators: Option<Vec<mpl_token_metadata::state::Creator>> = None;
+    if let Some(arg_creators) = args.creators {
+        let creators_vec = arg_creators
+            .iter()
+            .map(|x| mpl_token_metadata::state::Creator {
+                address: x.address,
+                verified: x.verified,
+                share: x.share,
+            })
+            .collect::<Vec<_>>();
+        creators = Some(creators_vec);
+    }
+
+    utils::update_metadata(
+        Some(mpl_token_metadata::state::Data {
+            name: args.name,
+            symbol: args.symbol,
+            uri: args.uri,
+            seller_fee_basis_points: args.seller_fee_basis_points,
+            creators,
+        }),
+        ctx.accounts.metadata.clone(),
+        ctx.accounts.assembler.to_account_info(),
+        Some(true),
+        ctx.accounts.token_metadata_program.clone(),
+        Some(assembler_signer),
+    )?;
+
     Ok(())
 }

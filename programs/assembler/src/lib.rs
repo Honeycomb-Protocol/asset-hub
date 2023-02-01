@@ -71,4 +71,8 @@ pub mod assembler {
     ) -> Result<()> {
         instructions::set_nft_generated(ctx, args)
     }
+
+    pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -> Result<()> {
+        instructions::update_metadata(ctx, args)
+    }
 }

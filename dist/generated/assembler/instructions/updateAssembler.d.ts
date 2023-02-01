@@ -11,7 +11,6 @@ export type UpdateAssemblerInstructionAccounts = {
     assembler: web3.PublicKey;
     authority: web3.PublicKey;
     newAuthority: web3.PublicKey;
-    payer: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
 export declare const updateAssemblerInstructionDiscriminator: number[];

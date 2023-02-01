@@ -32,6 +32,7 @@ export default async function (
         collectionUri: "https://assembler.test",
         nftBaseUri: "https://api.eboy.dev/u/temp",
         allowDuplicates: false,
+        defaultRoyalty: 100,
       });
       console.log("Assembler address: ", assemblerTx.response);
       setDeployments({ ...deployments, assembler: assemblerTx.assembler });
@@ -48,6 +49,7 @@ export default async function (
           assemblingAction: AssemblingAction.Burn,
           nftBaseUri: "https://api.eboy.dev/u/loading.json",
           allowDuplicates: false,
+          defaultRoyalty: 100,
         }
       );
       console.log("Assembler address: ", updateAssemblerTx.response);

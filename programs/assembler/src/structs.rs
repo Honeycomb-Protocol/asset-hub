@@ -32,6 +32,9 @@ pub struct Assembler {
 
     /// Should this assembler allow duplicate NFTs
     pub allow_duplicates: bool,
+
+    /// Default royalty percentage
+    pub default_royalty: u16,
 }
 impl Assembler {
     pub const LEN: usize = 144 + EXTRA_SIZE;
@@ -322,4 +325,11 @@ pub struct NFTUniqueConstraint {
 }
 impl NFTUniqueConstraint {
     pub const LEN: usize = 33 + EXTRA_SIZE;
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Creator {
+    pub address: Pubkey,
+    pub verified: bool,
+    pub share: u8,
 }

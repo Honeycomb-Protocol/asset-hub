@@ -23,20 +23,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUpdateAssemblerInstruction = exports.updateAssemblerInstructionDiscriminator = exports.updateAssemblerStruct = void 0;
+exports.createUpdateMetadataInstruction = exports.updateMetadataInstructionDiscriminator = exports.updateMetadataStruct = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const web3 = __importStar(require("@solana/web3.js"));
-const UpdateAssemblerArgs_1 = require("../types/UpdateAssemblerArgs");
-exports.updateAssemblerStruct = new beet.FixableBeetArgsStruct([
+const UpdateMetadataArgs_1 = require("../types/UpdateMetadataArgs");
+exports.updateMetadataStruct = new beet.FixableBeetArgsStruct([
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', UpdateAssemblerArgs_1.updateAssemblerArgsBeet],
-], 'UpdateAssemblerInstructionArgs');
-exports.updateAssemblerInstructionDiscriminator = [
-    23, 247, 28, 6, 104, 204, 226, 121,
+    ['args', UpdateMetadataArgs_1.updateMetadataArgsBeet],
+], 'UpdateMetadataInstructionArgs');
+exports.updateMetadataInstructionDiscriminator = [
+    170, 182, 43, 239, 97, 78, 225, 186,
 ];
-function createUpdateAssemblerInstruction(accounts, args, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
-    const [data] = exports.updateAssemblerStruct.serialize({
-        instructionDiscriminator: exports.updateAssemblerInstructionDiscriminator,
+function createUpdateMetadataInstruction(accounts, args, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+    const [data] = exports.updateMetadataStruct.serialize({
+        instructionDiscriminator: exports.updateMetadataInstructionDiscriminator,
         ...args,
     });
     const keys = [
@@ -46,12 +46,22 @@ function createUpdateAssemblerInstruction(accounts, args, programId = new web3.P
             isSigner: false,
         },
         {
+            pubkey: accounts.nft,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.metadata,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.authority,
             isWritable: false,
             isSigner: true,
         },
         {
-            pubkey: accounts.newAuthority,
+            pubkey: accounts.tokenMetadataProgram,
             isWritable: false,
             isSigner: false,
         },
@@ -68,5 +78,5 @@ function createUpdateAssemblerInstruction(accounts, args, programId = new web3.P
     });
     return ix;
 }
-exports.createUpdateAssemblerInstruction = createUpdateAssemblerInstruction;
-//# sourceMappingURL=updateAssembler.js.map
+exports.createUpdateMetadataInstruction = createUpdateMetadataInstruction;
+//# sourceMappingURL=updateMetadata.js.map

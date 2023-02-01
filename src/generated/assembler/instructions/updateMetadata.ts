@@ -8,72 +8,76 @@
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  UpdateAssemblerArgs,
-  updateAssemblerArgsBeet,
-} from '../types/UpdateAssemblerArgs'
+  UpdateMetadataArgs,
+  updateMetadataArgsBeet,
+} from '../types/UpdateMetadataArgs'
 
 /**
  * @category Instructions
- * @category UpdateAssembler
+ * @category UpdateMetadata
  * @category generated
  */
-export type UpdateAssemblerInstructionArgs = {
-  args: UpdateAssemblerArgs
+export type UpdateMetadataInstructionArgs = {
+  args: UpdateMetadataArgs
 }
 /**
  * @category Instructions
- * @category UpdateAssembler
+ * @category UpdateMetadata
  * @category generated
  */
-export const updateAssemblerStruct = new beet.FixableBeetArgsStruct<
-  UpdateAssemblerInstructionArgs & {
+export const updateMetadataStruct = new beet.FixableBeetArgsStruct<
+  UpdateMetadataInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', updateAssemblerArgsBeet],
+    ['args', updateMetadataArgsBeet],
   ],
-  'UpdateAssemblerInstructionArgs'
+  'UpdateMetadataInstructionArgs'
 )
 /**
- * Accounts required by the _updateAssembler_ instruction
+ * Accounts required by the _updateMetadata_ instruction
  *
  * @property [_writable_] assembler
+ * @property [] nft
+ * @property [_writable_] metadata
  * @property [**signer**] authority
- * @property [] newAuthority
+ * @property [] tokenMetadataProgram
  * @category Instructions
- * @category UpdateAssembler
+ * @category UpdateMetadata
  * @category generated
  */
-export type UpdateAssemblerInstructionAccounts = {
+export type UpdateMetadataInstructionAccounts = {
   assembler: web3.PublicKey
+  nft: web3.PublicKey
+  metadata: web3.PublicKey
   authority: web3.PublicKey
-  newAuthority: web3.PublicKey
+  tokenMetadataProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const updateAssemblerInstructionDiscriminator = [
-  23, 247, 28, 6, 104, 204, 226, 121,
+export const updateMetadataInstructionDiscriminator = [
+  170, 182, 43, 239, 97, 78, 225, 186,
 ]
 
 /**
- * Creates a _UpdateAssembler_ instruction.
+ * Creates a _UpdateMetadata_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category UpdateAssembler
+ * @category UpdateMetadata
  * @category generated
  */
-export function createUpdateAssemblerInstruction(
-  accounts: UpdateAssemblerInstructionAccounts,
-  args: UpdateAssemblerInstructionArgs,
+export function createUpdateMetadataInstruction(
+  accounts: UpdateMetadataInstructionAccounts,
+  args: UpdateMetadataInstructionArgs,
   programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
-  const [data] = updateAssemblerStruct.serialize({
-    instructionDiscriminator: updateAssemblerInstructionDiscriminator,
+  const [data] = updateMetadataStruct.serialize({
+    instructionDiscriminator: updateMetadataInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -83,12 +87,22 @@ export function createUpdateAssemblerInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.nft,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.metadata,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.authority,
       isWritable: false,
       isSigner: true,
     },
     {
-      pubkey: accounts.newAuthority,
+      pubkey: accounts.tokenMetadataProgram,
       isWritable: false,
       isSigner: false,
     },

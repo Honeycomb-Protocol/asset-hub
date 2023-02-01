@@ -19,8 +19,10 @@ __exportStar(require("./BlockDefinitionValue"), exports);
 __exportStar(require("./BlockType"), exports);
 __exportStar(require("./CreateAssemblerArgs"), exports);
 __exportStar(require("./CreateBlockArgs"), exports);
+__exportStar(require("./Creator"), exports);
 __exportStar(require("./NFTAttribute"), exports);
 __exportStar(require("./NFTAttributeValue"), exports);
 __exportStar(require("./SetNFTGeneratedArgs"), exports);
 __exportStar(require("./UpdateAssemblerArgs"), exports);
+__exportStar(require("./UpdateMetadataArgs"), exports);
 //# sourceMappingURL=index.js.map

@@ -27,23 +27,22 @@ exports.updateAssembler = exports.createUpdateAssemblerTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
-function createUpdateAssemblerTransaction(authority, payer, assembler, args, newAuthority = assembler_1.PROGRAM_ID, programId = assembler_1.PROGRAM_ID) {
+function createUpdateAssemblerTransaction(authority, assembler, args, newAuthority = assembler_1.PROGRAM_ID, programId = assembler_1.PROGRAM_ID) {
     return {
         tx: new web3.Transaction().add((0, generated_1.createUpdateAssemblerInstruction)({
             assembler,
             authority,
-            payer,
             newAuthority: newAuthority || programId,
         }, { args }, programId)),
         signers: [],
-        accounts: [assembler, authority, payer, newAuthority],
+        accounts: [assembler, authority, newAuthority],
         assembler,
     };
 }
 exports.createUpdateAssemblerTransaction = createUpdateAssemblerTransaction;
 async function updateAssembler(mx, assembler, args, newAuthority) {
     const wallet = mx.identity();
-    const ctx = createUpdateAssemblerTransaction(wallet.publicKey, wallet.publicKey, assembler, args, newAuthority);
+    const ctx = createUpdateAssemblerTransaction(wallet.publicKey, assembler, args, newAuthority);
     const blockhash = await mx.connection.getLatestBlockhash();
     ctx.tx.recentBlockhash = blockhash.blockhash;
     const response = await mx

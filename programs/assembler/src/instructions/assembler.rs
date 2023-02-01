@@ -69,6 +69,7 @@ pub struct CreateAssemblerArgs {
     collection_description: String,
     nft_base_uri: String,
     allow_duplicates: Option<bool>,
+    default_royalty: Option<u16>,
 }
 
 /// Create a new assembler
@@ -84,6 +85,7 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
     assembler.assembling_action = args.assembling_action;
     assembler.nfts = 0;
     assembler.allow_duplicates = args.allow_duplicates.unwrap_or(false);
+    assembler.default_royalty = args.default_royalty.unwrap_or(0);
 
     let assembler_seeds = &[
         b"assembler".as_ref(),
@@ -292,10 +294,6 @@ pub struct UpdateAssembler<'info> {
     /// The wallet that holds the authority over the assembler
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub new_authority: Option<AccountInfo<'info>>,
-
-    /// The wallet that pays for the rent
-    #[account(mut)]
-    pub payer: Signer<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -303,6 +301,7 @@ pub struct UpdateAssemblerArgs {
     assembling_action: AssemblingAction,
     nft_base_uri: String,
     allow_duplicates: Option<bool>,
+    default_royalty: Option<u16>,
 }
 
 /// Update an assembler
@@ -311,9 +310,9 @@ pub fn update_assembler(ctx: Context<UpdateAssembler>, args: UpdateAssemblerArgs
     assembler.nft_base_uri = args.nft_base_uri;
     assembler.assembling_action = args.assembling_action;
     assembler.allow_duplicates = args.allow_duplicates.unwrap_or(assembler.allow_duplicates);
+    assembler.default_royalty = args.default_royalty.unwrap_or(assembler.default_royalty);
 
-    let new_authority = &ctx.accounts.new_authority;
-    if let Some(new_authority) = new_authority {
+    if let Some(new_authority) = &ctx.accounts.new_authority {
         assembler.authority = new_authority.key();
     }
 

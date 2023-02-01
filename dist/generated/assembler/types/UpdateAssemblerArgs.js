@@ -30,5 +30,6 @@ exports.updateAssemblerArgsBeet = new beet.FixableBeetArgsStruct([
     ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
     ['nftBaseUri', beet.utf8String],
     ['allowDuplicates', beet.coption(beet.bool)],
+    ['defaultRoyalty', beet.coption(beet.u16)],
 ], 'UpdateAssemblerArgs');
 //# sourceMappingURL=UpdateAssemblerArgs.js.map

@@ -29,6 +29,7 @@ export type AssemblerArgs = {
   assemblingAction: AssemblingAction
   nfts: number
   allowDuplicates: boolean
+  defaultRoyalty: number
 }
 
 export const assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95]
@@ -50,7 +51,8 @@ export class Assembler implements AssemblerArgs {
     readonly nftBaseUri: string,
     readonly assemblingAction: AssemblingAction,
     readonly nfts: number,
-    readonly allowDuplicates: boolean
+    readonly allowDuplicates: boolean,
+    readonly defaultRoyalty: number
   ) {}
 
   /**
@@ -67,7 +69,8 @@ export class Assembler implements AssemblerArgs {
       args.nftBaseUri,
       args.assemblingAction,
       args.nfts,
-      args.allowDuplicates
+      args.allowDuplicates,
+      args.defaultRoyalty
     )
   }
 
@@ -187,6 +190,7 @@ export class Assembler implements AssemblerArgs {
         'AssemblingAction.' + AssemblingAction[this.assemblingAction],
       nfts: this.nfts,
       allowDuplicates: this.allowDuplicates,
+      defaultRoyalty: this.defaultRoyalty,
     }
   }
 }
@@ -213,6 +217,7 @@ export const assemblerBeet = new beet.FixableBeetStruct<
     ['assemblingAction', assemblingActionBeet],
     ['nfts', beet.u16],
     ['allowDuplicates', beet.bool],
+    ['defaultRoyalty', beet.u16],
   ],
   Assembler.fromArgs,
   'Assembler'

@@ -11,7 +11,6 @@ import { Metaplex } from "@metaplex-foundation/js";
 
 export function createUpdateAssemblerTransaction(
   authority: web3.PublicKey,
-  payer: web3.PublicKey,
   assembler: web3.PublicKey,
   args: UpdateAssemblerArgs,
   newAuthority: web3.PublicKey = PROGRAM_ID,
@@ -23,7 +22,6 @@ export function createUpdateAssemblerTransaction(
         {
           assembler,
           authority,
-          payer,
           newAuthority: newAuthority || programId,
         },
         { args },
@@ -31,7 +29,7 @@ export function createUpdateAssemblerTransaction(
       )
     ),
     signers: [],
-    accounts: [assembler, authority, payer, newAuthority],
+    accounts: [assembler, authority, newAuthority],
     assembler,
   };
 }
@@ -44,7 +42,6 @@ export async function updateAssembler(
 ) {
   const wallet = mx.identity();
   const ctx = createUpdateAssemblerTransaction(
-    wallet.publicKey,
     wallet.publicKey,
     assembler,
     args,

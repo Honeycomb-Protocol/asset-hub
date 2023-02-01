@@ -208,14 +208,6 @@ export type Assembler = {
           "docs": [
             "The wallet that holds the authority over the assembler"
           ]
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "The wallet that pays for the rent"
-          ]
         }
       ],
       "args": [
@@ -939,6 +931,59 @@ export type Assembler = {
           }
         }
       ]
+    },
+    {
+      "name": "updateMetadata",
+      "accounts": [
+        {
+          "name": "assembler",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Assembler state account"
+          ]
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The nft account"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata account of the NFT"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMetadataArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1018,6 +1063,13 @@ export type Assembler = {
               "Should this assembler allow duplicate NFTs"
             ],
             "type": "bool"
+          },
+          {
+            "name": "defaultRoyalty",
+            "docs": [
+              "Default royalty percentage"
+            ],
+            "type": "u16"
           }
         ]
       }
@@ -1275,6 +1327,12 @@ export type Assembler = {
             "type": {
               "option": "bool"
             }
+          },
+          {
+            "name": "defaultRoyalty",
+            "type": {
+              "option": "u16"
+            }
           }
         ]
       }
@@ -1298,6 +1356,12 @@ export type Assembler = {
             "name": "allowDuplicates",
             "type": {
               "option": "bool"
+            }
+          },
+          {
+            "name": "defaultRoyalty",
+            "type": {
+              "option": "u16"
             }
           }
         ]
@@ -1338,6 +1402,55 @@ export type Assembler = {
             "name": "newUri",
             "type": {
               "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "docs": [
+              "The name of the asset"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "docs": [
+              "The symbol for the asset"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "docs": [
+              "URI pointing to JSON representing the asset"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "sellerFeeBasisPoints",
+            "docs": [
+              "Royalty basis points that goes to creators in secondary sales (0-10000)"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "creators",
+            "docs": [
+              "Array of creators, optional"
+            ],
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": "Creator"
+                }
+              }
             }
           }
         ]
@@ -1394,6 +1507,26 @@ export type Assembler = {
             "type": {
               "defined": "NFTAttributeValue"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Creator",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "share",
+            "type": "u8"
           }
         ]
       }
@@ -1821,14 +1954,6 @@ export const IDL: Assembler = {
           "docs": [
             "The wallet that holds the authority over the assembler"
           ]
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "The wallet that pays for the rent"
-          ]
         }
       ],
       "args": [
@@ -2552,6 +2677,59 @@ export const IDL: Assembler = {
           }
         }
       ]
+    },
+    {
+      "name": "updateMetadata",
+      "accounts": [
+        {
+          "name": "assembler",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Assembler state account"
+          ]
+        },
+        {
+          "name": "nft",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The nft account"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata account of the NFT"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateMetadataArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -2631,6 +2809,13 @@ export const IDL: Assembler = {
               "Should this assembler allow duplicate NFTs"
             ],
             "type": "bool"
+          },
+          {
+            "name": "defaultRoyalty",
+            "docs": [
+              "Default royalty percentage"
+            ],
+            "type": "u16"
           }
         ]
       }
@@ -2888,6 +3073,12 @@ export const IDL: Assembler = {
             "type": {
               "option": "bool"
             }
+          },
+          {
+            "name": "defaultRoyalty",
+            "type": {
+              "option": "u16"
+            }
           }
         ]
       }
@@ -2911,6 +3102,12 @@ export const IDL: Assembler = {
             "name": "allowDuplicates",
             "type": {
               "option": "bool"
+            }
+          },
+          {
+            "name": "defaultRoyalty",
+            "type": {
+              "option": "u16"
             }
           }
         ]
@@ -2951,6 +3148,55 @@ export const IDL: Assembler = {
             "name": "newUri",
             "type": {
               "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "docs": [
+              "The name of the asset"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "docs": [
+              "The symbol for the asset"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "docs": [
+              "URI pointing to JSON representing the asset"
+            ],
+            "type": "string"
+          },
+          {
+            "name": "sellerFeeBasisPoints",
+            "docs": [
+              "Royalty basis points that goes to creators in secondary sales (0-10000)"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "creators",
+            "docs": [
+              "Array of creators, optional"
+            ],
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": "Creator"
+                }
+              }
             }
           }
         ]
@@ -3007,6 +3253,26 @@ export const IDL: Assembler = {
             "type": {
               "defined": "NFTAttributeValue"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Creator",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "share",
+            "type": "u8"
           }
         ]
       }

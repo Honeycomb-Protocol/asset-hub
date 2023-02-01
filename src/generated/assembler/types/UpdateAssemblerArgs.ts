@@ -11,6 +11,7 @@ export type UpdateAssemblerArgs = {
   assemblingAction: AssemblingAction
   nftBaseUri: string
   allowDuplicates: beet.COption<boolean>
+  defaultRoyalty: beet.COption<number>
 }
 
 /**
@@ -23,6 +24,7 @@ export const updateAssemblerArgsBeet =
       ['assemblingAction', assemblingActionBeet],
       ['nftBaseUri', beet.utf8String],
       ['allowDuplicates', beet.coption(beet.bool)],
+      ['defaultRoyalty', beet.coption(beet.u16)],
     ],
     'UpdateAssemblerArgs'
   )

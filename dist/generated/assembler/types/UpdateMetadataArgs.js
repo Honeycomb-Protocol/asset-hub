@@ -23,17 +23,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAssemblerArgsBeet = void 0;
+exports.updateMetadataArgsBeet = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
-const AssemblingAction_1 = require("./AssemblingAction");
-exports.createAssemblerArgsBeet = new beet.FixableBeetArgsStruct([
-    ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
-    ['collectionName', beet.utf8String],
-    ['collectionSymbol', beet.utf8String],
-    ['collectionUri', beet.utf8String],
-    ['collectionDescription', beet.utf8String],
-    ['nftBaseUri', beet.utf8String],
-    ['allowDuplicates', beet.coption(beet.bool)],
-    ['defaultRoyalty', beet.coption(beet.u16)],
-], 'CreateAssemblerArgs');
-//# sourceMappingURL=CreateAssemblerArgs.js.map
+const Creator_1 = require("./Creator");
+exports.updateMetadataArgsBeet = new beet.FixableBeetArgsStruct([
+    ['name', beet.utf8String],
+    ['symbol', beet.utf8String],
+    ['uri', beet.utf8String],
+    ['sellerFeeBasisPoints', beet.u16],
+    ['creators', beet.coption(beet.array(Creator_1.creatorBeet))],
+], 'UpdateMetadataArgs');
+//# sourceMappingURL=UpdateMetadataArgs.js.map

@@ -79,6 +79,36 @@ pub fn create_metadata<'info>(
     }
 }
 
+pub fn update_metadata<'info>(
+    data: Option<Data>,
+    metadata: AccountInfo<'info>,
+    authority: AccountInfo<'info>,
+    primary_sale_happened: Option<bool>,
+    token_metadata_program: AccountInfo<'info>,
+    signer_seeds: Option<&[&[&[u8]]; 1]>,
+) -> Result<()> {
+    let update_metadata = update_metadata_accounts(
+        token_metadata_program.key(),
+        metadata.key(),
+        authority.key(),
+        None,
+        data,
+        primary_sale_happened,
+    );
+
+    if let Some(signer_seed) = signer_seeds {
+        return solana_program::program::invoke_signed(
+            &update_metadata,
+            &[metadata, authority],
+            signer_seed,
+        )
+        .map_err(Into::into);
+    } else {
+        return solana_program::program::invoke(&update_metadata, &[metadata, authority])
+            .map_err(Into::into);
+    }
+}
+
 pub fn create_master_edition<'info>(
     mint: AccountInfo<'info>,
     metadata_account: AccountInfo<'info>,
@@ -175,36 +205,102 @@ pub fn set_and_verify_collection<'info>(
         )
         .map_err(Into::into);
     } else {
-        return Ok(());
+        return solana_program::program::invoke(
+            &verify_collection,
+            &[
+                metadata,
+                authority,
+                payer,
+                collection_mint,
+                collection_metadata_account,
+                collection_master_edition,
+            ],
+        )
+        .map_err(Into::into);
     }
 }
 
-pub fn update_metadata<'info>(
-    data: Option<Data>,
+pub fn set_and_verify_sized_collection<'info>(
     metadata: AccountInfo<'info>,
+    collection_mint: AccountInfo<'info>,
+    collection_metadata_account: AccountInfo<'info>,
+    collection_master_edition: AccountInfo<'info>,
     authority: AccountInfo<'info>,
-    primary_sale_happened: Option<bool>,
+    payer: AccountInfo<'info>,
     token_metadata_program: AccountInfo<'info>,
     signer_seeds: Option<&[&[&[u8]]; 1]>,
 ) -> Result<()> {
-    let update_metadata = update_metadata_accounts(
+    let verify_collection = mpl_token_metadata::instruction::set_and_verify_sized_collection_item(
         token_metadata_program.key(),
         metadata.key(),
         authority.key(),
+        payer.key(),
+        authority.key(),
+        collection_mint.key(),
+        collection_metadata_account.key(),
+        collection_master_edition.key(),
         None,
-        data,
-        primary_sale_happened,
     );
 
-    if let Some(signer_seed) = signer_seeds {
+    if let Some(signer_seeds) = signer_seeds {
         return solana_program::program::invoke_signed(
-            &update_metadata,
-            &[metadata, authority],
-            signer_seed,
+            &verify_collection,
+            &[
+                metadata,
+                authority,
+                payer,
+                collection_mint,
+                collection_metadata_account,
+                collection_master_edition,
+            ],
+            signer_seeds,
         )
         .map_err(Into::into);
     } else {
-        return solana_program::program::invoke(&update_metadata, &[metadata, authority])
-            .map_err(Into::into);
+        return solana_program::program::invoke(
+            &verify_collection,
+            &[
+                metadata,
+                authority,
+                payer,
+                collection_mint,
+                collection_metadata_account,
+                collection_master_edition,
+            ],
+        )
+        .map_err(Into::into);
+    }
+}
+
+pub fn set_collection_size<'info>(
+    size: u64,
+    collection_mint: AccountInfo<'info>,
+    collection_metadata_account: AccountInfo<'info>,
+    authority: AccountInfo<'info>,
+    token_metadata_program: AccountInfo<'info>,
+    signer_seeds: Option<&[&[&[u8]]; 1]>,
+) -> Result<()> {
+    let set_collection_size_ix = mpl_token_metadata::instruction::set_collection_size(
+        token_metadata_program.key(),
+        collection_metadata_account.key(),
+        authority.key(),
+        collection_mint.key(),
+        None,
+        size,
+    );
+
+    if let Some(signer_seeds) = signer_seeds {
+        return solana_program::program::invoke_signed(
+            &set_collection_size_ix,
+            &[collection_metadata_account, authority, collection_mint],
+            signer_seeds,
+        )
+        .map_err(Into::into);
+    } else {
+        return solana_program::program::invoke(
+            &set_collection_size_ix,
+            &[collection_metadata_account, authority, collection_mint],
+        )
+        .map_err(Into::into);
     }
 }
