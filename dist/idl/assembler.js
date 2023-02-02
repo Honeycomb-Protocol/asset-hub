@@ -204,12 +204,21 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "delegate",
+                    "isMut": false,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "[Optional] the delegate of the assembler"
+                    ]
+                },
+                {
                     "name": "newAuthority",
                     "isMut": false,
                     "isSigner": false,
                     "isOptional": true,
                     "docs": [
-                        "The wallet that holds the authority over the assembler"
+                        "[Optional] The new wallet that will hold the authority over the assembler"
                     ]
                 }
             ],
@@ -218,6 +227,67 @@ exports.IDL = {
                     "name": "args",
                     "type": {
                         "defined": "UpdateAssemblerArgs"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "createDelegateAuthority",
+            "accounts": [
+                {
+                    "name": "assembler",
+                    "isMut": true,
+                    "isSigner": false,
+                    "docs": [
+                        "Assembler state account"
+                    ]
+                },
+                {
+                    "name": "delegateAuthority",
+                    "isMut": true,
+                    "isSigner": false,
+                    "docs": [
+                        "the delegate authority account"
+                    ]
+                },
+                {
+                    "name": "delegate",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "the wallet that holds delegate authority"
+                    ]
+                },
+                {
+                    "name": "authority",
+                    "isMut": false,
+                    "isSigner": true,
+                    "docs": [
+                        "The wallet that holds the authority over the assembler"
+                    ]
+                },
+                {
+                    "name": "payer",
+                    "isMut": true,
+                    "isSigner": true,
+                    "docs": [
+                        "The wallet that pays for everything"
+                    ]
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "NATIVE SYSTEM PROGRAM"
+                    ]
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": "CreateDelegateAuthorityArgs"
                     }
                 }
             ]
@@ -918,6 +988,23 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "authority",
+                    "isMut": false,
+                    "isSigner": true,
+                    "docs": [
+                        "The wallet that holds the authority to execute this instruction"
+                    ]
+                },
+                {
+                    "name": "delegate",
+                    "isMut": false,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "[Optional] the delegate of the assembler"
+                    ]
+                },
+                {
                     "name": "tokenMetadataProgram",
                     "isMut": false,
                     "isSigner": false,
@@ -967,7 +1054,16 @@ exports.IDL = {
                     "isMut": false,
                     "isSigner": true,
                     "docs": [
-                        "The wallet that holds the authority over the assembler"
+                        "The wallet that holds the authority to execute this instruction"
+                    ]
+                },
+                {
+                    "name": "delegate",
+                    "isMut": false,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "[Optional] the delegate of the assembler"
                     ]
                 },
                 {
@@ -1291,6 +1387,37 @@ exports.IDL = {
                     }
                 ]
             }
+        },
+        {
+            "name": "delegateAuthority",
+            "docs": [
+                "Delegate Authority"
+            ],
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "authority",
+                        "docs": [
+                            "The delegate authority"
+                        ],
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "permission",
+                        "docs": [
+                            "The permission of the delegate authority"
+                        ],
+                        "type": {
+                            "defined": "DelegateAuthorityPermission"
+                        }
+                    }
+                ]
+            }
         }
     ],
     "types": [
@@ -1365,6 +1492,20 @@ exports.IDL = {
                         "name": "defaultRoyalty",
                         "type": {
                             "option": "u16"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CreateDelegateAuthorityArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "permission",
+                        "type": {
+                            "defined": "DelegateAuthorityPermission"
                         }
                     }
                 ]
@@ -1666,6 +1807,35 @@ exports.IDL = {
                     }
                 ]
             }
+        },
+        {
+            "name": "DelegateAuthorityPermission",
+            "docs": [
+                "Delegate Authority Permission"
+            ],
+            "type": {
+                "kind": "enum",
+                "variants": [
+                    {
+                        "name": "Master"
+                    },
+                    {
+                        "name": "UpdateAssembler"
+                    },
+                    {
+                        "name": "UpdateBlock"
+                    },
+                    {
+                        "name": "UpdateBlockDefinition"
+                    },
+                    {
+                        "name": "UpdateNFT"
+                    },
+                    {
+                        "name": "InitialArtGeneration"
+                    }
+                ]
+            }
         }
     ],
     "errors": [
@@ -1676,73 +1846,83 @@ exports.IDL = {
         },
         {
             "code": 6001,
+            "name": "Unauthorized",
+            "msg": "The provided authority or delegate authority is not valid"
+        },
+        {
+            "code": 6002,
             "name": "BlockTypeMismatch",
             "msg": "The type of block is not same as the block definition value provided"
         },
         {
-            "code": 6002,
+            "code": 6003,
             "name": "RequiredBlockImage",
             "msg": "The particular block requires an image in definition"
         },
         {
-            "code": 6003,
+            "code": 6004,
             "name": "InvalidBlockType",
             "msg": "The block has an invalid type"
         },
         {
-            "code": 6004,
+            "code": 6005,
             "name": "InvalidBlockDefinition",
             "msg": "The block defintion is invalid"
         },
         {
-            "code": 6005,
+            "code": 6006,
             "name": "InvalidMetadata",
             "msg": "The metadata provided for the mint is not valid"
         },
         {
-            "code": 6006,
+            "code": 6007,
             "name": "InvalidTokenForBlockDefinition",
             "msg": "The token is not valid for this block definition"
         },
         {
-            "code": 6007,
+            "code": 6008,
             "name": "NFTAlreadyMinted",
             "msg": "The NFT is already minted"
         },
         {
-            "code": 6008,
+            "code": 6009,
             "name": "BlockExistsForNFT",
             "msg": "NFT attribute is already present for this block"
         },
         {
-            "code": 6009,
+            "code": 6010,
             "name": "BlockDoesNotExistsForNFT",
             "msg": "NFT does not have attribute for this block"
         },
         {
-            "code": 6010,
+            "code": 6011,
             "name": "InvalidUniqueConstraint",
             "msg": "Unique constraint is not valid"
         },
         {
-            "code": 6011,
+            "code": 6012,
             "name": "UniqueConstraintNotProvided",
             "msg": "Unique constraint is not provided"
         },
         {
-            "code": 6012,
+            "code": 6013,
             "name": "DepositAccountNotProvided",
             "msg": "Deposit account is not provided"
         },
         {
-            "code": 6013,
+            "code": 6014,
             "name": "NFTNotMinted",
             "msg": "The NFT is not minted"
         },
         {
-            "code": 6014,
+            "code": 6015,
             "name": "NFTNotBurnable",
             "msg": "The NFT is cannot be burned"
+        },
+        {
+            "code": 6016,
+            "name": "InitialArtGenerated",
+            "msg": "The initial generation of art is already complete"
         }
     ]
 };

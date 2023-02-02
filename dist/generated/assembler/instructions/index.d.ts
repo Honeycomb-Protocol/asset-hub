@@ -4,6 +4,7 @@ export * from './createAssembler';
 export * from './createAssemblerCollectionMasterEdition';
 export * from './createBlock';
 export * from './createBlockDefinition';
+export * from './createDelegateAuthority';
 export * from './createNft';
 export * from './mintNft';
 export * from './removeBlock';

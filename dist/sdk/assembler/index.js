@@ -22,4 +22,5 @@ __exportStar(require("./disbandNft"), exports);
 __exportStar(require("./setupAssembler"), exports);
 __exportStar(require("./updateAssembler"), exports);
 __exportStar(require("./setNftGenerated"), exports);
+__exportStar(require("./createDelegateAuthority"), exports);
 //# sourceMappingURL=index.js.map

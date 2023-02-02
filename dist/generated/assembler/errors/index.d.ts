@@ -7,6 +7,11 @@ export declare class OverflowError extends Error {
     readonly name: string;
     constructor();
 }
+export declare class UnauthorizedError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
 export declare class BlockTypeMismatchError extends Error {
     readonly code: number;
     readonly name: string;
@@ -73,6 +78,11 @@ export declare class NFTNotMintedError extends Error {
     constructor();
 }
 export declare class NFTNotBurnableError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
+export declare class InitialArtGeneratedError extends Error {
     readonly code: number;
     readonly name: string;
     constructor();

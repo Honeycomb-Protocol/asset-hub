@@ -20,6 +20,7 @@ __exportStar(require("./createAssembler"), exports);
 __exportStar(require("./createAssemblerCollectionMasterEdition"), exports);
 __exportStar(require("./createBlock"), exports);
 __exportStar(require("./createBlockDefinition"), exports);
+__exportStar(require("./createDelegateAuthority"), exports);
 __exportStar(require("./createNft"), exports);
 __exportStar(require("./mintNft"), exports);
 __exportStar(require("./removeBlock"), exports);

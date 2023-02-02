@@ -1,7 +1,8 @@
 use {
     crate::{
-        structs::{Assembler, AssemblingAction},
-        utils::{create_master_edition, create_metadata},
+        errors::ErrorCode,
+        state::{Assembler, AssemblingAction, DelegateAuthority, DelegateAuthorityPermission},
+        utils::{assert_authority, create_master_edition, create_metadata},
     },
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount},
@@ -118,51 +119,6 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
         Some(assembler_signer),
     )?;
 
-    // let assembler_seeds = &[
-    //     b"assembler".as_ref(),
-    //     assembler.collection.as_ref(),
-    //     &[assembler.bump],
-    // ];
-    // let assembler_signer = &[&assembler_seeds[..]];
-
-    // let create_metadata = mpl_token_metadata::instruction::create_metadata_accounts_v3(
-    //     ctx.accounts.token_metadata_program.key(),
-    //     ctx.accounts.collection_metadata_account.key(),
-    //     assembler.collection,
-    //     assembler_key,
-    //     ctx.accounts.payer.key(),
-    //     assembler_key,
-    //     assembler.collection_name.clone(),
-    //     assembler.collection_symbol.clone(),
-    //     args.collection_uri,
-    //     None,
-    //     // Some(vec![mpl_token_metadata::state::Creator {
-    //     //     address: assembler.authority,
-    //     //     verified: true,
-    //     //     share: 100,
-    //     // }]),
-    //     0,
-    //     false,
-    //     true,
-    //     None,
-    //     None,
-    //     None,
-    // );
-
-    // solana_program::program::invoke_signed(
-    //     &create_metadata,
-    //     &[
-    //         ctx.accounts.collection_metadata_account.clone(),
-    //         ctx.accounts.collection_mint.to_account_info(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.payer.to_account_info(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.system_program.to_account_info(),
-    //         ctx.accounts.rent.to_account_info(),
-    //     ],
-    //     assembler_signer,
-    // )?;
-
     Ok(())
 }
 
@@ -251,33 +207,6 @@ pub fn create_assembler_collection_master_edition(
         Some(assembler_signer),
     )?;
 
-    // let create_master_edition = mpl_token_metadata::instruction::create_master_edition_v3(
-    //     ctx.accounts.token_metadata_program.key(),
-    //     ctx.accounts.collection_master_edition.key(),
-    //     ctx.accounts.collection_mint.key(),
-    //     assembler_key,
-    //     assembler_key,
-    //     ctx.accounts.collection_metadata_account.key(),
-    //     ctx.accounts.payer.key(),
-    //     Some(0),
-    // );
-
-    // solana_program::program::invoke_signed(
-    //     &create_master_edition,
-    //     &[
-    //         ctx.accounts.collection_master_edition.clone(),
-    //         ctx.accounts.collection_mint.to_account_info(),
-    //         assembler.to_account_info(),
-    //         assembler.to_account_info(),
-    //         ctx.accounts.payer.to_account_info(),
-    //         ctx.accounts.collection_metadata_account.to_account_info(),
-    //         ctx.accounts.token_program.to_account_info(),
-    //         ctx.accounts.system_program.to_account_info(),
-    //         ctx.accounts.rent.to_account_info(),
-    //     ],
-    //     assembler_signer,
-    // )?;
-
     Ok(())
 }
 
@@ -285,13 +214,26 @@ pub fn create_assembler_collection_master_edition(
 #[derive(Accounts)]
 pub struct UpdateAssembler<'info> {
     /// Assembler state account
-    #[account(mut, has_one = authority)]
+    #[account(mut)]
     pub assembler: Account<'info, Assembler>,
 
     /// The wallet that holds the authority over the assembler
     pub authority: Signer<'info>,
 
-    /// The wallet that holds the authority over the assembler
+    /// [Optional] the delegate of the assembler
+    #[account(
+        seeds = [
+            b"delegate".as_ref(),
+            assembler.key().as_ref(),
+            assembler.authority.as_ref(),
+            authority.key().as_ref(),
+            format!("{:?}", delegate.permission).as_ref(),
+        ],
+        bump = delegate.bump,
+    )]
+    pub delegate: Option<Account<'info, DelegateAuthority>>,
+
+    /// [Optional] The new wallet that will hold the authority over the assembler
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub new_authority: Option<AccountInfo<'info>>,
 }
@@ -306,6 +248,13 @@ pub struct UpdateAssemblerArgs {
 
 /// Update an assembler
 pub fn update_assembler(ctx: Context<UpdateAssembler>, args: UpdateAssemblerArgs) -> Result<()> {
+    assert_authority(
+        ctx.accounts.authority.key(),
+        &ctx.accounts.assembler,
+        &ctx.accounts.delegate,
+        &[DelegateAuthorityPermission::UpdateAssembler],
+    )?;
+
     let assembler = &mut ctx.accounts.assembler;
     assembler.nft_base_uri = args.nft_base_uri;
     assembler.assembling_action = args.assembling_action;
@@ -313,8 +262,69 @@ pub fn update_assembler(ctx: Context<UpdateAssembler>, args: UpdateAssemblerArgs
     assembler.default_royalty = args.default_royalty.unwrap_or(assembler.default_royalty);
 
     if let Some(new_authority) = &ctx.accounts.new_authority {
-        assembler.authority = new_authority.key();
+        if ctx.accounts.authority.key() == assembler.authority {
+            assembler.authority = new_authority.key();
+        } else {
+            msg!("Only the current authority can update the authority");
+            return Err(ErrorCode::Unauthorized.into());
+        }
     }
+
+    Ok(())
+}
+
+/// Accounts used in the create delegate authority instruction
+#[derive(Accounts)]
+#[instruction(args: CreateDelegateAuthorityArgs)]
+pub struct CreateDelegateAuthority<'info> {
+    /// Assembler state account
+    #[account(mut)]
+    pub assembler: Account<'info, Assembler>,
+
+    /// the delegate authority account
+    #[account(
+        init, payer = payer,
+        space = DelegateAuthority::LEN,
+        seeds = [
+            b"delegate".as_ref(),
+            assembler.key().as_ref(),
+            assembler.authority.as_ref(),
+            authority.key().as_ref(),
+            format!("{:?}", args.permission).as_ref(),
+        ],
+        bump,
+    )]
+    pub delegate_authority: Account<'info, DelegateAuthority>,
+
+    /// the wallet that holds delegate authority
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub delegate: AccountInfo<'info>,
+
+    /// The wallet that holds the authority over the assembler
+    pub authority: Signer<'info>,
+
+    /// The wallet that pays for everything
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    /// NATIVE SYSTEM PROGRAM
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct CreateDelegateAuthorityArgs {
+    pub permission: DelegateAuthorityPermission,
+}
+
+/// Create a delegate authority
+pub fn create_delegate_authority(
+    ctx: Context<CreateDelegateAuthority>,
+    args: CreateDelegateAuthorityArgs,
+) -> Result<()> {
+    let delegate_authority = &mut ctx.accounts.delegate_authority;
+
+    delegate_authority.authority = ctx.accounts.delegate.key();
+    delegate_authority.permission = args.permission;
 
     Ok(())
 }

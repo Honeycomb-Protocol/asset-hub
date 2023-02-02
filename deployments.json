@@ -2,11 +2,11 @@
   "assembler": {
     "devnet": {
       "program": "AXX2agYcoDwGFsgEWvSitqfGH4ooKXUqK5P7Ch9raDJT",
-      "assembler": "F6NkBZiDSTiJhKV46ZnCu6VXxc1EQmyDL1ME2rBnEHki",
-      "block": "7nJRjNGgzUp9XsF7xsCr4vjmQ3KDwz7Y3b2opkUisWbB",
-      "blockDefinition": "NoMfkLA8GofCBTDXYPmKiEpaiZFcUD25dkXQSccSqgp",
+      "assembler": "9Bk8SFw4aNjK3obcM3vHmpzH95BAiZGBDvQjG5qcQMFm",
+      "block": "BnEjHNeK6YwdFfYA5YxERprym3zpAtBkJTZeSzVnaCYi",
+      "blockDefinition": "64aVgtSwDEW99jiMoPFxmpYB4uaAv2XPdpr5z3W7wDkz",
       "blockDefinitionMint": "HdjzhUA5nmdXGpxrbENBjXUVQCi8Uubqay6WM9ribKrN",
-      "nftMint": "GGJUxYvHYFS62N9tWJ9zm3Xx5tv62diJuGhZBsiYd8zY"
+      "nftMint": "73nvSCVhxTm4CmyHPxMBkzpXqYrqFr2TkNYVw5LENZLU"
     }
   },
   "assetmanager": {

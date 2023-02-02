@@ -10,10 +10,11 @@ import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
 
 export function createUpdateAssemblerTransaction(
-  authority: web3.PublicKey,
   assembler: web3.PublicKey,
+  authority: web3.PublicKey,
   args: UpdateAssemblerArgs,
-  newAuthority: web3.PublicKey = PROGRAM_ID,
+  delegate?: web3.PublicKey,
+  newAuthority?: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts & { assembler: web3.PublicKey } {
   return {
@@ -22,6 +23,7 @@ export function createUpdateAssemblerTransaction(
         {
           assembler,
           authority,
+          delegate: delegate || programId,
           newAuthority: newAuthority || programId,
         },
         { args },
@@ -29,7 +31,7 @@ export function createUpdateAssemblerTransaction(
       )
     ),
     signers: [],
-    accounts: [assembler, authority, newAuthority],
+    accounts: [assembler, authority, delegate, newAuthority],
     assembler,
   };
 }
@@ -42,9 +44,10 @@ export async function updateAssembler(
 ) {
   const wallet = mx.identity();
   const ctx = createUpdateAssemblerTransaction(
-    wallet.publicKey,
     assembler,
+    wallet.publicKey,
     args,
+    undefined,
     newAuthority
   );
 

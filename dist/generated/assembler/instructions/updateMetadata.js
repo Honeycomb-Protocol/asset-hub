@@ -61,6 +61,11 @@ function createUpdateMetadataInstruction(accounts, args, programId = new web3.Pu
             isSigner: true,
         },
         {
+            pubkey: accounts.delegate,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.tokenMetadataProgram,
             isWritable: false,
             isSigner: false,

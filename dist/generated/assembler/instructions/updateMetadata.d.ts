@@ -12,6 +12,7 @@ export type UpdateMetadataInstructionAccounts = {
     nft: web3.PublicKey;
     metadata: web3.PublicKey;
     authority: web3.PublicKey;
+    delegate: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };

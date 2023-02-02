@@ -51,6 +51,11 @@ function createUpdateAssemblerInstruction(accounts, args, programId = new web3.P
             isSigner: true,
         },
         {
+            pubkey: accounts.delegate,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.newAuthority,
             isWritable: false,
             isSigner: false,

@@ -18,6 +18,7 @@ exports.accountProviders = void 0;
 __exportStar(require("./Assembler"), exports);
 __exportStar(require("./Block"), exports);
 __exportStar(require("./BlockDefinition"), exports);
+__exportStar(require("./DelegateAuthority"), exports);
 __exportStar(require("./NFT"), exports);
 __exportStar(require("./NFTUniqueConstraint"), exports);
 const Assembler_1 = require("./Assembler");
@@ -25,11 +26,13 @@ const Block_1 = require("./Block");
 const BlockDefinition_1 = require("./BlockDefinition");
 const NFT_1 = require("./NFT");
 const NFTUniqueConstraint_1 = require("./NFTUniqueConstraint");
+const DelegateAuthority_1 = require("./DelegateAuthority");
 exports.accountProviders = {
     Assembler: Assembler_1.Assembler,
     Block: Block_1.Block,
     BlockDefinition: BlockDefinition_1.BlockDefinition,
     NFT: NFT_1.NFT,
     NFTUniqueConstraint: NFTUniqueConstraint_1.NFTUniqueConstraint,
+    DelegateAuthority: DelegateAuthority_1.DelegateAuthority,
 };
 //# sourceMappingURL=index.js.map

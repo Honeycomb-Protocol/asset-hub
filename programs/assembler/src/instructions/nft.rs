@@ -1,14 +1,16 @@
-use crate::structs::Creator;
+use crate::state::Creator;
 
 use {
     crate::{
         errors::ErrorCode,
-        structs::{
+        state::{
             Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue,
-            NFTAttribute, NFTAttributeValue, NFTUniqueConstraint, NFT,
+            DelegateAuthority, DelegateAuthorityPermission, NFTAttribute, NFTAttributeValue,
+            NFTUniqueConstraint, NFT,
         },
         utils::{
-            self, create_master_edition, create_metadata, set_and_verify_collection, BpfWriter,
+            self, assert_authority, create_master_edition, create_metadata,
+            set_and_verify_collection, BpfWriter,
         },
     },
     anchor_lang::{prelude::*, solana_program},
@@ -876,6 +878,22 @@ pub struct SetNFTGenerated<'info> {
     #[account(mut)]
     pub nft_metadata: AccountInfo<'info>,
 
+    /// The wallet that holds the authority to execute this instruction
+    pub authority: Signer<'info>,
+
+    /// [Optional] the delegate of the assembler
+    #[account(
+        seeds = [
+            b"delegate".as_ref(),
+            assembler.key().as_ref(),
+            assembler.authority.as_ref(),
+            authority.key().as_ref(),
+            format!("{:?}", delegate.permission).as_ref(),
+        ],
+        bump = delegate.bump,
+    )]
+    pub delegate: Option<Account<'info, DelegateAuthority>>,
+
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: AccountInfo<'info>,
@@ -888,8 +906,20 @@ pub struct SetNFTGeneratedArgs {
 
 /// Set NFT is generated
 pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArgs) -> Result<()> {
+    assert_authority(
+        ctx.accounts.authority.key(),
+        &ctx.accounts.assembler,
+        &ctx.accounts.delegate,
+        &[DelegateAuthorityPermission::InitialArtGeneration],
+    )?;
+
     let assembler = &mut ctx.accounts.assembler;
     let nft = &mut ctx.accounts.nft;
+
+    if nft.is_generated {
+        return Err(ErrorCode::InitialArtGenerated.into());
+    }
+
     nft.is_generated = true;
 
     if let Some(new_uri) = args.new_uri {
@@ -922,7 +952,7 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
 #[derive(Accounts)]
 pub struct UpdateMetadata<'info> {
     /// Assembler state account
-    #[account(mut, has_one = authority)]
+    #[account(mut)]
     pub assembler: Account<'info, Assembler>,
 
     /// The nft account
@@ -934,8 +964,21 @@ pub struct UpdateMetadata<'info> {
     #[account(mut)]
     pub metadata: AccountInfo<'info>,
 
-    /// The wallet that holds the authority over the assembler
+    /// The wallet that holds the authority to execute this instruction
     pub authority: Signer<'info>,
+
+    /// [Optional] the delegate of the assembler
+    #[account(
+        seeds = [
+            b"delegate".as_ref(),
+            assembler.key().as_ref(),
+            assembler.authority.as_ref(),
+            authority.key().as_ref(),
+            format!("{:?}", delegate.permission).as_ref(),
+        ],
+        bump = delegate.bump,
+    )]
+    pub delegate: Option<Account<'info, DelegateAuthority>>,
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -958,6 +1001,13 @@ pub struct UpdateMetadataArgs {
 
 /// Update metadata
 pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -> Result<()> {
+    assert_authority(
+        ctx.accounts.authority.key(),
+        &ctx.accounts.assembler,
+        &ctx.accounts.delegate,
+        &[DelegateAuthorityPermission::UpdateNFT],
+    )?;
+
     let assembler_seeds = &[
         b"assembler".as_ref(),
         ctx.accounts.assembler.collection.as_ref(),

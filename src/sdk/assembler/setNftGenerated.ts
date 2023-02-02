@@ -14,7 +14,9 @@ export function createSetNftGeneratedTransaction(
   assembler: web3.PublicKey,
   nft: web3.PublicKey,
   nftMint: web3.PublicKey,
+  authority: web3.PublicKey,
   args: SetNFTGeneratedArgs,
+  delegate?: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
   const [nftMetadata] = web3.PublicKey.findProgramAddressSync(
@@ -33,6 +35,8 @@ export function createSetNftGeneratedTransaction(
           assembler,
           nft,
           nftMetadata,
+          authority,
+          delegate: delegate || programId,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
         },
         {
@@ -59,6 +63,7 @@ export async function setNftGenerated(
     nftAccount?.assembler || nftArgs.assembler,
     nft,
     nftAccount?.mint || nftArgs.mint,
+    mx.identity().publicKey,
     args
   );
 

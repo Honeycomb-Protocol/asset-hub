@@ -32,13 +32,33 @@ createErrorFromCodeLookup.set(0x1770, () => new OverflowError())
 createErrorFromNameLookup.set('Overflow', () => new OverflowError())
 
 /**
+ * Unauthorized: 'The provided authority or delegate authority is not valid'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class UnauthorizedError extends Error {
+  readonly code: number = 0x1771
+  readonly name: string = 'Unauthorized'
+  constructor() {
+    super('The provided authority or delegate authority is not valid')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, UnauthorizedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1771, () => new UnauthorizedError())
+createErrorFromNameLookup.set('Unauthorized', () => new UnauthorizedError())
+
+/**
  * BlockTypeMismatch: 'The type of block is not same as the block definition value provided'
  *
  * @category Errors
  * @category generated
  */
 export class BlockTypeMismatchError extends Error {
-  readonly code: number = 0x1771
+  readonly code: number = 0x1772
   readonly name: string = 'BlockTypeMismatch'
   constructor() {
     super(
@@ -50,7 +70,7 @@ export class BlockTypeMismatchError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1771, () => new BlockTypeMismatchError())
+createErrorFromCodeLookup.set(0x1772, () => new BlockTypeMismatchError())
 createErrorFromNameLookup.set(
   'BlockTypeMismatch',
   () => new BlockTypeMismatchError()
@@ -63,7 +83,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class RequiredBlockImageError extends Error {
-  readonly code: number = 0x1772
+  readonly code: number = 0x1773
   readonly name: string = 'RequiredBlockImage'
   constructor() {
     super('The particular block requires an image in definition')
@@ -73,7 +93,7 @@ export class RequiredBlockImageError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1772, () => new RequiredBlockImageError())
+createErrorFromCodeLookup.set(0x1773, () => new RequiredBlockImageError())
 createErrorFromNameLookup.set(
   'RequiredBlockImage',
   () => new RequiredBlockImageError()
@@ -86,7 +106,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidBlockTypeError extends Error {
-  readonly code: number = 0x1773
+  readonly code: number = 0x1774
   readonly name: string = 'InvalidBlockType'
   constructor() {
     super('The block has an invalid type')
@@ -96,7 +116,7 @@ export class InvalidBlockTypeError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1773, () => new InvalidBlockTypeError())
+createErrorFromCodeLookup.set(0x1774, () => new InvalidBlockTypeError())
 createErrorFromNameLookup.set(
   'InvalidBlockType',
   () => new InvalidBlockTypeError()
@@ -109,7 +129,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidBlockDefinitionError extends Error {
-  readonly code: number = 0x1774
+  readonly code: number = 0x1775
   readonly name: string = 'InvalidBlockDefinition'
   constructor() {
     super('The block defintion is invalid')
@@ -119,7 +139,7 @@ export class InvalidBlockDefinitionError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1774, () => new InvalidBlockDefinitionError())
+createErrorFromCodeLookup.set(0x1775, () => new InvalidBlockDefinitionError())
 createErrorFromNameLookup.set(
   'InvalidBlockDefinition',
   () => new InvalidBlockDefinitionError()
@@ -132,7 +152,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidMetadataError extends Error {
-  readonly code: number = 0x1775
+  readonly code: number = 0x1776
   readonly name: string = 'InvalidMetadata'
   constructor() {
     super('The metadata provided for the mint is not valid')
@@ -142,7 +162,7 @@ export class InvalidMetadataError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1775, () => new InvalidMetadataError())
+createErrorFromCodeLookup.set(0x1776, () => new InvalidMetadataError())
 createErrorFromNameLookup.set(
   'InvalidMetadata',
   () => new InvalidMetadataError()
@@ -155,7 +175,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidTokenForBlockDefinitionError extends Error {
-  readonly code: number = 0x1776
+  readonly code: number = 0x1777
   readonly name: string = 'InvalidTokenForBlockDefinition'
   constructor() {
     super('The token is not valid for this block definition')
@@ -166,7 +186,7 @@ export class InvalidTokenForBlockDefinitionError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1776,
+  0x1777,
   () => new InvalidTokenForBlockDefinitionError()
 )
 createErrorFromNameLookup.set(
@@ -181,7 +201,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class NFTAlreadyMintedError extends Error {
-  readonly code: number = 0x1777
+  readonly code: number = 0x1778
   readonly name: string = 'NFTAlreadyMinted'
   constructor() {
     super('The NFT is already minted')
@@ -191,7 +211,7 @@ export class NFTAlreadyMintedError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1777, () => new NFTAlreadyMintedError())
+createErrorFromCodeLookup.set(0x1778, () => new NFTAlreadyMintedError())
 createErrorFromNameLookup.set(
   'NFTAlreadyMinted',
   () => new NFTAlreadyMintedError()
@@ -204,7 +224,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class BlockExistsForNFTError extends Error {
-  readonly code: number = 0x1778
+  readonly code: number = 0x1779
   readonly name: string = 'BlockExistsForNFT'
   constructor() {
     super('NFT attribute is already present for this block')
@@ -214,7 +234,7 @@ export class BlockExistsForNFTError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1778, () => new BlockExistsForNFTError())
+createErrorFromCodeLookup.set(0x1779, () => new BlockExistsForNFTError())
 createErrorFromNameLookup.set(
   'BlockExistsForNFT',
   () => new BlockExistsForNFTError()
@@ -227,7 +247,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class BlockDoesNotExistsForNFTError extends Error {
-  readonly code: number = 0x1779
+  readonly code: number = 0x177a
   readonly name: string = 'BlockDoesNotExistsForNFT'
   constructor() {
     super('NFT does not have attribute for this block')
@@ -237,7 +257,7 @@ export class BlockDoesNotExistsForNFTError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1779, () => new BlockDoesNotExistsForNFTError())
+createErrorFromCodeLookup.set(0x177a, () => new BlockDoesNotExistsForNFTError())
 createErrorFromNameLookup.set(
   'BlockDoesNotExistsForNFT',
   () => new BlockDoesNotExistsForNFTError()
@@ -250,7 +270,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidUniqueConstraintError extends Error {
-  readonly code: number = 0x177a
+  readonly code: number = 0x177b
   readonly name: string = 'InvalidUniqueConstraint'
   constructor() {
     super('Unique constraint is not valid')
@@ -260,7 +280,7 @@ export class InvalidUniqueConstraintError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x177a, () => new InvalidUniqueConstraintError())
+createErrorFromCodeLookup.set(0x177b, () => new InvalidUniqueConstraintError())
 createErrorFromNameLookup.set(
   'InvalidUniqueConstraint',
   () => new InvalidUniqueConstraintError()
@@ -273,7 +293,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class UniqueConstraintNotProvidedError extends Error {
-  readonly code: number = 0x177b
+  readonly code: number = 0x177c
   readonly name: string = 'UniqueConstraintNotProvided'
   constructor() {
     super('Unique constraint is not provided')
@@ -284,7 +304,7 @@ export class UniqueConstraintNotProvidedError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x177b,
+  0x177c,
   () => new UniqueConstraintNotProvidedError()
 )
 createErrorFromNameLookup.set(
@@ -299,7 +319,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class DepositAccountNotProvidedError extends Error {
-  readonly code: number = 0x177c
+  readonly code: number = 0x177d
   readonly name: string = 'DepositAccountNotProvided'
   constructor() {
     super('Deposit account is not provided')
@@ -310,7 +330,7 @@ export class DepositAccountNotProvidedError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x177c,
+  0x177d,
   () => new DepositAccountNotProvidedError()
 )
 createErrorFromNameLookup.set(
@@ -325,7 +345,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class NFTNotMintedError extends Error {
-  readonly code: number = 0x177d
+  readonly code: number = 0x177e
   readonly name: string = 'NFTNotMinted'
   constructor() {
     super('The NFT is not minted')
@@ -335,7 +355,7 @@ export class NFTNotMintedError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x177d, () => new NFTNotMintedError())
+createErrorFromCodeLookup.set(0x177e, () => new NFTNotMintedError())
 createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError())
 
 /**
@@ -345,7 +365,7 @@ createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError())
  * @category generated
  */
 export class NFTNotBurnableError extends Error {
-  readonly code: number = 0x177e
+  readonly code: number = 0x177f
   readonly name: string = 'NFTNotBurnable'
   constructor() {
     super('The NFT is cannot be burned')
@@ -355,8 +375,31 @@ export class NFTNotBurnableError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x177e, () => new NFTNotBurnableError())
+createErrorFromCodeLookup.set(0x177f, () => new NFTNotBurnableError())
 createErrorFromNameLookup.set('NFTNotBurnable', () => new NFTNotBurnableError())
+
+/**
+ * InitialArtGenerated: 'The initial generation of art is already complete'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class InitialArtGeneratedError extends Error {
+  readonly code: number = 0x1780
+  readonly name: string = 'InitialArtGenerated'
+  constructor() {
+    super('The initial generation of art is already complete')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, InitialArtGeneratedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1780, () => new InitialArtGeneratedError())
+createErrorFromNameLookup.set(
+  'InitialArtGenerated',
+  () => new InitialArtGeneratedError()
+)
 
 /**
  * Attempts to resolve a custom program error from the provided error code.

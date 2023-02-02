@@ -5,6 +5,9 @@ pub enum ErrorCode {
     #[msg("Opertaion overflowed")]
     Overflow,
 
+    #[msg("The provided authority or delegate authority is not valid")]
+    Unauthorized,
+
     #[msg("The type of block is not same as the block definition value provided")]
     BlockTypeMismatch,
 
@@ -46,4 +49,7 @@ pub enum ErrorCode {
 
     #[msg("The NFT is cannot be burned")]
     NFTNotBurnable,
+
+    #[msg("The initial generation of art is already complete")]
+    InitialArtGenerated,
 }

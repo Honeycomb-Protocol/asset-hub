@@ -10,6 +10,7 @@ export declare const updateAssemblerStruct: beet.FixableBeetArgsStruct<UpdateAss
 export type UpdateAssemblerInstructionAccounts = {
     assembler: web3.PublicKey;
     authority: web3.PublicKey;
+    delegate: web3.PublicKey;
     newAuthority: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };

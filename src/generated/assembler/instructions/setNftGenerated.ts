@@ -42,6 +42,8 @@ export const setNftGeneratedStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_] assembler
  * @property [_writable_] nft
  * @property [_writable_] nftMetadata
+ * @property [**signer**] authority
+ * @property [] delegate
  * @property [] tokenMetadataProgram
  * @category Instructions
  * @category SetNftGenerated
@@ -51,6 +53,8 @@ export type SetNftGeneratedInstructionAccounts = {
   assembler: web3.PublicKey
   nft: web3.PublicKey
   nftMetadata: web3.PublicKey
+  authority: web3.PublicKey
+  delegate: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -92,6 +96,16 @@ export function createSetNftGeneratedInstruction(
     {
       pubkey: accounts.nftMetadata,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.authority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.delegate,
+      isWritable: false,
       isSigner: false,
     },
     {

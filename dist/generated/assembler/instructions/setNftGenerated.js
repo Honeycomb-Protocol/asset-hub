@@ -56,6 +56,16 @@ function createSetNftGeneratedInstruction(accounts, args, programId = new web3.P
             isSigner: false,
         },
         {
+            pubkey: accounts.authority,
+            isWritable: false,
+            isSigner: true,
+        },
+        {
+            pubkey: accounts.delegate,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.tokenMetadataProgram,
             isWritable: false,
             isSigner: false,

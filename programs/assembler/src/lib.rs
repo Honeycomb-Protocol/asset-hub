@@ -2,11 +2,11 @@ use anchor_lang::prelude::*;
 
 pub mod errors;
 pub mod instructions;
-pub mod structs;
+pub mod state;
 pub mod utils;
 
 use instructions::*;
-use structs::*;
+use state::*;
 
 declare_id!("Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz");
 
@@ -32,6 +32,13 @@ pub mod assembler {
         args: UpdateAssemblerArgs,
     ) -> Result<()> {
         instructions::update_assembler(ctx, args)
+    }
+
+    pub fn create_delegate_authority(
+        ctx: Context<CreateDelegateAuthority>,
+        args: CreateDelegateAuthorityArgs,
+    ) -> Result<()> {
+        instructions::create_delegate_authority(ctx, args)
     }
 
     pub fn create_block(ctx: Context<CreateBlock>, args: CreateBlockArgs) -> Result<()> {

@@ -41,6 +41,7 @@ export const updateAssemblerStruct = new beet.FixableBeetArgsStruct<
  *
  * @property [_writable_] assembler
  * @property [**signer**] authority
+ * @property [] delegate
  * @property [] newAuthority
  * @category Instructions
  * @category UpdateAssembler
@@ -49,6 +50,7 @@ export const updateAssemblerStruct = new beet.FixableBeetArgsStruct<
 export type UpdateAssemblerInstructionAccounts = {
   assembler: web3.PublicKey
   authority: web3.PublicKey
+  delegate: web3.PublicKey
   newAuthority: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -86,6 +88,11 @@ export function createUpdateAssemblerInstruction(
       pubkey: accounts.authority,
       isWritable: false,
       isSigner: true,
+    },
+    {
+      pubkey: accounts.delegate,
+      isWritable: false,
+      isSigner: false,
     },
     {
       pubkey: accounts.newAuthority,
