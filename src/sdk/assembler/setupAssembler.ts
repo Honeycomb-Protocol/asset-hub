@@ -21,6 +21,9 @@ import {
   devideAndSignV0Txns,
   sendBulkTransactions,
   sendBulkTransactionsLegacy,
+  uploadBulkMetadataToArwave,
+  UploadMetadataItemWithCallBack,
+  uploadMetadataToArwave,
 } from "../../utils";
 import { Wallet } from "@project-serum/anchor";
 type TransactionGroup = {
@@ -30,8 +33,7 @@ type TransactionGroup = {
 export async function setupAssembler(
   mx: Metaplex,
   config: AssemblerConfig,
-  updateConfig: (cfg: AssemblerConfig) => void,
-  readFile: (path: string) => Promise<MetaplexFile>
+  updateConfig: (cfg: AssemblerConfig) => void
 ) {
   const transactionGroups: TransactionGroup[] = [
     {
@@ -147,24 +149,8 @@ export async function setupAssembler(
                   block.name
               );
             }
-          } else if (blockDefinition.assetConfig) {
+          } else if (blockDefinition.assetConfig.uri) {
             let uri = blockDefinition.assetConfig.uri;
-            if (!uri && blockDefinition.assetConfig.image) {
-              const file = await readFile(blockDefinition.assetConfig.image);
-              const m = await mx.nfts().uploadMetadata({
-                name: "HoneyComb Asset",
-                image: file,
-                symbol: blockDefinition.assetConfig.symbol,
-                ...(blockDefinition.assetConfig.json || {}),
-              });
-              if (!blockDefinition.caches)
-                blockDefinition.caches = {
-                  image: blockDefinition.assetConfig.image,
-                };
-              blockDefinition.caches.image = blockDefinition.assetConfig.image;
-              uri = blockDefinition.assetConfig.uri = m.uri;
-              updateConfig(config);
-            }
 
             const createAssetCtx = createCreateAssetTransaction(
               wallet.publicKey,
@@ -296,6 +282,55 @@ export async function setupAssembler(
     console.error(e);
     return null;
   });
+
+  return config;
+}
+
+export async function uploadFiles(
+  mx: Metaplex,
+  config: AssemblerConfig,
+  updateConfig: (cfg: AssemblerConfig) => void,
+  readFile: (path: string) => Promise<MetaplexFile>
+) {
+  const uploadItems: UploadMetadataItemWithCallBack[] = [];
+  await Promise.all(
+    config.blocks.map(async (block) => {
+      await Promise.all(
+        block.definitions.map(async (blockDefinition) => {
+          if (blockDefinition.assetConfig) {
+            let uri = blockDefinition.assetConfig.uri;
+            if (!uri && blockDefinition.assetConfig.image) {
+              const file = await readFile(blockDefinition.assetConfig.image);
+              uploadItems.push({
+                data: {
+                  name: "HoneyComb Asset",
+                  image: file,
+                  symbol: blockDefinition.assetConfig.symbol,
+                  ...(blockDefinition.assetConfig.json || {}),
+                },
+                callback(res) {
+                  if (!blockDefinition.caches)
+                    blockDefinition.caches = {
+                      image:
+                        res.data.image || blockDefinition.assetConfig.image,
+                    };
+                  blockDefinition.assetConfig.image =
+                    blockDefinition.caches.image =
+                      res.data.image || blockDefinition.assetConfig.image;
+                  uri = blockDefinition.assetConfig.uri = res.uri;
+                  updateConfig(config);
+                },
+              });
+            }
+          }
+          return blockDefinition;
+        })
+      );
+      return uploadItems;
+    })
+  );
+  await uploadBulkMetadataToArwave(mx, uploadItems);
+  /// Creating blocks
 
   return config;
 }

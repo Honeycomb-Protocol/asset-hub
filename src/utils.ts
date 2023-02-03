@@ -1,13 +1,22 @@
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
 import {
+  JsonMetadata,
+  BundlrStorageDriver,
   IdentityClient,
   IdentitySigner,
+  isMetaplexFile,
   KeypairSigner,
   Metaplex,
+  MetaplexFile,
   Signer,
+  toMetaplexFileFromJson,
+  lamports,
+  BigNumber,
+  toBigNumber,
 } from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
+import { BN } from "bn.js";
 
 export const sendAndConfirmTransaction = async (
   tx: web3.Transaction,
@@ -453,4 +462,82 @@ export const bulkLutTransactions = async (
     txns: lutTxns,
     lookupTableAddress,
   };
+};
+
+export const uploadMetadataToArwave = async (
+  mx: Metaplex,
+  data: UploadMetadataInput
+) => {
+  const isMetaplexImage = isMetaplexFile(data.image);
+  const files = [];
+  if (isMetaplexImage) files.push(data.image);
+
+  files.push(
+    toMetaplexFileFromJson({
+      ...data,
+      image: isMetaplexImage
+        ? "https://arweave.net/YATQ46cZ_47VGkoGyJsMYMqyJehEkEdkRPxv9ENtT08"
+        : data.image,
+    })
+  );
+
+  const bundlrStorageDriver = mx.storage().driver() as BundlrStorageDriver;
+
+  // console.log(files);
+  const fundRequired = await bundlrStorageDriver.getUploadPriceForFiles(files);
+
+  return {
+    proceed: async () => {
+      if (isMetaplexImage)
+        data.image = await mx.storage().upload(data.image as MetaplexFile);
+
+      const metadataUri = await mx.storage().uploadJson({
+        ...data,
+      });
+
+      return {
+        uri: metadataUri,
+        data: data as JsonMetadata,
+      };
+    },
+    fundRequired: fundRequired.basisPoints as BigNumber,
+  };
+};
+export type UploadMetadataInput = {
+  [k: string]: any;
+  image: string | MetaplexFile;
+};
+export type UploadMetadataItemWithCallBack = {
+  data: UploadMetadataInput;
+  callback: (res: { uri: string; data: JsonMetadata }) => any;
+};
+export const uploadBulkMetadataToArwave = async (
+  mx: Metaplex,
+  items: UploadMetadataItemWithCallBack[]
+) => {
+  const bundlrStorageDriver = mx.storage().driver() as BundlrStorageDriver;
+
+  const balance = (await bundlrStorageDriver.getBalance()).basisPoints;
+  console.log("Balance", balance.toNumber() / 10 ** 9);
+
+  const uploadHandlers = await Promise.all(
+    items.map(({ data }) => uploadMetadataToArwave(mx, data))
+  );
+
+  const totalFundsRequired = uploadHandlers.reduce(
+    (bn, item) => bn.add(item.fundRequired),
+    toBigNumber(0)
+  );
+
+  const shortFall = lamports(totalFundsRequired.sub(balance));
+  console.log("Short Fall", shortFall.basisPoints.toNumber() / 10 ** 9);
+
+  if (shortFall.basisPoints.gt(toBigNumber(0)))
+    await bundlrStorageDriver.fund(shortFall);
+
+  await Promise.all(
+    uploadHandlers.map(({ proceed }, i) =>
+      proceed().then(items[i].callback).catch(console.error)
+    )
+  );
 };
