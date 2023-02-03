@@ -26,14 +26,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBlock = exports.createCreateBlockTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
-const assembler_1 = require("../../generated/assembler");
+const pdas_1 = require("./pdas");
 function createCreateBlockTransaction(assembler, authority, payer, args) {
-    const [block] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("block"),
-        Buffer.from(`${args.blockName}`),
-        Uint8Array.from([args.blockOrder]),
-        assembler.toBuffer(),
-    ], assembler_1.PROGRAM_ID);
+    const [block] = (0, pdas_1.getBlockPda)(assembler, args.blockOrder);
     return {
         tx: new web3.Transaction().add((0, generated_1.createCreateBlockInstruction)({
             assembler,

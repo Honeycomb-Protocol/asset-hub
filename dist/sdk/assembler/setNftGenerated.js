@@ -25,15 +25,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setNftGenerated = exports.createSetNftGeneratedTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
-const utils_1 = require("../../utils");
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
+const pdas_1 = require("./pdas");
 function createSetNftGeneratedTransaction(assembler, nft, nftMint, authority, args, delegate, programId = assembler_1.PROGRAM_ID) {
-    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        nftMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
+    const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint);
     return {
         tx: new web3.Transaction().add((0, generated_1.createSetNftGeneratedInstruction)({
             assembler,
@@ -41,7 +37,7 @@ function createSetNftGeneratedTransaction(assembler, nft, nftMint, authority, ar
             nftMetadata,
             authority,
             delegate: delegate || programId,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, {
             args,
         }, programId)),

@@ -8,8 +8,12 @@ import {
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
-import { METADATA_PROGRAM_ID } from "../../utils";
 import { Metaplex } from "@metaplex-foundation/js";
+import {
+  getAssemblerPda,
+  getMetadataAccount_,
+  METADATA_PROGRAM_ID,
+} from "./pdas";
 
 export function createCreateAssemblerTransaction(
   authority: web3.PublicKey,
@@ -19,34 +23,19 @@ export function createCreateAssemblerTransaction(
 ): TxSignersAccounts & { assembler: web3.PublicKey } {
   const collectionMint = web3.Keypair.generate();
 
-  const [collectionMetadataAccount] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      collectionMint.publicKey.toBuffer(),
-    ],
-    METADATA_PROGRAM_ID
-  );
-
-  const [collectionMasterEdition] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      collectionMint.publicKey.toBuffer(),
-      Buffer.from("edition"),
-    ],
-    METADATA_PROGRAM_ID
-  );
-
   const collectionTokenAccount = splToken.getAssociatedTokenAddressSync(
     collectionMint.publicKey,
     authority
   );
 
-  const [assembler] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("assembler"), collectionMint.publicKey.toBuffer()],
-    programId
+  const [collectionMetadataAccount] = getMetadataAccount_(
+    collectionMint.publicKey
   );
+  const [collectionMasterEdition] = getMetadataAccount_(
+    collectionMint.publicKey,
+    true
+  );
+  const [assembler] = getAssemblerPda(collectionMint.publicKey);
 
   return {
     tx: new web3.Transaction().add(

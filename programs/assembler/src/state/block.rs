@@ -1,4 +1,3 @@
-use crate::utils::EXTRA_SIZE;
 use anchor_lang::prelude::*;
 
 /// Block types
@@ -36,9 +35,12 @@ pub struct Block {
 
     /// The name of the block
     pub block_name: String,
+
+    /// The name of the block
+    pub block_defination_counts: u16,
 }
 impl Block {
-    pub const LEN: usize = 64 + EXTRA_SIZE;
+    pub const LEN: usize = 64 + 8 + (40 * 1); // base size + 8 align + string extra
 }
 
 /// Block Definition Account
@@ -54,9 +56,11 @@ pub struct BlockDefinition {
 
     /// The value of the block definition
     pub value: BlockDefinitionValue,
+
+    pub defination_index: u16,
 }
 impl BlockDefinition {
-    pub const LEN: usize = 128 + EXTRA_SIZE;
+    pub const LEN: usize = 128 + 8; // base size + 8 align
 }
 
 /// Block Definition Value

@@ -28,22 +28,13 @@ const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
-const utils_1 = require("../../utils");
+const pdas_1 = require("./pdas");
 function createCreateAssemblerTransaction(authority, payer, args, programId = assembler_1.PROGRAM_ID) {
     const collectionMint = web3.Keypair.generate();
-    const [collectionMetadataAccount] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        collectionMint.publicKey.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [collectionMasterEdition] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        collectionMint.publicKey.toBuffer(),
-        Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
     const collectionTokenAccount = splToken.getAssociatedTokenAddressSync(collectionMint.publicKey, authority);
-    const [assembler] = web3.PublicKey.findProgramAddressSync([Buffer.from("assembler"), collectionMint.publicKey.toBuffer()], programId);
+    const [collectionMetadataAccount] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey);
+    const [collectionMasterEdition] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey, true);
+    const [assembler] = (0, pdas_1.getAssemblerPda)(collectionMint.publicKey);
     return {
         tx: new web3.Transaction().add((0, generated_1.createCreateAssemblerInstruction)({
             collectionMint: collectionMint.publicKey,
@@ -51,7 +42,7 @@ function createCreateAssemblerTransaction(authority, payer, args, programId = as
             assembler,
             authority,
             payer,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, { args }, programId), splToken.createAssociatedTokenAccountInstruction(payer, collectionTokenAccount, authority, collectionMint.publicKey), (0, generated_1.createCreateAssemblerCollectionMasterEditionInstruction)({
             collectionMint: collectionMint.publicKey,
             collectionMetadataAccount,
@@ -60,7 +51,7 @@ function createCreateAssemblerTransaction(authority, payer, args, programId = as
             assembler,
             authority,
             payer,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [collectionMint],
         accounts: [
@@ -71,7 +62,7 @@ function createCreateAssemblerTransaction(authority, payer, args, programId = as
             assembler,
             authority,
             payer,
-            utils_1.METADATA_PROGRAM_ID,
+            pdas_1.METADATA_PROGRAM_ID,
         ],
         assembler,
     };

@@ -1,6 +1,5 @@
 import { Metaplex } from "@metaplex-foundation/js";
 import * as web3 from "@solana/web3.js";
-import { METADATA_PROGRAM_ID } from "../../utils";
 import { createSetNftGeneratedInstruction } from "../../generated";
 import {
   NFT,
@@ -9,6 +8,7 @@ import {
   SetNFTGeneratedArgs,
 } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
+import { getMetadataAccount_, METADATA_PROGRAM_ID } from "./pdas";
 
 export function createSetNftGeneratedTransaction(
   assembler: web3.PublicKey,
@@ -19,14 +19,7 @@ export function createSetNftGeneratedTransaction(
   delegate?: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
-  const [nftMetadata] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      nftMint.toBuffer(),
-    ],
-    METADATA_PROGRAM_ID
-  );
+  const [nftMetadata] = getMetadataAccount_(nftMint);
 
   return {
     tx: new web3.Transaction().add(

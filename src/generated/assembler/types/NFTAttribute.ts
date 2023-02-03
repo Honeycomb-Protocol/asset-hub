@@ -6,12 +6,11 @@
  */
 
 import * as web3 from '@solana/web3.js'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
 import * as beet from '@metaplex-foundation/beet'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
 import { NFTAttributeValue, nFTAttributeValueBeet } from './NFTAttributeValue'
 export type NFTAttribute = {
-  block: web3.PublicKey
-  blockDefinition: web3.PublicKey
+  blockDefinitionIndex: number
   mint: web3.PublicKey
   order: number
   attributeName: string
@@ -24,8 +23,7 @@ export type NFTAttribute = {
  */
 export const nFTAttributeBeet = new beet.FixableBeetArgsStruct<NFTAttribute>(
   [
-    ['block', beetSolana.publicKey],
-    ['blockDefinition', beetSolana.publicKey],
+    ['blockDefinitionIndex', beet.u16],
     ['mint', beetSolana.publicKey],
     ['order', beet.u8],
     ['attributeName', beet.utf8String],

@@ -1218,6 +1218,13 @@ export type Assembler = {
               "The name of the block"
             ],
             "type": "string"
+          },
+          {
+            "name": "blockDefinationCounts",
+            "docs": [
+              "The name of the block"
+            ],
+            "type": "u16"
           }
         ]
       }
@@ -1256,6 +1263,10 @@ export type Assembler = {
             "type": {
               "defined": "BlockDefinitionValue"
             }
+          },
+          {
+            "name": "definationIndex",
+            "type": "u16"
           }
         ]
       }
@@ -1606,18 +1617,11 @@ export type Assembler = {
         "kind": "struct",
         "fields": [
           {
-            "name": "block",
-            "docs": [
-              "The block account"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "blockDefinition",
+            "name": "blockDefinitionIndex",
             "docs": [
               "The block definition"
             ],
-            "type": "publicKey"
+            "type": "u16"
           },
           {
             "name": "mint",
@@ -3144,6 +3148,13 @@ export const IDL: Assembler = {
               "The name of the block"
             ],
             "type": "string"
+          },
+          {
+            "name": "blockDefinationCounts",
+            "docs": [
+              "The name of the block"
+            ],
+            "type": "u16"
           }
         ]
       }
@@ -3182,6 +3193,10 @@ export const IDL: Assembler = {
             "type": {
               "defined": "BlockDefinitionValue"
             }
+          },
+          {
+            "name": "definationIndex",
+            "type": "u16"
           }
         ]
       }
@@ -3532,18 +3547,11 @@ export const IDL: Assembler = {
         "kind": "struct",
         "fields": [
           {
-            "name": "block",
-            "docs": [
-              "The block account"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "blockDefinition",
+            "name": "blockDefinitionIndex",
             "docs": [
               "The block definition"
             ],
-            "type": "publicKey"
+            "type": "u16"
           },
           {
             "name": "mint",

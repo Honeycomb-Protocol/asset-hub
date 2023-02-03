@@ -4,7 +4,7 @@ pub mod nft;
 
 pub use {assembler::*, block::*, nft::*};
 
-use {crate::utils::EXTRA_SIZE, anchor_lang::prelude::*};
+use anchor_lang::prelude::*;
 
 /// Delegate Authority
 #[account]
@@ -18,7 +18,7 @@ pub struct DelegateAuthority {
     pub permission: DelegateAuthorityPermission,
 }
 impl DelegateAuthority {
-    pub const LEN: usize = 34 + EXTRA_SIZE;
+    pub const LEN: usize = 34 + 8; // base size + 8 align
 }
 
 /// Delegate Authority Permission

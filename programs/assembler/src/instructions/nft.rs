@@ -244,7 +244,10 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
         return Err(ErrorCode::NFTAlreadyMinted.into());
     }
 
-    let index = nft.attributes.iter().position(|r| r.block == block.key());
+    let index = nft
+        .attributes
+        .iter()
+        .position(|r| r.order == block.block_order);
     if let Some(_) = index {
         return Err(ErrorCode::BlockExistsForNFT.into());
     }
@@ -375,11 +378,10 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
     }
 
     let nft_attribute = NFTAttribute {
-        block: block.key(),
         mint: token_mint.key(),
         order: block.block_order,
         attribute_name: block.block_name.clone(),
-        block_definition: block_definition.key(),
+        block_definition_index: block_definition.defination_index,
         attribute_value,
     };
 
@@ -456,6 +458,7 @@ pub struct MintNFT<'info> {
 /// Create a new nft
 pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
     let assembler = &ctx.accounts.assembler;
+    let assembler_key = assembler.key();
     let nft = &mut ctx.accounts.nft;
 
     if nft.minted {
@@ -469,13 +472,24 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
                 return Err(ErrorCode::InvalidUniqueConstraint.into());
             }
 
-            let mut seeds = nft
-                .attributes
+            let mut seeds = Vec::new();
+            let mut attributes = nft.attributes.clone();
+            attributes.sort_by_key(|a| a.order);
+
+            let attribute_seed = attributes
                 .iter()
-                .map(|x| [x.block_definition.as_ref(), x.mint.as_ref()])
+                .map(|x| {
+                    [
+                        x.block_definition_index.to_be_bytes(),
+                        u16::from(x.order).to_be_bytes(),
+                    ]
+                    .concat()
+                })
                 .flatten()
                 .collect::<Vec<_>>();
 
+            seeds.push(&attribute_seed[..]);
+            seeds.push(assembler_key.as_ref());
             let (gen_unique_constraint_key, bump) =
                 Pubkey::find_program_address(&seeds[..], ctx.program_id);
 
@@ -837,7 +851,11 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
         }
     }
 
-    let index = nft.attributes.iter().position(|r| r.block == block.key());
+    let index = nft
+        .attributes
+        .iter()
+        .position(|r| r.order == block.block_order);
+
     if let Some(index) = index {
         NFT::reallocate(
             isize::try_from(NFTAttribute::LEN).unwrap() * -1,

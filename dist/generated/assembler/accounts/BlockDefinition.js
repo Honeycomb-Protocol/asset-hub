@@ -30,14 +30,15 @@ const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const BlockDefinitionValue_1 = require("../types/BlockDefinitionValue");
 exports.blockDefinitionDiscriminator = [107, 76, 146, 41, 130, 62, 5, 143];
 class BlockDefinition {
-    constructor(bump, block, mint, value) {
+    constructor(bump, block, mint, value, definationIndex) {
         this.bump = bump;
         this.block = block;
         this.mint = mint;
         this.value = value;
+        this.definationIndex = definationIndex;
     }
     static fromArgs(args) {
-        return new BlockDefinition(args.bump, args.block, args.mint, args.value);
+        return new BlockDefinition(args.bump, args.block, args.mint, args.value, args.definationIndex);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return BlockDefinition.deserialize(accountInfo.data, offset);
@@ -49,7 +50,7 @@ class BlockDefinition {
         }
         return BlockDefinition.fromAccountInfo(accountInfo, 0)[0];
     }
-    static gpaBuilder(programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+    static gpaBuilder(programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
         return beetSolana.GpaBuilder.fromStruct(programId, exports.blockDefinitionBeet);
     }
     static deserialize(buf, offset = 0) {
@@ -77,6 +78,7 @@ class BlockDefinition {
             block: this.block.toBase58(),
             mint: this.mint.toBase58(),
             value: this.value.__kind,
+            definationIndex: this.definationIndex,
         };
     }
 }
@@ -87,5 +89,6 @@ exports.blockDefinitionBeet = new beet.FixableBeetStruct([
     ['block', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
     ['value', BlockDefinitionValue_1.blockDefinitionValueBeet],
+    ['definationIndex', beet.u16],
 ], BlockDefinition.fromArgs, 'BlockDefinition');
 //# sourceMappingURL=BlockDefinition.js.map

@@ -31,7 +31,7 @@ exports.removeBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator'
 exports.removeBlockInstructionDiscriminator = [
     145, 94, 239, 114, 4, 117, 167, 145,
 ];
-function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
     var _a, _b, _c;
     const [data] = exports.removeBlockStruct.serialize({
         instructionDiscriminator: exports.removeBlockInstructionDiscriminator,

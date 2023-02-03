@@ -8,7 +8,7 @@ pub mod utils;
 use instructions::*;
 use state::*;
 
-declare_id!("Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz");
+declare_id!("4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp");
 
 #[program]
 pub mod assembler {

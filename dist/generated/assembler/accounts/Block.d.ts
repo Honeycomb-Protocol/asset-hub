@@ -10,6 +10,7 @@ export type BlockArgs = {
     isGraphical: boolean;
     blockType: BlockType;
     blockName: string;
+    blockDefinationCounts: number;
 };
 export declare const blockDiscriminator: number[];
 export declare class Block implements BlockArgs {
@@ -19,6 +20,7 @@ export declare class Block implements BlockArgs {
     readonly isGraphical: boolean;
     readonly blockType: BlockType;
     readonly blockName: string;
+    readonly blockDefinationCounts: number;
     private constructor();
     static fromArgs(args: BlockArgs): Block;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [Block, number];
@@ -37,6 +39,7 @@ export declare class Block implements BlockArgs {
         isGraphical: boolean;
         blockType: string;
         blockName: string;
+        blockDefinationCounts: number;
     };
 }
 export declare const blockBeet: beet.FixableBeetStruct<Block, BlockArgs & {

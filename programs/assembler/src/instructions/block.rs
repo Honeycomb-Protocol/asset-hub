@@ -19,7 +19,7 @@ pub struct CreateBlock<'info> {
       space = Block::LEN,
       seeds = [
         b"block".as_ref(),
-        args.block_name.as_bytes(),
+        // args.block_name.as_bytes(),
         &[args.block_order],
         assembler.key().as_ref(),
       ],
@@ -56,6 +56,7 @@ pub fn create_block(ctx: Context<CreateBlock>, args: CreateBlockArgs) -> Result<
     block.block_order = args.block_order;
     block.block_type = args.block_type;
     block.block_name = args.block_name;
+    block.block_defination_counts = 0;
     Ok(())
 }
 
@@ -104,12 +105,14 @@ pub fn create_block_definition(
     ctx: Context<CreateBlockDefinition>,
     args: BlockDefinitionValue,
 ) -> Result<()> {
+    let block = &mut ctx.accounts.block;
     let block_definition = &mut ctx.accounts.block_definition;
     block_definition.bump = ctx.bumps["block_definition"];
-    block_definition.block = ctx.accounts.block.key();
+    block_definition.block = block.key();
     block_definition.mint = ctx.accounts.block_definition_mint.key();
     block_definition.value = args;
-
+    block_definition.defination_index = block.block_defination_counts;
+    block.block_defination_counts += 1;
     match &block_definition.value {
         BlockDefinitionValue::Enum {
             is_collection: _is_collection,

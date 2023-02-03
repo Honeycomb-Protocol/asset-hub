@@ -31,7 +31,7 @@ exports.burnNftStruct = new beet.BeetArgsStruct([['instructionDiscriminator', be
 exports.burnNftInstructionDiscriminator = [
     119, 13, 183, 17, 194, 243, 38, 31,
 ];
-function createBurnNftInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+function createBurnNftInstruction(accounts, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
     var _a;
     const [data] = exports.burnNftStruct.serialize({
         instructionDiscriminator: exports.burnNftInstructionDiscriminator,

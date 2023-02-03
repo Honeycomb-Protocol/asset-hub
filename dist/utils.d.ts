@@ -2,7 +2,6 @@ import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
 import { IdentityClient, KeypairSigner, Metaplex, Signer } from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
-export declare const METADATA_PROGRAM_ID: web3.PublicKey;
 export declare const sendAndConfirmTransaction: (tx: web3.Transaction, connection: web3.Connection, wallet: anchor.Wallet, signers?: Signer[], sendOpts?: web3.SendOptions) => Promise<string>;
 export declare const createV0Tx: (payerKey: web3.PublicKey, latestBlockhash: string, ...txInstructions: web3.TransactionInstruction[]) => web3.VersionedTransaction;
 export declare const createV0TxWithLUTDumb: ({ lookupTable, ...msgArgs }: {
@@ -12,6 +11,7 @@ export declare const createV0TxWithLUTDumb: ({ lookupTable, ...msgArgs }: {
     recentBlockhash: web3.Blockhash;
 }) => web3.VersionedTransaction;
 export declare const createV0TxWithLUT: (connection: web3.Connection, payerKey: web3.PublicKey, lookupTableAddress: web3.PublicKey | web3.AddressLookupTableAccount, txInstructions: web3.TransactionInstruction[], latestBlockhash?: web3.BlockhashWithExpiryBlockHeight) => Promise<web3.VersionedTransaction>;
+export declare const numberToBytes: (x: number) => number[];
 export declare const getOrFetchLoockupTable: (connection: web3.Connection, lookupTableAddress: web3.PublicKey | web3.AddressLookupTableAccount) => Promise<web3.AddressLookupTableAccount | null>;
 export declare const devideAndSignTxns: (wallet: Wallet, connection: web3.Connection, rawTxns: TxSignersAccounts[], mextByteSizeOfAGroup?: number) => Promise<{
     tx: web3.Transaction;

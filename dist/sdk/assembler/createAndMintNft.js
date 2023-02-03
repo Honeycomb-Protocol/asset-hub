@@ -23,31 +23,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAndMintNft = exports.buildCreateAndMintNftCtx = exports.getUniqueConstraintPda = exports.createMintNftTransaction = exports.createAddBlockTransaction = exports.createCreateNftTransaction = void 0;
+exports.createAndMintNft = exports.buildCreateAndMintNftCtx = exports.createMintNftTransaction = exports.createAddBlockTransaction = exports.createCreateNftTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
 const utils_1 = require("../../utils");
+const pdas_1 = require("./pdas");
 function createCreateNftTransaction(assembler, collectionMint, authority, payer, programId = assembler_1.PROGRAM_ID) {
-    const [collectionMetadataAccount] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        collectionMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [collectionMasterEdition] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        collectionMint.toBuffer(),
-        Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
     const nftMint = web3.Keypair.generate();
-    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        nftMint.publicKey.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.publicKey.toBuffer()], programId);
+    const [collectionMetadataAccount] = (0, pdas_1.getMetadataAccount_)(collectionMint);
+    const [collectionMasterEdition] = (0, pdas_1.getMetadataAccount_)(collectionMint, true);
+    const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint.publicKey);
+    const [nft] = (0, pdas_1.getNftPda)(nftMint.publicKey);
     return {
         tx: new web3.Transaction().add((0, generated_1.createCreateNftInstruction)({
             assembler,
@@ -59,7 +47,7 @@ function createCreateNftTransaction(assembler, collectionMint, authority, payer,
             nft,
             authority,
             payer,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [nftMint],
         accounts: [
@@ -72,7 +60,7 @@ function createCreateNftTransaction(assembler, collectionMint, authority, payer,
             nft,
             authority,
             payer,
-            utils_1.METADATA_PROGRAM_ID,
+            pdas_1.METADATA_PROGRAM_ID,
         ],
         nft,
         nftMint: nftMint.publicKey,
@@ -81,18 +69,9 @@ function createCreateNftTransaction(assembler, collectionMint, authority, payer,
 exports.createCreateNftTransaction = createCreateNftTransaction;
 function createAddBlockTransaction(assembler, nft, nftMint, block, blockDefinition, tokenMint, authority, payer, assemblingAction = generated_1.AssemblingAction.Freeze, programId = assembler_1.PROGRAM_ID) {
     const tokenAccount = splToken.getAssociatedTokenAddressSync(tokenMint, authority);
-    const [tokenMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        tokenMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [tokenEdition] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        tokenMint.toBuffer(),
-        Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [depositAccount] = web3.PublicKey.findProgramAddressSync([Buffer.from("deposit"), tokenMint.toBuffer(), nftMint.toBuffer()], programId);
+    const [tokenMetadata] = (0, pdas_1.getMetadataAccount_)(tokenMint);
+    const [tokenEdition] = (0, pdas_1.getMetadataAccount_)(tokenMint, true);
+    const [depositAccount] = (0, pdas_1.getDepositPda)(tokenMint, nftMint);
     return {
         tx: new web3.Transaction().add((0, generated_1.createAddBlockInstruction)({
             assembler,
@@ -108,7 +87,7 @@ function createAddBlockTransaction(assembler, nft, nftMint, block, blockDefiniti
                 : programId,
             authority,
             payer,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [],
         accounts: [
@@ -122,25 +101,16 @@ function createAddBlockTransaction(assembler, nft, nftMint, block, blockDefiniti
             tokenEdition,
             authority,
             payer,
-            utils_1.METADATA_PROGRAM_ID,
+            pdas_1.METADATA_PROGRAM_ID,
         ],
     };
 }
 exports.createAddBlockTransaction = createAddBlockTransaction;
 function createMintNftTransaction(assembler, nftMint, uniqueConstraint, authority, payer, programId = assembler_1.PROGRAM_ID) {
-    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer()], programId);
-    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        nftMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [nftMasterEdition] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        nftMint.toBuffer(),
-        Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
     const tokenAccount = splToken.getAssociatedTokenAddressSync(nftMint, authority);
+    const [nft] = (0, pdas_1.getNftPda)(nftMint);
+    const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint);
+    const [nftMasterEdition] = (0, pdas_1.getMetadataAccount_)(nftMint, true);
     console.log("uniqueConstraint", uniqueConstraint === null || uniqueConstraint === void 0 ? void 0 : uniqueConstraint.toString());
     return {
         tx: new web3.Transaction().add(splToken.createAssociatedTokenAccountInstruction(payer, tokenAccount, authority, nftMint), (0, generated_1.createMintNftInstruction)({
@@ -153,23 +123,13 @@ function createMintNftTransaction(assembler, nftMint, uniqueConstraint, authorit
             uniqueConstraint: uniqueConstraint || programId,
             authority,
             payer,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [],
         accounts: [assembler, nft, nftMint, tokenAccount, authority, payer].concat(uniqueConstraint ? [uniqueConstraint] : []),
     };
 }
 exports.createMintNftTransaction = createMintNftTransaction;
-function getUniqueConstraintPda(blocks) {
-    const uniqueConstraintSeeds = blocks
-        .map(({ blockDefinition, tokenMint }) => [
-        blockDefinition.toBuffer(),
-        tokenMint.toBuffer(),
-    ])
-        .flat();
-    return web3.PublicKey.findProgramAddressSync([...uniqueConstraintSeeds], assembler_1.PROGRAM_ID)[0];
-}
-exports.getUniqueConstraintPda = getUniqueConstraintPda;
 async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
     const wallet = mx.identity();
     const txns = [];
@@ -182,7 +142,7 @@ async function buildCreateAndMintNftCtx({ mx, assembler, blocks, }) {
     });
     let uniqueConstraint = null;
     if (!assemblerAccount.allowDuplicates) {
-        uniqueConstraint = getUniqueConstraintPda(blocks);
+        uniqueConstraint = (0, pdas_1.getUniqueConstraintPda)(blocks, assembler)[0];
     }
     txns.push(createMintNftTransaction(assembler, nftMint, uniqueConstraint, wallet.publicKey, wallet.publicKey));
     return {
@@ -206,12 +166,11 @@ async function createAndMintNft({ mx, assembler, blocks, }) {
         txn.sign([wallet]);
     });
     const responses = await (0, utils_1.confirmBulkTransactions)(mx.connection, await (0, utils_1.sendBulkTransactions)(new web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "processed"), mintNftTxns));
-    let errorCount = 0;
     responses.forEach((element) => {
-        var _a;
+        var _a, _b, _c;
         if ((_a = element.value) === null || _a === void 0 ? void 0 : _a.err) {
-            errorCount++;
-            console.error(element.value.err);
+            console.error((_b = element.value) === null || _b === void 0 ? void 0 : _b.err);
+            throw (_c = element.value) === null || _c === void 0 ? void 0 : _c.err;
         }
     });
     return {

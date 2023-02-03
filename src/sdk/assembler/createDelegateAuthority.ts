@@ -1,14 +1,12 @@
-import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
-import * as splToken from "@solana/spl-token";
 import {
   CreateDelegateAuthorityArgs,
   createCreateDelegateAuthorityInstruction,
-  DelegateAuthorityPermission,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
+import { getDelegateAuthorityPda } from "./pdas";
 
 export function createCreateDelegateAuthorityTransaction(
   assembler: web3.PublicKey,
@@ -18,14 +16,10 @@ export function createCreateDelegateAuthorityTransaction(
   args: CreateDelegateAuthorityArgs,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts & { delegateAuthority: web3.PublicKey } {
-  const [delegateAuthority] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("delegate"),
-      assembler.toBuffer(),
-      delegate.toBuffer(),
-      Buffer.from(DelegateAuthorityPermission[args.permission]),
-    ],
-    programId
+  const [delegateAuthority] = getDelegateAuthorityPda(
+    assembler,
+    delegate,
+    args.permission
   );
 
   return {

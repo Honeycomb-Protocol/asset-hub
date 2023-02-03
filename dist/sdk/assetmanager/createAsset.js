@@ -25,24 +25,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAsset = exports.buildCreateAssetCtx = exports.createCreateAssetTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
-const utils_1 = require("../../utils");
 const generated_1 = require("../../generated");
 const assetmanager_1 = require("../../generated/assetmanager");
+const pdas_1 = require("../assembler/pdas");
 function createCreateAssetTransaction(payer, args, programId = assetmanager_1.PROGRAM_ID) {
     const mintKeypair = web3.Keypair.generate();
-    const [metadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        mintKeypair.publicKey.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [asset] = web3.PublicKey.findProgramAddressSync([Buffer.from("asset"), mintKeypair.publicKey.toBuffer()], programId);
+    const [metadata] = (0, pdas_1.getMetadataAccount_)(mintKeypair.publicKey);
+    const [asset] = (0, pdas_1.getAssetPda)(mintKeypair.publicKey);
     return {
         tx: new web3.Transaction().add((0, generated_1.createCreateAssetInstruction)({
             mint: mintKeypair.publicKey,
             metadata,
             asset,
             owner: payer,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, { args })),
         signers: [mintKeypair],
         accounts: [
@@ -50,7 +46,7 @@ function createCreateAssetTransaction(payer, args, programId = assetmanager_1.PR
             metadata,
             asset,
             payer,
-            utils_1.METADATA_PROGRAM_ID,
+            pdas_1.METADATA_PROGRAM_ID,
         ],
         mint: mintKeypair.publicKey,
         asset,

@@ -81,7 +81,7 @@ export class NFTUniqueConstraint implements NFTUniqueConstraintArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz'
+      '4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, nFTUniqueConstraintBeet)

@@ -1,4 +1,4 @@
-use crate::{errors::ErrorCode, utils::EXTRA_SIZE};
+use crate::errors::ErrorCode;
 use anchor_lang::{prelude::*, solana_program};
 
 /// NFT state account
@@ -43,7 +43,7 @@ pub struct NFT {
     pub attributes: Vec<NFTAttribute>,
 }
 impl NFT {
-    pub const LEN: usize = 232 + EXTRA_SIZE;
+    pub const LEN: usize = 256 + 8 + (40 * 4); // base size + 8 align + exta for strings
 
     /// Reallocate NFT size
     pub fn reallocate<'info>(
@@ -99,11 +99,8 @@ impl NFT {
 /// NFT Attribute
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct NFTAttribute {
-    /// The block account
-    pub block: Pubkey,
-
     /// The block definition
-    pub block_definition: Pubkey,
+    pub block_definition_index: u16,
 
     /// The token mint associated with this attribute
     pub mint: Pubkey,
@@ -118,7 +115,7 @@ pub struct NFTAttribute {
     pub attribute_value: NFTAttributeValue,
 }
 impl NFTAttribute {
-    pub const LEN: usize = 192;
+    pub const LEN: usize = 96 + (40 * 1);
 }
 
 /// NFT Attribute Value
@@ -143,5 +140,5 @@ pub struct NFTUniqueConstraint {
     pub nft: Pubkey,
 }
 impl NFTUniqueConstraint {
-    pub const LEN: usize = 33 + EXTRA_SIZE;
+    pub const LEN: usize = 33 + 8; // base size + 8 align
 }

@@ -29,13 +29,10 @@ const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
 const utils_1 = require("../../utils");
+const pdas_1 = require("./pdas");
 function createBurnNFTTransaction(assembler, nft, nftMint, uniqueConstraint, authority, programId = assembler_1.PROGRAM_ID) {
     const tokenAccount = splToken.getAssociatedTokenAddressSync(nftMint, authority);
-    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        nftMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
+    const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint);
     return {
         tx: new web3.Transaction().add((0, generated_1.createBurnNftInstruction)({
             assembler,
@@ -45,7 +42,7 @@ function createBurnNFTTransaction(assembler, nft, nftMint, uniqueConstraint, aut
             tokenAccount,
             uniqueConstraint,
             authority,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [],
         accounts: [assembler, nft, nftMint, tokenAccount, authority],
@@ -54,18 +51,9 @@ function createBurnNFTTransaction(assembler, nft, nftMint, uniqueConstraint, aut
 exports.createBurnNFTTransaction = createBurnNFTTransaction;
 function createRemoveBlockTransaction(assembler, nft, nftMint, block, blockDefinition, tokenMint, authority, assemblingAction = generated_1.AssemblingAction.Freeze, programId = assembler_1.PROGRAM_ID) {
     const tokenAccount = splToken.getAssociatedTokenAddressSync(tokenMint, authority);
-    const [tokenMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        tokenMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [tokenEdition] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
-        tokenMint.toBuffer(),
-        Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
-    const [depositAccount] = web3.PublicKey.findProgramAddressSync([Buffer.from("deposit"), tokenMint.toBuffer(), nftMint.toBuffer()], programId);
+    const [tokenMetadata] = (0, pdas_1.getMetadataAccount_)(tokenMint);
+    const [tokenEdition] = (0, pdas_1.getMetadataAccount_)(tokenMint, true);
+    const [depositAccount] = (0, pdas_1.getDepositPda)(tokenMint, nftMint);
     return {
         tx: new web3.Transaction().add((0, generated_1.createRemoveBlockInstruction)({
             assembler,
@@ -80,7 +68,7 @@ function createRemoveBlockTransaction(assembler, nft, nftMint, block, blockDefin
                 ? depositAccount
                 : programId,
             authority,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
         }, programId)),
         signers: [],
         accounts: [
@@ -92,20 +80,18 @@ function createRemoveBlockTransaction(assembler, nft, nftMint, block, blockDefin
             tokenAccount,
             tokenMetadata,
             authority,
-            utils_1.METADATA_PROGRAM_ID,
+            pdas_1.METADATA_PROGRAM_ID,
         ],
     };
 }
 exports.createRemoveBlockTransaction = createRemoveBlockTransaction;
 async function disbandNft(connection, wallet, nftMint) {
-    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer()], assembler_1.PROGRAM_ID);
+    const [nft] = (0, pdas_1.getNftPda)(nftMint);
     const nftAccount = await generated_1.NFT.fromAccountAddress(connection, nft);
     const assemblerAccount = await generated_1.Assembler.fromAccountAddress(connection, nftAccount.assembler);
     let uniqueConstraint = null;
     if (!assemblerAccount.allowDuplicates) {
-        uniqueConstraint = web3.PublicKey.findProgramAddressSync(nftAccount.attributes
-            .map((x) => [x.blockDefinition.toBuffer(), x.mint.toBuffer()])
-            .flat(), assembler_1.PROGRAM_ID)[0];
+        uniqueConstraint = (0, pdas_1.getUniqueConstraintPda)(nftAccount.attributes, nftAccount.assembler)[0];
     }
     const nftBurnTx = createBurnNFTTransaction(nftAccount.assembler, nft, nftMint, uniqueConstraint, wallet.publicKey);
     let signers = [...nftBurnTx.signers];
@@ -113,12 +99,13 @@ async function disbandNft(connection, wallet, nftMint) {
     const tx = new web3.Transaction().add(nftBurnTx.tx, ...(await Promise.all(nftAccount.attributes.map(async (attribute) => {
         if (!attribute.mint)
             return null;
-        const { tx, accounts: acc, signers: sigs, } = createRemoveBlockTransaction(nftAccount.assembler, nft, nftMint, attribute.block, attribute.blockDefinition, attribute.mint, wallet.publicKey, assemblerAccount.assemblingAction);
+        const [block] = (0, pdas_1.getBlockPda)(nftAccount.assembler, attribute.order);
+        const [blockDefinition] = (0, pdas_1.getBlockDefinitionPda)(block, attribute.mint);
+        const { tx, accounts: acc, signers: sigs, } = createRemoveBlockTransaction(nftAccount.assembler, nft, nftMint, block, blockDefinition, attribute.mint, wallet.publicKey, assemblerAccount.assemblingAction);
         signers = [...signers, ...sigs];
         accounts = [...accounts, ...acc];
         return tx;
     })).then((x) => x.filter((x) => x !== null))));
-    accounts = accounts.filter((x, index, self) => index === self.findIndex((y) => x.equals(y)));
     const txId = await (0, utils_1.sendAndConfirmTransaction)(tx, connection, wallet, signers, { skipPreflight: true });
     return {
         txId,

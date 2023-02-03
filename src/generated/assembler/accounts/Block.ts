@@ -22,6 +22,7 @@ export type BlockArgs = {
   isGraphical: boolean
   blockType: BlockType
   blockName: string
+  blockDefinationCounts: number
 }
 
 export const blockDiscriminator = [12, 72, 207, 108, 1, 228, 167, 221]
@@ -39,7 +40,8 @@ export class Block implements BlockArgs {
     readonly blockOrder: number,
     readonly isGraphical: boolean,
     readonly blockType: BlockType,
-    readonly blockName: string
+    readonly blockName: string,
+    readonly blockDefinationCounts: number
   ) {}
 
   /**
@@ -52,7 +54,8 @@ export class Block implements BlockArgs {
       args.blockOrder,
       args.isGraphical,
       args.blockType,
-      args.blockName
+      args.blockName,
+      args.blockDefinationCounts
     )
   }
 
@@ -96,7 +99,7 @@ export class Block implements BlockArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz'
+      '4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, blockBeet)
@@ -167,6 +170,7 @@ export class Block implements BlockArgs {
       isGraphical: this.isGraphical,
       blockType: 'BlockType.' + BlockType[this.blockType],
       blockName: this.blockName,
+      blockDefinationCounts: this.blockDefinationCounts,
     }
   }
 }
@@ -189,6 +193,7 @@ export const blockBeet = new beet.FixableBeetStruct<
     ['isGraphical', beet.bool],
     ['blockType', blockTypeBeet],
     ['blockName', beet.utf8String],
+    ['blockDefinationCounts', beet.u16],
   ],
   Block.fromArgs,
   'Block'

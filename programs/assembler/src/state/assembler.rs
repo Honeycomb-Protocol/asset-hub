@@ -1,4 +1,3 @@
-use crate::utils::EXTRA_SIZE;
 use anchor_lang::prelude::*;
 
 /// Assembler state account
@@ -37,7 +36,7 @@ pub struct Assembler {
     pub default_royalty: u16,
 }
 impl Assembler {
-    pub const LEN: usize = 144 + EXTRA_SIZE;
+    pub const LEN: usize = 168 + 8 + (40 * 4); // base size + 8 align + string extra
 }
 
 /// Assembling Action

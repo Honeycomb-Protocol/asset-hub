@@ -23,6 +23,7 @@ export type BlockDefinitionArgs = {
   block: web3.PublicKey
   mint: web3.PublicKey
   value: BlockDefinitionValue
+  definationIndex: number
 }
 
 export const blockDefinitionDiscriminator = [107, 76, 146, 41, 130, 62, 5, 143]
@@ -38,14 +39,21 @@ export class BlockDefinition implements BlockDefinitionArgs {
     readonly bump: number,
     readonly block: web3.PublicKey,
     readonly mint: web3.PublicKey,
-    readonly value: BlockDefinitionValue
+    readonly value: BlockDefinitionValue,
+    readonly definationIndex: number
   ) {}
 
   /**
    * Creates a {@link BlockDefinition} instance from the provided args.
    */
   static fromArgs(args: BlockDefinitionArgs) {
-    return new BlockDefinition(args.bump, args.block, args.mint, args.value)
+    return new BlockDefinition(
+      args.bump,
+      args.block,
+      args.mint,
+      args.value,
+      args.definationIndex
+    )
   }
 
   /**
@@ -88,7 +96,7 @@ export class BlockDefinition implements BlockDefinitionArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz'
+      '4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, blockDefinitionBeet)
@@ -157,6 +165,7 @@ export class BlockDefinition implements BlockDefinitionArgs {
       block: this.block.toBase58(),
       mint: this.mint.toBase58(),
       value: this.value.__kind,
+      definationIndex: this.definationIndex,
     }
   }
 }
@@ -177,6 +186,7 @@ export const blockDefinitionBeet = new beet.FixableBeetStruct<
     ['block', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
     ['value', blockDefinitionValueBeet],
+    ['definationIndex', beet.u16],
   ],
   BlockDefinition.fromArgs,
   'BlockDefinition'

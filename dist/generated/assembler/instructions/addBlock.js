@@ -31,7 +31,7 @@ exports.addBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator', b
 exports.addBlockInstructionDiscriminator = [
     208, 84, 156, 155, 72, 188, 114, 37,
 ];
-function createAddBlockInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+function createAddBlockInstruction(accounts, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
     var _a, _b, _c;
     const [data] = exports.addBlockStruct.serialize({
         instructionDiscriminator: exports.addBlockInstructionDiscriminator,

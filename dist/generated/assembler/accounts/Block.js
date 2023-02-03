@@ -30,16 +30,17 @@ const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const BlockType_1 = require("../types/BlockType");
 exports.blockDiscriminator = [12, 72, 207, 108, 1, 228, 167, 221];
 class Block {
-    constructor(bump, assembler, blockOrder, isGraphical, blockType, blockName) {
+    constructor(bump, assembler, blockOrder, isGraphical, blockType, blockName, blockDefinationCounts) {
         this.bump = bump;
         this.assembler = assembler;
         this.blockOrder = blockOrder;
         this.isGraphical = isGraphical;
         this.blockType = blockType;
         this.blockName = blockName;
+        this.blockDefinationCounts = blockDefinationCounts;
     }
     static fromArgs(args) {
-        return new Block(args.bump, args.assembler, args.blockOrder, args.isGraphical, args.blockType, args.blockName);
+        return new Block(args.bump, args.assembler, args.blockOrder, args.isGraphical, args.blockType, args.blockName, args.blockDefinationCounts);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Block.deserialize(accountInfo.data, offset);
@@ -51,7 +52,7 @@ class Block {
         }
         return Block.fromAccountInfo(accountInfo, 0)[0];
     }
-    static gpaBuilder(programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+    static gpaBuilder(programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
         return beetSolana.GpaBuilder.fromStruct(programId, exports.blockBeet);
     }
     static deserialize(buf, offset = 0) {
@@ -81,6 +82,7 @@ class Block {
             isGraphical: this.isGraphical,
             blockType: 'BlockType.' + BlockType_1.BlockType[this.blockType],
             blockName: this.blockName,
+            blockDefinationCounts: this.blockDefinationCounts,
         };
     }
 }
@@ -93,5 +95,6 @@ exports.blockBeet = new beet.FixableBeetStruct([
     ['isGraphical', beet.bool],
     ['blockType', BlockType_1.blockTypeBeet],
     ['blockName', beet.utf8String],
+    ['blockDefinationCounts', beet.u16],
 ], Block.fromArgs, 'Block');
 //# sourceMappingURL=Block.js.map

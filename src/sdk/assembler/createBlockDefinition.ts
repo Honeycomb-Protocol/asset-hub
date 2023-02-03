@@ -4,8 +4,8 @@ import {
   createCreateBlockDefinitionInstruction,
   BlockDefinitionValue,
 } from "../../generated";
-import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
+import { getBlockDefinitionPda } from "./pdas";
 
 export function createCreateBlockDefinitionTransaction(
   assembler: web3.PublicKey,
@@ -15,14 +15,7 @@ export function createCreateBlockDefinitionTransaction(
   payer: web3.PublicKey,
   args: BlockDefinitionValue
 ): TxSignersAccounts & { blockDefinition: web3.PublicKey } {
-  const [blockDefinition] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("block_definition"),
-      block.toBuffer(),
-      blockDefinitionMint.toBuffer(),
-    ],
-    PROGRAM_ID
-  );
+  const [blockDefinition] = getBlockDefinitionPda(block, blockDefinitionMint);
 
   return {
     tx: new web3.Transaction().add(

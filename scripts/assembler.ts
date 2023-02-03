@@ -60,18 +60,24 @@ export default async function (
         throw new Error(
           "Assembler address not found in deployments, Please create assembler first"
         );
+      const blockOrder = (deployments.blockOrder || 0) + 1;
       const blockAddress = await createBlock(
         mx,
         new web3.PublicKey(deployments.assembler),
         {
-          blockName: "Block 1",
-          blockOrder: 2,
+          blockName: `Block ${blockOrder}`,
+          blockOrder: blockOrder,
           blockType: BlockType.Enum,
           isGraphical: false,
         }
       );
       console.log("Create Block tx: ", blockAddress.response);
-      setDeployments({ ...deployments, block: blockAddress.block });
+      setDeployments({
+        ...deployments,
+        block: blockAddress.block,
+        blockOrder: blockOrder,
+        blockDefinitionIndex: -1,
+      });
       break;
 
     case "create-block-definition":
@@ -110,6 +116,10 @@ export default async function (
       } else {
         throw new Error("Invalid block type");
       }
+      const blockDefinitionIndex =
+        "blockDefinitionIndex" in deployments
+          ? deployments.blockDefinitionIndex + 1
+          : 0;
 
       const blockDefinitionAddress = await createBlockDefinition(
         mx,
@@ -125,6 +135,7 @@ export default async function (
       setDeployments({
         ...deployments,
         blockDefinition: blockDefinitionAddress.blockDefinition,
+        blockDefinitionIndex: blockDefinitionIndex,
         blockDefinitionMint: args[0],
       });
       break;
@@ -148,6 +159,8 @@ export default async function (
             block: new web3.PublicKey(deployments.block),
             blockDefinition: new web3.PublicKey(deployments.blockDefinition),
             tokenMint: new web3.PublicKey(deployments.blockDefinitionMint),
+            blockDefinitionIndex: deployments.blockDefinitionIndex,
+            order: deployments.blockOrder,
           },
         ],
       });

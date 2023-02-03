@@ -63,7 +63,7 @@ export const createAssemblerCollectionMasterEditionInstructionDiscriminator = [
  */
 export function createCreateAssemblerCollectionMasterEditionInstruction(
   accounts: CreateAssemblerCollectionMasterEditionInstructionAccounts,
-  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
+  programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')
 ) {
   const [data] = createAssemblerCollectionMasterEditionStruct.serialize({
     instructionDiscriminator:

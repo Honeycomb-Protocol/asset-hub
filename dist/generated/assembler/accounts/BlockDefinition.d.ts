@@ -8,6 +8,7 @@ export type BlockDefinitionArgs = {
     block: web3.PublicKey;
     mint: web3.PublicKey;
     value: BlockDefinitionValue;
+    definationIndex: number;
 };
 export declare const blockDefinitionDiscriminator: number[];
 export declare class BlockDefinition implements BlockDefinitionArgs {
@@ -15,6 +16,7 @@ export declare class BlockDefinition implements BlockDefinitionArgs {
     readonly block: web3.PublicKey;
     readonly mint: web3.PublicKey;
     readonly value: BlockDefinitionValue;
+    readonly definationIndex: number;
     private constructor();
     static fromArgs(args: BlockDefinitionArgs): BlockDefinition;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [BlockDefinition, number];
@@ -31,6 +33,7 @@ export declare class BlockDefinition implements BlockDefinitionArgs {
         block: string;
         mint: string;
         value: "Enum" | "Boolean" | "Number";
+        definationIndex: number;
     };
 }
 export declare const blockDefinitionBeet: beet.FixableBeetStruct<BlockDefinition, BlockDefinitionArgs & {

@@ -34,7 +34,7 @@ exports.updateAssemblerStruct = new beet.FixableBeetArgsStruct([
 exports.updateAssemblerInstructionDiscriminator = [
     23, 247, 28, 6, 104, 204, 226, 121,
 ];
-function createUpdateAssemblerInstruction(accounts, args, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
+function createUpdateAssemblerInstruction(accounts, args, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
     const [data] = exports.updateAssemblerStruct.serialize({
         instructionDiscriminator: exports.updateAssemblerInstructionDiscriminator,
         ...args,

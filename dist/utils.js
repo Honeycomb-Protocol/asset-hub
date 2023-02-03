@@ -23,9 +23,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.isKeypairSigner = exports.isSigner = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = exports.METADATA_PROGRAM_ID = void 0;
+exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.isKeypairSigner = exports.isSigner = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.numberToBytes = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
-exports.METADATA_PROGRAM_ID = new web3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 const sendAndConfirmTransaction = async (tx, connection, wallet, signers = [], sendOpts = {}) => {
     const block = await connection.getLatestBlockhash();
     tx.recentBlockhash = block.blockhash;
@@ -82,6 +81,11 @@ const createV0TxWithLUT = async (connection, payerKey, lookupTableAddress, txIns
     });
 };
 exports.createV0TxWithLUT = createV0TxWithLUT;
+const numberToBytes = (x) => {
+    let y = Math.floor(x / 2 ** 32);
+    return [y, y << 8, y << 16, y << 24, x, x << 8, x << 16, x << 24].map((z) => z >>> 24);
+};
+exports.numberToBytes = numberToBytes;
 const getOrFetchLoockupTable = async (connection, lookupTableAddress) => {
     return "state" in lookupTableAddress
         ? lookupTableAddress

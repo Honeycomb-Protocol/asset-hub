@@ -9,9 +9,6 @@ import {
 } from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
 
-export const METADATA_PROGRAM_ID = new web3.PublicKey(
-  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-);
 export const sendAndConfirmTransaction = async (
   tx: web3.Transaction,
   connection: web3.Connection,
@@ -101,6 +98,13 @@ export const createV0TxWithLUT = async (
     lookupTable,
   });
 };
+export const numberToBytes = (x: number) => {
+  let y = Math.floor(x / 2 ** 32);
+  return [y, y << 8, y << 16, y << 24, x, x << 8, x << 16, x << 24].map(
+    (z) => z >>> 24
+  );
+};
+
 export const getOrFetchLoockupTable = async (
   connection: web3.Connection,
   lookupTableAddress: web3.PublicKey | web3.AddressLookupTableAccount
@@ -269,20 +273,6 @@ export const devideAndSignV0Txns = async (
     return tx;
   });
 
-  // if (closeTableInTheEnd) {
-  //   txns.push(
-  //     createV0Tx(
-  //       wallet.publicKey,
-  //       latestBlockhash.blockhash,
-  //       web3.AddressLookupTableProgram.closeLookupTable({
-  //         authority: wallet.publicKey,
-  //         lookupTable: lookupTable.key,
-  //         recipient: wallet.publicKey,
-  //       })
-  //     )
-  //   );
-  // }
-  // console.log(txns.map((tx) => tx.serialize().byteLength));
   return txns;
 };
 

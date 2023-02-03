@@ -3,6 +3,7 @@ import * as web3 from "@solana/web3.js";
 import { createCreateBlockInstruction, CreateBlockArgs } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
+import { getBlockPda } from "./pdas";
 
 export function createCreateBlockTransaction(
   assembler: web3.PublicKey,
@@ -10,15 +11,7 @@ export function createCreateBlockTransaction(
   payer: web3.PublicKey,
   args: CreateBlockArgs
 ): TxSignersAccounts & { block: web3.PublicKey } {
-  const [block] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("block"),
-      Buffer.from(`${args.blockName}`),
-      Uint8Array.from([args.blockOrder]),
-      assembler.toBuffer(),
-    ],
-    PROGRAM_ID
-  );
+  const [block] = getBlockPda(assembler, args.blockOrder);
 
   return {
     tx: new web3.Transaction().add(

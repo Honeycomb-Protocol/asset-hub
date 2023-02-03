@@ -1,6 +1,5 @@
 import * as anchor from "@project-serum/anchor";
 import * as web3 from "@solana/web3.js";
-import { METADATA_PROGRAM_ID, sendAndConfirmTransaction } from "../../utils";
 import { CreateAssetArgs, createCreateAssetInstruction } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assetmanager";
 import { TxSignersAccounts } from "../../types";
@@ -9,6 +8,11 @@ import {
   Metaplex,
   TransactionBuilder,
 } from "@metaplex-foundation/js";
+import {
+  getAssetPda,
+  getMetadataAccount_,
+  METADATA_PROGRAM_ID,
+} from "../assembler/pdas";
 
 export function createCreateAssetTransaction(
   payer: web3.PublicKey,
@@ -17,19 +21,8 @@ export function createCreateAssetTransaction(
 ): TxSignersAccounts & { mint: web3.PublicKey; asset: web3.PublicKey } {
   const mintKeypair = web3.Keypair.generate();
 
-  const [metadata] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      mintKeypair.publicKey.toBuffer(),
-    ],
-    METADATA_PROGRAM_ID
-  );
-
-  const [asset] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("asset"), mintKeypair.publicKey.toBuffer()],
-    programId
-  );
+  const [metadata] = getMetadataAccount_(mintKeypair.publicKey);
+  const [asset] = getAssetPda(mintKeypair.publicKey);
 
   return {
     tx: new web3.Transaction().add(

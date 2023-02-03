@@ -21,6 +21,8 @@ export type CreateAndMintNftArgs = {
     block: web3.PublicKey;
     blockDefinition: web3.PublicKey;
     tokenMint: web3.PublicKey;
+    order: number;
+    blockDefinitionIndex: number;
   }[];
 };
 

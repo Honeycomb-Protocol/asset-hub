@@ -24,12 +24,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.nFTAttributeBeet = void 0;
-const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
+const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const NFTAttributeValue_1 = require("./NFTAttributeValue");
 exports.nFTAttributeBeet = new beet.FixableBeetArgsStruct([
-    ['block', beetSolana.publicKey],
-    ['blockDefinition', beetSolana.publicKey],
+    ['blockDefinitionIndex', beet.u16],
     ['mint', beetSolana.publicKey],
     ['order', beet.u8],
     ['attributeName', beet.utf8String],

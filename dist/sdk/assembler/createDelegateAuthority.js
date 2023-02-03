@@ -27,13 +27,9 @@ exports.createDelegateAuthority = exports.createCreateDelegateAuthorityTransacti
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
+const pdas_1 = require("./pdas");
 function createCreateDelegateAuthorityTransaction(assembler, delegate, authority, payer, args, programId = assembler_1.PROGRAM_ID) {
-    const [delegateAuthority] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("delegate"),
-        assembler.toBuffer(),
-        delegate.toBuffer(),
-        Buffer.from(generated_1.DelegateAuthorityPermission[args.permission]),
-    ], programId);
+    const [delegateAuthority] = (0, pdas_1.getDelegateAuthorityPda)(assembler, delegate, args.permission);
     return {
         tx: new web3.Transaction().add((0, generated_1.createCreateDelegateAuthorityInstruction)({
             assembler,
