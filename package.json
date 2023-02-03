@@ -19,6 +19,7 @@
     "build-deploy": "yarn build && yarn deploy",
     "assembler": "ts-node ./scripts/index.ts assembler",
     "assetmanager": "ts-node ./scripts/index.ts assetmanager",
+    "staking": "ts-node ./scripts/index.ts staking",
     "postinstall": "node scripts/postinstall.js"
   },
   "dependencies": {

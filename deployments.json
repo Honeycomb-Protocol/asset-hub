@@ -15,5 +15,11 @@
     "devnet": {
       "program": "CzrvRiFA2q7Q1QbWi2CTozV65W6UaeCvUMpkMJbEjmcK"
     }
+  },
+  "staking": {
+    "devnet": {
+      "program": "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz",
+      "project": "9MEwGNR2iPBv8TX3wQFZ6zfSnibwNMUWMMaaGoD9tRDc"
+    }
   }
 }
