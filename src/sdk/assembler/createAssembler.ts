@@ -13,7 +13,7 @@ import {
   getAssemblerPda,
   getMetadataAccount_,
   METADATA_PROGRAM_ID,
-} from "./pdas";
+} from "../pdas";
 
 export function createCreateAssemblerTransaction(
   authority: web3.PublicKey,

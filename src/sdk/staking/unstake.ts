@@ -4,7 +4,7 @@ import { createUnstakeInstruction, Project } from "../../generated";
 import { PROGRAM_ID } from "../../generated/staking";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
-import { METADATA_PROGRAM_ID } from "../../utils";
+import { METADATA_PROGRAM_ID } from "../pdas";
 import { createClaimRewardsTransaction } from "./claimRewards";
 
 export function createUnstakeTransaction(

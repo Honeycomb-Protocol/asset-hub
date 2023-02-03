@@ -20,7 +20,7 @@ import {
   getNftPda,
   getUniqueConstraintPda,
   METADATA_PROGRAM_ID,
-} from "./pdas";
+} from "../pdas";
 
 export function createCreateNftTransaction(
   assembler: web3.PublicKey,

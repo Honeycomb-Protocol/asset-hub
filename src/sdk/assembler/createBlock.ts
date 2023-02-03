@@ -3,7 +3,7 @@ import * as web3 from "@solana/web3.js";
 import { createCreateBlockInstruction, CreateBlockArgs } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
-import { getBlockPda } from "./pdas";
+import { getBlockPda } from "../pdas";
 
 export function createCreateBlockTransaction(
   assembler: web3.PublicKey,

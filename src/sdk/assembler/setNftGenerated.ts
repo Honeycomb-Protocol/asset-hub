@@ -8,7 +8,7 @@ import {
   SetNFTGeneratedArgs,
 } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
-import { getMetadataAccount_, METADATA_PROGRAM_ID } from "./pdas";
+import { getMetadataAccount_, METADATA_PROGRAM_ID } from "../pdas";
 
 export function createSetNftGeneratedTransaction(
   assembler: web3.PublicKey,
