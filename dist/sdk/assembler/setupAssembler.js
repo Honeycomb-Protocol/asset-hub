@@ -26,14 +26,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupAssembler = void 0;
+exports.uploadFiles = exports.setupAssembler = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const generated_1 = require("../../generated");
 const _1 = require(".");
 const assetmanager_1 = require("../assetmanager");
 const utils_1 = require("../../utils");
-async function setupAssembler(mx, config, updateConfig, readFile) {
+async function setupAssembler(mx, config, updateConfig) {
     const transactionGroups = [
         {
             txns: [],
@@ -128,24 +128,8 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
                         block.name);
                 }
             }
-            else if (blockDefinition.assetConfig) {
+            else if (blockDefinition.assetConfig.uri) {
                 let uri = blockDefinition.assetConfig.uri;
-                if (!uri && blockDefinition.assetConfig.image) {
-                    const file = await readFile(blockDefinition.assetConfig.image);
-                    const m = await mx.nfts().uploadMetadata({
-                        name: "HoneyComb Asset",
-                        image: file,
-                        symbol: blockDefinition.assetConfig.symbol,
-                        ...(blockDefinition.assetConfig.json || {}),
-                    });
-                    if (!blockDefinition.caches)
-                        blockDefinition.caches = {
-                            image: blockDefinition.assetConfig.image,
-                        };
-                    blockDefinition.caches.image = blockDefinition.assetConfig.image;
-                    uri = blockDefinition.assetConfig.uri = m.uri;
-                    updateConfig(config);
-                }
                 const createAssetCtx = (0, assetmanager_1.createCreateAssetTransaction)(wallet.publicKey, {
                     name: blockDefinition.value,
                     candyGuard: blockDefinition.assetConfig.candyGuard
@@ -218,4 +202,41 @@ async function setupAssembler(mx, config, updateConfig, readFile) {
     return config;
 }
 exports.setupAssembler = setupAssembler;
+async function uploadFiles(mx, config, updateConfig, readFile) {
+    const uploadItems = [];
+    await Promise.all(config.blocks.map(async (block) => {
+        await Promise.all(block.definitions.map(async (blockDefinition) => {
+            if (blockDefinition.assetConfig) {
+                let uri = blockDefinition.assetConfig.uri;
+                if (!uri && blockDefinition.assetConfig.image) {
+                    const file = await readFile(blockDefinition.assetConfig.image);
+                    uploadItems.push({
+                        data: {
+                            name: "HoneyComb Asset",
+                            image: file,
+                            symbol: blockDefinition.assetConfig.symbol,
+                            ...(blockDefinition.assetConfig.json || {}),
+                        },
+                        callback(res) {
+                            if (!blockDefinition.caches)
+                                blockDefinition.caches = {
+                                    image: res.data.image || blockDefinition.assetConfig.image,
+                                };
+                            blockDefinition.assetConfig.image =
+                                blockDefinition.caches.image =
+                                    res.data.image || blockDefinition.assetConfig.image;
+                            uri = blockDefinition.assetConfig.uri = res.uri;
+                            updateConfig(config);
+                        },
+                    });
+                }
+            }
+            return blockDefinition;
+        }));
+        return uploadItems;
+    }));
+    await (0, utils_1.uploadBulkMetadataToArwave)(mx, uploadItems);
+    return config;
+}
+exports.uploadFiles = uploadFiles;
 //# sourceMappingURL=setupAssembler.js.map

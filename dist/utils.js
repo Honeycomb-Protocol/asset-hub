@@ -23,8 +23,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.isKeypairSigner = exports.isSigner = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.numberToBytes = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = void 0;
+exports.uploadBulkMetadataToArwave = exports.uploadMetadataToArwave = exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.isKeypairSigner = exports.isSigner = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.numberToBytes = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
+const js_1 = require("@metaplex-foundation/js");
 const sendAndConfirmTransaction = async (tx, connection, wallet, signers = [], sendOpts = {}) => {
     const block = await connection.getLatestBlockhash();
     tx.recentBlockhash = block.blockhash;
@@ -288,4 +289,46 @@ const bulkLutTransactions = async (mx, txns) => {
     };
 };
 exports.bulkLutTransactions = bulkLutTransactions;
+const uploadMetadataToArwave = async (mx, data) => {
+    const isMetaplexImage = (0, js_1.isMetaplexFile)(data.image);
+    const files = [];
+    if (isMetaplexImage)
+        files.push(data.image);
+    files.push((0, js_1.toMetaplexFileFromJson)({
+        ...data,
+        image: isMetaplexImage
+            ? "https://arweave.net/YATQ46cZ_47VGkoGyJsMYMqyJehEkEdkRPxv9ENtT08"
+            : data.image,
+    }));
+    const bundlrStorageDriver = mx.storage().driver();
+    const fundRequired = await bundlrStorageDriver.getUploadPriceForFiles(files);
+    return {
+        proceed: async () => {
+            if (isMetaplexImage)
+                data.image = await mx.storage().upload(data.image);
+            const metadataUri = await mx.storage().uploadJson({
+                ...data,
+            });
+            return {
+                uri: metadataUri,
+                data: data,
+            };
+        },
+        fundRequired: fundRequired.basisPoints,
+    };
+};
+exports.uploadMetadataToArwave = uploadMetadataToArwave;
+const uploadBulkMetadataToArwave = async (mx, items) => {
+    const bundlrStorageDriver = mx.storage().driver();
+    const balance = (await bundlrStorageDriver.getBalance()).basisPoints;
+    console.log("Balance", balance.toNumber() / 10 ** 9);
+    const uploadHandlers = await Promise.all(items.map(({ data }) => (0, exports.uploadMetadataToArwave)(mx, data)));
+    const totalFundsRequired = uploadHandlers.reduce((bn, item) => bn.add(item.fundRequired), (0, js_1.toBigNumber)(0));
+    const shortFall = (0, js_1.lamports)(totalFundsRequired.sub(balance));
+    console.log("Short Fall", shortFall.basisPoints.toNumber() / 10 ** 9);
+    if (shortFall.basisPoints.gt((0, js_1.toBigNumber)(0)))
+        await bundlrStorageDriver.fund(shortFall);
+    await Promise.all(uploadHandlers.map(({ proceed }, i) => proceed().then(items[i].callback).catch(console.error)));
+};
+exports.uploadBulkMetadataToArwave = uploadBulkMetadataToArwave;
 //# sourceMappingURL=utils.js.map

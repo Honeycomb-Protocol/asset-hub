@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import { IdentityClient, KeypairSigner, Metaplex, Signer } from "@metaplex-foundation/js";
+import { JsonMetadata, IdentityClient, KeypairSigner, Metaplex, MetaplexFile, Signer, BigNumber } from "@metaplex-foundation/js";
 import { TxSignersAccounts, Wallet } from "./types";
 export declare const sendAndConfirmTransaction: (tx: web3.Transaction, connection: web3.Connection, wallet: anchor.Wallet, signers?: Signer[], sendOpts?: web3.SendOptions) => Promise<string>;
 export declare const createV0Tx: (payerKey: web3.PublicKey, latestBlockhash: string, ...txInstructions: web3.TransactionInstruction[]) => web3.VersionedTransaction;
@@ -29,3 +29,22 @@ export declare const bulkLutTransactions: (mx: Metaplex, txns: TxSignersAccounts
     txns: web3.VersionedTransaction[];
     lookupTableAddress: web3.PublicKey;
 }>;
+export declare const uploadMetadataToArwave: (mx: Metaplex, data: UploadMetadataInput) => Promise<{
+    proceed: () => Promise<{
+        uri: string;
+        data: JsonMetadata<string>;
+    }>;
+    fundRequired: BigNumber;
+}>;
+export type UploadMetadataInput = {
+    [k: string]: any;
+    image: string | MetaplexFile;
+};
+export type UploadMetadataItemWithCallBack = {
+    data: UploadMetadataInput;
+    callback: (res: {
+        uri: string;
+        data: JsonMetadata;
+    }) => any;
+};
+export declare const uploadBulkMetadataToArwave: (mx: Metaplex, items: UploadMetadataItemWithCallBack[]) => Promise<void>;

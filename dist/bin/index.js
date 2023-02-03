@@ -16,6 +16,23 @@ const anchor_1 = require("@project-serum/anchor");
     .command("validate", "validate config", () => { }, (argv) => {
     console.info(argv);
 })
+    .command("upload", "Deploy assembler and asset managers", () => { }, (argv) => {
+    const connection = new anchor_1.web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "confirmed");
+    const metaplex = new js_1.Metaplex(connection);
+    metaplex.use((0, js_1.keypairIdentity)(anchor_1.web3.Keypair.fromSecretKey(Uint8Array.from((0, node_utils_1.readConfigFile)("key.json")))));
+    metaplex.use((0, js_1.bundlrStorage)({
+        address: "https://devnet.bundlr.network",
+        providerUrl: connection.rpcEndpoint,
+        timeout: 60000,
+    }));
+    const config = (0, node_utils_1.readConfigFile)("assembler.json");
+    (0, sdk_1.uploadFiles)(metaplex, config, (cfg) => {
+        (0, node_utils_1.saveConfigFile)(cfg, "assembler.json");
+    }, async (file) => {
+        const buffer = await promises_1.default.readFile(path_1.default.resolve(process.cwd(), file));
+        return (0, js_1.toMetaplexFile)(buffer, file.slice(file.lastIndexOf("/") + 1));
+    });
+})
     .command("lfg", "Deploy assembler and asset managers", () => { }, (argv) => {
     const connection = new anchor_1.web3.Connection("https://lingering-newest-sheet.solana-devnet.quiknode.pro/fb6e6465df3955a06fd5ddec2e5b003896f56adb/", "confirmed");
     const metaplex = new js_1.Metaplex(connection);
@@ -23,9 +40,6 @@ const anchor_1 = require("@project-serum/anchor");
     const config = (0, node_utils_1.readConfigFile)("assembler.json");
     (0, sdk_1.setupAssembler)(metaplex, config, (cfg) => {
         (0, node_utils_1.saveConfigFile)(cfg, "assembler.json");
-    }, async (file) => {
-        const buffer = await promises_1.default.readFile(path_1.default.resolve(process.cwd(), file));
-        return (0, js_1.toMetaplexFile)(buffer, file.slice(file.lastIndexOf("/") + 1));
     });
 })
     .demandCommand(1)
