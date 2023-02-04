@@ -68,7 +68,7 @@ pub struct CreateBlockDefinition<'info> {
     pub assembler: Account<'info, Assembler>,
 
     /// Block account
-    #[account( has_one = assembler )]
+    #[account(mut, has_one = assembler )]
     pub block: Account<'info, Block>,
 
     /// Block Definition account

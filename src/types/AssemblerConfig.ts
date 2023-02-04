@@ -30,6 +30,7 @@ export type BlockDefinitionConfig = {
   };
   assetConfig?: AssetConfig;
   address?: string;
+  definationIndex?: number;
 };
 
 export type AssetConfig = {

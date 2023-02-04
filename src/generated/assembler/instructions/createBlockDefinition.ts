@@ -40,7 +40,7 @@ export const createBlockDefinitionStruct = new beet.FixableBeetArgsStruct<
  * Accounts required by the _createBlockDefinition_ instruction
  *
  * @property [] assembler
- * @property [] block
+ * @property [_writable_] block
  * @property [_writable_] blockDefinition
  * @property [_writable_] blockDefinitionMint
  * @property [**signer**] authority
@@ -91,7 +91,7 @@ export function createCreateBlockDefinitionInstruction(
     },
     {
       pubkey: accounts.block,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {

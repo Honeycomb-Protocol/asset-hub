@@ -355,7 +355,7 @@ export type Assembler = {
                 },
                 {
                     "name": "block";
-                    "isMut": false;
+                    "isMut": true;
                     "isSigner": false;
                     "docs": [
                         "Block account"

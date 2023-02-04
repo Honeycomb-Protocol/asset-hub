@@ -48,7 +48,7 @@ function createCreateBlockDefinitionInstruction(accounts, args, programId = new 
         },
         {
             pubkey: accounts.block,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {

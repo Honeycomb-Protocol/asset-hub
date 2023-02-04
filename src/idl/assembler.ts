@@ -355,7 +355,7 @@ export type Assembler = {
         },
         {
           "name": "block",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "Block account"
@@ -2285,7 +2285,7 @@ export const IDL: Assembler = {
         },
         {
           "name": "block",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "Block account"
