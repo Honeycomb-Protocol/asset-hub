@@ -28,30 +28,35 @@ const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const staking_1 = require("../../generated/staking");
+const pdas_1 = require("../pdas");
+const claimRewards_1 = require("./claimRewards");
 const utils_1 = require("../../utils");
 function createUnstakeTransaction(project, nftMint, wallet, programId = staking_1.PROGRAM_ID) {
-    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer()], programId);
+    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()], programId);
     const nftAccount = splToken.getAssociatedTokenAddressSync(nftMint, wallet);
     const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        pdas_1.METADATA_PROGRAM_ID.toBuffer(),
         nftMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
+    ], pdas_1.METADATA_PROGRAM_ID);
     const [nftEdition] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        pdas_1.METADATA_PROGRAM_ID.toBuffer(),
         nftMint.toBuffer(),
         Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
+    ], pdas_1.METADATA_PROGRAM_ID);
+    const [staker] = web3.PublicKey.findProgramAddressSync([Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()], programId);
     const instructions = [
         (0, generated_1.createUnstakeInstruction)({
+            project,
             nft,
             nftMint,
             nftAccount,
             nftMetadata,
             nftEdition,
+            staker,
             wallet,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
             clock: web3.SYSVAR_CLOCK_PUBKEY,
             sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         }, programId),
@@ -60,21 +65,26 @@ function createUnstakeTransaction(project, nftMint, wallet, programId = staking_
         tx: new web3.Transaction().add(...instructions),
         signers: [],
         accounts: instructions.flatMap((i) => i.keys.map((k) => k.pubkey)),
-        project,
     };
 }
 exports.createUnstakeTransaction = createUnstakeTransaction;
 async function unstake(mx, project, nftMint) {
+    const projectAccount = await generated_1.Project.fromAccountAddress(mx.connection, project);
+    const multipliers = await (0, utils_1.getOrFetchMultipliers)(mx.connection, project);
     const wallet = mx.identity();
-    const ctx = createUnstakeTransaction(project, nftMint, wallet.publicKey);
+    const claimCtx = (0, claimRewards_1.createClaimRewardsTransaction)(project, nftMint, projectAccount.rewardMint, wallet.publicKey, multipliers === null || multipliers === void 0 ? void 0 : multipliers.address);
+    const unstakeCtx = createUnstakeTransaction(project, nftMint, wallet.publicKey);
     const blockhash = await mx.connection.getLatestBlockhash();
-    ctx.tx.recentBlockhash = blockhash.blockhash;
+    const tx = new web3.Transaction().add(claimCtx.tx, unstakeCtx.tx);
+    tx.recentBlockhash = blockhash.blockhash;
     const response = await mx
         .rpc()
-        .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
+        .sendAndConfirmTransaction(tx, { skipPreflight: true }, [
+        ...claimCtx.signers,
+        ...unstakeCtx.signers,
+    ]);
     return {
         response,
-        project: ctx.project,
     };
 }
 exports.unstake = unstake;

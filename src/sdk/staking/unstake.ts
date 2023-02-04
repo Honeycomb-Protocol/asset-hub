@@ -6,6 +6,7 @@ import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
 import { METADATA_PROGRAM_ID } from "../pdas";
 import { createClaimRewardsTransaction } from "./claimRewards";
+import { getOrFetchMultipliers } from "../../utils";
 
 export function createUnstakeTransaction(
   project: web3.PublicKey,
@@ -14,7 +15,7 @@ export function createUnstakeTransaction(
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
   const [nft] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("nft"), nftMint.toBuffer()],
+    [Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()],
     programId
   );
 
@@ -39,14 +40,21 @@ export function createUnstakeTransaction(
     METADATA_PROGRAM_ID
   );
 
+  const [staker] = web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()],
+    programId
+  );
+
   const instructions: web3.TransactionInstruction[] = [
     createUnstakeInstruction(
       {
+        project,
         nft,
         nftMint,
         nftAccount,
         nftMetadata,
         nftEdition,
+        staker,
         wallet,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
         clock: web3.SYSVAR_CLOCK_PUBKEY,
@@ -73,12 +81,15 @@ export async function unstake(
     project
   );
 
+  const multipliers = await getOrFetchMultipliers(mx.connection, project);
+
   const wallet = mx.identity();
   const claimCtx = createClaimRewardsTransaction(
     project,
     nftMint,
     projectAccount.rewardMint,
-    wallet.publicKey
+    wallet.publicKey,
+    multipliers?.address
   );
   const unstakeCtx = createUnstakeTransaction(
     project,

@@ -1,13 +1,13 @@
 import * as beet from '@metaplex-foundation/beet';
 import * as web3 from '@solana/web3.js';
 import { UpdateProjectArgs } from '../types/UpdateProjectArgs';
-export type UpdatePojectInstructionArgs = {
+export type UpdateProjectInstructionArgs = {
     args: UpdateProjectArgs;
 };
-export declare const updatePojectStruct: beet.FixableBeetArgsStruct<UpdatePojectInstructionArgs & {
+export declare const updateProjectStruct: beet.FixableBeetArgsStruct<UpdateProjectInstructionArgs & {
     instructionDiscriminator: number[];
 }>;
-export type UpdatePojectInstructionAccounts = {
+export type UpdateProjectInstructionAccounts = {
     project: web3.PublicKey;
     newAuthority: web3.PublicKey;
     collection: web3.PublicKey;
@@ -17,5 +17,5 @@ export type UpdatePojectInstructionAccounts = {
     rent?: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
-export declare const updatePojectInstructionDiscriminator: number[];
-export declare function createUpdatePojectInstruction(accounts: UpdatePojectInstructionAccounts, args: UpdatePojectInstructionArgs, programId?: web3.PublicKey): web3.TransactionInstruction;
+export declare const updateProjectInstructionDiscriminator: number[];
+export declare function createUpdateProjectInstruction(accounts: UpdateProjectInstructionAccounts, args: UpdateProjectInstructionArgs, programId?: web3.PublicKey): web3.TransactionInstruction;

@@ -38,6 +38,11 @@ function createUnstakeInstruction(accounts, programId = new web3.PublicKey('8pyn
     });
     const keys = [
         {
+            pubkey: accounts.project,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.nft,
             isWritable: true,
             isSigner: false,
@@ -60,6 +65,11 @@ function createUnstakeInstruction(accounts, programId = new web3.PublicKey('8pyn
         {
             pubkey: accounts.nftEdition,
             isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.staker,
+            isWritable: true,
             isSigner: false,
         },
         {

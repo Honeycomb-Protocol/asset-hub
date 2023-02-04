@@ -1,5 +1,5 @@
 use {
-    crate::{state::*, traits::Default},
+    crate::{state::*, traits::Default, utils},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, Token, TokenAccount},
 };
@@ -58,8 +58,14 @@ pub struct CreateProject<'info> {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct CreateProjectArgs {
     pub name: String,
-    pub rewards_per_second: u64,
-    pub start_time: i64,
+    pub rewards_per_duration: u64,
+    pub rewards_duration: Option<u64>,
+    pub max_rewards_duration: Option<u64>,
+    pub min_stake_duration: Option<u64>,
+    pub cooldown_duration: Option<u64>,
+    pub reset_stake_duration: Option<bool>,
+    pub start_time: Option<i64>,
+    pub end_time: Option<i64>,
 }
 
 /// Create a new project
@@ -74,8 +80,14 @@ pub fn create_project(ctx: Context<CreateProject>, args: CreateProjectArgs) -> R
     project.reward_mint = ctx.accounts.reward_mint.key();
     project.vault = ctx.accounts.vault.key();
     project.name = args.name;
-    project.rewards_per_second = args.rewards_per_second;
+    project.rewards_per_duration = args.rewards_per_duration;
+    project.rewards_duration = args.rewards_duration.unwrap_or(1);
+    project.max_rewards_duration = args.max_rewards_duration;
+    project.min_stake_duration = args.min_stake_duration;
+    project.cooldown_duration = args.cooldown_duration;
+    project.reset_stake_duration = args.reset_stake_duration.unwrap_or(true);
     project.start_time = args.start_time;
+    project.end_time = args.end_time;
 
     Ok(())
 }
@@ -112,8 +124,14 @@ pub struct UpdateProject<'info> {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct UpdateProjectArgs {
     pub name: Option<String>,
-    pub rewards_per_second: Option<u64>,
+    pub rewards_per_duration: Option<u64>,
+    pub rewards_duration: Option<u64>,
+    pub max_rewards_duration: Option<u64>,
+    pub min_stake_duration: Option<u64>,
+    pub cooldown_duration: Option<u64>,
+    pub reset_stake_duration: Option<bool>,
     pub start_time: Option<i64>,
+    pub end_time: Option<i64>,
 }
 
 /// Update a project
@@ -121,17 +139,46 @@ pub fn update_project(ctx: Context<UpdateProject>, args: UpdateProjectArgs) -> R
     let project = &mut ctx.accounts.project;
 
     project.name = args.name.unwrap_or(project.name.clone());
-    project.rewards_per_second = args
-        .rewards_per_second
-        .unwrap_or(project.rewards_per_second);
-    project.start_time = args.start_time.unwrap_or(project.start_time);
+    project.rewards_per_duration = args
+        .rewards_per_duration
+        .unwrap_or(project.rewards_per_duration);
+    project.rewards_duration = args.rewards_duration.unwrap_or(project.rewards_duration);
+
+    project.max_rewards_duration = if args.max_rewards_duration.is_some() {
+        args.max_rewards_duration
+    } else {
+        project.max_rewards_duration
+    };
+    project.min_stake_duration = if args.min_stake_duration.is_some() {
+        args.min_stake_duration
+    } else {
+        project.min_stake_duration
+    };
+    project.cooldown_duration = if args.cooldown_duration.is_some() {
+        args.cooldown_duration
+    } else {
+        project.cooldown_duration
+    };
+    project.reset_stake_duration = args
+        .reset_stake_duration
+        .unwrap_or(project.reset_stake_duration);
+    project.start_time = if args.start_time.is_some() {
+        args.start_time
+    } else {
+        project.start_time
+    };
+    project.end_time = if args.end_time.is_some() {
+        args.end_time
+    } else {
+        project.end_time
+    };
 
     if let Some(new_authority) = &ctx.accounts.new_authority {
         project.authority = new_authority.key();
     }
 
     if let Some(collection) = &ctx.accounts.collection {
-        Project::reallocate(
+        utils::reallocate(
             32,
             project.to_account_info(),
             ctx.accounts.authority.to_account_info(),
@@ -142,7 +189,7 @@ pub fn update_project(ctx: Context<UpdateProject>, args: UpdateProjectArgs) -> R
     }
 
     if let Some(creator) = &ctx.accounts.creator {
-        Project::reallocate(
+        utils::reallocate(
             32,
             project.to_account_info(),
             ctx.accounts.authority.to_account_info(),

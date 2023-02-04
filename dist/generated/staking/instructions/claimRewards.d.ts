@@ -5,10 +5,12 @@ export declare const claimRewardsStruct: beet.BeetArgsStruct<{
 }>;
 export type ClaimRewardsInstructionAccounts = {
     project: web3.PublicKey;
+    multipliers: web3.PublicKey;
     nft: web3.PublicKey;
     rewardMint: web3.PublicKey;
     vault: web3.PublicKey;
     tokenAccount: web3.PublicKey;
+    staker: web3.PublicKey;
     wallet: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
     clock: web3.PublicKey;

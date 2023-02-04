@@ -29,7 +29,7 @@ const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 exports.projectDiscriminator = [205, 168, 189, 202, 181, 247, 142, 19];
 class Project {
-    constructor(bump, vaultBump, key, authority, rewardMint, vault, name, rewardsPerSecond, totalStaked, startTime, collections, creators) {
+    constructor(bump, vaultBump, key, authority, rewardMint, vault, name, rewardsPerDuration, rewardsDuration, maxRewardsDuration, minStakeDuration, cooldownDuration, resetStakeDuration, allowedMints, totalStaked, startTime, endTime, collections, creators) {
         this.bump = bump;
         this.vaultBump = vaultBump;
         this.key = key;
@@ -37,14 +37,21 @@ class Project {
         this.rewardMint = rewardMint;
         this.vault = vault;
         this.name = name;
-        this.rewardsPerSecond = rewardsPerSecond;
+        this.rewardsPerDuration = rewardsPerDuration;
+        this.rewardsDuration = rewardsDuration;
+        this.maxRewardsDuration = maxRewardsDuration;
+        this.minStakeDuration = minStakeDuration;
+        this.cooldownDuration = cooldownDuration;
+        this.resetStakeDuration = resetStakeDuration;
+        this.allowedMints = allowedMints;
         this.totalStaked = totalStaked;
         this.startTime = startTime;
+        this.endTime = endTime;
         this.collections = collections;
         this.creators = creators;
     }
     static fromArgs(args) {
-        return new Project(args.bump, args.vaultBump, args.key, args.authority, args.rewardMint, args.vault, args.name, args.rewardsPerSecond, args.totalStaked, args.startTime, args.collections, args.creators);
+        return new Project(args.bump, args.vaultBump, args.key, args.authority, args.rewardMint, args.vault, args.name, args.rewardsPerDuration, args.rewardsDuration, args.maxRewardsDuration, args.minStakeDuration, args.cooldownDuration, args.resetStakeDuration, args.allowedMints, args.totalStaked, args.startTime, args.endTime, args.collections, args.creators);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Project.deserialize(accountInfo.data, offset);
@@ -87,8 +94,8 @@ class Project {
             rewardMint: this.rewardMint.toBase58(),
             vault: this.vault.toBase58(),
             name: this.name,
-            rewardsPerSecond: (() => {
-                const x = this.rewardsPerSecond;
+            rewardsPerDuration: (() => {
+                const x = this.rewardsPerDuration;
                 if (typeof x.toNumber === 'function') {
                     try {
                         return x.toNumber();
@@ -99,6 +106,23 @@ class Project {
                 }
                 return x;
             })(),
+            rewardsDuration: (() => {
+                const x = this.rewardsDuration;
+                if (typeof x.toNumber === 'function') {
+                    try {
+                        return x.toNumber();
+                    }
+                    catch (_) {
+                        return x;
+                    }
+                }
+                return x;
+            })(),
+            maxRewardsDuration: this.maxRewardsDuration,
+            minStakeDuration: this.minStakeDuration,
+            cooldownDuration: this.cooldownDuration,
+            resetStakeDuration: this.resetStakeDuration,
+            allowedMints: this.allowedMints,
             totalStaked: (() => {
                 const x = this.totalStaked;
                 if (typeof x.toNumber === 'function') {
@@ -111,18 +135,8 @@ class Project {
                 }
                 return x;
             })(),
-            startTime: (() => {
-                const x = this.startTime;
-                if (typeof x.toNumber === 'function') {
-                    try {
-                        return x.toNumber();
-                    }
-                    catch (_) {
-                        return x;
-                    }
-                }
-                return x;
-            })(),
+            startTime: this.startTime,
+            endTime: this.endTime,
             collections: this.collections,
             creators: this.creators,
         };
@@ -138,9 +152,16 @@ exports.projectBeet = new beet.FixableBeetStruct([
     ['rewardMint', beetSolana.publicKey],
     ['vault', beetSolana.publicKey],
     ['name', beet.utf8String],
-    ['rewardsPerSecond', beet.u64],
+    ['rewardsPerDuration', beet.u64],
+    ['rewardsDuration', beet.u64],
+    ['maxRewardsDuration', beet.coption(beet.u64)],
+    ['minStakeDuration', beet.coption(beet.u64)],
+    ['cooldownDuration', beet.coption(beet.u64)],
+    ['resetStakeDuration', beet.bool],
+    ['allowedMints', beet.bool],
     ['totalStaked', beet.u64],
-    ['startTime', beet.i64],
+    ['startTime', beet.coption(beet.i64)],
+    ['endTime', beet.coption(beet.i64)],
     ['collections', beet.array(beetSolana.publicKey)],
     ['creators', beet.array(beetSolana.publicKey)],
 ], Project.fromArgs, 'Project');

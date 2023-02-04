@@ -27,7 +27,10 @@ exports.createStakingProject = exports.createCreateStakingProjectTransaction = v
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const staking_1 = require("../../generated/staking");
-function createCreateStakingProjectTransaction(rewardMint, authority, payer, args, collections = [], creators = [], programId = staking_1.PROGRAM_ID) {
+const updateStakingProject_1 = require("./updateStakingProject");
+const initMultipliers_1 = require("./initMultipliers");
+const addMultiplier_1 = require("./addMultiplier");
+function createCreateStakingProjectTransaction(rewardMint, authority, payer, args, collections = [], creators = [], multipliers = [], multipliersDecimals = 9, programId = staking_1.PROGRAM_ID) {
     const key = web3.Keypair.generate().publicKey;
     const [project] = web3.PublicKey.findProgramAddressSync([Buffer.from("project"), key.toBuffer()], programId);
     const [vault] = web3.PublicKey.findProgramAddressSync([Buffer.from("vault"), project.toBuffer(), rewardMint.toBuffer()], programId);
@@ -40,32 +43,36 @@ function createCreateStakingProjectTransaction(rewardMint, authority, payer, arg
             authority,
             payer,
         }, { args }, programId),
-        ...collections.map((collection) => (0, generated_1.createUpdatePojectInstruction)({
-            project,
-            collection,
-            creator: programId,
-            authority,
-            newAuthority: programId,
-        }, {
-            args: {
-                name: null,
-                rewardsPerSecond: null,
-                startTime: null,
-            },
-        })),
-        ...creators.map((creator) => (0, generated_1.createUpdatePojectInstruction)({
-            project,
-            collection: programId,
-            creator,
-            authority,
-            newAuthority: programId,
-        }, {
-            args: {
-                name: null,
-                rewardsPerSecond: null,
-                startTime: null,
-            },
-        })),
+        ...collections.map((collection) => (0, updateStakingProject_1.createUpdateStakingProjectTransaction)(project, authority, {
+            name: null,
+            rewardsPerDuration: null,
+            rewardsDuration: null,
+            maxRewardsDuration: null,
+            minStakeDuration: null,
+            cooldownDuration: null,
+            resetStakeDuration: null,
+            startTime: null,
+            endTime: null,
+        }, collection).tx.instructions[0]),
+        ...creators.map((creator) => (0, updateStakingProject_1.createUpdateStakingProjectTransaction)(project, authority, {
+            name: null,
+            rewardsPerDuration: null,
+            rewardsDuration: null,
+            maxRewardsDuration: null,
+            minStakeDuration: null,
+            cooldownDuration: null,
+            resetStakeDuration: null,
+            startTime: null,
+            endTime: null,
+        }, undefined, creator).tx.instructions[0]),
+        ...(multipliers.length
+            ? [
+                (0, initMultipliers_1.createInitMultiplierTransaction)(project, authority, {
+                    decimals: multipliersDecimals,
+                }).tx.instructions[0],
+                ...multipliers.map((multiplier) => (0, addMultiplier_1.createAddMultiplierTransaction)(project, authority, payer, multiplier).tx.instructions[0]),
+            ]
+            : []),
     ];
     return {
         tx: new web3.Transaction().add(...instructions),
@@ -75,9 +82,9 @@ function createCreateStakingProjectTransaction(rewardMint, authority, payer, arg
     };
 }
 exports.createCreateStakingProjectTransaction = createCreateStakingProjectTransaction;
-async function createStakingProject(mx, rewardMint, args, collections = [], creators = []) {
+async function createStakingProject(mx, rewardMint, args, collections = [], creators = [], multipliers = [], multipliersDecimals = 9) {
     const wallet = mx.identity();
-    const ctx = createCreateStakingProjectTransaction(rewardMint, wallet.publicKey, wallet.publicKey, args, collections, creators);
+    const ctx = createCreateStakingProjectTransaction(rewardMint, wallet.publicKey, wallet.publicKey, args, collections, creators, multipliers, multipliersDecimals);
     const blockhash = await mx.connection.getLatestBlockhash();
     ctx.tx.recentBlockhash = blockhash.blockhash;
     const response = await mx

@@ -5,6 +5,9 @@ import { PROGRAM_ID } from "../../generated/staking";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
 import { METADATA_PROGRAM_ID } from "../pdas";
+import { getOrFetchNft, getOrFetchStaker } from "../../utils";
+import { createInitStakerTransaction } from "./initStaker";
+import { createInitNFTTransaction } from "./initNFT";
 
 export function createStakeTransaction(
   project: web3.PublicKey,
@@ -13,7 +16,7 @@ export function createStakeTransaction(
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
   const [nft] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("nft"), nftMint.toBuffer()],
+    [Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()],
     programId
   );
 
@@ -38,6 +41,11 @@ export function createStakeTransaction(
     METADATA_PROGRAM_ID
   );
 
+  const [staker] = web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()],
+    programId
+  );
+
   const instructions: web3.TransactionInstruction[] = [
     createStakeInstruction(
       {
@@ -47,6 +55,7 @@ export function createStakeTransaction(
         nftAccount,
         nftMetadata,
         nftEdition,
+        staker,
         wallet,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
         clock: web3.SYSVAR_CLOCK_PUBKEY,
@@ -69,15 +78,40 @@ export async function stake(
   nftMint: web3.PublicKey
 ) {
   const wallet = mx.identity();
-  const ctx = createStakeTransaction(project, nftMint, wallet.publicKey);
+
+  const staker = await getOrFetchStaker(
+    mx.connection,
+    wallet.publicKey,
+    project
+  );
+  const initStakerCtx =
+    !staker && createInitStakerTransaction(project, wallet.publicKey);
+
+  const nft = await getOrFetchNft(mx.connection, nftMint, project);
+  const initNftCtx =
+    !nft && createInitNFTTransaction(project, nftMint, wallet.publicKey);
+
+  const stakeCtx = createStakeTransaction(project, nftMint, wallet.publicKey);
+
+  const tx = new web3.Transaction();
+
+  initNftCtx && tx.add(initNftCtx.tx);
+
+  initStakerCtx && tx.add(initStakerCtx.tx);
+
+  tx.add(stakeCtx.tx);
 
   const blockhash = await mx.connection.getLatestBlockhash();
 
-  ctx.tx.recentBlockhash = blockhash.blockhash;
+  tx.recentBlockhash = blockhash.blockhash;
 
   const response = await mx
     .rpc()
-    .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
+    .sendAndConfirmTransaction(tx, { skipPreflight: true }, [
+      ...(initNftCtx?.signers || []),
+      ...(initStakerCtx?.signers || []),
+      ...stakeCtx.signers,
+    ]);
 
   return {
     response,

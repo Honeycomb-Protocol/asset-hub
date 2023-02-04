@@ -19,7 +19,12 @@ export type NFTArgs = {
   project: web3.PublicKey
   staker: web3.PublicKey
   mint: web3.PublicKey
+  creator: web3.PublicKey
+  collection: web3.PublicKey
   lastClaim: beet.bignum
+  stakedAt: beet.bignum
+  lastStakedAt: beet.bignum
+  lastUnstakedAt: beet.bignum
 }
 
 export const nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217]
@@ -36,7 +41,12 @@ export class NFT implements NFTArgs {
     readonly project: web3.PublicKey,
     readonly staker: web3.PublicKey,
     readonly mint: web3.PublicKey,
-    readonly lastClaim: beet.bignum
+    readonly creator: web3.PublicKey,
+    readonly collection: web3.PublicKey,
+    readonly lastClaim: beet.bignum,
+    readonly stakedAt: beet.bignum,
+    readonly lastStakedAt: beet.bignum,
+    readonly lastUnstakedAt: beet.bignum
   ) {}
 
   /**
@@ -48,7 +58,12 @@ export class NFT implements NFTArgs {
       args.project,
       args.staker,
       args.mint,
-      args.lastClaim
+      args.creator,
+      args.collection,
+      args.lastClaim,
+      args.stakedAt,
+      args.lastStakedAt,
+      args.lastUnstakedAt
     )
   }
 
@@ -159,8 +174,43 @@ export class NFT implements NFTArgs {
       project: this.project.toBase58(),
       staker: this.staker.toBase58(),
       mint: this.mint.toBase58(),
+      creator: this.creator.toBase58(),
+      collection: this.collection.toBase58(),
       lastClaim: (() => {
         const x = <{ toNumber: () => number }>this.lastClaim
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
+      stakedAt: (() => {
+        const x = <{ toNumber: () => number }>this.stakedAt
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
+      lastStakedAt: (() => {
+        const x = <{ toNumber: () => number }>this.lastStakedAt
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
+      lastUnstakedAt: (() => {
+        const x = <{ toNumber: () => number }>this.lastUnstakedAt
         if (typeof x.toNumber === 'function') {
           try {
             return x.toNumber()
@@ -190,7 +240,12 @@ export const nFTBeet = new beet.BeetStruct<
     ['project', beetSolana.publicKey],
     ['staker', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
+    ['creator', beetSolana.publicKey],
+    ['collection', beetSolana.publicKey],
     ['lastClaim', beet.i64],
+    ['stakedAt', beet.i64],
+    ['lastStakedAt', beet.i64],
+    ['lastUnstakedAt', beet.i64],
   ],
   NFT.fromArgs,
   'NFT'

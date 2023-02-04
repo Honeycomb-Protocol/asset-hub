@@ -48,3 +48,33 @@ export type UploadMetadataItemWithCallBack = {
     }) => any;
 };
 export declare const uploadBulkMetadataToArwave: (mx: Metaplex, items: UploadMetadataItemWithCallBack[]) => Promise<void>;
+export declare const getOrFetchMultipliers: (connection: web3.Connection, project: web3.PublicKey, programId?: web3.PublicKey) => Promise<{
+    address: web3.PublicKey;
+    bump: number;
+    project: web3.PublicKey;
+    decimals: number;
+    durationMultipliers: import("./generated/staking").Multiplier[];
+    countMultipliers: import("./generated/staking").Multiplier[];
+    creatorMultipliers: import("./generated/staking").Multiplier[];
+    collectionMultipliers: import("./generated/staking").Multiplier[];
+}>;
+export declare const getOrFetchStaker: (connection: web3.Connection, wallet: web3.PublicKey, project: web3.PublicKey, programId?: web3.PublicKey) => Promise<{
+    address: web3.PublicKey;
+    bump: number;
+    project: web3.PublicKey;
+    wallet: web3.PublicKey;
+    totalStaked: import("@metaplex-foundation/beet").bignum;
+}>;
+export declare const getOrFetchNft: (connection: web3.Connection, nftMint: web3.PublicKey, project: web3.PublicKey, programId?: web3.PublicKey) => Promise<{
+    address: web3.PublicKey;
+    bump: number;
+    project: web3.PublicKey;
+    staker: web3.PublicKey;
+    mint: web3.PublicKey;
+    creator: web3.PublicKey;
+    collection: web3.PublicKey;
+    lastClaim: import("@metaplex-foundation/beet").bignum;
+    stakedAt: import("@metaplex-foundation/beet").bignum;
+    lastStakedAt: import("@metaplex-foundation/beet").bignum;
+    lastUnstakedAt: import("@metaplex-foundation/beet").bignum;
+}>;

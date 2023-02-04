@@ -8,8 +8,14 @@
 import * as beet from '@metaplex-foundation/beet'
 export type UpdateProjectArgs = {
   name: beet.COption<string>
-  rewardsPerSecond: beet.COption<beet.bignum>
+  rewardsPerDuration: beet.COption<beet.bignum>
+  rewardsDuration: beet.COption<beet.bignum>
+  maxRewardsDuration: beet.COption<beet.bignum>
+  minStakeDuration: beet.COption<beet.bignum>
+  cooldownDuration: beet.COption<beet.bignum>
+  resetStakeDuration: beet.COption<boolean>
   startTime: beet.COption<beet.bignum>
+  endTime: beet.COption<beet.bignum>
 }
 
 /**
@@ -20,8 +26,14 @@ export const updateProjectArgsBeet =
   new beet.FixableBeetArgsStruct<UpdateProjectArgs>(
     [
       ['name', beet.coption(beet.utf8String)],
-      ['rewardsPerSecond', beet.coption(beet.u64)],
+      ['rewardsPerDuration', beet.coption(beet.u64)],
+      ['rewardsDuration', beet.coption(beet.u64)],
+      ['maxRewardsDuration', beet.coption(beet.u64)],
+      ['minStakeDuration', beet.coption(beet.u64)],
+      ['cooldownDuration', beet.coption(beet.u64)],
+      ['resetStakeDuration', beet.coption(beet.bool)],
       ['startTime', beet.coption(beet.i64)],
+      ['endTime', beet.coption(beet.i64)],
     ],
     'UpdateProjectArgs'
   )

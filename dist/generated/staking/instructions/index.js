@@ -14,10 +14,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(require("./addMultiplier"), exports);
 __exportStar(require("./claimRewards"), exports);
 __exportStar(require("./createProject"), exports);
 __exportStar(require("./fundRewards"), exports);
+__exportStar(require("./initMultipliers"), exports);
+__exportStar(require("./initNft"), exports);
+__exportStar(require("./initStaker"), exports);
 __exportStar(require("./stake"), exports);
 __exportStar(require("./unstake"), exports);
-__exportStar(require("./updatePoject"), exports);
+__exportStar(require("./updateProject"), exports);
 //# sourceMappingURL=index.js.map

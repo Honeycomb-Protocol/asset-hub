@@ -29,15 +29,20 @@ const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 exports.nFTDiscriminator = [88, 10, 146, 176, 101, 11, 40, 217];
 class NFT {
-    constructor(bump, project, staker, mint, lastClaim) {
+    constructor(bump, project, staker, mint, creator, collection, lastClaim, stakedAt, lastStakedAt, lastUnstakedAt) {
         this.bump = bump;
         this.project = project;
         this.staker = staker;
         this.mint = mint;
+        this.creator = creator;
+        this.collection = collection;
         this.lastClaim = lastClaim;
+        this.stakedAt = stakedAt;
+        this.lastStakedAt = lastStakedAt;
+        this.lastUnstakedAt = lastUnstakedAt;
     }
     static fromArgs(args) {
-        return new NFT(args.bump, args.project, args.staker, args.mint, args.lastClaim);
+        return new NFT(args.bump, args.project, args.staker, args.mint, args.creator, args.collection, args.lastClaim, args.stakedAt, args.lastStakedAt, args.lastUnstakedAt);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return NFT.deserialize(accountInfo.data, offset);
@@ -76,8 +81,46 @@ class NFT {
             project: this.project.toBase58(),
             staker: this.staker.toBase58(),
             mint: this.mint.toBase58(),
+            creator: this.creator.toBase58(),
+            collection: this.collection.toBase58(),
             lastClaim: (() => {
                 const x = this.lastClaim;
+                if (typeof x.toNumber === 'function') {
+                    try {
+                        return x.toNumber();
+                    }
+                    catch (_) {
+                        return x;
+                    }
+                }
+                return x;
+            })(),
+            stakedAt: (() => {
+                const x = this.stakedAt;
+                if (typeof x.toNumber === 'function') {
+                    try {
+                        return x.toNumber();
+                    }
+                    catch (_) {
+                        return x;
+                    }
+                }
+                return x;
+            })(),
+            lastStakedAt: (() => {
+                const x = this.lastStakedAt;
+                if (typeof x.toNumber === 'function') {
+                    try {
+                        return x.toNumber();
+                    }
+                    catch (_) {
+                        return x;
+                    }
+                }
+                return x;
+            })(),
+            lastUnstakedAt: (() => {
+                const x = this.lastUnstakedAt;
                 if (typeof x.toNumber === 'function') {
                     try {
                         return x.toNumber();
@@ -98,6 +141,11 @@ exports.nFTBeet = new beet.BeetStruct([
     ['project', beetSolana.publicKey],
     ['staker', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
+    ['creator', beetSolana.publicKey],
+    ['collection', beetSolana.publicKey],
     ['lastClaim', beet.i64],
+    ['stakedAt', beet.i64],
+    ['lastStakedAt', beet.i64],
+    ['lastUnstakedAt', beet.i64],
 ], NFT.fromArgs, 'NFT');
 //# sourceMappingURL=NFT.js.map

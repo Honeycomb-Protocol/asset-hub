@@ -25,8 +25,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAssetPda = exports.getUniqueConstraintPda = exports.getBlockDefinitionPda = exports.getDelegateAuthorityPda = exports.getBlockPda = exports.getDepositPda = exports.getNftPda = exports.getAssemblerPda = exports.getMetadataAccount_ = exports.METADATA_PROGRAM_ID = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
-const assembler_1 = require("../../generated/assembler");
-const assetmanager_1 = require("../../generated/assetmanager");
+const assembler_1 = require("../generated/assembler");
+const assetmanager_1 = require("../generated/assetmanager");
 exports.METADATA_PROGRAM_ID = new web3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 const getMetadataAccount_ = (mint, edition = false, programId = exports.METADATA_PROGRAM_ID) => {
     const seeds = [

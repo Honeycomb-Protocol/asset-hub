@@ -28,21 +28,25 @@ const web3 = __importStar(require("@solana/web3.js"));
 const splToken = __importStar(require("@solana/spl-token"));
 const generated_1 = require("../../generated");
 const staking_1 = require("../../generated/staking");
+const pdas_1 = require("../pdas");
 const utils_1 = require("../../utils");
+const initStaker_1 = require("./initStaker");
+const initNFT_1 = require("./initNFT");
 function createStakeTransaction(project, nftMint, wallet, programId = staking_1.PROGRAM_ID) {
-    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer()], programId);
+    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()], programId);
     const nftAccount = splToken.getAssociatedTokenAddressSync(nftMint, wallet);
     const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        pdas_1.METADATA_PROGRAM_ID.toBuffer(),
         nftMint.toBuffer(),
-    ], utils_1.METADATA_PROGRAM_ID);
+    ], pdas_1.METADATA_PROGRAM_ID);
     const [nftEdition] = web3.PublicKey.findProgramAddressSync([
         Buffer.from("metadata"),
-        utils_1.METADATA_PROGRAM_ID.toBuffer(),
+        pdas_1.METADATA_PROGRAM_ID.toBuffer(),
         nftMint.toBuffer(),
         Buffer.from("edition"),
-    ], utils_1.METADATA_PROGRAM_ID);
+    ], pdas_1.METADATA_PROGRAM_ID);
+    const [staker] = web3.PublicKey.findProgramAddressSync([Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()], programId);
     const instructions = [
         (0, generated_1.createStakeInstruction)({
             project,
@@ -51,8 +55,9 @@ function createStakeTransaction(project, nftMint, wallet, programId = staking_1.
             nftAccount,
             nftMetadata,
             nftEdition,
+            staker,
             wallet,
-            tokenMetadataProgram: utils_1.METADATA_PROGRAM_ID,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
             clock: web3.SYSVAR_CLOCK_PUBKEY,
             sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         }, programId),
@@ -61,21 +66,31 @@ function createStakeTransaction(project, nftMint, wallet, programId = staking_1.
         tx: new web3.Transaction().add(...instructions),
         signers: [],
         accounts: instructions.flatMap((i) => i.keys.map((k) => k.pubkey)),
-        project,
     };
 }
 exports.createStakeTransaction = createStakeTransaction;
 async function stake(mx, project, nftMint) {
     const wallet = mx.identity();
-    const ctx = createStakeTransaction(project, nftMint, wallet.publicKey);
+    const staker = await (0, utils_1.getOrFetchStaker)(mx.connection, wallet.publicKey, project);
+    const initStakerCtx = !staker && (0, initStaker_1.createInitStakerTransaction)(project, wallet.publicKey);
+    const nft = await (0, utils_1.getOrFetchNft)(mx.connection, nftMint, project);
+    const initNftCtx = !nft && (0, initNFT_1.createInitNFTTransaction)(project, nftMint, wallet.publicKey);
+    const stakeCtx = createStakeTransaction(project, nftMint, wallet.publicKey);
+    const tx = new web3.Transaction();
+    initNftCtx && tx.add(initNftCtx.tx);
+    initStakerCtx && tx.add(initStakerCtx.tx);
+    tx.add(stakeCtx.tx);
     const blockhash = await mx.connection.getLatestBlockhash();
-    ctx.tx.recentBlockhash = blockhash.blockhash;
+    tx.recentBlockhash = blockhash.blockhash;
     const response = await mx
         .rpc()
-        .sendAndConfirmTransaction(ctx.tx, { skipPreflight: true }, ctx.signers);
+        .sendAndConfirmTransaction(tx, { skipPreflight: true }, [
+        ...((initNftCtx === null || initNftCtx === void 0 ? void 0 : initNftCtx.signers) || []),
+        ...((initStakerCtx === null || initStakerCtx === void 0 ? void 0 : initStakerCtx.signers) || []),
+        ...stakeCtx.signers,
+    ]);
     return {
         response,
-        project: ctx.project,
     };
 }
 exports.stake = stake;

@@ -24,10 +24,12 @@ export const claimRewardsStruct = new beet.BeetArgsStruct<{
  * Accounts required by the _claimRewards_ instruction
  *
  * @property [] project
+ * @property [] multipliers
  * @property [_writable_] nft
  * @property [_writable_] rewardMint
  * @property [_writable_] vault
  * @property [_writable_] tokenAccount
+ * @property [_writable_] staker
  * @property [_writable_, **signer**] wallet
  * @property [] clock
  * @category Instructions
@@ -36,10 +38,12 @@ export const claimRewardsStruct = new beet.BeetArgsStruct<{
  */
 export type ClaimRewardsInstructionAccounts = {
   project: web3.PublicKey
+  multipliers: web3.PublicKey
   nft: web3.PublicKey
   rewardMint: web3.PublicKey
   vault: web3.PublicKey
   tokenAccount: web3.PublicKey
+  staker: web3.PublicKey
   wallet: web3.PublicKey
   tokenProgram?: web3.PublicKey
   clock: web3.PublicKey
@@ -72,6 +76,11 @@ export function createClaimRewardsInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.multipliers,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.nft,
       isWritable: true,
       isSigner: false,
@@ -88,6 +97,11 @@ export function createClaimRewardsInstruction(
     },
     {
       pubkey: accounts.tokenAccount,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.staker,
       isWritable: true,
       isSigner: false,
     },

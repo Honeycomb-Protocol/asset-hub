@@ -2,6 +2,7 @@ pub mod errors;
 pub mod instructions;
 pub mod state;
 pub mod traits;
+pub mod utils;
 
 use {anchor_lang::prelude::*, instructions::*};
 
@@ -15,8 +16,27 @@ pub mod staking {
         instructions::create_project(ctx, args)
     }
 
-    pub fn update_poject(ctx: Context<UpdateProject>, args: UpdateProjectArgs) -> Result<()> {
+    pub fn update_project(ctx: Context<UpdateProject>, args: UpdateProjectArgs) -> Result<()> {
         instructions::update_project(ctx, args)
+    }
+
+    pub fn init_multipliers(
+        ctx: Context<InitMultipliers>,
+        args: InitMultipliersArgs,
+    ) -> Result<()> {
+        instructions::init_multipliers(ctx, args)
+    }
+
+    pub fn add_multiplier(ctx: Context<AddMultiplier>, args: AddMultiplierArgs) -> Result<()> {
+        instructions::add_multiplier(ctx, args)
+    }
+
+    pub fn init_nft(ctx: Context<InitNFT>) -> Result<()> {
+        instructions::init_nft(ctx)
+    }
+
+    pub fn init_staker(ctx: Context<InitStaker>) -> Result<()> {
+        instructions::init_staker(ctx)
     }
 
     pub fn stake(ctx: Context<Stake>) -> Result<()> {

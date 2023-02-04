@@ -27,7 +27,7 @@ exports.setNftGenerated = exports.createSetNftGeneratedTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const assembler_1 = require("../../generated/assembler");
-const pdas_1 = require("./pdas");
+const pdas_1 = require("../pdas");
 function createSetNftGeneratedTransaction(assembler, nft, nftMint, authority, args, delegate, programId = assembler_1.PROGRAM_ID) {
     const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint);
     return {

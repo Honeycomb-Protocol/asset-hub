@@ -27,7 +27,13 @@ exports.createProjectArgsBeet = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
 exports.createProjectArgsBeet = new beet.FixableBeetArgsStruct([
     ['name', beet.utf8String],
-    ['rewardsPerSecond', beet.u64],
-    ['startTime', beet.i64],
+    ['rewardsPerDuration', beet.u64],
+    ['rewardsDuration', beet.coption(beet.u64)],
+    ['maxRewardsDuration', beet.coption(beet.u64)],
+    ['minStakeDuration', beet.coption(beet.u64)],
+    ['cooldownDuration', beet.coption(beet.u64)],
+    ['resetStakeDuration', beet.coption(beet.bool)],
+    ['startTime', beet.coption(beet.i64)],
+    ['endTime', beet.coption(beet.i64)],
 ], 'CreateProjectArgs');
 //# sourceMappingURL=CreateProjectArgs.js.map

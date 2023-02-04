@@ -23,9 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadBulkMetadataToArwave = exports.uploadMetadataToArwave = exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.isKeypairSigner = exports.isSigner = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.numberToBytes = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = void 0;
+exports.getOrFetchNft = exports.getOrFetchStaker = exports.getOrFetchMultipliers = exports.uploadBulkMetadataToArwave = exports.uploadMetadataToArwave = exports.bulkLutTransactions = exports.confirmBulkTransactions = exports.sendBulkTransactionsLegacy = exports.sendBulkTransactions = exports.createLookupTable = exports.isKeypairSigner = exports.isSigner = exports.devideAndSignV0Txns = exports.devideAndSignTxns = exports.getOrFetchLoockupTable = exports.numberToBytes = exports.createV0TxWithLUT = exports.createV0TxWithLUTDumb = exports.createV0Tx = exports.sendAndConfirmTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const js_1 = require("@metaplex-foundation/js");
+const staking_1 = require("./generated/staking");
 const sendAndConfirmTransaction = async (tx, connection, wallet, signers = [], sendOpts = {}) => {
     const block = await connection.getLatestBlockhash();
     tx.recentBlockhash = block.blockhash;
@@ -331,4 +332,43 @@ const uploadBulkMetadataToArwave = async (mx, items) => {
     await Promise.all(uploadHandlers.map(({ proceed }, i) => proceed().then(items[i].callback).catch(console.error)));
 };
 exports.uploadBulkMetadataToArwave = uploadBulkMetadataToArwave;
+const getOrFetchMultipliers = async (connection, project, programId = staking_1.PROGRAM_ID) => {
+    const [multipliers] = web3.PublicKey.findProgramAddressSync([Buffer.from("multipliers"), project.toBuffer()], programId);
+    try {
+        return {
+            ...(await staking_1.Multipliers.fromAccountAddress(connection, multipliers)),
+            address: multipliers,
+        };
+    }
+    catch (_a) {
+        return null;
+    }
+};
+exports.getOrFetchMultipliers = getOrFetchMultipliers;
+const getOrFetchStaker = async (connection, wallet, project, programId = staking_1.PROGRAM_ID) => {
+    const [staker] = web3.PublicKey.findProgramAddressSync([Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()], programId);
+    try {
+        return {
+            ...(await staking_1.Staker.fromAccountAddress(connection, staker)),
+            address: staker,
+        };
+    }
+    catch (_a) {
+        return null;
+    }
+};
+exports.getOrFetchStaker = getOrFetchStaker;
+const getOrFetchNft = async (connection, nftMint, project, programId = staking_1.PROGRAM_ID) => {
+    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()], programId);
+    try {
+        return {
+            ...(await staking_1.NFT.fromAccountAddress(connection, nft)),
+            address: nft,
+        };
+    }
+    catch (_a) {
+        return null;
+    }
+};
+exports.getOrFetchNft = getOrFetchNft;
 //# sourceMappingURL=utils.js.map

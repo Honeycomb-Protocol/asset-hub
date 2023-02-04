@@ -23,11 +23,13 @@ export const unstakeStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _unstake_ instruction
  *
+ * @property [] project
  * @property [_writable_] nft
  * @property [_writable_] nftMint
  * @property [_writable_] nftAccount
  * @property [_writable_] nftMetadata
  * @property [] nftEdition
+ * @property [_writable_] staker
  * @property [_writable_, **signer**] wallet
  * @property [] tokenMetadataProgram
  * @property [] clock
@@ -37,11 +39,13 @@ export const unstakeStruct = new beet.BeetArgsStruct<{
  * @category generated
  */
 export type UnstakeInstructionAccounts = {
+  project: web3.PublicKey
   nft: web3.PublicKey
   nftMint: web3.PublicKey
   nftAccount: web3.PublicKey
   nftMetadata: web3.PublicKey
   nftEdition: web3.PublicKey
+  staker: web3.PublicKey
   wallet: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
@@ -72,6 +76,11 @@ export function createUnstakeInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.project,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.nft,
       isWritable: true,
       isSigner: false,
@@ -94,6 +103,11 @@ export function createUnstakeInstruction(
     {
       pubkey: accounts.nftEdition,
       isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.staker,
+      isWritable: true,
       isSigner: false,
     },
     {

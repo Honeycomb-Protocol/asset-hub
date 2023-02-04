@@ -23,21 +23,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUpdatePojectInstruction = exports.updatePojectInstructionDiscriminator = exports.updatePojectStruct = void 0;
+exports.createAddMultiplierInstruction = exports.addMultiplierInstructionDiscriminator = exports.addMultiplierStruct = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const web3 = __importStar(require("@solana/web3.js"));
-const UpdateProjectArgs_1 = require("../types/UpdateProjectArgs");
-exports.updatePojectStruct = new beet.FixableBeetArgsStruct([
+const AddMultiplierArgs_1 = require("../types/AddMultiplierArgs");
+exports.addMultiplierStruct = new beet.FixableBeetArgsStruct([
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', UpdateProjectArgs_1.updateProjectArgsBeet],
-], 'UpdatePojectInstructionArgs');
-exports.updatePojectInstructionDiscriminator = [
-    145, 101, 224, 142, 135, 126, 58, 73,
+    ['args', AddMultiplierArgs_1.addMultiplierArgsBeet],
+], 'AddMultiplierInstructionArgs');
+exports.addMultiplierInstructionDiscriminator = [
+    193, 91, 229, 211, 57, 136, 141, 169,
 ];
-function createUpdatePojectInstruction(accounts, args, programId = new web3.PublicKey('8pyniLLXEHVUJKX2h5E9DrvwTsRmSR64ucUYBg8jQgPP')) {
-    var _a, _b;
-    const [data] = exports.updatePojectStruct.serialize({
-        instructionDiscriminator: exports.updatePojectInstructionDiscriminator,
+function createAddMultiplierInstruction(accounts, args, programId = new web3.PublicKey('8pyniLLXEHVUJKX2h5E9DrvwTsRmSR64ucUYBg8jQgPP')) {
+    var _a;
+    const [data] = exports.addMultiplierStruct.serialize({
+        instructionDiscriminator: exports.addMultiplierInstructionDiscriminator,
         ...args,
     });
     const keys = [
@@ -47,22 +47,17 @@ function createUpdatePojectInstruction(accounts, args, programId = new web3.Publ
             isSigner: false,
         },
         {
-            pubkey: accounts.newAuthority,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.collection,
-            isWritable: false,
-            isSigner: false,
-        },
-        {
-            pubkey: accounts.creator,
-            isWritable: false,
+            pubkey: accounts.multipliers,
+            isWritable: true,
             isSigner: false,
         },
         {
             pubkey: accounts.authority,
+            isWritable: true,
+            isSigner: true,
+        },
+        {
+            pubkey: accounts.payer,
             isWritable: true,
             isSigner: true,
         },
@@ -72,7 +67,7 @@ function createUpdatePojectInstruction(accounts, args, programId = new web3.Publ
             isSigner: false,
         },
         {
-            pubkey: (_b = accounts.rent) !== null && _b !== void 0 ? _b : web3.SYSVAR_RENT_PUBKEY,
+            pubkey: accounts.rentSysvar,
             isWritable: false,
             isSigner: false,
         },
@@ -89,5 +84,5 @@ function createUpdatePojectInstruction(accounts, args, programId = new web3.Publ
     });
     return ix;
 }
-exports.createUpdatePojectInstruction = createUpdatePojectInstruction;
-//# sourceMappingURL=updatePoject.js.map
+exports.createAddMultiplierInstruction = createAddMultiplierInstruction;
+//# sourceMappingURL=addMultiplier.js.map

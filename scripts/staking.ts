@@ -26,10 +26,34 @@ export default async function (
         new web3.PublicKey(args[0]),
         {
           name: "Test",
-          rewardsPerSecond: 100000000,
-          startTime: 0,
+          rewardsPerDuration: 1000000000,
+          rewardsDuration: 1,
+          maxRewardsDuration: 20,
+          minStakeDuration: 60 * 1,
+          cooldownDuration: 60 * 2,
+          resetStakeDuration: false,
+          startTime: Date.now() * 1000,
+          endTime: Date.now() * 1000 + 3600 * 24,
         },
-        [new web3.PublicKey(args[1])]
+        [new web3.PublicKey(args[1])],
+        undefined,
+        [
+          {
+            multiplierType: {
+              __kind: "StakeDuration",
+              minDuration: 60 * 2,
+            },
+            value: 10000,
+          },
+          {
+            multiplierType: {
+              __kind: "NFTCount",
+              minCount: 1,
+            },
+            value: 100000,
+          },
+        ],
+        3
       );
       console.log("Tx:", createProjectCtx.response.signature);
       console.log("Project: ", createProjectCtx.project.toString());

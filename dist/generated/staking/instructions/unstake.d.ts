@@ -4,11 +4,13 @@ export declare const unstakeStruct: beet.BeetArgsStruct<{
     instructionDiscriminator: number[];
 }>;
 export type UnstakeInstructionAccounts = {
+    project: web3.PublicKey;
     nft: web3.PublicKey;
     nftMint: web3.PublicKey;
     nftAccount: web3.PublicKey;
     nftMetadata: web3.PublicKey;
     nftEdition: web3.PublicKey;
+    staker: web3.PublicKey;
     wallet: web3.PublicKey;
     systemProgram?: web3.PublicKey;
     tokenProgram?: web3.PublicKey;

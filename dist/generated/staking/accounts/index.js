@@ -15,9 +15,13 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountProviders = void 0;
+__exportStar(require("./Multipliers"), exports);
 __exportStar(require("./NFT"), exports);
 __exportStar(require("./Project"), exports);
+__exportStar(require("./Staker"), exports);
+const Multipliers_1 = require("./Multipliers");
 const NFT_1 = require("./NFT");
 const Project_1 = require("./Project");
-exports.accountProviders = { NFT: NFT_1.NFT, Project: Project_1.Project };
+const Staker_1 = require("./Staker");
+exports.accountProviders = { Multipliers: Multipliers_1.Multipliers, NFT: NFT_1.NFT, Project: Project_1.Project, Staker: Staker_1.Staker };
 //# sourceMappingURL=index.js.map

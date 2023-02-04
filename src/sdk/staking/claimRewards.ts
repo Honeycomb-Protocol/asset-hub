@@ -4,16 +4,18 @@ import { createClaimRewardsInstruction, Project } from "../../generated";
 import { PROGRAM_ID } from "../../generated/staking";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
+import { getOrFetchMultipliers } from "../../utils";
 
 export function createClaimRewardsTransaction(
   project: web3.PublicKey,
   nftMint: web3.PublicKey,
   rewardMint: web3.PublicKey,
   wallet: web3.PublicKey,
+  multipliers: web3.PublicKey | undefined,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
   const [nft] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("nft"), nftMint.toBuffer()],
+    [Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()],
     programId
   );
 
@@ -27,14 +29,21 @@ export function createClaimRewardsTransaction(
     wallet
   );
 
+  const [staker] = web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()],
+    programId
+  );
+
   const instructions: web3.TransactionInstruction[] = [
     createClaimRewardsInstruction(
       {
         project,
+        multipliers: multipliers || programId,
         nft,
         rewardMint,
         vault,
         tokenAccount,
+        staker,
         wallet,
         clock: web3.SYSVAR_CLOCK_PUBKEY,
       },
@@ -59,12 +68,14 @@ export async function claimRewards(
     project
   );
 
+  const multipliers = await getOrFetchMultipliers(mx.connection, project);
   const wallet = mx.identity();
   const ctx = createClaimRewardsTransaction(
     project,
     nftMint,
     projectAccount.rewardMint,
-    wallet.publicKey
+    wallet.publicKey,
+    multipliers?.address
   );
 
   const blockhash = await mx.connection.getLatestBlockhash();

@@ -27,7 +27,7 @@ exports.createAsset = exports.buildCreateAssetCtx = exports.createCreateAssetTra
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
 const assetmanager_1 = require("../../generated/assetmanager");
-const pdas_1 = require("../assembler/pdas");
+const pdas_1 = require("../pdas");
 function createCreateAssetTransaction(payer, args, programId = assetmanager_1.PROGRAM_ID) {
     const mintKeypair = web3.Keypair.generate();
     const [metadata] = (0, pdas_1.getMetadataAccount_)(mintKeypair.publicKey);

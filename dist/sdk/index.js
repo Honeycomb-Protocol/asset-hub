@@ -17,4 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./assembler"), exports);
 __exportStar(require("./assetmanager"), exports);
 __exportStar(require("./staking"), exports);
+__exportStar(require("./pdas"), exports);
 //# sourceMappingURL=index.js.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"AddMultiplierArgs.js","sourceRoot":"","sources":["../../../../src/generated/staking/types/AddMultiplierArgs.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAOA,gEAAiD;AACjD,qDAAqE;AAUxD,QAAA,qBAAqB,GAChC,IAAI,IAAI,CAAC,qBAAqB,CAC5B;IACE,CAAC,OAAO,EAAE,IAAI,CAAC,GAAG,CAAC;IACnB,CAAC,gBAAgB,EAAE,mCAAkB,CAAC;CACvC,EACD,mBAAmB,CACpB,CAAA"}

@@ -10,9 +10,16 @@ export type ProjectArgs = {
     rewardMint: web3.PublicKey;
     vault: web3.PublicKey;
     name: string;
-    rewardsPerSecond: beet.bignum;
+    rewardsPerDuration: beet.bignum;
+    rewardsDuration: beet.bignum;
+    maxRewardsDuration: beet.COption<beet.bignum>;
+    minStakeDuration: beet.COption<beet.bignum>;
+    cooldownDuration: beet.COption<beet.bignum>;
+    resetStakeDuration: boolean;
+    allowedMints: boolean;
     totalStaked: beet.bignum;
-    startTime: beet.bignum;
+    startTime: beet.COption<beet.bignum>;
+    endTime: beet.COption<beet.bignum>;
     collections: web3.PublicKey[];
     creators: web3.PublicKey[];
 };
@@ -25,9 +32,16 @@ export declare class Project implements ProjectArgs {
     readonly rewardMint: web3.PublicKey;
     readonly vault: web3.PublicKey;
     readonly name: string;
-    readonly rewardsPerSecond: beet.bignum;
+    readonly rewardsPerDuration: beet.bignum;
+    readonly rewardsDuration: beet.bignum;
+    readonly maxRewardsDuration: beet.COption<beet.bignum>;
+    readonly minStakeDuration: beet.COption<beet.bignum>;
+    readonly cooldownDuration: beet.COption<beet.bignum>;
+    readonly resetStakeDuration: boolean;
+    readonly allowedMints: boolean;
     readonly totalStaked: beet.bignum;
-    readonly startTime: beet.bignum;
+    readonly startTime: beet.COption<beet.bignum>;
+    readonly endTime: beet.COption<beet.bignum>;
     readonly collections: web3.PublicKey[];
     readonly creators: web3.PublicKey[];
     private constructor();
@@ -49,15 +63,22 @@ export declare class Project implements ProjectArgs {
         rewardMint: string;
         vault: string;
         name: string;
-        rewardsPerSecond: number | {
+        rewardsPerDuration: number | {
             toNumber: () => number;
         };
+        rewardsDuration: number | {
+            toNumber: () => number;
+        };
+        maxRewardsDuration: beet.bignum;
+        minStakeDuration: beet.bignum;
+        cooldownDuration: beet.bignum;
+        resetStakeDuration: boolean;
+        allowedMints: boolean;
         totalStaked: number | {
             toNumber: () => number;
         };
-        startTime: number | {
-            toNumber: () => number;
-        };
+        startTime: beet.bignum;
+        endTime: beet.bignum;
         collections: web3.PublicKey[];
         creators: web3.PublicKey[];
     };

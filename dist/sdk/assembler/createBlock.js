@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBlock = exports.createCreateBlockTransaction = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const generated_1 = require("../../generated");
-const pdas_1 = require("./pdas");
+const pdas_1 = require("../pdas");
 function createCreateBlockTransaction(assembler, authority, payer, args) {
     const [block] = (0, pdas_1.getBlockPda)(assembler, args.blockOrder);
     return {

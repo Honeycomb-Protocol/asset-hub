@@ -43,6 +43,11 @@ function createClaimRewardsInstruction(accounts, programId = new web3.PublicKey(
             isSigner: false,
         },
         {
+            pubkey: accounts.multipliers,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.nft,
             isWritable: true,
             isSigner: false,
@@ -59,6 +64,11 @@ function createClaimRewardsInstruction(accounts, programId = new web3.PublicKey(
         },
         {
             pubkey: accounts.tokenAccount,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.staker,
             isWritable: true,
             isSigner: false,
         },

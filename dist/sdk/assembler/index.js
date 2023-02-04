@@ -19,7 +19,6 @@ __exportStar(require("./createBlock"), exports);
 __exportStar(require("./createBlockDefinition"), exports);
 __exportStar(require("./createAndMintNft"), exports);
 __exportStar(require("./disbandNft"), exports);
-__exportStar(require("./pdas"), exports);
 __exportStar(require("./setupAssembler"), exports);
 __exportStar(require("./updateAssembler"), exports);
 __exportStar(require("./setNftGenerated"), exports);

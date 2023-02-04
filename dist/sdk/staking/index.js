@@ -15,6 +15,13 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./createStakingProject"), exports);
+__exportStar(require("./updateStakingProject"), exports);
+__exportStar(require("./initMultipliers"), exports);
+__exportStar(require("./addMultiplier"), exports);
+__exportStar(require("./initNFT"), exports);
+__exportStar(require("./initStaker"), exports);
 __exportStar(require("./stake"), exports);
 __exportStar(require("./unstake"), exports);
+__exportStar(require("./fundRewards"), exports);
+__exportStar(require("./claimRewards"), exports);
 //# sourceMappingURL=index.js.map

@@ -32,13 +32,33 @@ createErrorFromCodeLookup.set(0x1770, () => new OverflowError())
 createErrorFromNameLookup.set('Overflow', () => new OverflowError())
 
 /**
+ * OnlyOwner: 'Only the owner can perform this operation'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class OnlyOwnerError extends Error {
+  readonly code: number = 0x1771
+  readonly name: string = 'OnlyOwner'
+  constructor() {
+    super('Only the owner can perform this operation')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, OnlyOwnerError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1771, () => new OnlyOwnerError())
+createErrorFromNameLookup.set('OnlyOwner', () => new OnlyOwnerError())
+
+/**
  * InvalidMetadata: 'Invalid metadata'
  *
  * @category Errors
  * @category generated
  */
 export class InvalidMetadataError extends Error {
-  readonly code: number = 0x1771
+  readonly code: number = 0x1772
   readonly name: string = 'InvalidMetadata'
   constructor() {
     super('Invalid metadata')
@@ -48,7 +68,7 @@ export class InvalidMetadataError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1771, () => new InvalidMetadataError())
+createErrorFromCodeLookup.set(0x1772, () => new InvalidMetadataError())
 createErrorFromNameLookup.set(
   'InvalidMetadata',
   () => new InvalidMetadataError()
@@ -61,7 +81,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidNFTError extends Error {
-  readonly code: number = 0x1772
+  readonly code: number = 0x1773
   readonly name: string = 'InvalidNFT'
   constructor() {
     super('Invalid NFT')
@@ -71,8 +91,71 @@ export class InvalidNFTError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1772, () => new InvalidNFTError())
+createErrorFromCodeLookup.set(0x1773, () => new InvalidNFTError())
 createErrorFromNameLookup.set('InvalidNFT', () => new InvalidNFTError())
+
+/**
+ * RewardsNotAvailable: 'Rewards not available yet'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class RewardsNotAvailableError extends Error {
+  readonly code: number = 0x1774
+  readonly name: string = 'RewardsNotAvailable'
+  constructor() {
+    super('Rewards not available yet')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, RewardsNotAvailableError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1774, () => new RewardsNotAvailableError())
+createErrorFromNameLookup.set(
+  'RewardsNotAvailable',
+  () => new RewardsNotAvailableError()
+)
+
+/**
+ * CantStakeYet: 'Can't stake yet'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class CantStakeYetError extends Error {
+  readonly code: number = 0x1775
+  readonly name: string = 'CantStakeYet'
+  constructor() {
+    super("Can't stake yet")
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, CantStakeYetError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1775, () => new CantStakeYetError())
+createErrorFromNameLookup.set('CantStakeYet', () => new CantStakeYetError())
+
+/**
+ * CantUnstakeYet: 'Can't unstake yet'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class CantUnstakeYetError extends Error {
+  readonly code: number = 0x1776
+  readonly name: string = 'CantUnstakeYet'
+  constructor() {
+    super("Can't unstake yet")
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, CantUnstakeYetError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1776, () => new CantUnstakeYetError())
+createErrorFromNameLookup.set('CantUnstakeYet', () => new CantUnstakeYetError())
 
 /**
  * Attempts to resolve a custom program error from the provided error code.

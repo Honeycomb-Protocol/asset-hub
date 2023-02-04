@@ -22,9 +22,16 @@ export type ProjectArgs = {
   rewardMint: web3.PublicKey
   vault: web3.PublicKey
   name: string
-  rewardsPerSecond: beet.bignum
+  rewardsPerDuration: beet.bignum
+  rewardsDuration: beet.bignum
+  maxRewardsDuration: beet.COption<beet.bignum>
+  minStakeDuration: beet.COption<beet.bignum>
+  cooldownDuration: beet.COption<beet.bignum>
+  resetStakeDuration: boolean
+  allowedMints: boolean
   totalStaked: beet.bignum
-  startTime: beet.bignum
+  startTime: beet.COption<beet.bignum>
+  endTime: beet.COption<beet.bignum>
   collections: web3.PublicKey[]
   creators: web3.PublicKey[]
 }
@@ -46,9 +53,16 @@ export class Project implements ProjectArgs {
     readonly rewardMint: web3.PublicKey,
     readonly vault: web3.PublicKey,
     readonly name: string,
-    readonly rewardsPerSecond: beet.bignum,
+    readonly rewardsPerDuration: beet.bignum,
+    readonly rewardsDuration: beet.bignum,
+    readonly maxRewardsDuration: beet.COption<beet.bignum>,
+    readonly minStakeDuration: beet.COption<beet.bignum>,
+    readonly cooldownDuration: beet.COption<beet.bignum>,
+    readonly resetStakeDuration: boolean,
+    readonly allowedMints: boolean,
     readonly totalStaked: beet.bignum,
-    readonly startTime: beet.bignum,
+    readonly startTime: beet.COption<beet.bignum>,
+    readonly endTime: beet.COption<beet.bignum>,
     readonly collections: web3.PublicKey[],
     readonly creators: web3.PublicKey[]
   ) {}
@@ -65,9 +79,16 @@ export class Project implements ProjectArgs {
       args.rewardMint,
       args.vault,
       args.name,
-      args.rewardsPerSecond,
+      args.rewardsPerDuration,
+      args.rewardsDuration,
+      args.maxRewardsDuration,
+      args.minStakeDuration,
+      args.cooldownDuration,
+      args.resetStakeDuration,
+      args.allowedMints,
       args.totalStaked,
       args.startTime,
+      args.endTime,
       args.collections,
       args.creators
     )
@@ -185,8 +206,8 @@ export class Project implements ProjectArgs {
       rewardMint: this.rewardMint.toBase58(),
       vault: this.vault.toBase58(),
       name: this.name,
-      rewardsPerSecond: (() => {
-        const x = <{ toNumber: () => number }>this.rewardsPerSecond
+      rewardsPerDuration: (() => {
+        const x = <{ toNumber: () => number }>this.rewardsPerDuration
         if (typeof x.toNumber === 'function') {
           try {
             return x.toNumber()
@@ -196,6 +217,22 @@ export class Project implements ProjectArgs {
         }
         return x
       })(),
+      rewardsDuration: (() => {
+        const x = <{ toNumber: () => number }>this.rewardsDuration
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
+      maxRewardsDuration: this.maxRewardsDuration,
+      minStakeDuration: this.minStakeDuration,
+      cooldownDuration: this.cooldownDuration,
+      resetStakeDuration: this.resetStakeDuration,
+      allowedMints: this.allowedMints,
       totalStaked: (() => {
         const x = <{ toNumber: () => number }>this.totalStaked
         if (typeof x.toNumber === 'function') {
@@ -207,17 +244,8 @@ export class Project implements ProjectArgs {
         }
         return x
       })(),
-      startTime: (() => {
-        const x = <{ toNumber: () => number }>this.startTime
-        if (typeof x.toNumber === 'function') {
-          try {
-            return x.toNumber()
-          } catch (_) {
-            return x
-          }
-        }
-        return x
-      })(),
+      startTime: this.startTime,
+      endTime: this.endTime,
       collections: this.collections,
       creators: this.creators,
     }
@@ -243,9 +271,16 @@ export const projectBeet = new beet.FixableBeetStruct<
     ['rewardMint', beetSolana.publicKey],
     ['vault', beetSolana.publicKey],
     ['name', beet.utf8String],
-    ['rewardsPerSecond', beet.u64],
+    ['rewardsPerDuration', beet.u64],
+    ['rewardsDuration', beet.u64],
+    ['maxRewardsDuration', beet.coption(beet.u64)],
+    ['minStakeDuration', beet.coption(beet.u64)],
+    ['cooldownDuration', beet.coption(beet.u64)],
+    ['resetStakeDuration', beet.bool],
+    ['allowedMints', beet.bool],
     ['totalStaked', beet.u64],
-    ['startTime', beet.i64],
+    ['startTime', beet.coption(beet.i64)],
+    ['endTime', beet.coption(beet.i64)],
     ['collections', beet.array(beetSolana.publicKey)],
     ['creators', beet.array(beetSolana.publicKey)],
   ],

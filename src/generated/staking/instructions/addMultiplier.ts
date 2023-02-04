@@ -8,78 +8,77 @@
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  UpdateProjectArgs,
-  updateProjectArgsBeet,
-} from '../types/UpdateProjectArgs'
+  AddMultiplierArgs,
+  addMultiplierArgsBeet,
+} from '../types/AddMultiplierArgs'
 
 /**
  * @category Instructions
- * @category UpdatePoject
+ * @category AddMultiplier
  * @category generated
  */
-export type UpdatePojectInstructionArgs = {
-  args: UpdateProjectArgs
+export type AddMultiplierInstructionArgs = {
+  args: AddMultiplierArgs
 }
 /**
  * @category Instructions
- * @category UpdatePoject
+ * @category AddMultiplier
  * @category generated
  */
-export const updatePojectStruct = new beet.FixableBeetArgsStruct<
-  UpdatePojectInstructionArgs & {
+export const addMultiplierStruct = new beet.FixableBeetArgsStruct<
+  AddMultiplierInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', updateProjectArgsBeet],
+    ['args', addMultiplierArgsBeet],
   ],
-  'UpdatePojectInstructionArgs'
+  'AddMultiplierInstructionArgs'
 )
 /**
- * Accounts required by the _updatePoject_ instruction
+ * Accounts required by the _addMultiplier_ instruction
  *
  * @property [_writable_] project
- * @property [] newAuthority
- * @property [] collection
- * @property [] creator
+ * @property [_writable_] multipliers
  * @property [_writable_, **signer**] authority
+ * @property [_writable_, **signer**] payer
+ * @property [] rentSysvar
  * @category Instructions
- * @category UpdatePoject
+ * @category AddMultiplier
  * @category generated
  */
-export type UpdatePojectInstructionAccounts = {
+export type AddMultiplierInstructionAccounts = {
   project: web3.PublicKey
-  newAuthority: web3.PublicKey
-  collection: web3.PublicKey
-  creator: web3.PublicKey
+  multipliers: web3.PublicKey
   authority: web3.PublicKey
+  payer: web3.PublicKey
   systemProgram?: web3.PublicKey
-  rent?: web3.PublicKey
+  rentSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const updatePojectInstructionDiscriminator = [
-  145, 101, 224, 142, 135, 126, 58, 73,
+export const addMultiplierInstructionDiscriminator = [
+  193, 91, 229, 211, 57, 136, 141, 169,
 ]
 
 /**
- * Creates a _UpdatePoject_ instruction.
+ * Creates a _AddMultiplier_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category UpdatePoject
+ * @category AddMultiplier
  * @category generated
  */
-export function createUpdatePojectInstruction(
-  accounts: UpdatePojectInstructionAccounts,
-  args: UpdatePojectInstructionArgs,
+export function createAddMultiplierInstruction(
+  accounts: AddMultiplierInstructionAccounts,
+  args: AddMultiplierInstructionArgs,
   programId = new web3.PublicKey('8pyniLLXEHVUJKX2h5E9DrvwTsRmSR64ucUYBg8jQgPP')
 ) {
-  const [data] = updatePojectStruct.serialize({
-    instructionDiscriminator: updatePojectInstructionDiscriminator,
+  const [data] = addMultiplierStruct.serialize({
+    instructionDiscriminator: addMultiplierInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -89,22 +88,17 @@ export function createUpdatePojectInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.newAuthority,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collection,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.creator,
-      isWritable: false,
+      pubkey: accounts.multipliers,
+      isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.authority,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.payer,
       isWritable: true,
       isSigner: true,
     },
@@ -114,7 +108,7 @@ export function createUpdatePojectInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
+      pubkey: accounts.rentSysvar,
       isWritable: false,
       isSigner: false,
     },

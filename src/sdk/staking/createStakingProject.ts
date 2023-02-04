@@ -2,11 +2,14 @@ import * as web3 from "@solana/web3.js";
 import {
   createCreateProjectInstruction,
   CreateProjectArgs,
-  createUpdatePojectInstruction,
+  AddMultiplierArgs,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/staking";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
+import { createUpdateStakingProjectTransaction } from "./updateStakingProject";
+import { createInitMultiplierTransaction } from "./initMultipliers";
+import { createAddMultiplierTransaction } from "./addMultiplier";
 
 export function createCreateStakingProjectTransaction(
   rewardMint: web3.PublicKey,
@@ -15,6 +18,8 @@ export function createCreateStakingProjectTransaction(
   args: CreateProjectArgs,
   collections: web3.PublicKey[] = [],
   creators: web3.PublicKey[] = [],
+  multipliers: AddMultiplierArgs[] = [],
+  multipliersDecimals: number = 9,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts & { project: web3.PublicKey } {
   const key = web3.Keypair.generate().publicKey;
@@ -43,43 +48,64 @@ export function createCreateStakingProjectTransaction(
       programId
     ),
 
-    ...collections.map((collection) =>
-      createUpdatePojectInstruction(
-        {
+    ...collections.map(
+      (collection) =>
+        createUpdateStakingProjectTransaction(
           project,
-          collection,
-          creator: programId,
           authority,
-          newAuthority: programId,
-        },
-        {
-          args: {
+          {
             name: null,
-            rewardsPerSecond: null,
+            rewardsPerDuration: null,
+            rewardsDuration: null,
+            maxRewardsDuration: null,
+            minStakeDuration: null,
+            cooldownDuration: null,
+            resetStakeDuration: null,
             startTime: null,
+            endTime: null,
           },
-        }
-      )
+          collection
+        ).tx.instructions[0]
     ),
 
-    ...creators.map((creator) =>
-      createUpdatePojectInstruction(
-        {
+    ...creators.map(
+      (creator) =>
+        createUpdateStakingProjectTransaction(
           project,
-          collection: programId,
-          creator,
           authority,
-          newAuthority: programId,
-        },
-        {
-          args: {
+          {
             name: null,
-            rewardsPerSecond: null,
+            rewardsPerDuration: null,
+            rewardsDuration: null,
+            maxRewardsDuration: null,
+            minStakeDuration: null,
+            cooldownDuration: null,
+            resetStakeDuration: null,
             startTime: null,
+            endTime: null,
           },
-        }
-      )
+          undefined,
+          creator
+        ).tx.instructions[0]
     ),
+
+    ...(multipliers.length
+      ? [
+          createInitMultiplierTransaction(project, authority, {
+            decimals: multipliersDecimals,
+          }).tx.instructions[0],
+
+          ...multipliers.map(
+            (multiplier) =>
+              createAddMultiplierTransaction(
+                project,
+                authority,
+                payer,
+                multiplier
+              ).tx.instructions[0]
+          ),
+        ]
+      : []),
   ];
 
   return {
@@ -95,7 +121,9 @@ export async function createStakingProject(
   rewardMint: web3.PublicKey,
   args: CreateProjectArgs,
   collections: web3.PublicKey[] = [],
-  creators: web3.PublicKey[] = []
+  creators: web3.PublicKey[] = [],
+  multipliers: AddMultiplierArgs[] = [],
+  multipliersDecimals: number = 9
 ) {
   const wallet = mx.identity();
   const ctx = createCreateStakingProjectTransaction(
@@ -104,7 +132,9 @@ export async function createStakingProject(
     wallet.publicKey,
     args,
     collections,
-    creators
+    creators,
+    multipliers,
+    multipliersDecimals
   );
 
   const blockhash = await mx.connection.getLatestBlockhash();
