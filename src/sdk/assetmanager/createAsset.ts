@@ -8,11 +8,7 @@ import {
   Metaplex,
   TransactionBuilder,
 } from "@metaplex-foundation/js";
-import {
-  getAssetPda,
-  getMetadataAccount_,
-  METADATA_PROGRAM_ID,
-} from "../assembler/pdas";
+import { getAssetPda, getMetadataAccount_, METADATA_PROGRAM_ID } from "../pdas";
 
 export function createCreateAssetTransaction(
   payer: web3.PublicKey,

@@ -5,7 +5,7 @@ import {
   BlockDefinitionValue,
 } from "../../generated";
 import { TxSignersAccounts } from "../../types";
-import { getBlockDefinitionPda } from "./pdas";
+import { getBlockDefinitionPda } from "../pdas";
 
 export function createCreateBlockDefinitionTransaction(
   assembler: web3.PublicKey,

@@ -6,7 +6,7 @@ import {
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
-import { getDelegateAuthorityPda } from "./pdas";
+import { getDelegateAuthorityPda } from "../pdas";
 
 export function createCreateDelegateAuthorityTransaction(
   assembler: web3.PublicKey,
