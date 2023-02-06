@@ -5,6 +5,7 @@ import {
   claimRewards,
   createStakingProject,
   fundRewards,
+  LockType,
   stake,
   unstake,
 } from "../src";
@@ -34,6 +35,7 @@ export default async function (
           resetStakeDuration: false,
           startTime: Date.now() * 1000,
           endTime: Date.now() * 1000 + 3600 * 24,
+          lockType: LockType.Freeze,
         },
         [new web3.PublicKey(args[1])],
         undefined,

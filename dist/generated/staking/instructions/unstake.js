@@ -73,6 +73,16 @@ function createUnstakeInstruction(accounts, programId = new web3.PublicKey('8pyn
             isSigner: false,
         },
         {
+            pubkey: accounts.depositAccount,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.depositTokenRecord,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.staker,
             isWritable: true,
             isSigner: false,
@@ -89,6 +99,11 @@ function createUnstakeInstruction(accounts, programId = new web3.PublicKey('8pyn
         },
         {
             pubkey: (_b = accounts.tokenProgram) !== null && _b !== void 0 ? _b : splToken.TOKEN_PROGRAM_ID,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.associatedTokenProgram,
             isWritable: false,
             isSigner: false,
         },

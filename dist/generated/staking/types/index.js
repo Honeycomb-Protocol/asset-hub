@@ -17,6 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./AddMultiplierArgs"), exports);
 __exportStar(require("./CreateProjectArgs"), exports);
 __exportStar(require("./InitMultipliersArgs"), exports);
+__exportStar(require("./LockType"), exports);
 __exportStar(require("./Multiplier"), exports);
 __exportStar(require("./MultiplierType"), exports);
 __exportStar(require("./UpdateProjectArgs"), exports);

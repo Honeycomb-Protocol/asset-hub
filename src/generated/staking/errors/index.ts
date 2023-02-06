@@ -158,6 +158,32 @@ createErrorFromCodeLookup.set(0x1776, () => new CantUnstakeYetError())
 createErrorFromNameLookup.set('CantUnstakeYet', () => new CantUnstakeYetError())
 
 /**
+ * DepositAccountNotProvided: 'Deposit account is not provided'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class DepositAccountNotProvidedError extends Error {
+  readonly code: number = 0x1777
+  readonly name: string = 'DepositAccountNotProvided'
+  constructor() {
+    super('Deposit account is not provided')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, DepositAccountNotProvidedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(
+  0x1777,
+  () => new DepositAccountNotProvidedError()
+)
+createErrorFromNameLookup.set(
+  'DepositAccountNotProvided',
+  () => new DepositAccountNotProvidedError()
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

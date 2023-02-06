@@ -12,9 +12,12 @@ export type StakeInstructionAccounts = {
     nftEdition: web3.PublicKey;
     nftTokenRecord: web3.PublicKey;
     staker: web3.PublicKey;
+    depositAccount: web3.PublicKey;
+    depositTokenRecord: web3.PublicKey;
     wallet: web3.PublicKey;
     systemProgram?: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
+    associatedTokenProgram: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;
     clock: web3.PublicKey;
     sysvarInstructions: web3.PublicKey;

@@ -6,6 +6,7 @@ import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
 import {
   getMetadataAccount_,
+  getStakedNftDepositPda,
   getStakedNftPda,
   getStakerPda,
   METADATA_PROGRAM_ID,
@@ -28,6 +29,11 @@ export function createStakeTransaction(
     __kind: "token_record",
     tokenAccount: nftAccount,
   });
+  const [depositAccount] = getStakedNftDepositPda(nftMint);
+  const [depositTokenRecord] = getMetadataAccount_(nftMint, {
+    __kind: "token_record",
+    tokenAccount: depositAccount,
+  });
   const [staker] = getStakerPda(project, wallet);
 
   const instructions: web3.TransactionInstruction[] = [
@@ -40,8 +46,11 @@ export function createStakeTransaction(
         nftMetadata,
         nftEdition,
         nftTokenRecord,
+        depositAccount,
+        depositTokenRecord,
         staker,
         wallet,
+        associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
         clock: web3.SYSVAR_CLOCK_PUBKEY,
         sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,

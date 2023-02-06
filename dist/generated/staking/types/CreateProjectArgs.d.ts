@@ -1,6 +1,8 @@
 import * as beet from '@metaplex-foundation/beet';
+import { LockType } from './LockType';
 export type CreateProjectArgs = {
     name: string;
+    lockType: beet.COption<LockType>;
     rewardsPerDuration: beet.bignum;
     rewardsDuration: beet.COption<beet.bignum>;
     maxRewardsDuration: beet.COption<beet.bignum>;

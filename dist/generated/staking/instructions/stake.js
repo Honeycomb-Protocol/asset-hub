@@ -78,6 +78,16 @@ function createStakeInstruction(accounts, programId = new web3.PublicKey('8pyniL
             isSigner: false,
         },
         {
+            pubkey: accounts.depositAccount,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.depositTokenRecord,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.wallet,
             isWritable: true,
             isSigner: true,
@@ -89,6 +99,11 @@ function createStakeInstruction(accounts, programId = new web3.PublicKey('8pyniL
         },
         {
             pubkey: (_b = accounts.tokenProgram) !== null && _b !== void 0 ? _b : splToken.TOKEN_PROGRAM_ID,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.associatedTokenProgram,
             isWritable: false,
             isSigner: false,
         },

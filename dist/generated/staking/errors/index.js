@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorFromName = exports.errorFromCode = exports.CantUnstakeYetError = exports.CantStakeYetError = exports.RewardsNotAvailableError = exports.InvalidNFTError = exports.InvalidMetadataError = exports.OnlyOwnerError = exports.OverflowError = void 0;
+exports.errorFromName = exports.errorFromCode = exports.DepositAccountNotProvidedError = exports.CantUnstakeYetError = exports.CantStakeYetError = exports.RewardsNotAvailableError = exports.InvalidNFTError = exports.InvalidMetadataError = exports.OnlyOwnerError = exports.OverflowError = void 0;
 const createErrorFromCodeLookup = new Map();
 const createErrorFromNameLookup = new Map();
 class OverflowError extends Error {
@@ -94,6 +94,19 @@ class CantUnstakeYetError extends Error {
 exports.CantUnstakeYetError = CantUnstakeYetError;
 createErrorFromCodeLookup.set(0x1776, () => new CantUnstakeYetError());
 createErrorFromNameLookup.set('CantUnstakeYet', () => new CantUnstakeYetError());
+class DepositAccountNotProvidedError extends Error {
+    constructor() {
+        super('Deposit account is not provided');
+        this.code = 0x1777;
+        this.name = 'DepositAccountNotProvided';
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, DepositAccountNotProvidedError);
+        }
+    }
+}
+exports.DepositAccountNotProvidedError = DepositAccountNotProvidedError;
+createErrorFromCodeLookup.set(0x1777, () => new DepositAccountNotProvidedError());
+createErrorFromNameLookup.set('DepositAccountNotProvided', () => new DepositAccountNotProvidedError());
 function errorFromCode(code) {
     const createError = createErrorFromCodeLookup.get(code);
     return createError != null ? createError() : null;

@@ -8,6 +8,7 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
+import { LockType, lockTypeBeet } from '../types/LockType'
 
 /**
  * Arguments used to create {@link Project}
@@ -21,6 +22,7 @@ export type ProjectArgs = {
   authority: web3.PublicKey
   rewardMint: web3.PublicKey
   vault: web3.PublicKey
+  lockType: LockType
   name: string
   rewardsPerDuration: beet.bignum
   rewardsDuration: beet.bignum
@@ -52,6 +54,7 @@ export class Project implements ProjectArgs {
     readonly authority: web3.PublicKey,
     readonly rewardMint: web3.PublicKey,
     readonly vault: web3.PublicKey,
+    readonly lockType: LockType,
     readonly name: string,
     readonly rewardsPerDuration: beet.bignum,
     readonly rewardsDuration: beet.bignum,
@@ -78,6 +81,7 @@ export class Project implements ProjectArgs {
       args.authority,
       args.rewardMint,
       args.vault,
+      args.lockType,
       args.name,
       args.rewardsPerDuration,
       args.rewardsDuration,
@@ -205,6 +209,7 @@ export class Project implements ProjectArgs {
       authority: this.authority.toBase58(),
       rewardMint: this.rewardMint.toBase58(),
       vault: this.vault.toBase58(),
+      lockType: 'LockType.' + LockType[this.lockType],
       name: this.name,
       rewardsPerDuration: (() => {
         const x = <{ toNumber: () => number }>this.rewardsPerDuration
@@ -270,6 +275,7 @@ export const projectBeet = new beet.FixableBeetStruct<
     ['authority', beetSolana.publicKey],
     ['rewardMint', beetSolana.publicKey],
     ['vault', beetSolana.publicKey],
+    ['lockType', lockTypeBeet],
     ['name', beet.utf8String],
     ['rewardsPerDuration', beet.u64],
     ['rewardsDuration', beet.u64],

@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStakedNftPda = exports.getStakerPda = exports.getAssetPda = exports.getUniqueConstraintPda = exports.getBlockDefinitionPda = exports.getDelegateAuthorityPda = exports.getBlockPda = exports.getDepositPda = exports.getNftPda = exports.getAssemblerPda = exports.getMetadataAccount_ = exports.METADATA_PROGRAM_ID = void 0;
+exports.getStakedNftDepositPda = exports.getStakedNftPda = exports.getStakerPda = exports.getAssetPda = exports.getUniqueConstraintPda = exports.getBlockDefinitionPda = exports.getDelegateAuthorityPda = exports.getBlockPda = exports.getDepositPda = exports.getNftPda = exports.getAssemblerPda = exports.getMetadataAccount_ = exports.METADATA_PROGRAM_ID = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const assembler_1 = require("../generated/assembler");
 const assetmanager_1 = require("../generated/assetmanager");
@@ -113,4 +113,8 @@ const getStakedNftPda = (project, mint, programId = staking_1.PROGRAM_ID) => {
     return web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), mint.toBuffer(), project.toBuffer()], programId);
 };
 exports.getStakedNftPda = getStakedNftPda;
+const getStakedNftDepositPda = (nftMint, programId = assembler_1.PROGRAM_ID) => {
+    return web3.PublicKey.findProgramAddressSync([Buffer.from("deposit"), nftMint.toBuffer()], programId);
+};
+exports.getStakedNftDepositPda = getStakedNftDepositPda;
 //# sourceMappingURL=pdas.js.map

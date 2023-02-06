@@ -27,15 +27,17 @@ exports.projectBeet = exports.Project = exports.projectDiscriminator = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
+const LockType_1 = require("../types/LockType");
 exports.projectDiscriminator = [205, 168, 189, 202, 181, 247, 142, 19];
 class Project {
-    constructor(bump, vaultBump, key, authority, rewardMint, vault, name, rewardsPerDuration, rewardsDuration, maxRewardsDuration, minStakeDuration, cooldownDuration, resetStakeDuration, allowedMints, totalStaked, startTime, endTime, collections, creators) {
+    constructor(bump, vaultBump, key, authority, rewardMint, vault, lockType, name, rewardsPerDuration, rewardsDuration, maxRewardsDuration, minStakeDuration, cooldownDuration, resetStakeDuration, allowedMints, totalStaked, startTime, endTime, collections, creators) {
         this.bump = bump;
         this.vaultBump = vaultBump;
         this.key = key;
         this.authority = authority;
         this.rewardMint = rewardMint;
         this.vault = vault;
+        this.lockType = lockType;
         this.name = name;
         this.rewardsPerDuration = rewardsPerDuration;
         this.rewardsDuration = rewardsDuration;
@@ -51,7 +53,7 @@ class Project {
         this.creators = creators;
     }
     static fromArgs(args) {
-        return new Project(args.bump, args.vaultBump, args.key, args.authority, args.rewardMint, args.vault, args.name, args.rewardsPerDuration, args.rewardsDuration, args.maxRewardsDuration, args.minStakeDuration, args.cooldownDuration, args.resetStakeDuration, args.allowedMints, args.totalStaked, args.startTime, args.endTime, args.collections, args.creators);
+        return new Project(args.bump, args.vaultBump, args.key, args.authority, args.rewardMint, args.vault, args.lockType, args.name, args.rewardsPerDuration, args.rewardsDuration, args.maxRewardsDuration, args.minStakeDuration, args.cooldownDuration, args.resetStakeDuration, args.allowedMints, args.totalStaked, args.startTime, args.endTime, args.collections, args.creators);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Project.deserialize(accountInfo.data, offset);
@@ -93,6 +95,7 @@ class Project {
             authority: this.authority.toBase58(),
             rewardMint: this.rewardMint.toBase58(),
             vault: this.vault.toBase58(),
+            lockType: 'LockType.' + LockType_1.LockType[this.lockType],
             name: this.name,
             rewardsPerDuration: (() => {
                 const x = this.rewardsPerDuration;
@@ -151,6 +154,7 @@ exports.projectBeet = new beet.FixableBeetStruct([
     ['authority', beetSolana.publicKey],
     ['rewardMint', beetSolana.publicKey],
     ['vault', beetSolana.publicKey],
+    ['lockType', LockType_1.lockTypeBeet],
     ['name', beet.utf8String],
     ['rewardsPerDuration', beet.u64],
     ['rewardsDuration', beet.u64],

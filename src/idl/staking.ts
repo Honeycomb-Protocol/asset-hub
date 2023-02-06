@@ -415,6 +415,24 @@ export type Staking = {
           ]
         },
         {
+          "name": "depositAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The account that will hold the nft sent on expedition"
+          ]
+        },
+        {
+          "name": "depositTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Deposit token_record"
+          ]
+        },
+        {
           "name": "wallet",
           "isMut": true,
           "isSigner": true,
@@ -436,6 +454,14 @@ export type Staking = {
           "isSigner": false,
           "docs": [
             "NATIVE TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
           ]
         },
         {
@@ -526,6 +552,24 @@ export type Staking = {
           ]
         },
         {
+          "name": "depositAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The account that will hold the nft sent on expedition"
+          ]
+        },
+        {
+          "name": "depositTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Deposit token_record"
+          ]
+        },
+        {
           "name": "staker",
           "isMut": true,
           "isSigner": false,
@@ -555,6 +599,14 @@ export type Staking = {
           "isSigner": false,
           "docs": [
             "NATIVE TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
           ]
         },
         {
@@ -925,6 +977,15 @@ export type Staking = {
             "type": "publicKey"
           },
           {
+            "name": "lockType",
+            "docs": [
+              "Lock type { Freeze, Custody }"
+            ],
+            "type": {
+              "defined": "LockType"
+            }
+          },
+          {
             "name": "name",
             "docs": [
               "name of the project"
@@ -1110,6 +1171,14 @@ export type Staking = {
             "type": "string"
           },
           {
+            "name": "lockType",
+            "type": {
+              "option": {
+                "defined": "LockType"
+              }
+            }
+          },
+          {
             "name": "rewardsPerDuration",
             "type": "u64"
           },
@@ -1283,6 +1352,20 @@ export type Staking = {
       }
     },
     {
+      "name": "LockType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Freeze"
+          },
+          {
+            "name": "Custoday"
+          }
+        ]
+      }
+    },
+    {
       "name": "ValidateCollectionCreatorOutput",
       "type": {
         "kind": "enum",
@@ -1344,6 +1427,11 @@ export type Staking = {
       "code": 6006,
       "name": "CantUnstakeYet",
       "msg": "Can't unstake yet"
+    },
+    {
+      "code": 6007,
+      "name": "DepositAccountNotProvided",
+      "msg": "Deposit account is not provided"
     }
   ]
 };
@@ -1765,6 +1853,24 @@ export const IDL: Staking = {
           ]
         },
         {
+          "name": "depositAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The account that will hold the nft sent on expedition"
+          ]
+        },
+        {
+          "name": "depositTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Deposit token_record"
+          ]
+        },
+        {
           "name": "wallet",
           "isMut": true,
           "isSigner": true,
@@ -1786,6 +1892,14 @@ export const IDL: Staking = {
           "isSigner": false,
           "docs": [
             "NATIVE TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
           ]
         },
         {
@@ -1876,6 +1990,24 @@ export const IDL: Staking = {
           ]
         },
         {
+          "name": "depositAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The account that will hold the nft sent on expedition"
+          ]
+        },
+        {
+          "name": "depositTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Deposit token_record"
+          ]
+        },
+        {
           "name": "staker",
           "isMut": true,
           "isSigner": false,
@@ -1905,6 +2037,14 @@ export const IDL: Staking = {
           "isSigner": false,
           "docs": [
             "NATIVE TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
           ]
         },
         {
@@ -2275,6 +2415,15 @@ export const IDL: Staking = {
             "type": "publicKey"
           },
           {
+            "name": "lockType",
+            "docs": [
+              "Lock type { Freeze, Custody }"
+            ],
+            "type": {
+              "defined": "LockType"
+            }
+          },
+          {
             "name": "name",
             "docs": [
               "name of the project"
@@ -2460,6 +2609,14 @@ export const IDL: Staking = {
             "type": "string"
           },
           {
+            "name": "lockType",
+            "type": {
+              "option": {
+                "defined": "LockType"
+              }
+            }
+          },
+          {
             "name": "rewardsPerDuration",
             "type": "u64"
           },
@@ -2633,6 +2790,20 @@ export const IDL: Staking = {
       }
     },
     {
+      "name": "LockType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Freeze"
+          },
+          {
+            "name": "Custoday"
+          }
+        ]
+      }
+    },
+    {
       "name": "ValidateCollectionCreatorOutput",
       "type": {
         "kind": "enum",
@@ -2694,6 +2865,11 @@ export const IDL: Staking = {
       "code": 6006,
       "name": "CantUnstakeYet",
       "msg": "Can't unstake yet"
+    },
+    {
+      "code": 6007,
+      "name": "DepositAccountNotProvided",
+      "msg": "Deposit account is not provided"
     }
   ]
 };

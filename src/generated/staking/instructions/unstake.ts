@@ -30,8 +30,11 @@ export const unstakeStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] nftMetadata
  * @property [] nftEdition
  * @property [_writable_] nftTokenRecord
+ * @property [_writable_] depositAccount
+ * @property [_writable_] depositTokenRecord
  * @property [_writable_] staker
  * @property [_writable_, **signer**] wallet
+ * @property [] associatedTokenProgram
  * @property [] tokenMetadataProgram
  * @property [] clock
  * @property [] sysvarInstructions
@@ -47,10 +50,13 @@ export type UnstakeInstructionAccounts = {
   nftMetadata: web3.PublicKey
   nftEdition: web3.PublicKey
   nftTokenRecord: web3.PublicKey
+  depositAccount: web3.PublicKey
+  depositTokenRecord: web3.PublicKey
   staker: web3.PublicKey
   wallet: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  associatedTokenProgram: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
   clock: web3.PublicKey
   sysvarInstructions: web3.PublicKey
@@ -113,6 +119,16 @@ export function createUnstakeInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.depositAccount,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.depositTokenRecord,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.staker,
       isWritable: true,
       isSigner: false,
@@ -129,6 +145,11 @@ export function createUnstakeInstruction(
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.associatedTokenProgram,
       isWritable: false,
       isSigner: false,
     },

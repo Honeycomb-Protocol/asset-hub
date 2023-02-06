@@ -16,6 +16,9 @@ pub struct Project {
     /// The account owning tokens distributed to stakers
     pub vault: Pubkey,
 
+    /// Lock type { Freeze, Custody }
+    pub lock_type: LockType,
+
     /// name of the project
     pub name: String,
 
@@ -56,7 +59,7 @@ pub struct Project {
     pub creators: Vec<Pubkey>,
 }
 impl Default for Project {
-    const LEN: usize = 8 + 268;
+    const LEN: usize = 8 + 266;
 
     fn set_defaults(&mut self) {
         self.bump = 0;
@@ -65,6 +68,7 @@ impl Default for Project {
         self.authority = Pubkey::default();
         self.reward_mint = Pubkey::default();
         self.vault = Pubkey::default();
+        self.lock_type = LockType::Freeze;
         self.name = "".to_string();
         self.rewards_per_duration = 0;
         self.rewards_duration = 1;
@@ -79,4 +83,10 @@ impl Default for Project {
         self.collections = vec![];
         self.creators = vec![];
     }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+pub enum LockType {
+    Freeze,
+    Custoday,
 }

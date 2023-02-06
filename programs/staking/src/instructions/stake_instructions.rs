@@ -1,7 +1,10 @@
 use {
     crate::{errors::ErrorCode, state::*, traits::Default, utils},
     anchor_lang::{prelude::*, solana_program},
-    anchor_spl::token::{self, Approve, Mint, Token, TokenAccount},
+    anchor_spl::{
+        associated_token::AssociatedToken,
+        token::{self, CloseAccount, Mint, Token, TokenAccount},
+    },
     mpl_token_metadata::{
         instruction::{DelegateArgs, RevokeArgs},
         state::{Metadata, TokenMetadataAccount},
@@ -123,6 +126,25 @@ pub struct Stake<'info> {
     #[account(mut, has_one = project, has_one = wallet)]
     pub staker: Account<'info, Staker>,
 
+    /// The account that will hold the nft sent on expedition
+    #[account(
+        init,
+        payer = wallet,
+        seeds = [
+            b"deposit",
+            nft_mint.key().as_ref(),
+        ],
+        bump,
+        token::mint = nft_mint,
+        token::authority = nft,
+    )]
+    pub deposit_account: Option<Account<'info, TokenAccount>>,
+
+    /// Deposit token_record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub deposit_token_record: Option<AccountInfo<'info>>,
+
     /// The wallet that pays for the rent
     #[account(mut)]
     pub wallet: Signer<'info>,
@@ -133,6 +155,9 @@ pub struct Stake<'info> {
     /// NATIVE TOKEN PROGRAM
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// ASSOCIATED TOKEN PROGRAM
+    pub associated_token_program: Program<'info, AssociatedToken>,
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -165,18 +190,6 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
         }
     }
 
-    token::approve(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            Approve {
-                to: ctx.accounts.nft_account.to_account_info(),
-                delegate: nft.to_account_info(),
-                authority: ctx.accounts.wallet.to_account_info(),
-            },
-        ),
-        1,
-    )?;
-
     let mint_key = ctx.accounts.nft_mint.key();
     let project_key = project.key();
     let nft_seeds = &[
@@ -187,40 +200,69 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
     ];
     let nft_signer = &[&nft_seeds[..]];
 
-    utils::delegate(
-        DelegateArgs::StakingV1 {
-            amount: 1,
-            authorization_data: None,
-        },
-        None,
-        nft.to_account_info(),
-        ctx.accounts.nft_metadata.to_account_info(),
-        ctx.accounts.nft_edition.to_account_info(),
-        ctx.accounts.nft_token_record.clone(),
-        ctx.accounts.nft_mint.to_account_info(),
-        ctx.accounts.nft_account.to_account_info(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
-        ctx.accounts.token_program.to_account_info(),
-        None,
-    )?;
+    match project.lock_type {
+        LockType::Freeze => {
+            utils::delegate(
+                DelegateArgs::StakingV1 {
+                    amount: 1,
+                    authorization_data: None,
+                },
+                None,
+                nft.to_account_info(),
+                ctx.accounts.nft_metadata.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_token_record.clone(),
+                ctx.accounts.nft_mint.to_account_info(),
+                ctx.accounts.nft_account.to_account_info(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                None,
+            )?;
 
-    utils::lock(
-        nft.to_account_info(),
-        ctx.accounts.nft_mint.to_account_info(),
-        ctx.accounts.nft_account.to_account_info(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.nft_metadata.to_account_info(),
-        ctx.accounts.nft_edition.to_account_info(),
-        ctx.accounts.nft_token_record.clone(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
-        ctx.accounts.token_program.to_account_info(),
-        Some(nft_signer),
-    )?;
+            utils::lock(
+                nft.to_account_info(),
+                ctx.accounts.nft_mint.to_account_info(),
+                ctx.accounts.nft_account.to_account_info(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.nft_metadata.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_token_record.clone(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                Some(nft_signer),
+            )?;
+        }
+        LockType::Custoday => {
+            if let Some(deposit_account) = &ctx.accounts.deposit_account {
+                utils::transfer(
+                    1,
+                    ctx.accounts.nft_account.to_account_info(),
+                    ctx.accounts.wallet.to_account_info(),
+                    deposit_account.to_account_info(),
+                    nft.to_account_info(),
+                    ctx.accounts.nft_mint.to_account_info(),
+                    ctx.accounts.nft_metadata.to_account_info(),
+                    ctx.accounts.nft_edition.to_account_info(),
+                    ctx.accounts.nft_token_record.clone(),
+                    ctx.accounts.deposit_token_record.clone(),
+                    ctx.accounts.wallet.to_account_info(),
+                    ctx.accounts.wallet.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                    ctx.accounts.token_program.to_account_info(),
+                    ctx.accounts.associated_token_program.to_account_info(),
+                    ctx.accounts.sysvar_instructions.to_account_info(),
+                    Some(nft_signer),
+                )?;
+            } else {
+                return Err(ErrorCode::DepositAccountNotProvided.into());
+            }
+        }
+    }
 
     nft.last_staked_at = ctx.accounts.clock.unix_timestamp;
     nft.staker = staker.key();
@@ -266,6 +308,19 @@ pub struct Unstake<'info> {
     #[account(mut)]
     pub nft_token_record: Option<AccountInfo<'info>>,
 
+    /// The account that will hold the nft sent on expedition
+    #[account(
+        mut,
+        token::mint = nft_mint,
+        token::authority = nft,
+    )]
+    pub deposit_account: Option<Account<'info, TokenAccount>>,
+
+    /// Deposit token_record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub deposit_token_record: Option<AccountInfo<'info>>,
+
     /// Staker state account
     #[account(mut, has_one = project, has_one = wallet)]
     pub staker: Account<'info, Staker>,
@@ -280,6 +335,9 @@ pub struct Unstake<'info> {
     /// NATIVE TOKEN PROGRAM
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// ASSOCIATED TOKEN PROGRAM
+    pub associated_token_program: Program<'info, AssociatedToken>,
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -328,37 +386,76 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
     ];
     let nft_signer = &[&nft_seeds[..]];
 
-    utils::unlock(
-        nft.to_account_info(),
-        ctx.accounts.nft_mint.to_account_info(),
-        ctx.accounts.nft_account.to_account_info(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.nft_metadata.to_account_info(),
-        ctx.accounts.nft_edition.to_account_info(),
-        ctx.accounts.nft_token_record.clone(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
-        ctx.accounts.token_program.to_account_info(),
-        Some(nft_signer),
-    )?;
+    match project.lock_type {
+        LockType::Freeze => {
+            utils::unlock(
+                nft.to_account_info(),
+                ctx.accounts.nft_mint.to_account_info(),
+                ctx.accounts.nft_account.to_account_info(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.nft_metadata.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_token_record.clone(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                Some(nft_signer),
+            )?;
 
-    utils::revoke(
-        RevokeArgs::StakingV1,
-        None,
-        nft.to_account_info(),
-        ctx.accounts.nft_metadata.to_account_info(),
-        ctx.accounts.nft_edition.to_account_info(),
-        ctx.accounts.nft_token_record.clone(),
-        ctx.accounts.nft_mint.to_account_info(),
-        ctx.accounts.nft_account.to_account_info(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
-        ctx.accounts.token_program.to_account_info(),
-        Some(nft_signer),
-    )?;
+            utils::revoke(
+                RevokeArgs::StakingV1,
+                None,
+                nft.to_account_info(),
+                ctx.accounts.nft_metadata.to_account_info(),
+                ctx.accounts.nft_edition.to_account_info(),
+                ctx.accounts.nft_token_record.clone(),
+                ctx.accounts.nft_mint.to_account_info(),
+                ctx.accounts.nft_account.to_account_info(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.wallet.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                Some(nft_signer),
+            )?;
+        }
+        LockType::Custoday => {
+            if let Some(deposit_account) = &ctx.accounts.deposit_account {
+                utils::transfer(
+                    1,
+                    deposit_account.to_account_info(),
+                    nft.to_account_info(),
+                    ctx.accounts.nft_account.to_account_info(),
+                    ctx.accounts.wallet.to_account_info(),
+                    ctx.accounts.nft_mint.to_account_info(),
+                    ctx.accounts.nft_metadata.to_account_info(),
+                    ctx.accounts.nft_edition.to_account_info(),
+                    ctx.accounts.deposit_token_record.clone(),
+                    ctx.accounts.nft_token_record.clone(),
+                    nft.to_account_info(),
+                    ctx.accounts.wallet.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                    ctx.accounts.token_program.to_account_info(),
+                    ctx.accounts.associated_token_program.to_account_info(),
+                    ctx.accounts.sysvar_instructions.to_account_info(),
+                    Some(nft_signer),
+                )?;
+
+                token::close_account(CpiContext::new_with_signer(
+                    ctx.accounts.token_program.to_account_info(),
+                    CloseAccount {
+                        account: deposit_account.to_account_info(),
+                        destination: ctx.accounts.wallet.to_account_info(),
+                        authority: nft.to_account_info(),
+                    },
+                    nft_signer,
+                ))?;
+            } else {
+                return Err(ErrorCode::DepositAccountNotProvided.into());
+            }
+        }
+    }
 
     Ok(())
 }

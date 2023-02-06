@@ -180,3 +180,13 @@ export const getStakedNftPda = (
     programId
   );
 };
+
+export const getStakedNftDepositPda = (
+  nftMint: web3.PublicKey,
+  programId = ASSEMBLER_PROGRAM_ID
+) => {
+  return web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("deposit"), nftMint.toBuffer()],
+    programId
+  );
+};

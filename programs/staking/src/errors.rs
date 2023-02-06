@@ -22,4 +22,7 @@ pub enum ErrorCode {
 
     #[msg("Can't unstake yet")]
     CantUnstakeYet,
+
+    #[msg("Deposit account is not provided")]
+    DepositAccountNotProvided,
 }

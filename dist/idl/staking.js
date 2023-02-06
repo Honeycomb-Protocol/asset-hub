@@ -418,6 +418,24 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "depositAccount",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "The account that will hold the nft sent on expedition"
+                    ]
+                },
+                {
+                    "name": "depositTokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "Deposit token_record"
+                    ]
+                },
+                {
                     "name": "wallet",
                     "isMut": true,
                     "isSigner": true,
@@ -439,6 +457,14 @@ exports.IDL = {
                     "isSigner": false,
                     "docs": [
                         "NATIVE TOKEN PROGRAM"
+                    ]
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "ASSOCIATED TOKEN PROGRAM"
                     ]
                 },
                 {
@@ -529,6 +555,24 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "depositAccount",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "The account that will hold the nft sent on expedition"
+                    ]
+                },
+                {
+                    "name": "depositTokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "Deposit token_record"
+                    ]
+                },
+                {
                     "name": "staker",
                     "isMut": true,
                     "isSigner": false,
@@ -558,6 +602,14 @@ exports.IDL = {
                     "isSigner": false,
                     "docs": [
                         "NATIVE TOKEN PROGRAM"
+                    ]
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "ASSOCIATED TOKEN PROGRAM"
                     ]
                 },
                 {
@@ -928,6 +980,15 @@ exports.IDL = {
                         "type": "publicKey"
                     },
                     {
+                        "name": "lockType",
+                        "docs": [
+                            "Lock type { Freeze, Custody }"
+                        ],
+                        "type": {
+                            "defined": "LockType"
+                        }
+                    },
+                    {
                         "name": "name",
                         "docs": [
                             "name of the project"
@@ -1113,6 +1174,14 @@ exports.IDL = {
                         "type": "string"
                     },
                     {
+                        "name": "lockType",
+                        "type": {
+                            "option": {
+                                "defined": "LockType"
+                            }
+                        }
+                    },
+                    {
                         "name": "rewardsPerDuration",
                         "type": "u64"
                     },
@@ -1286,6 +1355,20 @@ exports.IDL = {
             }
         },
         {
+            "name": "LockType",
+            "type": {
+                "kind": "enum",
+                "variants": [
+                    {
+                        "name": "Freeze"
+                    },
+                    {
+                        "name": "Custoday"
+                    }
+                ]
+            }
+        },
+        {
             "name": "ValidateCollectionCreatorOutput",
             "type": {
                 "kind": "enum",
@@ -1347,6 +1430,11 @@ exports.IDL = {
             "code": 6006,
             "name": "CantUnstakeYet",
             "msg": "Can't unstake yet"
+        },
+        {
+            "code": 6007,
+            "name": "DepositAccountNotProvided",
+            "msg": "Deposit account is not provided"
         }
     ]
 };

@@ -40,6 +40,11 @@ function createUnstakeTransaction(project, nftMint, wallet, programId = staking_
         __kind: "token_record",
         tokenAccount: nftAccount,
     });
+    const [depositAccount] = (0, pdas_1.getStakedNftDepositPda)(nftMint);
+    const [depositTokenRecord] = (0, pdas_1.getMetadataAccount_)(nftMint, {
+        __kind: "token_record",
+        tokenAccount: depositAccount,
+    });
     const [staker] = (0, pdas_1.getStakerPda)(project, wallet);
     const instructions = [
         (0, generated_1.createUnstakeInstruction)({
@@ -50,8 +55,11 @@ function createUnstakeTransaction(project, nftMint, wallet, programId = staking_
             nftMetadata,
             nftEdition,
             nftTokenRecord,
+            depositAccount,
+            depositTokenRecord,
             staker,
             wallet,
+            associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
             tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
             clock: web3.SYSVAR_CLOCK_PUBKEY,
             sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,

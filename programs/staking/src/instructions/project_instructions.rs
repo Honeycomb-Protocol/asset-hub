@@ -58,6 +58,7 @@ pub struct CreateProject<'info> {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct CreateProjectArgs {
     pub name: String,
+    pub lock_type: Option<LockType>,
     pub rewards_per_duration: u64,
     pub rewards_duration: Option<u64>,
     pub max_rewards_duration: Option<u64>,
@@ -80,6 +81,7 @@ pub fn create_project(ctx: Context<CreateProject>, args: CreateProjectArgs) -> R
     project.reward_mint = ctx.accounts.reward_mint.key();
     project.vault = ctx.accounts.vault.key();
     project.name = args.name;
+    project.lock_type = args.lock_type.unwrap_or(LockType::Freeze);
     project.rewards_per_duration = args.rewards_per_duration;
     project.rewards_duration = args.rewards_duration.unwrap_or(1);
     project.max_rewards_duration = args.max_rewards_duration;

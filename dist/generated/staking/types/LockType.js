@@ -23,19 +23,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createProjectArgsBeet = void 0;
+exports.lockTypeBeet = exports.LockType = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
-const LockType_1 = require("./LockType");
-exports.createProjectArgsBeet = new beet.FixableBeetArgsStruct([
-    ['name', beet.utf8String],
-    ['lockType', beet.coption(LockType_1.lockTypeBeet)],
-    ['rewardsPerDuration', beet.u64],
-    ['rewardsDuration', beet.coption(beet.u64)],
-    ['maxRewardsDuration', beet.coption(beet.u64)],
-    ['minStakeDuration', beet.coption(beet.u64)],
-    ['cooldownDuration', beet.coption(beet.u64)],
-    ['resetStakeDuration', beet.coption(beet.bool)],
-    ['startTime', beet.coption(beet.i64)],
-    ['endTime', beet.coption(beet.i64)],
-], 'CreateProjectArgs');
-//# sourceMappingURL=CreateProjectArgs.js.map
+var LockType;
+(function (LockType) {
+    LockType[LockType["Freeze"] = 0] = "Freeze";
+    LockType[LockType["Custoday"] = 1] = "Custoday";
+})(LockType = exports.LockType || (exports.LockType = {}));
+exports.lockTypeBeet = beet.fixedScalarEnum(LockType);
+//# sourceMappingURL=LockType.js.map

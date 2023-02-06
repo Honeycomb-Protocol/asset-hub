@@ -2,6 +2,7 @@
 import * as web3 from '@solana/web3.js';
 import * as beet from '@metaplex-foundation/beet';
 import * as beetSolana from '@metaplex-foundation/beet-solana';
+import { LockType } from '../types/LockType';
 export type ProjectArgs = {
     bump: number;
     vaultBump: number;
@@ -9,6 +10,7 @@ export type ProjectArgs = {
     authority: web3.PublicKey;
     rewardMint: web3.PublicKey;
     vault: web3.PublicKey;
+    lockType: LockType;
     name: string;
     rewardsPerDuration: beet.bignum;
     rewardsDuration: beet.bignum;
@@ -31,6 +33,7 @@ export declare class Project implements ProjectArgs {
     readonly authority: web3.PublicKey;
     readonly rewardMint: web3.PublicKey;
     readonly vault: web3.PublicKey;
+    readonly lockType: LockType;
     readonly name: string;
     readonly rewardsPerDuration: beet.bignum;
     readonly rewardsDuration: beet.bignum;
@@ -62,6 +65,7 @@ export declare class Project implements ProjectArgs {
         authority: string;
         rewardMint: string;
         vault: string;
+        lockType: string;
         name: string;
         rewardsPerDuration: number | {
             toNumber: () => number;

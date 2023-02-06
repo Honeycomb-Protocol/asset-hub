@@ -409,16 +409,6 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                     ctx.accounts.sysvar_instructions.to_account_info(),
                     Some(assembler_signer),
                 )?;
-
-                token::close_account(CpiContext::new_with_signer(
-                    ctx.accounts.token_program.to_account_info(),
-                    CloseAccount {
-                        account: deposit_account.to_account_info(),
-                        destination: ctx.accounts.authority.to_account_info(),
-                        authority: assembler.to_account_info(),
-                    },
-                    assembler_signer,
-                ))?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
             }
@@ -630,7 +620,7 @@ pub struct BurnNFT<'info> {
     pub assembler: Account<'info, Assembler>,
 
     /// NFT account
-    #[account(mut, has_one = authority, has_one = assembler)]
+    #[account(mut, has_one = assembler)]
     pub nft: Account<'info, NFT>,
 
     /// NFT mint account
@@ -912,6 +902,16 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                     ctx.accounts.sysvar_instructions.to_account_info(),
                     Some(assembler_signer),
                 )?;
+
+                token::close_account(CpiContext::new_with_signer(
+                    ctx.accounts.token_program.to_account_info(),
+                    CloseAccount {
+                        account: deposit_account.to_account_info(),
+                        destination: ctx.accounts.authority.to_account_info(),
+                        authority: assembler.to_account_info(),
+                    },
+                    assembler_signer,
+                ))?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
             }
