@@ -33,20 +33,15 @@ const utils_1 = require("../../utils");
 const initStaker_1 = require("./initStaker");
 const initNFT_1 = require("./initNFT");
 function createStakeTransaction(project, nftMint, wallet, programId = staking_1.PROGRAM_ID) {
-    const [nft] = web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()], programId);
+    const [nft] = (0, pdas_1.getStakedNftPda)(project, nftMint);
     const nftAccount = splToken.getAssociatedTokenAddressSync(nftMint, wallet);
-    const [nftMetadata] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        pdas_1.METADATA_PROGRAM_ID.toBuffer(),
-        nftMint.toBuffer(),
-    ], pdas_1.METADATA_PROGRAM_ID);
-    const [nftEdition] = web3.PublicKey.findProgramAddressSync([
-        Buffer.from("metadata"),
-        pdas_1.METADATA_PROGRAM_ID.toBuffer(),
-        nftMint.toBuffer(),
-        Buffer.from("edition"),
-    ], pdas_1.METADATA_PROGRAM_ID);
-    const [staker] = web3.PublicKey.findProgramAddressSync([Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()], programId);
+    const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint);
+    const [nftEdition] = (0, pdas_1.getMetadataAccount_)(nftMint, { __kind: "edition" });
+    const [nftTokenRecord] = (0, pdas_1.getMetadataAccount_)(nftMint, {
+        __kind: "token_record",
+        tokenAccount: nftAccount,
+    });
+    const [staker] = (0, pdas_1.getStakerPda)(project, wallet);
     const instructions = [
         (0, generated_1.createStakeInstruction)({
             project,
@@ -55,6 +50,7 @@ function createStakeTransaction(project, nftMint, wallet, programId = staking_1.
             nftAccount,
             nftMetadata,
             nftEdition,
+            nftTokenRecord,
             staker,
             wallet,
             tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,

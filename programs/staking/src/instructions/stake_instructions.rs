@@ -1,9 +1,9 @@
 use {
     crate::{errors::ErrorCode, state::*, traits::Default, utils},
     anchor_lang::{prelude::*, solana_program},
-    anchor_spl::token::{self, Approve, Mint, Revoke, Token, TokenAccount},
+    anchor_spl::token::{self, Approve, Mint, Token, TokenAccount},
     mpl_token_metadata::{
-        instruction::InstructionBuilder,
+        instruction::{DelegateArgs, RevokeArgs},
         state::{Metadata, TokenMetadataAccount},
     },
 };
@@ -114,6 +114,11 @@ pub struct Stake<'info> {
     #[account()]
     pub nft_edition: AccountInfo<'info>,
 
+    /// NFT token record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_token_record: Option<AccountInfo<'info>>,
+
     /// Staker state account
     #[account(mut, has_one = project, has_one = wallet)]
     pub staker: Account<'info, Staker>,
@@ -182,38 +187,39 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
     ];
     let nft_signer = &[&nft_seeds[..]];
 
-    let lock_ix = mpl_token_metadata::instruction::builders::LockBuilder::new()
-        .authority(nft.key())
-        .token_owner(ctx.accounts.wallet.key())
-        .token(ctx.accounts.nft_account.key())
-        .mint(ctx.accounts.nft_mint.key())
-        .metadata(ctx.accounts.nft_metadata.key())
-        .edition(ctx.accounts.nft_edition.key())
-        .payer(ctx.accounts.wallet.key())
-        .system_program(ctx.accounts.system_program.key())
-        .sysvar_instructions(ctx.accounts.sysvar_instructions.key())
-        .spl_token_program(ctx.accounts.token_program.key())
-        .build(mpl_token_metadata::instruction::LockArgs::V1 {
+    utils::delegate(
+        DelegateArgs::StakingV1 {
+            amount: 1,
             authorization_data: None,
-        })
-        .unwrap()
-        .instruction();
+        },
+        None,
+        nft.to_account_info(),
+        ctx.accounts.nft_metadata.to_account_info(),
+        ctx.accounts.nft_edition.to_account_info(),
+        ctx.accounts.nft_token_record.clone(),
+        ctx.accounts.nft_mint.to_account_info(),
+        ctx.accounts.nft_account.to_account_info(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
+        None,
+    )?;
 
-    solana_program::program::invoke_signed(
-        &lock_ix,
-        &[
-            nft.to_account_info(),
-            ctx.accounts.wallet.to_account_info(),
-            ctx.accounts.nft_account.to_account_info(),
-            ctx.accounts.nft_mint.to_account_info(),
-            ctx.accounts.nft_metadata.to_account_info(),
-            ctx.accounts.nft_edition.to_account_info(),
-            ctx.accounts.wallet.to_account_info(),
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.sysvar_instructions.to_account_info(),
-            ctx.accounts.token_program.to_account_info(),
-        ],
-        nft_signer,
+    utils::lock(
+        nft.to_account_info(),
+        ctx.accounts.nft_mint.to_account_info(),
+        ctx.accounts.nft_account.to_account_info(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.nft_metadata.to_account_info(),
+        ctx.accounts.nft_edition.to_account_info(),
+        ctx.accounts.nft_token_record.clone(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
+        Some(nft_signer),
     )?;
 
     nft.last_staked_at = ctx.accounts.clock.unix_timestamp;
@@ -254,6 +260,11 @@ pub struct Unstake<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account()]
     pub nft_edition: AccountInfo<'info>,
+
+    /// NFT token record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_token_record: Option<AccountInfo<'info>>,
 
     /// Staker state account
     #[account(mut, has_one = project, has_one = wallet)]
@@ -317,47 +328,37 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
     ];
     let nft_signer = &[&nft_seeds[..]];
 
-    let unlock_ix = mpl_token_metadata::instruction::builders::UnlockBuilder::new()
-        .authority(ctx.accounts.nft.key())
-        .token_owner(ctx.accounts.wallet.key())
-        .token(ctx.accounts.nft_account.key())
-        .mint(ctx.accounts.nft_mint.key())
-        .metadata(ctx.accounts.nft_metadata.key())
-        .edition(ctx.accounts.nft_edition.key())
-        .payer(ctx.accounts.wallet.key())
-        .system_program(ctx.accounts.system_program.key())
-        .sysvar_instructions(ctx.accounts.sysvar_instructions.key())
-        .spl_token_program(ctx.accounts.token_program.key())
-        .build(mpl_token_metadata::instruction::UnlockArgs::V1 {
-            authorization_data: None,
-        })
-        .unwrap()
-        .instruction();
-
-    solana_program::program::invoke_signed(
-        &unlock_ix,
-        &[
-            ctx.accounts.nft.to_account_info(),
-            ctx.accounts.wallet.to_account_info(),
-            ctx.accounts.nft_account.to_account_info(),
-            ctx.accounts.nft_mint.to_account_info(),
-            ctx.accounts.nft_metadata.to_account_info(),
-            ctx.accounts.nft_edition.to_account_info(),
-            ctx.accounts.wallet.to_account_info(),
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.sysvar_instructions.to_account_info(),
-            ctx.accounts.token_program.to_account_info(),
-        ],
-        nft_signer,
+    utils::unlock(
+        nft.to_account_info(),
+        ctx.accounts.nft_mint.to_account_info(),
+        ctx.accounts.nft_account.to_account_info(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.nft_metadata.to_account_info(),
+        ctx.accounts.nft_edition.to_account_info(),
+        ctx.accounts.nft_token_record.clone(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
+        Some(nft_signer),
     )?;
 
-    token::revoke(CpiContext::new(
+    utils::revoke(
+        RevokeArgs::StakingV1,
+        None,
+        nft.to_account_info(),
+        ctx.accounts.nft_metadata.to_account_info(),
+        ctx.accounts.nft_edition.to_account_info(),
+        ctx.accounts.nft_token_record.clone(),
+        ctx.accounts.nft_mint.to_account_info(),
+        ctx.accounts.nft_account.to_account_info(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.wallet.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
-        Revoke {
-            source: ctx.accounts.nft_account.to_account_info(),
-            authority: ctx.accounts.wallet.to_account_info(),
-        },
-    ))?;
+        Some(nft_signer),
+    )?;
 
     Ok(())
 }

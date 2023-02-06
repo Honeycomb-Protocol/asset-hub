@@ -401,6 +401,15 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "nftTokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "NFT token record"
+                    ]
+                },
+                {
                     "name": "staker",
                     "isMut": true,
                     "isSigner": false,
@@ -508,6 +517,15 @@ exports.IDL = {
                     "isSigner": false,
                     "docs": [
                         "NFT edition"
+                    ]
+                },
+                {
+                    "name": "nftTokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "NFT token record"
                     ]
                 },
                 {

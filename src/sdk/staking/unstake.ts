@@ -4,7 +4,12 @@ import { createUnstakeInstruction, Project } from "../../generated";
 import { PROGRAM_ID } from "../../generated/staking";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
-import { METADATA_PROGRAM_ID } from "../pdas";
+import {
+  getMetadataAccount_,
+  getStakedNftPda,
+  getStakerPda,
+  METADATA_PROGRAM_ID,
+} from "../pdas";
 import { createClaimRewardsTransaction } from "./claimRewards";
 import { getOrFetchMultipliers } from "../../utils";
 
@@ -14,36 +19,15 @@ export function createUnstakeTransaction(
   wallet: web3.PublicKey,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
-  const [nft] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("nft"), nftMint.toBuffer(), project.toBuffer()],
-    programId
-  );
-
+  const [nft] = getStakedNftPda(project, nftMint);
   const nftAccount = splToken.getAssociatedTokenAddressSync(nftMint, wallet);
-
-  const [nftMetadata] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      nftMint.toBuffer(),
-    ],
-    METADATA_PROGRAM_ID
-  );
-
-  const [nftEdition] = web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      nftMint.toBuffer(),
-      Buffer.from("edition"),
-    ],
-    METADATA_PROGRAM_ID
-  );
-
-  const [staker] = web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()],
-    programId
-  );
+  const [nftMetadata] = getMetadataAccount_(nftMint);
+  const [nftEdition] = getMetadataAccount_(nftMint, { __kind: "edition" });
+  const [nftTokenRecord] = getMetadataAccount_(nftMint, {
+    __kind: "token_record",
+    tokenAccount: nftAccount,
+  });
+  const [staker] = getStakerPda(project, wallet);
 
   const instructions: web3.TransactionInstruction[] = [
     createUnstakeInstruction(
@@ -54,6 +38,7 @@ export function createUnstakeTransaction(
         nftAccount,
         nftMetadata,
         nftEdition,
+        nftTokenRecord,
         staker,
         wallet,
         tokenMetadataProgram: METADATA_PROGRAM_ID,

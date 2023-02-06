@@ -23,10 +23,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAssetPda = exports.getUniqueConstraintPda = exports.getBlockDefinitionPda = exports.getDelegateAuthorityPda = exports.getBlockPda = exports.getDepositPda = exports.getNftPda = exports.getAssemblerPda = exports.getMetadataAccount_ = exports.METADATA_PROGRAM_ID = void 0;
+exports.getStakedNftPda = exports.getStakerPda = exports.getAssetPda = exports.getUniqueConstraintPda = exports.getBlockDefinitionPda = exports.getDelegateAuthorityPda = exports.getBlockPda = exports.getDepositPda = exports.getNftPda = exports.getAssemblerPda = exports.getMetadataAccount_ = exports.METADATA_PROGRAM_ID = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const assembler_1 = require("../generated/assembler");
 const assetmanager_1 = require("../generated/assetmanager");
+const staking_1 = require("../generated/staking");
 exports.METADATA_PROGRAM_ID = new web3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 const getMetadataAccount_ = (mint, type, programId = exports.METADATA_PROGRAM_ID) => {
     const seeds = [
@@ -104,4 +105,12 @@ const getAssetPda = (mint, programId = assetmanager_1.PROGRAM_ID) => {
     return web3.PublicKey.findProgramAddressSync([Buffer.from("asset"), mint.toBuffer()], programId);
 };
 exports.getAssetPda = getAssetPda;
+const getStakerPda = (project, wallet, programId = staking_1.PROGRAM_ID) => {
+    return web3.PublicKey.findProgramAddressSync([Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()], programId);
+};
+exports.getStakerPda = getStakerPda;
+const getStakedNftPda = (project, mint, programId = staking_1.PROGRAM_ID) => {
+    return web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), mint.toBuffer(), project.toBuffer()], programId);
+};
+exports.getStakedNftPda = getStakedNftPda;
 //# sourceMappingURL=pdas.js.map

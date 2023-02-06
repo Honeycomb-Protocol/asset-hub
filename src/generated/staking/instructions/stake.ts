@@ -29,6 +29,7 @@ export const stakeStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] nftAccount
  * @property [_writable_] nftMetadata
  * @property [] nftEdition
+ * @property [_writable_] nftTokenRecord
  * @property [_writable_] staker
  * @property [_writable_, **signer**] wallet
  * @property [] tokenMetadataProgram
@@ -45,6 +46,7 @@ export type StakeInstructionAccounts = {
   nftAccount: web3.PublicKey
   nftMetadata: web3.PublicKey
   nftEdition: web3.PublicKey
+  nftTokenRecord: web3.PublicKey
   staker: web3.PublicKey
   wallet: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -103,6 +105,11 @@ export function createStakeInstruction(
     {
       pubkey: accounts.nftEdition,
       isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.nftTokenRecord,
+      isWritable: true,
       isSigner: false,
     },
     {

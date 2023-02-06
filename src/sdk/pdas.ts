@@ -4,6 +4,7 @@ import {
   PROGRAM_ID as ASSEMBLER_PROGRAM_ID,
 } from "../generated/assembler";
 import { PROGRAM_ID as ASSETMANAGER_PROGRAM_ID } from "../generated/assetmanager";
+import { PROGRAM_ID as STAKING_PROGRAM_ID } from "../generated/staking";
 
 type MetadataPDaType =
   | { __kind: "edition" }
@@ -152,6 +153,30 @@ export const getAssetPda = (
 ) => {
   return web3.PublicKey.findProgramAddressSync(
     [Buffer.from("asset"), mint.toBuffer()],
+    programId
+  );
+};
+
+// Staking
+
+export const getStakerPda = (
+  project: web3.PublicKey,
+  wallet: web3.PublicKey,
+  programId: web3.PublicKey = STAKING_PROGRAM_ID
+) => {
+  return web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()],
+    programId
+  );
+};
+
+export const getStakedNftPda = (
+  project: web3.PublicKey,
+  mint: web3.PublicKey,
+  programId: web3.PublicKey = STAKING_PROGRAM_ID
+) => {
+  return web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("nft"), mint.toBuffer(), project.toBuffer()],
     programId
   );
 };
