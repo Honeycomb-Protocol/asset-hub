@@ -34,7 +34,7 @@ exports.updateMetadataStruct = new beet.FixableBeetArgsStruct([
 exports.updateMetadataInstructionDiscriminator = [
     170, 182, 43, 239, 97, 78, 225, 186,
 ];
-function createUpdateMetadataInstruction(accounts, args, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
+function createUpdateMetadataInstruction(accounts, args, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     const [data] = exports.updateMetadataStruct.serialize({
         instructionDiscriminator: exports.updateMetadataInstructionDiscriminator,
         ...args,

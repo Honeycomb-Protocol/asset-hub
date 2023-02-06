@@ -25,7 +25,7 @@ export default async function (
   switch (action) {
     case "create-assembler":
       const assemblerTx = await createAssembler(mx, {
-        assemblingAction: AssemblingAction.TakeCustody,
+        assemblingAction: AssemblingAction.Freeze,
         collectionName: "Assembler Test Collection",
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",
@@ -163,7 +163,7 @@ export default async function (
             order: deployments.blockOrder,
           },
         ],
-      });
+      }).catch((e) => console.error(e));
       if (!mint) throw new Error("Mint txns failed!");
       console.log("Mint response: ", mint.responses);
       setDeployments({

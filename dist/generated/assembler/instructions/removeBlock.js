@@ -31,7 +31,7 @@ exports.removeBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator'
 exports.removeBlockInstructionDiscriminator = [
     145, 94, 239, 114, 4, 117, 167, 145,
 ];
-function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
+function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     var _a, _b, _c;
     const [data] = exports.removeBlockStruct.serialize({
         instructionDiscriminator: exports.removeBlockInstructionDiscriminator,
@@ -69,7 +69,7 @@ function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('
         },
         {
             pubkey: accounts.tokenMetadata,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {
@@ -78,7 +78,17 @@ function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('
             isSigner: false,
         },
         {
+            pubkey: accounts.tokenRecord,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.depositAccount,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.depositTokenRecord,
             isWritable: true,
             isSigner: false,
         },
@@ -88,7 +98,22 @@ function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('
             isSigner: true,
         },
         {
-            pubkey: (_a = accounts.tokenProgram) !== null && _a !== void 0 ? _a : splToken.TOKEN_PROGRAM_ID,
+            pubkey: accounts.payer,
+            isWritable: true,
+            isSigner: true,
+        },
+        {
+            pubkey: (_a = accounts.systemProgram) !== null && _a !== void 0 ? _a : web3.SystemProgram.programId,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: (_b = accounts.tokenProgram) !== null && _b !== void 0 ? _b : splToken.TOKEN_PROGRAM_ID,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.associatedTokenProgram,
             isWritable: false,
             isSigner: false,
         },
@@ -98,7 +123,7 @@ function createRemoveBlockInstruction(accounts, programId = new web3.PublicKey('
             isSigner: false,
         },
         {
-            pubkey: (_b = accounts.systemProgram) !== null && _b !== void 0 ? _b : web3.SystemProgram.programId,
+            pubkey: accounts.sysvarInstructions,
             isWritable: false,
             isSigner: false,
         },

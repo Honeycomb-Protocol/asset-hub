@@ -577,7 +577,7 @@ exports.IDL = {
                 },
                 {
                     "name": "tokenMetadata",
-                    "isMut": false,
+                    "isMut": true,
                     "isSigner": false,
                     "docs": [
                         "Attribute token metadata"
@@ -592,12 +592,30 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "tokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "Attribute token record"
+                    ]
+                },
+                {
                     "name": "depositAccount",
                     "isMut": true,
                     "isSigner": false,
                     "isOptional": true,
                     "docs": [
                         "The account that will hold the nft sent on expedition"
+                    ]
+                },
+                {
+                    "name": "depositTokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "Deposit token_record"
                     ]
                 },
                 {
@@ -633,11 +651,27 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "ASSOCIATED TOKEN PROGRAM"
+                    ]
+                },
+                {
                     "name": "tokenMetadataProgram",
                     "isMut": false,
                     "isSigner": false,
                     "docs": [
                         "METAPLEX TOKEN METADATA PROGRAM"
+                    ]
+                },
+                {
+                    "name": "sysvarInstructions",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "NATIVE Instructions SYSVAR"
                     ]
                 },
                 {
@@ -894,7 +928,7 @@ exports.IDL = {
                 },
                 {
                     "name": "tokenMetadata",
-                    "isMut": false,
+                    "isMut": true,
                     "isSigner": false,
                     "docs": [
                         "Burning token metadata"
@@ -909,12 +943,30 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "tokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "Attribute token record"
+                    ]
+                },
+                {
                     "name": "depositAccount",
                     "isMut": true,
                     "isSigner": false,
                     "isOptional": true,
                     "docs": [
                         "The account that will hold the nft sent on expedition"
+                    ]
+                },
+                {
+                    "name": "depositTokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "Deposit token_record"
                     ]
                 },
                 {
@@ -926,11 +978,35 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "payer",
+                    "isMut": true,
+                    "isSigner": true,
+                    "docs": [
+                        "The wallet that pays for the rent"
+                    ]
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "SYSTEM PROGRAM"
+                    ]
+                },
+                {
                     "name": "tokenProgram",
                     "isMut": false,
                     "isSigner": false,
                     "docs": [
                         "SPL TOKEN PROGRAM"
+                    ]
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "ASSOCIATED TOKEN PROGRAM"
                     ]
                 },
                 {
@@ -942,11 +1018,11 @@ exports.IDL = {
                     ]
                 },
                 {
-                    "name": "systemProgram",
+                    "name": "sysvarInstructions",
                     "isMut": false,
                     "isSigner": false,
                     "docs": [
-                        "SYSTEM PROGRAM"
+                        "NATIVE Instructions SYSVAR"
                     ]
                 },
                 {
@@ -1910,21 +1986,26 @@ exports.IDL = {
         },
         {
             "code": 6013,
+            "name": "DelegateAccountNotProvided",
+            "msg": "Delegate is not provided"
+        },
+        {
+            "code": 6014,
             "name": "DepositAccountNotProvided",
             "msg": "Deposit account is not provided"
         },
         {
-            "code": 6014,
+            "code": 6015,
             "name": "NFTNotMinted",
             "msg": "The NFT is not minted"
         },
         {
-            "code": 6015,
+            "code": 6016,
             "name": "NFTNotBurnable",
             "msg": "The NFT is cannot be burned"
         },
         {
-            "code": 6016,
+            "code": 6017,
             "name": "InitialArtGenerated",
             "msg": "The initial generation of art is already complete"
         }

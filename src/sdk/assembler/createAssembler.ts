@@ -33,7 +33,7 @@ export function createCreateAssemblerTransaction(
   );
   const [collectionMasterEdition] = getMetadataAccount_(
     collectionMint.publicKey,
-    true
+    { __kind: "edition" }
   );
   const [assembler] = getAssemblerPda(collectionMint.publicKey);
 

@@ -33,7 +33,7 @@ function createCreateAssemblerTransaction(authority, payer, args, programId = as
     const collectionMint = web3.Keypair.generate();
     const collectionTokenAccount = splToken.getAssociatedTokenAddressSync(collectionMint.publicKey, authority);
     const [collectionMetadataAccount] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey);
-    const [collectionMasterEdition] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey, true);
+    const [collectionMasterEdition] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey, { __kind: "edition" });
     const [assembler] = (0, pdas_1.getAssemblerPda)(collectionMint.publicKey);
     return {
         tx: new web3.Transaction().add((0, generated_1.createCreateAssemblerInstruction)({

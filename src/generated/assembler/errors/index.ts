@@ -313,13 +313,39 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * DelegateAccountNotProvided: 'Delegate is not provided'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class DelegateAccountNotProvidedError extends Error {
+  readonly code: number = 0x177d
+  readonly name: string = 'DelegateAccountNotProvided'
+  constructor() {
+    super('Delegate is not provided')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, DelegateAccountNotProvidedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(
+  0x177d,
+  () => new DelegateAccountNotProvidedError()
+)
+createErrorFromNameLookup.set(
+  'DelegateAccountNotProvided',
+  () => new DelegateAccountNotProvidedError()
+)
+
+/**
  * DepositAccountNotProvided: 'Deposit account is not provided'
  *
  * @category Errors
  * @category generated
  */
 export class DepositAccountNotProvidedError extends Error {
-  readonly code: number = 0x177d
+  readonly code: number = 0x177e
   readonly name: string = 'DepositAccountNotProvided'
   constructor() {
     super('Deposit account is not provided')
@@ -330,7 +356,7 @@ export class DepositAccountNotProvidedError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x177d,
+  0x177e,
   () => new DepositAccountNotProvidedError()
 )
 createErrorFromNameLookup.set(
@@ -345,7 +371,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class NFTNotMintedError extends Error {
-  readonly code: number = 0x177e
+  readonly code: number = 0x177f
   readonly name: string = 'NFTNotMinted'
   constructor() {
     super('The NFT is not minted')
@@ -355,7 +381,7 @@ export class NFTNotMintedError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x177e, () => new NFTNotMintedError())
+createErrorFromCodeLookup.set(0x177f, () => new NFTNotMintedError())
 createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError())
 
 /**
@@ -365,7 +391,7 @@ createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError())
  * @category generated
  */
 export class NFTNotBurnableError extends Error {
-  readonly code: number = 0x177f
+  readonly code: number = 0x1780
   readonly name: string = 'NFTNotBurnable'
   constructor() {
     super('The NFT is cannot be burned')
@@ -375,7 +401,7 @@ export class NFTNotBurnableError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x177f, () => new NFTNotBurnableError())
+createErrorFromCodeLookup.set(0x1780, () => new NFTNotBurnableError())
 createErrorFromNameLookup.set('NFTNotBurnable', () => new NFTNotBurnableError())
 
 /**
@@ -385,7 +411,7 @@ createErrorFromNameLookup.set('NFTNotBurnable', () => new NFTNotBurnableError())
  * @category generated
  */
 export class InitialArtGeneratedError extends Error {
-  readonly code: number = 0x1780
+  readonly code: number = 0x1781
   readonly name: string = 'InitialArtGenerated'
   constructor() {
     super('The initial generation of art is already complete')
@@ -395,7 +421,7 @@ export class InitialArtGeneratedError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1780, () => new InitialArtGeneratedError())
+createErrorFromCodeLookup.set(0x1781, () => new InitialArtGeneratedError())
 createErrorFromNameLookup.set(
   'InitialArtGenerated',
   () => new InitialArtGeneratedError()

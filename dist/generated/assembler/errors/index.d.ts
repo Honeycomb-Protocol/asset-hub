@@ -67,6 +67,11 @@ export declare class UniqueConstraintNotProvidedError extends Error {
     readonly name: string;
     constructor();
 }
+export declare class DelegateAccountNotProvidedError extends Error {
+    readonly code: number;
+    readonly name: string;
+    constructor();
+}
 export declare class DepositAccountNotProvidedError extends Error {
     readonly code: number;
     readonly name: string;

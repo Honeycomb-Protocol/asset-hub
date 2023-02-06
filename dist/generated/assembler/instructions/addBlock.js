@@ -31,7 +31,7 @@ exports.addBlockStruct = new beet.BeetArgsStruct([['instructionDiscriminator', b
 exports.addBlockInstructionDiscriminator = [
     208, 84, 156, 155, 72, 188, 114, 37,
 ];
-function createAddBlockInstruction(accounts, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
+function createAddBlockInstruction(accounts, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     var _a, _b, _c;
     const [data] = exports.addBlockStruct.serialize({
         instructionDiscriminator: exports.addBlockInstructionDiscriminator,
@@ -69,7 +69,7 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('4cE
         },
         {
             pubkey: accounts.tokenMetadata,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {
@@ -78,7 +78,17 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('4cE
             isSigner: false,
         },
         {
+            pubkey: accounts.tokenRecord,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.depositAccount,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.depositTokenRecord,
             isWritable: true,
             isSigner: false,
         },
@@ -103,7 +113,17 @@ function createAddBlockInstruction(accounts, programId = new web3.PublicKey('4cE
             isSigner: false,
         },
         {
+            pubkey: accounts.associatedTokenProgram,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.tokenMetadataProgram,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.sysvarInstructions,
             isWritable: false,
             isSigner: false,
         },

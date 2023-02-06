@@ -28,14 +28,25 @@ const web3 = __importStar(require("@solana/web3.js"));
 const assembler_1 = require("../generated/assembler");
 const assetmanager_1 = require("../generated/assetmanager");
 exports.METADATA_PROGRAM_ID = new web3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
-const getMetadataAccount_ = (mint, edition = false, programId = exports.METADATA_PROGRAM_ID) => {
+const getMetadataAccount_ = (mint, type, programId = exports.METADATA_PROGRAM_ID) => {
     const seeds = [
         Buffer.from("metadata"),
-        exports.METADATA_PROGRAM_ID.toBuffer(),
+        programId.toBuffer(),
         mint.toBuffer(),
     ];
-    if (edition)
-        seeds.push(Buffer.from("edition"));
+    if (type) {
+        seeds.push(Buffer.from(type.__kind));
+        switch (type.__kind) {
+            case "token_record":
+                seeds.push(type.tokenAccount.toBuffer());
+                break;
+            case "persistent_delegate":
+                seeds.push(type.tokenAccountOwner.toBuffer());
+                break;
+            default:
+                break;
+        }
+    }
     return web3.PublicKey.findProgramAddressSync(seeds, programId);
 };
 exports.getMetadataAccount_ = getMetadataAccount_;

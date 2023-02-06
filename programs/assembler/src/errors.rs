@@ -41,6 +41,9 @@ pub enum ErrorCode {
     #[msg("Unique constraint is not provided")]
     UniqueConstraintNotProvided,
 
+    #[msg("Delegate is not provided")]
+    DelegateAccountNotProvided,
+
     #[msg("Deposit account is not provided")]
     DepositAccountNotProvided,
 

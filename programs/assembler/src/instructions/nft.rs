@@ -1,10 +1,8 @@
-use crate::state::Creator;
-
 use {
     crate::{
         errors::ErrorCode,
         state::{
-            Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue,
+            Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue, Creator,
             DelegateAuthority, DelegateAuthorityPermission, NFTAttribute, NFTAttributeValue,
             NFTUniqueConstraint, NFT,
         },
@@ -14,11 +12,13 @@ use {
         },
     },
     anchor_lang::{prelude::*, solana_program},
-    anchor_spl::token::{
-        self, Approve, Burn, CloseAccount, Mint, MintTo, Revoke, Token, TokenAccount, Transfer,
+    anchor_spl::{
+        associated_token::AssociatedToken,
+        token::{self, Burn, CloseAccount, Mint, MintTo, Token, TokenAccount},
     },
     mpl_token_metadata::{
         self,
+        instruction::{DelegateArgs, RevokeArgs},
         state::{Metadata, TokenMetadataAccount},
     },
 };
@@ -163,11 +163,11 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
 pub struct AddBlock<'info> {
     /// Assembler state account
     #[account()]
-    pub assembler: Account<'info, Assembler>,
+    pub assembler: Box<Account<'info, Assembler>>,
 
     /// NFT account
     #[account(mut, has_one = assembler, has_one = authority)]
-    pub nft: Account<'info, NFT>,
+    pub nft: Box<Account<'info, NFT>>,
 
     /// Block account
     #[account(has_one = assembler)]
@@ -187,13 +187,18 @@ pub struct AddBlock<'info> {
 
     /// Attribute token metadata
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account()]
+    #[account(mut)]
     pub token_metadata: AccountInfo<'info>,
 
     /// Attribute token edition
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account()]
     pub token_edition: AccountInfo<'info>,
+
+    /// Attribute token record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub token_record: Option<AccountInfo<'info>>,
 
     /// The account that will hold the nft sent on expedition
     #[account(
@@ -210,6 +215,11 @@ pub struct AddBlock<'info> {
     )]
     pub deposit_account: Option<Account<'info, TokenAccount>>,
 
+    /// Deposit token_record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub deposit_token_record: Option<AccountInfo<'info>>,
+
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -224,9 +234,17 @@ pub struct AddBlock<'info> {
     /// SPL TOKEN PROGRAM
     pub token_program: Program<'info, Token>,
 
+    /// ASSOCIATED TOKEN PROGRAM
+    pub associated_token_program: Program<'info, AssociatedToken>,
+
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: AccountInfo<'info>,
+
+    /// NATIVE Instructions SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 
     /// SYSVAR RENT
     pub rent: Sysvar<'info, Rent>,
@@ -321,18 +339,6 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
             )?;
         }
         AssemblingAction::Freeze => {
-            token::approve(
-                CpiContext::new(
-                    ctx.accounts.token_program.to_account_info(),
-                    Approve {
-                        to: ctx.accounts.token_account.to_account_info(),
-                        delegate: assembler.to_account_info(),
-                        authority: ctx.accounts.authority.to_account_info(),
-                    },
-                ),
-                1 * 10u64.pow(token_mint.decimals.into()),
-            )?;
-
             let assembler_seeds = &[
                 b"assembler".as_ref(),
                 assembler.collection.as_ref(),
@@ -340,37 +346,79 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
             ];
             let assembler_signer = &[&assembler_seeds[..]];
 
-            solana_program::program::invoke_signed(
-                &mpl_token_metadata::instruction::freeze_delegated_account(
-                    ctx.accounts.token_metadata_program.key(),
-                    assembler.key(),
-                    ctx.accounts.token_account.key(),
-                    ctx.accounts.token_edition.key(),
-                    token_mint.key(),
-                ),
-                &[
-                    assembler.to_account_info(),
-                    ctx.accounts.token_account.to_account_info(),
-                    ctx.accounts.token_edition.to_account_info(),
-                    ctx.accounts.token_mint.to_account_info(),
-                    ctx.accounts.token_program.to_account_info(),
-                ],
-                assembler_signer,
+            utils::delegate(
+                DelegateArgs::StakingV1 {
+                    amount: 1 * 10u64.pow(token_mint.decimals.into()),
+                    authorization_data: None,
+                },
+                None,
+                assembler.to_account_info(),
+                ctx.accounts.token_metadata.to_account_info(),
+                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_record.clone(),
+                ctx.accounts.token_mint.to_account_info(),
+                ctx.accounts.token_account.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.payer.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                None,
+            )?;
+
+            utils::lock(
+                assembler.to_account_info(),
+                ctx.accounts.token_mint.to_account_info(),
+                ctx.accounts.token_account.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.token_metadata.to_account_info(),
+                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_record.clone(),
+                ctx.accounts.payer.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                Some(assembler_signer),
             )?;
         }
         AssemblingAction::TakeCustody => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                token::transfer(
-                    CpiContext::new(
-                        ctx.accounts.token_program.to_account_info(),
-                        Transfer {
-                            from: ctx.accounts.token_account.to_account_info(),
-                            to: deposit_account.to_account_info(),
-                            authority: ctx.accounts.authority.to_account_info(),
-                        },
-                    ),
+                let assembler_seeds = &[
+                    b"assembler".as_ref(),
+                    assembler.collection.as_ref(),
+                    &[assembler.bump],
+                ];
+                let assembler_signer = &[&assembler_seeds[..]];
+
+                utils::transfer(
                     1 * 10u64.pow(token_mint.decimals.into()),
+                    ctx.accounts.token_account.to_account_info(),
+                    ctx.accounts.authority.to_account_info(),
+                    deposit_account.to_account_info(),
+                    assembler.to_account_info(),
+                    ctx.accounts.token_mint.to_account_info(),
+                    ctx.accounts.token_metadata.to_account_info(),
+                    ctx.accounts.token_edition.to_account_info(),
+                    ctx.accounts.token_record.clone(),
+                    ctx.accounts.deposit_token_record.clone(),
+                    ctx.accounts.authority.to_account_info(),
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                    ctx.accounts.token_program.to_account_info(),
+                    ctx.accounts.associated_token_program.to_account_info(),
+                    ctx.accounts.sysvar_instructions.to_account_info(),
+                    Some(assembler_signer),
                 )?;
+
+                token::close_account(CpiContext::new_with_signer(
+                    ctx.accounts.token_program.to_account_info(),
+                    CloseAccount {
+                        account: deposit_account.to_account_info(),
+                        destination: ctx.accounts.authority.to_account_info(),
+                        authority: assembler.to_account_info(),
+                    },
+                    assembler_signer,
+                ))?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
             }
@@ -669,11 +717,11 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
 pub struct RemoveBlock<'info> {
     /// Assembler state account
     #[account(mut)]
-    pub assembler: Account<'info, Assembler>,
+    pub assembler: Box<Account<'info, Assembler>>,
 
     /// NFT account
     #[account(mut, has_one = assembler, has_one = authority)]
-    pub nft: Account<'info, NFT>,
+    pub nft: Box<Account<'info, NFT>>,
 
     /// Block account
     #[account(has_one = assembler)]
@@ -693,7 +741,7 @@ pub struct RemoveBlock<'info> {
 
     /// Burning token metadata
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account()]
+    #[account(mut)]
     pub token_metadata: AccountInfo<'info>,
 
     /// Burning token edition
@@ -701,33 +749,49 @@ pub struct RemoveBlock<'info> {
     #[account()]
     pub token_edition: AccountInfo<'info>,
 
+    /// Attribute token record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub token_record: Option<AccountInfo<'info>>,
+
     /// The account that will hold the nft sent on expedition
     #[account(
         mut,
-        seeds = [
-            b"deposit",
-            token_mint.key().as_ref(),
-            nft.mint.as_ref(),
-        ],
-        bump,
         token::mint = token_mint,
         token::authority = assembler,
     )]
     pub deposit_account: Option<Account<'info, TokenAccount>>,
 
+    /// Deposit token_record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub deposit_token_record: Option<AccountInfo<'info>>,
+
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    /// The wallet that pays for the rent
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    /// SYSTEM PROGRAM
+    pub system_program: Program<'info, System>,
+
     /// SPL TOKEN PROGRAM
     pub token_program: Program<'info, Token>,
+
+    /// ASSOCIATED TOKEN PROGRAM
+    pub associated_token_program: Program<'info, AssociatedToken>,
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: AccountInfo<'info>,
 
-    /// SYSTEM PROGRAM
-    pub system_program: Program<'info, System>,
+    /// NATIVE Instructions SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 
     /// RENT PROGRAM
     pub rent: Sysvar<'info, Rent>,
@@ -795,56 +859,59 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
             return Err(ErrorCode::NFTNotBurnable.into());
         }
         AssemblingAction::Freeze => {
-            solana_program::program::invoke_signed(
-                &mpl_token_metadata::instruction::thaw_delegated_account(
-                    ctx.accounts.token_metadata_program.key(),
-                    assembler.key(),
-                    ctx.accounts.token_account.key(),
-                    ctx.accounts.token_edition.key(),
-                    token_mint.key(),
-                ),
-                &[
-                    assembler.to_account_info(),
-                    ctx.accounts.token_account.to_account_info(),
-                    ctx.accounts.token_edition.to_account_info(),
-                    ctx.accounts.token_mint.to_account_info(),
-                    ctx.accounts.token_program.to_account_info(),
-                ],
-                assembler_signer,
+            utils::unlock(
+                assembler.to_account_info(),
+                token_mint.to_account_info(),
+                ctx.accounts.token_account.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.token_metadata.to_account_info(),
+                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_record.clone(),
+                ctx.accounts.payer.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                Some(assembler_signer),
             )?;
 
-            token::revoke(CpiContext::new(
+            utils::revoke(
+                RevokeArgs::StakingV1,
+                None,
+                assembler.to_account_info(),
+                ctx.accounts.token_metadata.to_account_info(),
+                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_record.clone(),
+                ctx.accounts.token_mint.to_account_info(),
+                ctx.accounts.token_account.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.payer.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
-                Revoke {
-                    source: ctx.accounts.token_account.to_account_info(),
-                    authority: ctx.accounts.authority.to_account_info(),
-                },
-            ))?;
+                Some(assembler_signer),
+            )?;
         }
         AssemblingAction::TakeCustody => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                token::transfer(
-                    CpiContext::new_with_signer(
-                        ctx.accounts.token_program.to_account_info(),
-                        Transfer {
-                            from: deposit_account.to_account_info(),
-                            to: ctx.accounts.token_account.to_account_info(),
-                            authority: assembler.to_account_info(),
-                        },
-                        assembler_signer,
-                    ),
+                utils::transfer(
                     1 * 10u64.pow(token_mint.decimals.into()),
-                )?;
-
-                token::close_account(CpiContext::new_with_signer(
+                    deposit_account.to_account_info(),
+                    assembler.to_account_info(),
+                    ctx.accounts.token_account.to_account_info(),
+                    ctx.accounts.authority.to_account_info(),
+                    ctx.accounts.token_mint.to_account_info(),
+                    ctx.accounts.token_metadata.to_account_info(),
+                    ctx.accounts.token_edition.to_account_info(),
+                    ctx.accounts.deposit_token_record.clone(),
+                    ctx.accounts.token_record.clone(),
+                    assembler.to_account_info(),
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
                     ctx.accounts.token_program.to_account_info(),
-                    CloseAccount {
-                        account: deposit_account.to_account_info(),
-                        destination: ctx.accounts.authority.to_account_info(),
-                        authority: assembler.to_account_info(),
-                    },
-                    assembler_signer,
-                ))?;
+                    ctx.accounts.associated_token_program.to_account_info(),
+                    ctx.accounts.sysvar_instructions.to_account_info(),
+                    Some(assembler_signer),
+                )?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
             }

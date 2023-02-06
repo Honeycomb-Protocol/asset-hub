@@ -56,7 +56,7 @@ class Assembler {
         }
         return Assembler.fromAccountInfo(accountInfo, 0)[0];
     }
-    static gpaBuilder(programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
+    static gpaBuilder(programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
         return beetSolana.GpaBuilder.fromStruct(programId, exports.assemblerBeet);
     }
     static deserialize(buf, offset = 0) {

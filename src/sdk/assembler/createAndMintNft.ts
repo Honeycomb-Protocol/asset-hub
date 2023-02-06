@@ -35,7 +35,9 @@ export function createCreateNftTransaction(
   const nftMint = web3.Keypair.generate();
 
   const [collectionMetadataAccount] = getMetadataAccount_(collectionMint);
-  const [collectionMasterEdition] = getMetadataAccount_(collectionMint, true);
+  const [collectionMasterEdition] = getMetadataAccount_(collectionMint, {
+    __kind: "edition",
+  });
   const [nftMetadata] = getMetadataAccount_(nftMint.publicKey);
   const [nft] = getNftPda(nftMint.publicKey);
 
@@ -92,8 +94,18 @@ export function createAddBlockTransaction(
     authority
   );
   const [tokenMetadata] = getMetadataAccount_(tokenMint);
-  const [tokenEdition] = getMetadataAccount_(tokenMint, true);
+  const [tokenEdition] = getMetadataAccount_(tokenMint, {
+    __kind: "edition",
+  });
+  const [tokenRecord] = getMetadataAccount_(tokenMint, {
+    __kind: "token_record",
+    tokenAccount,
+  });
   const [depositAccount] = getDepositPda(tokenMint, nftMint);
+  const [depositTokenRecord] = getMetadataAccount_(tokenMint, {
+    __kind: "token_record",
+    tokenAccount: depositAccount,
+  });
 
   return {
     tx: new web3.Transaction().add(
@@ -107,14 +119,17 @@ export function createAddBlockTransaction(
           tokenAccount,
           tokenMetadata,
           tokenEdition,
+          tokenRecord,
           depositAccount:
             assemblingAction === AssemblingAction.TakeCustody
               ? depositAccount
               : programId,
-          // nftAttribute,
+          depositTokenRecord,
           authority,
           payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
+          sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+          associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
         },
         programId
       )
@@ -151,7 +166,9 @@ export function createMintNftTransaction(
 
   const [nft] = getNftPda(nftMint);
   const [nftMetadata] = getMetadataAccount_(nftMint);
-  const [nftMasterEdition] = getMetadataAccount_(nftMint, true);
+  const [nftMasterEdition] = getMetadataAccount_(nftMint, {
+    __kind: "edition",
+  });
 
   console.log("uniqueConstraint", uniqueConstraint?.toString());
 

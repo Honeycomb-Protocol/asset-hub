@@ -80,7 +80,7 @@ export const createAssemblerInstructionDiscriminator = [
 export function createCreateAssemblerInstruction(
   accounts: CreateAssemblerInstructionAccounts,
   args: CreateAssemblerInstructionArgs,
-  programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')
+  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = createAssemblerStruct.serialize({
     instructionDiscriminator: createAssemblerInstructionDiscriminator,

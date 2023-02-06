@@ -76,7 +76,7 @@ export const updateMetadataInstructionDiscriminator = [
 export function createUpdateMetadataInstruction(
   accounts: UpdateMetadataInstructionAccounts,
   args: UpdateMetadataInstructionArgs,
-  programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')
+  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = updateMetadataStruct.serialize({
     instructionDiscriminator: updateMetadataInstructionDiscriminator,

@@ -34,7 +34,7 @@ exports.createDelegateAuthorityStruct = new beet.BeetArgsStruct([
 exports.createDelegateAuthorityInstructionDiscriminator = [
     232, 124, 221, 107, 188, 245, 74, 127,
 ];
-function createCreateDelegateAuthorityInstruction(accounts, args, programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')) {
+function createCreateDelegateAuthorityInstruction(accounts, args, programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')) {
     var _a;
     const [data] = exports.createDelegateAuthorityStruct.serialize({
         instructionDiscriminator: exports.createDelegateAuthorityInstructionDiscriminator,

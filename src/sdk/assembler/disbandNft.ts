@@ -65,6 +65,7 @@ export function createRemoveBlockTransaction(
   blockDefinition: web3.PublicKey,
   tokenMint: web3.PublicKey,
   authority: web3.PublicKey,
+  payer: web3.PublicKey,
   assemblingAction: AssemblingAction = AssemblingAction.Freeze,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
@@ -73,8 +74,16 @@ export function createRemoveBlockTransaction(
     authority
   );
   const [tokenMetadata] = getMetadataAccount_(tokenMint);
-  const [tokenEdition] = getMetadataAccount_(tokenMint, true);
+  const [tokenEdition] = getMetadataAccount_(tokenMint, { __kind: "edition" });
+  const [tokenRecord] = getMetadataAccount_(tokenMint, {
+    __kind: "token_record",
+    tokenAccount,
+  });
   const [depositAccount] = getDepositPda(tokenMint, nftMint);
+  const [depositTokenRecord] = getMetadataAccount_(tokenMint, {
+    __kind: "token_record",
+    tokenAccount: depositAccount,
+  });
 
   return {
     tx: new web3.Transaction().add(
@@ -88,12 +97,17 @@ export function createRemoveBlockTransaction(
           tokenAccount,
           tokenMetadata,
           tokenEdition,
+          tokenRecord,
           depositAccount:
             assemblingAction === AssemblingAction.TakeCustody
               ? depositAccount
               : programId,
+          depositTokenRecord,
           authority,
+          payer,
           tokenMetadataProgram: METADATA_PROGRAM_ID,
+          associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+          sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         },
         programId
       )
@@ -174,6 +188,7 @@ export async function disbandNft(
           block,
           blockDefinition,
           attribute.mint,
+          wallet.publicKey,
           wallet.publicKey,
           assemblerAccount.assemblingAction
         );

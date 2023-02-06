@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorFromName = exports.errorFromCode = exports.InitialArtGeneratedError = exports.NFTNotBurnableError = exports.NFTNotMintedError = exports.DepositAccountNotProvidedError = exports.UniqueConstraintNotProvidedError = exports.InvalidUniqueConstraintError = exports.BlockDoesNotExistsForNFTError = exports.BlockExistsForNFTError = exports.NFTAlreadyMintedError = exports.InvalidTokenForBlockDefinitionError = exports.InvalidMetadataError = exports.InvalidBlockDefinitionError = exports.InvalidBlockTypeError = exports.RequiredBlockImageError = exports.BlockTypeMismatchError = exports.UnauthorizedError = exports.OverflowError = void 0;
+exports.errorFromName = exports.errorFromCode = exports.InitialArtGeneratedError = exports.NFTNotBurnableError = exports.NFTNotMintedError = exports.DepositAccountNotProvidedError = exports.DelegateAccountNotProvidedError = exports.UniqueConstraintNotProvidedError = exports.InvalidUniqueConstraintError = exports.BlockDoesNotExistsForNFTError = exports.BlockExistsForNFTError = exports.NFTAlreadyMintedError = exports.InvalidTokenForBlockDefinitionError = exports.InvalidMetadataError = exports.InvalidBlockDefinitionError = exports.InvalidBlockTypeError = exports.RequiredBlockImageError = exports.BlockTypeMismatchError = exports.UnauthorizedError = exports.OverflowError = void 0;
 const createErrorFromCodeLookup = new Map();
 const createErrorFromNameLookup = new Map();
 class OverflowError extends Error {
@@ -172,10 +172,23 @@ class UniqueConstraintNotProvidedError extends Error {
 exports.UniqueConstraintNotProvidedError = UniqueConstraintNotProvidedError;
 createErrorFromCodeLookup.set(0x177c, () => new UniqueConstraintNotProvidedError());
 createErrorFromNameLookup.set('UniqueConstraintNotProvided', () => new UniqueConstraintNotProvidedError());
+class DelegateAccountNotProvidedError extends Error {
+    constructor() {
+        super('Delegate is not provided');
+        this.code = 0x177d;
+        this.name = 'DelegateAccountNotProvided';
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, DelegateAccountNotProvidedError);
+        }
+    }
+}
+exports.DelegateAccountNotProvidedError = DelegateAccountNotProvidedError;
+createErrorFromCodeLookup.set(0x177d, () => new DelegateAccountNotProvidedError());
+createErrorFromNameLookup.set('DelegateAccountNotProvided', () => new DelegateAccountNotProvidedError());
 class DepositAccountNotProvidedError extends Error {
     constructor() {
         super('Deposit account is not provided');
-        this.code = 0x177d;
+        this.code = 0x177e;
         this.name = 'DepositAccountNotProvided';
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, DepositAccountNotProvidedError);
@@ -183,12 +196,12 @@ class DepositAccountNotProvidedError extends Error {
     }
 }
 exports.DepositAccountNotProvidedError = DepositAccountNotProvidedError;
-createErrorFromCodeLookup.set(0x177d, () => new DepositAccountNotProvidedError());
+createErrorFromCodeLookup.set(0x177e, () => new DepositAccountNotProvidedError());
 createErrorFromNameLookup.set('DepositAccountNotProvided', () => new DepositAccountNotProvidedError());
 class NFTNotMintedError extends Error {
     constructor() {
         super('The NFT is not minted');
-        this.code = 0x177e;
+        this.code = 0x177f;
         this.name = 'NFTNotMinted';
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, NFTNotMintedError);
@@ -196,12 +209,12 @@ class NFTNotMintedError extends Error {
     }
 }
 exports.NFTNotMintedError = NFTNotMintedError;
-createErrorFromCodeLookup.set(0x177e, () => new NFTNotMintedError());
+createErrorFromCodeLookup.set(0x177f, () => new NFTNotMintedError());
 createErrorFromNameLookup.set('NFTNotMinted', () => new NFTNotMintedError());
 class NFTNotBurnableError extends Error {
     constructor() {
         super('The NFT is cannot be burned');
-        this.code = 0x177f;
+        this.code = 0x1780;
         this.name = 'NFTNotBurnable';
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, NFTNotBurnableError);
@@ -209,12 +222,12 @@ class NFTNotBurnableError extends Error {
     }
 }
 exports.NFTNotBurnableError = NFTNotBurnableError;
-createErrorFromCodeLookup.set(0x177f, () => new NFTNotBurnableError());
+createErrorFromCodeLookup.set(0x1780, () => new NFTNotBurnableError());
 createErrorFromNameLookup.set('NFTNotBurnable', () => new NFTNotBurnableError());
 class InitialArtGeneratedError extends Error {
     constructor() {
         super('The initial generation of art is already complete');
-        this.code = 0x1780;
+        this.code = 0x1781;
         this.name = 'InitialArtGenerated';
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, InitialArtGeneratedError);
@@ -222,7 +235,7 @@ class InitialArtGeneratedError extends Error {
     }
 }
 exports.InitialArtGeneratedError = InitialArtGeneratedError;
-createErrorFromCodeLookup.set(0x1780, () => new InitialArtGeneratedError());
+createErrorFromCodeLookup.set(0x1781, () => new InitialArtGeneratedError());
 createErrorFromNameLookup.set('InitialArtGenerated', () => new InitialArtGeneratedError());
 function errorFromCode(code) {
     const createError = createErrorFromCodeLookup.get(code);

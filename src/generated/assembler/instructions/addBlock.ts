@@ -29,12 +29,16 @@ export const addBlockStruct = new beet.BeetArgsStruct<{
  * @property [] blockDefinition
  * @property [_writable_] tokenMint
  * @property [_writable_] tokenAccount
- * @property [] tokenMetadata
+ * @property [_writable_] tokenMetadata
  * @property [] tokenEdition
+ * @property [_writable_] tokenRecord
  * @property [_writable_] depositAccount
+ * @property [_writable_] depositTokenRecord
  * @property [_writable_, **signer**] authority
  * @property [_writable_, **signer**] payer
+ * @property [] associatedTokenProgram
  * @property [] tokenMetadataProgram
+ * @property [] sysvarInstructions
  * @category Instructions
  * @category AddBlock
  * @category generated
@@ -48,12 +52,16 @@ export type AddBlockInstructionAccounts = {
   tokenAccount: web3.PublicKey
   tokenMetadata: web3.PublicKey
   tokenEdition: web3.PublicKey
+  tokenRecord: web3.PublicKey
   depositAccount: web3.PublicKey
+  depositTokenRecord: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  associatedTokenProgram: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
+  sysvarInstructions: web3.PublicKey
   rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -72,7 +80,7 @@ export const addBlockInstructionDiscriminator = [
  */
 export function createAddBlockInstruction(
   accounts: AddBlockInstructionAccounts,
-  programId = new web3.PublicKey('4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp')
+  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
 ) {
   const [data] = addBlockStruct.serialize({
     instructionDiscriminator: addBlockInstructionDiscriminator,
@@ -110,7 +118,7 @@ export function createAddBlockInstruction(
     },
     {
       pubkey: accounts.tokenMetadata,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -119,7 +127,17 @@ export function createAddBlockInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.tokenRecord,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.depositAccount,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.depositTokenRecord,
       isWritable: true,
       isSigner: false,
     },
@@ -144,7 +162,17 @@ export function createAddBlockInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.associatedTokenProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.tokenMetadataProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.sysvarInstructions,
       isWritable: false,
       isSigner: false,
     },
