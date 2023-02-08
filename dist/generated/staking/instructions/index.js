@@ -24,4 +24,5 @@ __exportStar(require("./initStaker"), exports);
 __exportStar(require("./stake"), exports);
 __exportStar(require("./unstake"), exports);
 __exportStar(require("./updateProject"), exports);
+__exportStar(require("./withdrawRewards"), exports);
 //# sourceMappingURL=index.js.map

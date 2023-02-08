@@ -696,6 +696,65 @@ export type Staking = {
       ]
     },
     {
+      "name": "withdrawRewards",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Project state account"
+          ]
+        },
+        {
+          "name": "rewardMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Mint address of the reward token"
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Vault"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Payee token account"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE TOKEN PROGRAM"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "claimRewards",
       "accounts": [
         {
@@ -2111,6 +2170,65 @@ export const IDL: Staking = {
         },
         {
           "name": "wallet",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE TOKEN PROGRAM"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawRewards",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Project state account"
+          ]
+        },
+        {
+          "name": "rewardMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Mint address of the reward token"
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Vault"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Payee token account"
+          ]
+        },
+        {
+          "name": "authority",
           "isMut": true,
           "isSigner": true,
           "docs": [

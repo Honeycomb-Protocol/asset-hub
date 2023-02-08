@@ -48,6 +48,59 @@ pub fn fund_rewards(ctx: Context<FundRewards>, amount: u64) -> Result<()> {
     Ok(())
 }
 
+/// Accounts used in withdraw rewards instruction
+#[derive(Accounts)]
+pub struct WithdrawRewards<'info> {
+    /// Project state account
+    #[account(has_one = authority)]
+    pub project: Account<'info, Project>,
+
+    /// Mint address of the reward token
+    #[account(mut, constraint = reward_mint.key() == project.reward_mint)]
+    pub reward_mint: Account<'info, Mint>,
+
+    /// Vault
+    #[account(mut, constraint = vault.key() == project.vault)]
+    pub vault: Account<'info, TokenAccount>,
+
+    /// Payee token account
+    #[account(mut, constraint = token_account.mint == reward_mint.key())]
+    pub token_account: Account<'info, TokenAccount>,
+
+    /// The wallet that pays for the rent
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    /// NATIVE TOKEN PROGRAM
+    #[account(address = token::ID)]
+    pub token_program: Program<'info, Token>,
+}
+
+/// Withdraw rewards
+pub fn withdraw_rewards(ctx: Context<WithdrawRewards>, amount: u64) -> Result<()> {
+    let project_key = ctx.accounts.project.key();
+    let project_seeds = &[
+        b"project".as_ref(),
+        project_key.as_ref(),
+        &[ctx.accounts.project.bump],
+    ];
+    let project_signer = &[&project_seeds[..]];
+
+    token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.vault.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.project.to_account_info(),
+            },
+            project_signer,
+        ),
+        amount,
+    )?;
+    Ok(())
+}
+
 /// Accounts used in fund rewards instruction
 #[derive(Accounts)]
 pub struct ClaimRewards<'info> {
@@ -95,13 +148,6 @@ pub struct ClaimRewards<'info> {
 pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
     let project = &ctx.accounts.project;
     let nft = &mut ctx.accounts.nft;
-
-    let project_seeds = &[
-        b"project".as_ref(),
-        ctx.accounts.project.key.as_ref(),
-        &[ctx.accounts.project.bump],
-    ];
-    let project_signer = &[&project_seeds[..]];
 
     let mut seconds_elapsed: u64 =
         u64::try_from(ctx.accounts.clock.unix_timestamp - nft.last_claim).unwrap();
@@ -192,13 +238,21 @@ pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
 
     rewards_amount = (rewards_amount * total_multipliers) / multplier_decimals;
 
+    let project_key = project.key();
+    let project_seeds = &[
+        b"project".as_ref(),
+        project_key.as_ref(),
+        &[ctx.accounts.project.bump],
+    ];
+    let project_signer = &[&project_seeds[..]];
+
     token::transfer(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
             Transfer {
-                from: ctx.accounts.token_account.to_account_info(),
-                to: ctx.accounts.vault.to_account_info(),
-                authority: ctx.accounts.wallet.to_account_info(),
+                from: ctx.accounts.vault.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: project.to_account_info(),
             },
             project_signer,
         ),

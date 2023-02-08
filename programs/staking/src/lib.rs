@@ -51,6 +51,10 @@ pub mod staking {
         instructions::fund_rewards(ctx, amount)
     }
 
+    pub fn withdraw_rewards(ctx: Context<WithdrawRewards>, amount: u64) -> Result<()> {
+        instructions::withdraw_rewards(ctx, amount)
+    }
+
     pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
         instructions::claim_rewards(ctx)
     }
