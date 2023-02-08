@@ -136,7 +136,7 @@ pub struct Stake<'info> {
         ],
         bump,
         token::mint = nft_mint,
-        token::authority = nft,
+        token::authority = staker,
     )]
     pub deposit_account: Option<Account<'info, TokenAccount>>,
 
@@ -190,15 +190,15 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
         }
     }
 
-    let mint_key = ctx.accounts.nft_mint.key();
+    let wallet_key = ctx.accounts.wallet.key();
     let project_key = project.key();
-    let nft_seeds = &[
-        b"nft".as_ref(),
-        mint_key.as_ref(),
+    let staker_seeds = &[
+        b"staker",
+        wallet_key.as_ref(),
         project_key.as_ref(),
-        &[nft.bump],
+        &[staker.bump],
     ];
-    let nft_signer = &[&nft_seeds[..]];
+    let staker_signer = &[&staker_seeds[..]];
 
     match project.lock_type {
         LockType::Freeze => {
@@ -234,7 +234,7 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
                 ctx.accounts.system_program.to_account_info(),
                 ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
-                Some(nft_signer),
+                Some(staker_signer),
             )?;
         }
         LockType::Custoday => {
@@ -256,7 +256,7 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
                     ctx.accounts.token_program.to_account_info(),
                     ctx.accounts.associated_token_program.to_account_info(),
                     ctx.accounts.sysvar_instructions.to_account_info(),
-                    Some(nft_signer),
+                    Some(staker_signer),
                 )?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
@@ -376,15 +376,15 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
     nft.creator = Pubkey::default();
     staker.total_staked -= 1;
 
-    let mint_key = ctx.accounts.nft_mint.key();
+    let wallet_key = ctx.accounts.wallet.key();
     let project_key = project.key();
-    let nft_seeds = &[
-        b"nft".as_ref(),
-        mint_key.as_ref(),
+    let staker_seeds = &[
+        b"staker",
+        wallet_key.as_ref(),
         project_key.as_ref(),
-        &[nft.bump],
+        &[staker.bump],
     ];
-    let nft_signer = &[&nft_seeds[..]];
+    let staker_signer = &[&staker_seeds[..]];
 
     match project.lock_type {
         LockType::Freeze => {
@@ -400,7 +400,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                 ctx.accounts.system_program.to_account_info(),
                 ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
-                Some(nft_signer),
+                Some(staker_signer),
             )?;
 
             utils::revoke(
@@ -417,7 +417,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                 ctx.accounts.system_program.to_account_info(),
                 ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
-                Some(nft_signer),
+                Some(staker_signer),
             )?;
         }
         LockType::Custoday => {
@@ -439,7 +439,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                     ctx.accounts.token_program.to_account_info(),
                     ctx.accounts.associated_token_program.to_account_info(),
                     ctx.accounts.sysvar_instructions.to_account_info(),
-                    Some(nft_signer),
+                    Some(staker_signer),
                 )?;
 
                 token::close_account(CpiContext::new_with_signer(
@@ -449,7 +449,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                         destination: ctx.accounts.wallet.to_account_info(),
                         authority: nft.to_account_info(),
                     },
-                    nft_signer,
+                    staker_signer,
                 ))?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
