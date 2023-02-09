@@ -31,21 +31,29 @@ const staking_1 = require("../../generated/staking");
 const pdas_1 = require("../pdas");
 const claimRewards_1 = require("./claimRewards");
 const utils_1 = require("../../utils");
-function createUnstakeTransaction(project, nftMint, wallet, programId = staking_1.PROGRAM_ID) {
+const mpl_token_metadata_1 = require("@metaplex-foundation/mpl-token-metadata");
+function createUnstakeTransaction(project, nftMint, wallet, lockType = staking_1.LockType.Freeze, tokenStandard = mpl_token_metadata_1.TokenStandard.NonFungible, programId = staking_1.PROGRAM_ID) {
     const [nft] = (0, pdas_1.getStakedNftPda)(project, nftMint);
     const nftAccount = splToken.getAssociatedTokenAddressSync(nftMint, wallet);
     const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint);
     const [nftEdition] = (0, pdas_1.getMetadataAccount_)(nftMint, { __kind: "edition" });
-    const [nftTokenRecord] = (0, pdas_1.getMetadataAccount_)(nftMint, {
-        __kind: "token_record",
-        tokenAccount: nftAccount,
-    });
-    const [depositAccount] = (0, pdas_1.getStakedNftDepositPda)(nftMint);
-    const [depositTokenRecord] = (0, pdas_1.getMetadataAccount_)(nftMint, {
-        __kind: "token_record",
-        tokenAccount: depositAccount,
-    });
     const [staker] = (0, pdas_1.getStakerPda)(project, wallet);
+    let nftTokenRecord, depositAccount, depositTokenRecord;
+    if (lockType == staking_1.LockType.Custoday) {
+        [depositAccount] = (0, pdas_1.getStakedNftDepositPda)(nftMint);
+    }
+    if (tokenStandard === mpl_token_metadata_1.TokenStandard.ProgrammableNonFungible) {
+        [nftTokenRecord] = (0, pdas_1.getMetadataAccount_)(nftMint, {
+            __kind: "token_record",
+            tokenAccount: nftAccount,
+        });
+        if (lockType == staking_1.LockType.Custoday) {
+            [depositTokenRecord] = (0, pdas_1.getMetadataAccount_)(nftMint, {
+                __kind: "token_record",
+                tokenAccount: depositAccount,
+            });
+        }
+    }
     const instructions = [
         (0, generated_1.createUnstakeInstruction)({
             project,
@@ -54,9 +62,9 @@ function createUnstakeTransaction(project, nftMint, wallet, programId = staking_
             nftAccount,
             nftMetadata,
             nftEdition,
-            nftTokenRecord,
-            depositAccount,
-            depositTokenRecord,
+            nftTokenRecord: nftTokenRecord || programId,
+            depositAccount: depositAccount || programId,
+            depositTokenRecord: depositTokenRecord || programId,
             staker,
             wallet,
             associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -74,10 +82,11 @@ function createUnstakeTransaction(project, nftMint, wallet, programId = staking_
 exports.createUnstakeTransaction = createUnstakeTransaction;
 async function unstake(mx, project, nftMint) {
     const projectAccount = await generated_1.Project.fromAccountAddress(mx.connection, project);
+    const metadata = await mx.nfts().findByMint({ mintAddress: nftMint });
     const multipliers = await (0, utils_1.getOrFetchMultipliers)(mx.connection, project);
     const wallet = mx.identity();
     const claimCtx = (0, claimRewards_1.createClaimRewardsTransaction)(project, nftMint, projectAccount.rewardMint, wallet.publicKey, multipliers === null || multipliers === void 0 ? void 0 : multipliers.address);
-    const unstakeCtx = createUnstakeTransaction(project, nftMint, wallet.publicKey);
+    const unstakeCtx = createUnstakeTransaction(project, nftMint, wallet.publicKey, projectAccount.lockType, metadata.tokenStandard);
     const blockhash = await mx.connection.getLatestBlockhash();
     const tx = new web3.Transaction().add(claimCtx.tx, unstakeCtx.tx);
     tx.recentBlockhash = blockhash.blockhash;

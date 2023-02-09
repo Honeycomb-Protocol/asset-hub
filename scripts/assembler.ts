@@ -26,7 +26,7 @@ export default async function (
   switch (action) {
     case "create-assembler":
       const assemblerTx = await createAssembler(mx, {
-        assemblingAction: AssemblingAction.Freeze,
+        assemblingAction: AssemblingAction.TakeCustody,
         collectionName: "Assembler Test Collection",
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",

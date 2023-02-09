@@ -114,7 +114,7 @@ pub struct Stake<'info> {
 
     /// NFT edition
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account()]
+    #[account(mut)]
     pub nft_edition: AccountInfo<'info>,
 
     /// NFT token record
@@ -202,13 +202,33 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
 
     match project.lock_type {
         LockType::Freeze => {
-            utils::delegate(
-                DelegateArgs::StakingV1 {
-                    amount: 1,
-                    authorization_data: None,
+            let metadata_account_info = &ctx.accounts.nft_metadata;
+            if metadata_account_info.data_is_empty() {
+                return Err(ErrorCode::InvalidMetadata.into());
+            }
+
+            let metadata: Metadata = Metadata::from_account_info(metadata_account_info)?;
+            if metadata.mint != ctx.accounts.nft_mint.key() {
+                return Err(ErrorCode::InvalidMetadata.into());
+            }
+
+            let args: Result<DelegateArgs> = match metadata.token_standard {
+                Some(token_standard) => match token_standard {
+                    mpl_token_metadata::state::TokenStandard::ProgrammableNonFungible => {
+                        Ok(DelegateArgs::StakingV1 {
+                            amount: 1,
+                            authorization_data: None,
+                        })
+                    }
+                    _ => Ok(DelegateArgs::StandardV1 { amount: 1 }),
                 },
+                None => Err(ErrorCode::InvalidMetadata.into()),
+            };
+
+            utils::delegate(
+                args.unwrap(),
                 None,
-                nft.to_account_info(),
+                staker.to_account_info(),
                 ctx.accounts.nft_metadata.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.nft_token_record.clone(),
@@ -223,7 +243,7 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
             )?;
 
             utils::lock(
-                nft.to_account_info(),
+                staker.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
                 ctx.accounts.nft_account.to_account_info(),
                 ctx.accounts.wallet.to_account_info(),
@@ -244,7 +264,7 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
                     ctx.accounts.nft_account.to_account_info(),
                     ctx.accounts.wallet.to_account_info(),
                     deposit_account.to_account_info(),
-                    nft.to_account_info(),
+                    staker.to_account_info(),
                     ctx.accounts.nft_mint.to_account_info(),
                     ctx.accounts.nft_metadata.to_account_info(),
                     ctx.accounts.nft_edition.to_account_info(),
@@ -300,7 +320,7 @@ pub struct Unstake<'info> {
 
     /// NFT edition
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account()]
+    #[account(mut)]
     pub nft_edition: AccountInfo<'info>,
 
     /// NFT token record
@@ -312,7 +332,7 @@ pub struct Unstake<'info> {
     #[account(
         mut,
         token::mint = nft_mint,
-        token::authority = nft,
+        token::authority = staker,
     )]
     pub deposit_account: Option<Account<'info, TokenAccount>>,
 
@@ -388,8 +408,28 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
 
     match project.lock_type {
         LockType::Freeze => {
+            let metadata_account_info = &ctx.accounts.nft_metadata;
+            if metadata_account_info.data_is_empty() {
+                return Err(ErrorCode::InvalidMetadata.into());
+            }
+
+            let metadata: Metadata = Metadata::from_account_info(metadata_account_info)?;
+            if metadata.mint != ctx.accounts.nft_mint.key() {
+                return Err(ErrorCode::InvalidMetadata.into());
+            }
+
+            let args: Result<RevokeArgs> = match metadata.token_standard {
+                Some(token_standard) => match token_standard {
+                    mpl_token_metadata::state::TokenStandard::ProgrammableNonFungible => {
+                        Ok(RevokeArgs::StakingV1)
+                    }
+                    _ => Ok(RevokeArgs::StandardV1),
+                },
+                None => Err(ErrorCode::InvalidMetadata.into()),
+            };
+
             utils::unlock(
-                nft.to_account_info(),
+                staker.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
                 ctx.accounts.nft_account.to_account_info(),
                 ctx.accounts.wallet.to_account_info(),
@@ -404,9 +444,9 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
             )?;
 
             utils::revoke(
-                RevokeArgs::StakingV1,
+                args.unwrap(),
                 None,
-                nft.to_account_info(),
+                staker.to_account_info(),
                 ctx.accounts.nft_metadata.to_account_info(),
                 ctx.accounts.nft_edition.to_account_info(),
                 ctx.accounts.nft_token_record.clone(),
@@ -425,7 +465,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                 utils::transfer(
                     1,
                     deposit_account.to_account_info(),
-                    nft.to_account_info(),
+                    staker.to_account_info(),
                     ctx.accounts.nft_account.to_account_info(),
                     ctx.accounts.wallet.to_account_info(),
                     ctx.accounts.nft_mint.to_account_info(),
@@ -433,7 +473,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                     ctx.accounts.nft_edition.to_account_info(),
                     ctx.accounts.deposit_token_record.clone(),
                     ctx.accounts.nft_token_record.clone(),
-                    nft.to_account_info(),
+                    staker.to_account_info(),
                     ctx.accounts.wallet.to_account_info(),
                     ctx.accounts.system_program.to_account_info(),
                     ctx.accounts.token_program.to_account_info(),
@@ -447,7 +487,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                     CloseAccount {
                         account: deposit_account.to_account_info(),
                         destination: ctx.accounts.wallet.to_account_info(),
-                        authority: nft.to_account_info(),
+                        authority: staker.to_account_info(),
                     },
                     staker_signer,
                 ))?;

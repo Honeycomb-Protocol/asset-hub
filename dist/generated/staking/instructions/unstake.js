@@ -64,7 +64,7 @@ function createUnstakeInstruction(accounts, programId = new web3.PublicKey('8pyn
         },
         {
             pubkey: accounts.nftEdition,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {

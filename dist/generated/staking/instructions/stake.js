@@ -64,7 +64,7 @@ function createStakeInstruction(accounts, programId = new web3.PublicKey('8pyniL
         },
         {
             pubkey: accounts.nftEdition,
-            isWritable: false,
+            isWritable: true,
             isSigner: false,
         },
         {

@@ -46,7 +46,7 @@ pub enum DelegateAuthorityPermission {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct Creator {
     pub address: Pubkey,
-    pub verified: bool,
+    // pub verified: bool,
     pub share: u8,
 }
 

@@ -35,10 +35,10 @@ export default async function (
           resetStakeDuration: false,
           startTime: Date.now() * 1000,
           endTime: Date.now() * 1000 + 3600 * 24,
-          lockType: LockType.Freeze,
+          lockType: LockType.Custoday,
         },
-        [new web3.PublicKey(args[1])],
         undefined,
+        [new web3.PublicKey(args[1])],
         [
           {
             multiplierType: {
@@ -102,6 +102,6 @@ export default async function (
       break;
 
     default:
-      throw new Error("Invalid Asset manager program action");
+      throw new Error("Invalid Staking program action");
   }
 }

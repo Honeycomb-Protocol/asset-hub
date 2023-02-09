@@ -1114,8 +1114,8 @@ pub struct UpdateMetadataArgs {
     pub uri: String,
     /// Royalty basis points that goes to creators in secondary sales (0-10000)
     pub seller_fee_basis_points: u16,
-    /// Array of creators, optional
-    pub creators: Option<Vec<Creator>>,
+    // Array of creators, optional
+    // pub creators: Option<Vec<Creator>>,
 }
 
 /// Update metadata
@@ -1134,18 +1134,18 @@ pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    let mut creators: Option<Vec<mpl_token_metadata::state::Creator>> = None;
-    if let Some(arg_creators) = args.creators {
-        let creators_vec = arg_creators
-            .iter()
-            .map(|x| mpl_token_metadata::state::Creator {
-                address: x.address,
-                verified: x.verified,
-                share: x.share,
-            })
-            .collect::<Vec<_>>();
-        creators = Some(creators_vec);
-    }
+    // let mut creators: Option<Vec<mpl_token_metadata::state::Creator>> = None;
+    // if let Some(arg_creators) = args.creators {
+    //     let creators_vec = arg_creators
+    //         .iter()
+    //         .map(|x| mpl_token_metadata::state::Creator {
+    //             address: x.address,
+    //             verified: false,
+    //             share: x.share,
+    //         })
+    //         .collect::<Vec<_>>();
+    //     creators = Some(creators_vec);
+    // }
 
     utils::update_metadata(
         Some(mpl_token_metadata::state::Data {
@@ -1153,7 +1153,7 @@ pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -
             symbol: args.symbol,
             uri: args.uri,
             seller_fee_basis_points: args.seller_fee_basis_points,
-            creators,
+            creators: None,
         }),
         ctx.accounts.metadata.clone(),
         ctx.accounts.assembler.to_account_info(),

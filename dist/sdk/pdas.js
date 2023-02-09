@@ -113,7 +113,7 @@ const getStakedNftPda = (project, mint, programId = staking_1.PROGRAM_ID) => {
     return web3.PublicKey.findProgramAddressSync([Buffer.from("nft"), mint.toBuffer(), project.toBuffer()], programId);
 };
 exports.getStakedNftPda = getStakedNftPda;
-const getStakedNftDepositPda = (nftMint, programId = assembler_1.PROGRAM_ID) => {
+const getStakedNftDepositPda = (nftMint, programId = staking_1.PROGRAM_ID) => {
     return web3.PublicKey.findProgramAddressSync([Buffer.from("deposit"), nftMint.toBuffer()], programId);
 };
 exports.getStakedNftDepositPda = getStakedNftDepositPda;

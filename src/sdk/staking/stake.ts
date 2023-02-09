@@ -1,9 +1,10 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { createStakeInstruction } from "../../generated";
-import { PROGRAM_ID } from "../../generated/staking";
+import { LockType, PROGRAM_ID, Project } from "../../generated/staking";
 import { TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
+import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 import {
   getMetadataAccount_,
   getStakedNftDepositPda,
@@ -19,22 +20,36 @@ export function createStakeTransaction(
   project: web3.PublicKey,
   nftMint: web3.PublicKey,
   wallet: web3.PublicKey,
+  lockType: LockType = LockType.Freeze,
+  tokenStandard: TokenStandard = TokenStandard.NonFungible,
   programId: web3.PublicKey = PROGRAM_ID
 ): TxSignersAccounts {
   const [nft] = getStakedNftPda(project, nftMint);
   const nftAccount = splToken.getAssociatedTokenAddressSync(nftMint, wallet);
   const [nftMetadata] = getMetadataAccount_(nftMint);
   const [nftEdition] = getMetadataAccount_(nftMint, { __kind: "edition" });
-  const [nftTokenRecord] = getMetadataAccount_(nftMint, {
-    __kind: "token_record",
-    tokenAccount: nftAccount,
-  });
-  const [depositAccount] = getStakedNftDepositPda(nftMint);
-  const [depositTokenRecord] = getMetadataAccount_(nftMint, {
-    __kind: "token_record",
-    tokenAccount: depositAccount,
-  });
   const [staker] = getStakerPda(project, wallet);
+
+  let nftTokenRecord: web3.PublicKey,
+    depositAccount: web3.PublicKey,
+    depositTokenRecord: web3.PublicKey;
+
+  if (lockType == LockType.Custoday) {
+    [depositAccount] = getStakedNftDepositPda(nftMint);
+  }
+
+  if (tokenStandard === TokenStandard.ProgrammableNonFungible) {
+    [nftTokenRecord] = getMetadataAccount_(nftMint, {
+      __kind: "token_record",
+      tokenAccount: nftAccount,
+    });
+    if (lockType == LockType.Custoday) {
+      [depositTokenRecord] = getMetadataAccount_(nftMint, {
+        __kind: "token_record",
+        tokenAccount: depositAccount,
+      });
+    }
+  }
 
   const instructions: web3.TransactionInstruction[] = [
     createStakeInstruction(
@@ -45,9 +60,9 @@ export function createStakeTransaction(
         nftAccount,
         nftMetadata,
         nftEdition,
-        nftTokenRecord,
-        depositAccount,
-        depositTokenRecord,
+        nftTokenRecord: nftTokenRecord || programId,
+        depositAccount: depositAccount || programId,
+        depositTokenRecord: depositTokenRecord || programId,
         staker,
         wallet,
         associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -85,7 +100,19 @@ export async function stake(
   const initNftCtx =
     !nft && createInitNFTTransaction(project, nftMint, wallet.publicKey);
 
-  const stakeCtx = createStakeTransaction(project, nftMint, wallet.publicKey);
+  const projectAccount = await Project.fromAccountAddress(
+    mx.connection,
+    project
+  );
+  const metadata = await mx.nfts().findByMint({ mintAddress: nftMint });
+
+  const stakeCtx = createStakeTransaction(
+    project,
+    nftMint,
+    wallet.publicKey,
+    projectAccount.lockType,
+    metadata.tokenStandard
+  );
 
   const tx = new web3.Transaction();
 

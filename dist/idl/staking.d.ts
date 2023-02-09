@@ -391,7 +391,7 @@ export type Staking = {
                 },
                 {
                     "name": "nftEdition";
-                    "isMut": false;
+                    "isMut": true;
                     "isSigner": false;
                     "docs": [
                         "NFT edition"
@@ -536,7 +536,7 @@ export type Staking = {
                 },
                 {
                     "name": "nftEdition";
-                    "isMut": false;
+                    "isMut": true;
                     "isSigner": false;
                     "docs": [
                         "NFT edition"

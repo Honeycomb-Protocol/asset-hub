@@ -394,7 +394,7 @@ exports.IDL = {
                 },
                 {
                     "name": "nftEdition",
-                    "isMut": false,
+                    "isMut": true,
                     "isSigner": false,
                     "docs": [
                         "NFT edition"
@@ -539,7 +539,7 @@ exports.IDL = {
                 },
                 {
                     "name": "nftEdition",
-                    "isMut": false,
+                    "isMut": true,
                     "isSigner": false,
                     "docs": [
                         "NFT edition"

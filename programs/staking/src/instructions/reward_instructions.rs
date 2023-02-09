@@ -238,10 +238,9 @@ pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
 
     rewards_amount = (rewards_amount * total_multipliers) / multplier_decimals;
 
-    let project_key = project.key();
     let project_seeds = &[
         b"project".as_ref(),
-        project_key.as_ref(),
+        project.key.as_ref(),
         &[ctx.accounts.project.bump],
     ];
     let project_signer = &[&project_seeds[..]];

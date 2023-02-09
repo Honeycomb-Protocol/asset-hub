@@ -123,11 +123,26 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
             symbol: assembler.collection_symbol.clone(),
             uri: args.collection_uri,
             seller_fee_basis_points: assembler.default_royalty,
-            creators: Some(vec![mpl_token_metadata::state::Creator {
-                address: assembler.key(),
-                verified: true,
-                share: 0,
-            }]),
+            creators: Some(
+                [
+                    vec![mpl_token_metadata::state::Creator {
+                        address: assembler.key(),
+                        verified: true,
+                        share: 0,
+                    }],
+                    assembler
+                        .default_creators
+                        .clone()
+                        .iter()
+                        .map(|c| mpl_token_metadata::state::Creator {
+                            address: c.address,
+                            verified: false,
+                            share: c.share,
+                        })
+                        .collect(),
+                ]
+                .concat(),
+            ),
             primary_sale_happened: false,
             is_mutable: true,
             token_standard: mpl_token_metadata::state::TokenStandard::NonFungible,

@@ -1686,19 +1686,6 @@ exports.IDL = {
                             "Royalty basis points that goes to creators in secondary sales (0-10000)"
                         ],
                         "type": "u16"
-                    },
-                    {
-                        "name": "creators",
-                        "docs": [
-                            "Array of creators, optional"
-                        ],
-                        "type": {
-                            "option": {
-                                "vec": {
-                                    "defined": "Creator"
-                                }
-                            }
-                        }
                     }
                 ]
             }
@@ -1759,10 +1746,6 @@ exports.IDL = {
                     {
                         "name": "address",
                         "type": "publicKey"
-                    },
-                    {
-                        "name": "verified",
-                        "type": "bool"
                     },
                     {
                         "name": "share",
