@@ -9,13 +9,16 @@ export type MintNftInstructionAccounts = {
     nftMint: web3.PublicKey;
     nftMetadata: web3.PublicKey;
     nftMasterEdition: web3.PublicKey;
+    nftTokenRecord: web3.PublicKey;
     tokenAccount: web3.PublicKey;
     uniqueConstraint: web3.PublicKey;
     authority: web3.PublicKey;
     payer: web3.PublicKey;
     systemProgram?: web3.PublicKey;
     tokenProgram?: web3.PublicKey;
+    associatedTokenProgram: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;
+    sysvarInstructions: web3.PublicKey;
     rent?: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };

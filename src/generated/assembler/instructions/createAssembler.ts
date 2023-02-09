@@ -41,18 +41,21 @@ export const createAssemblerStruct = new beet.FixableBeetArgsStruct<
  * Accounts required by the _createAssembler_ instruction
  *
  * @property [_writable_, **signer**] collectionMint
- * @property [_writable_] collectionMetadataAccount
+ * @property [_writable_] collectionMetadata
+ * @property [_writable_] collectionMasterEdition
  * @property [_writable_] assembler
  * @property [] authority
  * @property [_writable_, **signer**] payer
  * @property [] tokenMetadataProgram
+ * @property [] sysvarInstructions
  * @category Instructions
  * @category CreateAssembler
  * @category generated
  */
 export type CreateAssemblerInstructionAccounts = {
   collectionMint: web3.PublicKey
-  collectionMetadataAccount: web3.PublicKey
+  collectionMetadata: web3.PublicKey
+  collectionMasterEdition: web3.PublicKey
   assembler: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
@@ -60,6 +63,7 @@ export type CreateAssemblerInstructionAccounts = {
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
   rent?: web3.PublicKey
+  sysvarInstructions: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -93,7 +97,12 @@ export function createCreateAssemblerInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.collectionMetadataAccount,
+      pubkey: accounts.collectionMetadata,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.collectionMasterEdition,
       isWritable: true,
       isSigner: false,
     },
@@ -129,6 +138,11 @@ export function createCreateAssemblerInstruction(
     },
     {
       pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.sysvarInstructions,
       isWritable: false,
       isSigner: false,
     },

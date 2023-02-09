@@ -1,5 +1,7 @@
 import * as beet from '@metaplex-foundation/beet';
+import * as web3 from '@solana/web3.js';
 import { AssemblingAction } from './AssemblingAction';
+import { TokenStandard } from './TokenStandard';
 export type CreateAssemblerArgs = {
     assemblingAction: AssemblingAction;
     collectionName: string;
@@ -9,5 +11,7 @@ export type CreateAssemblerArgs = {
     nftBaseUri: string;
     allowDuplicates: beet.COption<boolean>;
     defaultRoyalty: beet.COption<number>;
+    tokenStandard: beet.COption<TokenStandard>;
+    ruleSet: beet.COption<web3.PublicKey>;
 };
 export declare const createAssemblerArgsBeet: beet.FixableBeetArgsStruct<CreateAssemblerArgs>;

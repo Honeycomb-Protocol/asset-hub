@@ -25,6 +25,7 @@ __exportStar(require("./DelegateAuthorityPermission"), exports);
 __exportStar(require("./NFTAttribute"), exports);
 __exportStar(require("./NFTAttributeValue"), exports);
 __exportStar(require("./SetNFTGeneratedArgs"), exports);
+__exportStar(require("./TokenStandard"), exports);
 __exportStar(require("./UpdateAssemblerArgs"), exports);
 __exportStar(require("./UpdateMetadataArgs"), exports);
 //# sourceMappingURL=index.js.map

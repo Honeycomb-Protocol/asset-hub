@@ -46,6 +46,29 @@ async function setupAssembler(mx, config, updateConfig) {
     const assemblingAction = generated_1.AssemblingAction[config.assemblingAction] || generated_1.AssemblingAction.Burn;
     let assemblerAddress = config.assemblerAddress;
     if (!assemblerAddress) {
+        let tokenStandard = null;
+        switch (config.tokenStandard) {
+            case "NFT":
+                tokenStandard = generated_1.TokenStandard.NonFungible;
+                break;
+            case "NonFungible":
+                tokenStandard = generated_1.TokenStandard.NonFungible;
+                break;
+            case "NonFungibleToken":
+                tokenStandard = generated_1.TokenStandard.NonFungible;
+                break;
+            case "pNFT":
+                tokenStandard = generated_1.TokenStandard.ProgrammableNonFungible;
+                break;
+            case "ProgrammableNonFungible":
+                tokenStandard = generated_1.TokenStandard.ProgrammableNonFungible;
+                break;
+            case "ProgrammableNonFungibleToken":
+                tokenStandard = generated_1.TokenStandard.ProgrammableNonFungible;
+                break;
+            default:
+                tokenStandard = null;
+        }
         const collectionUri = "";
         const createAssemblerCtx = (0, _1.createCreateAssemblerTransaction)(wallet.publicKey, wallet.publicKey, {
             assemblingAction: assemblingAction,
@@ -56,6 +79,8 @@ async function setupAssembler(mx, config, updateConfig) {
             nftBaseUri: config.base_url,
             allowDuplicates: config.allowDuplicates || null,
             defaultRoyalty: config.defaultRoyalty || null,
+            tokenStandard: tokenStandard,
+            ruleSet: config.ruleSet ? new web3.PublicKey(config.ruleSet) : null,
         });
         transactionGroups[0].txns.push(createAssemblerCtx);
         transactionGroups[0].postActions.push(() => {

@@ -12,6 +12,7 @@ import {
   AssemblingAction,
   assemblingActionBeet,
 } from '../types/AssemblingAction'
+import { TokenStandard, tokenStandardBeet } from '../types/TokenStandard'
 
 /**
  * Arguments used to create {@link Assembler}
@@ -30,6 +31,8 @@ export type AssemblerArgs = {
   nfts: number
   allowDuplicates: boolean
   defaultRoyalty: number
+  tokenStandard: TokenStandard
+  ruleSet: beet.COption<web3.PublicKey>
 }
 
 export const assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95]
@@ -52,7 +55,9 @@ export class Assembler implements AssemblerArgs {
     readonly assemblingAction: AssemblingAction,
     readonly nfts: number,
     readonly allowDuplicates: boolean,
-    readonly defaultRoyalty: number
+    readonly defaultRoyalty: number,
+    readonly tokenStandard: TokenStandard,
+    readonly ruleSet: beet.COption<web3.PublicKey>
   ) {}
 
   /**
@@ -70,7 +75,9 @@ export class Assembler implements AssemblerArgs {
       args.assemblingAction,
       args.nfts,
       args.allowDuplicates,
-      args.defaultRoyalty
+      args.defaultRoyalty,
+      args.tokenStandard,
+      args.ruleSet
     )
   }
 
@@ -191,6 +198,8 @@ export class Assembler implements AssemblerArgs {
       nfts: this.nfts,
       allowDuplicates: this.allowDuplicates,
       defaultRoyalty: this.defaultRoyalty,
+      tokenStandard: 'TokenStandard.' + TokenStandard[this.tokenStandard],
+      ruleSet: this.ruleSet,
     }
   }
 }
@@ -218,6 +227,8 @@ export const assemblerBeet = new beet.FixableBeetStruct<
     ['nfts', beet.u16],
     ['allowDuplicates', beet.bool],
     ['defaultRoyalty', beet.u16],
+    ['tokenStandard', tokenStandardBeet],
+    ['ruleSet', beet.coption(beetSolana.publicKey)],
   ],
   Assembler.fromArgs,
   'Assembler'

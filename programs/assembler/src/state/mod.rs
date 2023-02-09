@@ -49,3 +49,10 @@ pub struct Creator {
     pub verified: bool,
     pub share: u8,
 }
+
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq)]
+pub enum TokenStandard {
+    NonFungible,             // This is a master edition
+    ProgrammableNonFungible, // NonFungible with programmable configuration
+}

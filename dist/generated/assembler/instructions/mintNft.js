@@ -63,6 +63,11 @@ function createMintNftInstruction(accounts, programId = new web3.PublicKey('Gq13
             isSigner: false,
         },
         {
+            pubkey: accounts.nftTokenRecord,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.tokenAccount,
             isWritable: true,
             isSigner: false,
@@ -93,7 +98,17 @@ function createMintNftInstruction(accounts, programId = new web3.PublicKey('Gq13
             isSigner: false,
         },
         {
+            pubkey: accounts.associatedTokenProgram,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.tokenMetadataProgram,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.sysvarInstructions,
             isWritable: false,
             isSigner: false,
         },

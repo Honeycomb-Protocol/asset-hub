@@ -17,11 +17,19 @@ exports.IDL = {
                     ]
                 },
                 {
-                    "name": "collectionMetadataAccount",
+                    "name": "collectionMetadata",
                     "isMut": true,
                     "isSigner": false,
                     "docs": [
                         "Metadata account of the collection"
+                    ]
+                },
+                {
+                    "name": "collectionMasterEdition",
+                    "isMut": true,
+                    "isSigner": false,
+                    "docs": [
+                        "Master Edition account of the collection"
                     ]
                 },
                 {
@@ -78,6 +86,14 @@ exports.IDL = {
                     "isSigner": false,
                     "docs": [
                         "SYSVAR RENT"
+                    ]
+                },
+                {
+                    "name": "sysvarInstructions",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "NATIVE Instructions SYSVAR"
                     ]
                 }
             ],
@@ -466,6 +482,14 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "nftMasterEdition",
+                    "isMut": true,
+                    "isSigner": false,
+                    "docs": [
+                        "Master Edition account of the NFT"
+                    ]
+                },
+                {
                     "name": "nft",
                     "isMut": true,
                     "isSigner": false,
@@ -519,6 +543,14 @@ exports.IDL = {
                     "isSigner": false,
                     "docs": [
                         "SYSVAR RENT"
+                    ]
+                },
+                {
+                    "name": "sysvarInstructions",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "NATIVE Instructions SYSVAR"
                     ]
                 }
             ],
@@ -587,6 +619,7 @@ exports.IDL = {
                     "name": "tokenEdition",
                     "isMut": false,
                     "isSigner": false,
+                    "isOptional": true,
                     "docs": [
                         "Attribute token edition"
                     ]
@@ -729,6 +762,15 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "nftTokenRecord",
+                    "isMut": true,
+                    "isSigner": false,
+                    "isOptional": true,
+                    "docs": [
+                        "NFT token record"
+                    ]
+                },
+                {
                     "name": "tokenAccount",
                     "isMut": true,
                     "isSigner": false,
@@ -778,11 +820,27 @@ exports.IDL = {
                     ]
                 },
                 {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "ASSOCIATED TOKEN PROGRAM"
+                    ]
+                },
+                {
                     "name": "tokenMetadataProgram",
                     "isMut": false,
                     "isSigner": false,
                     "docs": [
                         "METAPLEX TOKEN METADATA PROGRAM"
+                    ]
+                },
+                {
+                    "name": "sysvarInstructions",
+                    "isMut": false,
+                    "isSigner": false,
+                    "docs": [
+                        "NATIVE Instructions SYSVAR"
                     ]
                 },
                 {
@@ -938,6 +996,7 @@ exports.IDL = {
                     "name": "tokenEdition",
                     "isMut": false,
                     "isSigner": false,
+                    "isOptional": true,
                     "docs": [
                         "Burning token edition"
                     ]
@@ -1245,6 +1304,24 @@ exports.IDL = {
                             "Default royalty percentage"
                         ],
                         "type": "u16"
+                    },
+                    {
+                        "name": "tokenStandard",
+                        "docs": [
+                            "Token Standard"
+                        ],
+                        "type": {
+                            "defined": "TokenStandard"
+                        }
+                    },
+                    {
+                        "name": "ruleSet",
+                        "docs": [
+                            "pNFT rule set"
+                        ],
+                        "type": {
+                            "option": "publicKey"
+                        }
                     }
                 ]
             }
@@ -1549,6 +1626,20 @@ exports.IDL = {
                         "name": "defaultRoyalty",
                         "type": {
                             "option": "u16"
+                        }
+                    },
+                    {
+                        "name": "tokenStandard",
+                        "type": {
+                            "option": {
+                                "defined": "TokenStandard"
+                            }
+                        }
+                    },
+                    {
+                        "name": "ruleSet",
+                        "type": {
+                            "option": "publicKey"
                         }
                     }
                 ]
@@ -1913,6 +2004,20 @@ exports.IDL = {
                     },
                     {
                         "name": "InitialArtGeneration"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TokenStandard",
+            "type": {
+                "kind": "enum",
+                "variants": [
+                    {
+                        "name": "NonFungible"
+                    },
+                    {
+                        "name": "ProgrammableNonFungible"
                     }
                 ]
             }

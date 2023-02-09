@@ -37,33 +37,30 @@ function createCreateNftTransaction(assembler, collectionMint, authority, payer,
         __kind: "edition",
     });
     const [nftMetadata] = (0, pdas_1.getMetadataAccount_)(nftMint.publicKey);
+    const [nftMasterEdition] = (0, pdas_1.getMetadataAccount_)(nftMint.publicKey, {
+        __kind: "edition",
+    });
     const [nft] = (0, pdas_1.getNftPda)(nftMint.publicKey);
-    return {
-        tx: new web3.Transaction().add((0, generated_1.createCreateNftInstruction)({
+    const instructions = [
+        (0, generated_1.createCreateNftInstruction)({
             assembler,
             collectionMint,
             collectionMetadataAccount,
             collectionMasterEdition,
             nftMint: nftMint.publicKey,
             nftMetadata,
+            nftMasterEdition,
             nft,
             authority,
             payer,
             tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
-        }, programId)),
+            sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        }, programId),
+    ];
+    return {
+        tx: new web3.Transaction().add(...instructions),
         signers: [nftMint],
-        accounts: [
-            assembler,
-            collectionMint,
-            collectionMetadataAccount,
-            collectionMasterEdition,
-            nftMint.publicKey,
-            nftMetadata,
-            nft,
-            authority,
-            payer,
-            pdas_1.METADATA_PROGRAM_ID,
-        ],
+        accounts: instructions.flatMap((i) => i.keys.map((k) => k.pubkey)),
         nft,
         nftMint: nftMint.publicKey,
     };
@@ -72,20 +69,23 @@ exports.createCreateNftTransaction = createCreateNftTransaction;
 function createAddBlockTransaction(assembler, nft, nftMint, block, blockDefinition, tokenMint, authority, payer, assemblingAction = generated_1.AssemblingAction.Freeze, programId = assembler_1.PROGRAM_ID) {
     const tokenAccount = splToken.getAssociatedTokenAddressSync(tokenMint, authority);
     const [tokenMetadata] = (0, pdas_1.getMetadataAccount_)(tokenMint);
-    const [tokenEdition] = (0, pdas_1.getMetadataAccount_)(tokenMint, {
-        __kind: "edition",
-    });
-    const [tokenRecord] = (0, pdas_1.getMetadataAccount_)(tokenMint, {
-        __kind: "token_record",
-        tokenAccount,
-    });
     const [depositAccount] = (0, pdas_1.getDepositPda)(tokenMint, nftMint);
-    const [depositTokenRecord] = (0, pdas_1.getMetadataAccount_)(tokenMint, {
-        __kind: "token_record",
-        tokenAccount: depositAccount,
-    });
-    return {
-        tx: new web3.Transaction().add((0, generated_1.createAddBlockInstruction)({
+    let tokenRecord, depositTokenRecord, tokenEdition;
+    if (true) {
+        [tokenEdition] = (0, pdas_1.getMetadataAccount_)(tokenMint, {
+            __kind: "edition",
+        });
+        [tokenRecord] = (0, pdas_1.getMetadataAccount_)(tokenMint, {
+            __kind: "token_record",
+            tokenAccount,
+        });
+        [depositTokenRecord] = (0, pdas_1.getMetadataAccount_)(tokenMint, {
+            __kind: "token_record",
+            tokenAccount: depositAccount,
+        });
+    }
+    const instructions = [
+        (0, generated_1.createAddBlockInstruction)({
             assembler,
             nft,
             block,
@@ -93,32 +93,23 @@ function createAddBlockTransaction(assembler, nft, nftMint, block, blockDefiniti
             tokenMint,
             tokenAccount,
             tokenMetadata,
-            tokenEdition,
-            tokenRecord,
+            tokenEdition: tokenEdition || programId,
+            tokenRecord: tokenRecord || programId,
             depositAccount: assemblingAction === generated_1.AssemblingAction.TakeCustody
                 ? depositAccount
                 : programId,
-            depositTokenRecord,
+            depositTokenRecord: depositTokenRecord || programId,
             authority,
             payer,
             tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
             sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-        }, programId)),
+        }, programId),
+    ];
+    return {
+        tx: new web3.Transaction().add(...instructions),
         signers: [],
-        accounts: [
-            assembler,
-            nft,
-            block,
-            blockDefinition,
-            tokenMint,
-            tokenAccount,
-            tokenMetadata,
-            tokenEdition,
-            authority,
-            payer,
-            pdas_1.METADATA_PROGRAM_ID,
-        ],
+        accounts: instructions.flatMap((i) => i.keys.map((k) => k.pubkey)),
     };
 }
 exports.createAddBlockTransaction = createAddBlockTransaction;
@@ -129,22 +120,32 @@ function createMintNftTransaction(assembler, nftMint, uniqueConstraint, authorit
     const [nftMasterEdition] = (0, pdas_1.getMetadataAccount_)(nftMint, {
         __kind: "edition",
     });
-    console.log("uniqueConstraint", uniqueConstraint === null || uniqueConstraint === void 0 ? void 0 : uniqueConstraint.toString());
-    return {
-        tx: new web3.Transaction().add(splToken.createAssociatedTokenAccountInstruction(payer, tokenAccount, authority, nftMint), (0, generated_1.createMintNftInstruction)({
+    const [nftTokenRecord] = (0, pdas_1.getMetadataAccount_)(nftMint, {
+        __kind: "token_record",
+        tokenAccount,
+    });
+    const instructions = [
+        splToken.createAssociatedTokenAccountInstruction(payer, tokenAccount, authority, nftMint),
+        (0, generated_1.createMintNftInstruction)({
             assembler,
             nft,
             nftMint,
             nftMetadata,
             nftMasterEdition,
+            nftTokenRecord,
             tokenAccount,
             uniqueConstraint: uniqueConstraint || programId,
             authority,
             payer,
+            associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
             tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
-        }, programId)),
+            sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        }, programId),
+    ];
+    return {
+        tx: new web3.Transaction().add(...instructions),
         signers: [],
-        accounts: [assembler, nft, nftMint, tokenAccount, authority, payer].concat(uniqueConstraint ? [uniqueConstraint] : []),
+        accounts: instructions.flatMap((i) => i.keys.map((k) => k.pubkey)),
     };
 }
 exports.createMintNftTransaction = createMintNftTransaction;

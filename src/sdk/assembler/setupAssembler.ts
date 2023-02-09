@@ -5,6 +5,7 @@ import {
   AssemblingAction,
   BlockDefinitionValue,
   BlockType,
+  TokenStandard,
 } from "../../generated";
 import { AssemblerConfig, TxSignersAccounts } from "../../types";
 import {
@@ -49,6 +50,31 @@ export async function setupAssembler(
 
   let assemblerAddress = config.assemblerAddress;
   if (!assemblerAddress) {
+    let tokenStandard: TokenStandard = null;
+
+    switch (config.tokenStandard) {
+      case "NFT":
+        tokenStandard = TokenStandard.NonFungible;
+        break;
+      case "NonFungible":
+        tokenStandard = TokenStandard.NonFungible;
+        break;
+      case "NonFungibleToken":
+        tokenStandard = TokenStandard.NonFungible;
+        break;
+      case "pNFT":
+        tokenStandard = TokenStandard.ProgrammableNonFungible;
+        break;
+      case "ProgrammableNonFungible":
+        tokenStandard = TokenStandard.ProgrammableNonFungible;
+        break;
+      case "ProgrammableNonFungibleToken":
+        tokenStandard = TokenStandard.ProgrammableNonFungible;
+        break;
+      default:
+        tokenStandard = null;
+    }
+
     const collectionUri = "";
     const createAssemblerCtx = createCreateAssemblerTransaction(
       wallet.publicKey,
@@ -62,6 +88,8 @@ export async function setupAssembler(
         nftBaseUri: config.base_url,
         allowDuplicates: config.allowDuplicates || null,
         defaultRoyalty: config.defaultRoyalty || null,
+        tokenStandard: tokenStandard,
+        ruleSet: config.ruleSet ? new web3.PublicKey(config.ruleSet) : null,
       }
     );
     transactionGroups[0].txns.push(createAssemblerCtx);

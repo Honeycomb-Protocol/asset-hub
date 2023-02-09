@@ -1,11 +1,15 @@
 use {
     crate::{
         errors::ErrorCode,
-        state::{Assembler, AssemblingAction, DelegateAuthority, DelegateAuthorityPermission},
-        utils::{assert_authority, create_master_edition, create_metadata},
+        state::{
+            Assembler, AssemblingAction, DelegateAuthority, DelegateAuthorityPermission,
+            TokenStandard,
+        },
+        utils::{assert_authority, create_nft},
     },
-    anchor_lang::prelude::*,
+    anchor_lang::{prelude::*, solana_program},
     anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount},
+    mpl_token_metadata::state::AssetData,
 };
 
 /// Accounts used in the create assembler instruction
@@ -24,7 +28,12 @@ pub struct CreateAssembler<'info> {
     /// Metadata account of the collection
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub collection_metadata_account: AccountInfo<'info>,
+    pub collection_metadata: AccountInfo<'info>,
+
+    /// Master Edition account of the collection
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub collection_master_edition: AccountInfo<'info>,
 
     /// Assembler state account
     #[account(
@@ -59,6 +68,11 @@ pub struct CreateAssembler<'info> {
 
     /// SYSVAR RENT
     pub rent: Sysvar<'info, Rent>,
+
+    /// NATIVE Instructions SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -71,6 +85,8 @@ pub struct CreateAssemblerArgs {
     nft_base_uri: String,
     allow_duplicates: Option<bool>,
     default_royalty: Option<u16>,
+    token_standard: Option<TokenStandard>,
+    rule_set: Option<Pubkey>,
 }
 
 /// Create a new assembler
@@ -87,6 +103,10 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
     assembler.nfts = 0;
     assembler.allow_duplicates = args.allow_duplicates.unwrap_or(false);
     assembler.default_royalty = args.default_royalty.unwrap_or(0);
+    assembler.token_standard = args
+        .token_standard
+        .unwrap_or(crate::state::TokenStandard::NonFungible);
+    assembler.rule_set = args.rule_set;
 
     let assembler_seeds = &[
         b"assembler".as_ref(),
@@ -95,29 +115,58 @@ pub fn create_assembler(ctx: Context<CreateAssembler>, args: CreateAssemblerArgs
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    create_metadata(
-        assembler.collection_name.clone(),
-        assembler.collection_symbol.clone(),
-        args.collection_uri,
-        0,
-        None,
-        // Some(vec![mpl_token_metadata::state::Creator {
-        //     address: assembler.authority,
-        //     verified: true,
-        //     share: 100,
-        // }]),
-        None,
-        None,
-        None,
+    create_nft(
+        AssetData {
+            name: assembler.collection_name.clone(),
+            symbol: assembler.collection_symbol.clone(),
+            uri: args.collection_uri,
+            seller_fee_basis_points: assembler.default_royalty,
+            creators: None,
+            primary_sale_happened: false,
+            is_mutable: true,
+            token_standard: mpl_token_metadata::state::TokenStandard::NonFungible,
+            collection: None,
+            uses: None,
+            collection_details: None,
+            rule_set: assembler.rule_set,
+        },
+        false,
+        true,
+        ctx.accounts.collection_metadata.to_account_info(),
+        ctx.accounts.collection_master_edition.to_account_info(),
+        ctx.accounts.collection_mint.to_account_info(),
         assembler.to_account_info(),
         ctx.accounts.payer.to_account_info(),
-        ctx.accounts.collection_mint.to_account_info(),
-        ctx.accounts.collection_metadata_account.clone(),
+        assembler.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.token_metadata_program.to_account_info(),
-        ctx.accounts.rent.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
         Some(assembler_signer),
     )?;
+
+    // create_metadata(
+    //     assembler.collection_name.clone(),
+    //     assembler.collection_symbol.clone(),
+    //     args.collection_uri,
+    //     0,
+    //     None,
+    //     // Some(vec![mpl_token_metadata::state::Creator {
+    //     //     address: assembler.authority,
+    //     //     verified: true,
+    //     //     share: 100,
+    //     // }]),
+    //     None,
+    //     None,
+    //     None,
+    //     assembler.to_account_info(),
+    //     ctx.accounts.payer.to_account_info(),
+    //     ctx.accounts.collection_mint.to_account_info(),
+    //     ctx.accounts.collection_metadata_account.clone(),
+    //     ctx.accounts.system_program.to_account_info(),
+    //     ctx.accounts.token_metadata_program.to_account_info(),
+    //     ctx.accounts.rent.to_account_info(),
+    //     Some(assembler_signer),
+    // )?;
 
     Ok(())
 }
@@ -194,18 +243,18 @@ pub fn create_assembler_collection_master_edition(
         1,
     )?;
 
-    create_master_edition(
-        ctx.accounts.collection_mint.to_account_info(),
-        ctx.accounts.collection_metadata_account.to_account_info(),
-        ctx.accounts.collection_master_edition.clone(),
-        assembler.to_account_info(),
-        ctx.accounts.payer.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_metadata_program.clone(),
-        ctx.accounts.rent.to_account_info(),
-        Some(assembler_signer),
-    )?;
+    // create_master_edition(
+    //     ctx.accounts.collection_mint.to_account_info(),
+    //     ctx.accounts.collection_metadata_account.to_account_info(),
+    //     ctx.accounts.collection_master_edition.clone(),
+    //     assembler.to_account_info(),
+    //     ctx.accounts.payer.to_account_info(),
+    //     ctx.accounts.system_program.to_account_info(),
+    //     ctx.accounts.token_program.to_account_info(),
+    //     ctx.accounts.token_metadata_program.clone(),
+    //     ctx.accounts.rent.to_account_info(),
+    //     Some(assembler_signer),
+    // )?;
 
     Ok(())
 }

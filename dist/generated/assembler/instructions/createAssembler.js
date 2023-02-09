@@ -48,7 +48,12 @@ function createCreateAssemblerInstruction(accounts, args, programId = new web3.P
             isSigner: true,
         },
         {
-            pubkey: accounts.collectionMetadataAccount,
+            pubkey: accounts.collectionMetadata,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.collectionMasterEdition,
             isWritable: true,
             isSigner: false,
         },
@@ -84,6 +89,11 @@ function createCreateAssemblerInstruction(accounts, args, programId = new web3.P
         },
         {
             pubkey: (_c = accounts.rent) !== null && _c !== void 0 ? _c : web3.SYSVAR_RENT_PUBKEY,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.sysvarInstructions,
             isWritable: false,
             isSigner: false,
         },

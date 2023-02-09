@@ -23,21 +23,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAssemblerArgsBeet = void 0;
+exports.tokenStandardBeet = exports.TokenStandard = void 0;
 const beet = __importStar(require("@metaplex-foundation/beet"));
-const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
-const AssemblingAction_1 = require("./AssemblingAction");
-const TokenStandard_1 = require("./TokenStandard");
-exports.createAssemblerArgsBeet = new beet.FixableBeetArgsStruct([
-    ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
-    ['collectionName', beet.utf8String],
-    ['collectionSymbol', beet.utf8String],
-    ['collectionUri', beet.utf8String],
-    ['collectionDescription', beet.utf8String],
-    ['nftBaseUri', beet.utf8String],
-    ['allowDuplicates', beet.coption(beet.bool)],
-    ['defaultRoyalty', beet.coption(beet.u16)],
-    ['tokenStandard', beet.coption(TokenStandard_1.tokenStandardBeet)],
-    ['ruleSet', beet.coption(beetSolana.publicKey)],
-], 'CreateAssemblerArgs');
-//# sourceMappingURL=CreateAssemblerArgs.js.map
+var TokenStandard;
+(function (TokenStandard) {
+    TokenStandard[TokenStandard["NonFungible"] = 0] = "NonFungible";
+    TokenStandard[TokenStandard["ProgrammableNonFungible"] = 1] = "ProgrammableNonFungible";
+})(TokenStandard = exports.TokenStandard || (exports.TokenStandard = {}));
+exports.tokenStandardBeet = beet.fixedScalarEnum(TokenStandard);
+//# sourceMappingURL=TokenStandard.js.map

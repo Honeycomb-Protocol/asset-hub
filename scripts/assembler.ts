@@ -12,6 +12,7 @@ import {
   BlockType,
   BlockDefinitionValue,
   Block,
+  TokenStandard,
 } from "../src";
 
 export default async function (
@@ -25,7 +26,7 @@ export default async function (
   switch (action) {
     case "create-assembler":
       const assemblerTx = await createAssembler(mx, {
-        assemblingAction: AssemblingAction.Freeze,
+        assemblingAction: AssemblingAction.TakeCustody,
         collectionName: "Assembler Test Collection",
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",
@@ -33,6 +34,8 @@ export default async function (
         nftBaseUri: "https://api.eboy.dev/u/temp",
         allowDuplicates: false,
         defaultRoyalty: 100,
+        tokenStandard: TokenStandard.ProgrammableNonFungible,
+        ruleSet: null,
       });
       console.log("Assembler address: ", assemblerTx.response);
       setDeployments({ ...deployments, assembler: assemblerTx.assembler });
@@ -166,6 +169,7 @@ export default async function (
       }).catch((e) => console.error(e));
       if (!mint) throw new Error("Mint txns failed!");
       console.log("Mint response: ", mint.responses);
+      console.log("NFT Mint", mint.nftMint.toString());
       setDeployments({
         ...deployments,
         nftMint: mint.nftMint,

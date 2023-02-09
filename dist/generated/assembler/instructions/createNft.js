@@ -68,6 +68,11 @@ function createCreateNftInstruction(accounts, programId = new web3.PublicKey('Gq
             isSigner: false,
         },
         {
+            pubkey: accounts.nftMasterEdition,
+            isWritable: true,
+            isSigner: false,
+        },
+        {
             pubkey: accounts.nft,
             isWritable: true,
             isSigner: false,
@@ -99,6 +104,11 @@ function createCreateNftInstruction(accounts, programId = new web3.PublicKey('Gq
         },
         {
             pubkey: (_c = accounts.rent) !== null && _c !== void 0 ? _c : web3.SYSVAR_RENT_PUBKEY,
+            isWritable: false,
+            isSigner: false,
+        },
+        {
+            pubkey: accounts.sysvarInstructions,
             isWritable: false,
             isSigner: false,
         },

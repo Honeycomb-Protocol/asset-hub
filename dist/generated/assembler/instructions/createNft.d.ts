@@ -10,6 +10,7 @@ export type CreateNftInstructionAccounts = {
     collectionMasterEdition: web3.PublicKey;
     nftMint: web3.PublicKey;
     nftMetadata: web3.PublicKey;
+    nftMasterEdition: web3.PublicKey;
     nft: web3.PublicKey;
     authority: web3.PublicKey;
     payer: web3.PublicKey;
@@ -17,6 +18,7 @@ export type CreateNftInstructionAccounts = {
     tokenProgram?: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;
     rent?: web3.PublicKey;
+    sysvarInstructions: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
 export declare const createNftInstructionDiscriminator: number[];

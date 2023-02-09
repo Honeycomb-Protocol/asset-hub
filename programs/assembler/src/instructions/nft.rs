@@ -6,10 +6,7 @@ use {
             DelegateAuthority, DelegateAuthorityPermission, NFTAttribute, NFTAttributeValue,
             NFTUniqueConstraint, NFT,
         },
-        utils::{
-            self, assert_authority, create_master_edition, create_metadata,
-            set_and_verify_collection, BpfWriter,
-        },
+        utils::{self, assert_authority, BpfWriter},
     },
     anchor_lang::{prelude::*, solana_program},
     anchor_spl::{
@@ -18,8 +15,8 @@ use {
     },
     mpl_token_metadata::{
         self,
-        instruction::{DelegateArgs, RevokeArgs},
-        state::{Metadata, TokenMetadataAccount},
+        instruction::{DelegateArgs, MintArgs, RevokeArgs},
+        state::{AssetData, Metadata, TokenMetadataAccount, TokenStandard},
     },
 };
 
@@ -28,11 +25,11 @@ use {
 pub struct CreateNFT<'info> {
     /// Assembler state account
     #[account(mut)]
-    pub assembler: Account<'info, Assembler>,
+    pub assembler: Box<Account<'info, Assembler>>,
 
     /// The collection mint of the assembler
     #[account(mut, constraint = collection_mint.key() == assembler.collection)]
-    pub collection_mint: Account<'info, Mint>,
+    pub collection_mint: Box<Account<'info, Mint>>,
 
     /// Metadata account of the collection
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -58,6 +55,11 @@ pub struct CreateNFT<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     pub nft_metadata: AccountInfo<'info>,
+
+    /// Master Edition account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_master_edition: AccountInfo<'info>,
 
     /// NFT account
     #[account(
@@ -92,6 +94,11 @@ pub struct CreateNFT<'info> {
 
     /// SYSVAR RENT
     pub rent: Sysvar<'info, Rent>,
+
+    /// NATIVE Instructions SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 }
 
 /// Create a new nft
@@ -120,40 +127,50 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    create_metadata(
-        nft.name.clone(),
-        nft.symbol.clone(),
-        nft.uri.clone(),
-        assembler.default_royalty,
-        None,
-        // Some(vec![mpl_token_metadata::state::Creator {
-        //     address: assembler.authority,
-        //     verified: true,
-        //     share: 100,
-        // }]),
-        None,
-        None,
-        None,
+    utils::create_nft(
+        AssetData {
+            name: nft.name.clone(),
+            symbol: nft.symbol.clone(),
+            uri: nft.uri.clone(),
+            seller_fee_basis_points: assembler.default_royalty,
+            creators: None,
+            primary_sale_happened: false,
+            is_mutable: true,
+            token_standard: match assembler.token_standard {
+                crate::state::TokenStandard::NonFungible => TokenStandard::NonFungible,
+                crate::state::TokenStandard::ProgrammableNonFungible => {
+                    TokenStandard::ProgrammableNonFungible
+                }
+            },
+            collection: None,
+            uses: None,
+            collection_details: None,
+            rule_set: assembler.rule_set,
+        },
+        false,
+        true,
+        ctx.accounts.nft_metadata.to_account_info(),
+        ctx.accounts.nft_master_edition.to_account_info(),
+        ctx.accounts.nft_mint.to_account_info(),
         assembler.to_account_info(),
         ctx.accounts.payer.to_account_info(),
-        ctx.accounts.nft_mint.to_account_info(),
-        ctx.accounts.nft_metadata.clone(),
+        assembler.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.token_metadata_program.to_account_info(),
-        ctx.accounts.rent.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
         Some(assembler_signer),
     )?;
 
-    set_and_verify_collection(
-        ctx.accounts.nft_metadata.clone(),
-        ctx.accounts.collection_mint.to_account_info(),
-        ctx.accounts.collection_metadata_account.clone(),
-        ctx.accounts.collection_master_edition.clone(),
-        assembler.to_account_info(),
-        ctx.accounts.payer.to_account_info(),
-        ctx.accounts.token_metadata_program.clone(),
-        Some(assembler_signer),
-    )?;
+    // set_and_verify_collection(
+    //     ctx.accounts.nft_metadata.clone(),
+    //     ctx.accounts.collection_mint.to_account_info(),
+    //     ctx.accounts.collection_metadata_account.clone(),
+    //     ctx.accounts.collection_master_edition.clone(),
+    //     assembler.to_account_info(),
+    //     ctx.accounts.payer.to_account_info(),
+    //     ctx.accounts.token_metadata_program.clone(),
+    //     Some(assembler_signer),
+    // )?;
 
     Ok(())
 }
@@ -193,7 +210,7 @@ pub struct AddBlock<'info> {
     /// Attribute token edition
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account()]
-    pub token_edition: AccountInfo<'info>,
+    pub token_edition: Option<AccountInfo<'info>>,
 
     /// Attribute token record
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -354,7 +371,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 None,
                 assembler.to_account_info(),
                 ctx.accounts.token_metadata.to_account_info(),
-                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_edition.clone(),
                 ctx.accounts.token_record.clone(),
                 ctx.accounts.token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
@@ -372,7 +389,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 ctx.accounts.token_account.to_account_info(),
                 ctx.accounts.authority.to_account_info(),
                 ctx.accounts.token_metadata.to_account_info(),
-                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_edition.clone(),
                 ctx.accounts.token_record.clone(),
                 ctx.accounts.payer.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
@@ -383,13 +400,6 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
         }
         AssemblingAction::TakeCustody => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                let assembler_seeds = &[
-                    b"assembler".as_ref(),
-                    assembler.collection.as_ref(),
-                    &[assembler.bump],
-                ];
-                let assembler_signer = &[&assembler_seeds[..]];
-
                 utils::transfer(
                     1 * 10u64.pow(token_mint.decimals.into()),
                     ctx.accounts.token_account.to_account_info(),
@@ -398,7 +408,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                     assembler.to_account_info(),
                     ctx.accounts.token_mint.to_account_info(),
                     ctx.accounts.token_metadata.to_account_info(),
-                    ctx.accounts.token_edition.to_account_info(),
+                    ctx.accounts.token_edition.clone(),
                     ctx.accounts.token_record.clone(),
                     ctx.accounts.deposit_token_record.clone(),
                     ctx.accounts.authority.to_account_info(),
@@ -407,7 +417,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                     ctx.accounts.token_program.to_account_info(),
                     ctx.accounts.associated_token_program.to_account_info(),
                     ctx.accounts.sysvar_instructions.to_account_info(),
-                    Some(assembler_signer),
+                    None,
                 )?;
             } else {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
@@ -461,6 +471,11 @@ pub struct MintNFT<'info> {
     #[account(mut)]
     pub nft_master_edition: AccountInfo<'info>,
 
+    /// NFT token record
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_token_record: Option<AccountInfo<'info>>,
+
     /// NFT token account
     #[account(mut, constraint = token_account.mint == nft_mint.key() && token_account.owner == authority.key())]
     pub token_account: Box<Account<'info, TokenAccount>>,
@@ -485,9 +500,17 @@ pub struct MintNFT<'info> {
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
 
+    /// ASSOCIATED TOKEN PROGRAM
+    pub associated_token_program: Program<'info, AssociatedToken>,
+
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: AccountInfo<'info>,
+
+    /// NATIVE Instructions SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 
     /// SYSVAR RENT
     pub rent: Sysvar<'info, Rent>,
@@ -579,35 +602,28 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    token::mint_to(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            MintTo {
-                mint: ctx.accounts.nft_mint.to_account_info(),
-                to: ctx.accounts.token_account.to_account_info(),
-                authority: assembler.to_account_info(),
-            },
-            assembler_signer,
-        ),
-        1,
+    utils::mint_nft(
+        MintArgs::V1 {
+            amount: 1,
+            authorization_data: None,
+        },
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.authority.to_account_info(),
+        ctx.accounts.nft_metadata.to_account_info(),
+        Some(ctx.accounts.nft_master_edition.to_account_info()),
+        ctx.accounts.nft_token_record.clone(),
+        ctx.accounts.nft_mint.to_account_info(),
+        assembler.to_account_info(),
+        None, // delegate_record,
+        ctx.accounts.payer.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.rent.to_account_info(),
+        Some(assembler_signer),
     )?;
 
     nft.minted = true;
-
-    if ctx.accounts.nft_master_edition.data_is_empty() {
-        create_master_edition(
-            ctx.accounts.nft_mint.to_account_info(),
-            ctx.accounts.nft_metadata.to_account_info(),
-            ctx.accounts.nft_master_edition.clone(),
-            assembler.to_account_info(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.token_metadata_program.clone(),
-            ctx.accounts.rent.to_account_info(),
-            Some(assembler_signer),
-        )?;
-    }
 
     Ok(())
 }
@@ -737,7 +753,7 @@ pub struct RemoveBlock<'info> {
     /// Burning token edition
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account()]
-    pub token_edition: AccountInfo<'info>,
+    pub token_edition: Option<AccountInfo<'info>>,
 
     /// Attribute token record
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -855,7 +871,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 ctx.accounts.token_account.to_account_info(),
                 ctx.accounts.authority.to_account_info(),
                 ctx.accounts.token_metadata.to_account_info(),
-                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_edition.clone(),
                 ctx.accounts.token_record.clone(),
                 ctx.accounts.payer.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
@@ -869,7 +885,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 None,
                 assembler.to_account_info(),
                 ctx.accounts.token_metadata.to_account_info(),
-                ctx.accounts.token_edition.to_account_info(),
+                ctx.accounts.token_edition.clone(),
                 ctx.accounts.token_record.clone(),
                 ctx.accounts.token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
@@ -891,7 +907,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                     ctx.accounts.authority.to_account_info(),
                     ctx.accounts.token_mint.to_account_info(),
                     ctx.accounts.token_metadata.to_account_info(),
-                    ctx.accounts.token_edition.to_account_info(),
+                    ctx.accounts.token_edition.clone(),
                     ctx.accounts.deposit_token_record.clone(),
                     ctx.accounts.token_record.clone(),
                     assembler.to_account_info(),

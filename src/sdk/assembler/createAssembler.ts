@@ -28,62 +28,34 @@ export function createCreateAssemblerTransaction(
     authority
   );
 
-  const [collectionMetadataAccount] = getMetadataAccount_(
-    collectionMint.publicKey
-  );
+  const [collectionMetadata] = getMetadataAccount_(collectionMint.publicKey);
   const [collectionMasterEdition] = getMetadataAccount_(
     collectionMint.publicKey,
     { __kind: "edition" }
   );
   const [assembler] = getAssemblerPda(collectionMint.publicKey);
 
-  return {
-    tx: new web3.Transaction().add(
-      createCreateAssemblerInstruction(
-        {
-          collectionMint: collectionMint.publicKey,
-          collectionMetadataAccount,
-          assembler,
-          authority,
-          payer,
-          tokenMetadataProgram: METADATA_PROGRAM_ID,
-        },
-        { args },
-        programId
-      ),
-
-      splToken.createAssociatedTokenAccountInstruction(
-        payer,
-        collectionTokenAccount,
+  const instructions: web3.TransactionInstruction[] = [
+    createCreateAssemblerInstruction(
+      {
+        collectionMint: collectionMint.publicKey,
+        collectionMetadata,
+        collectionMasterEdition,
+        assembler,
         authority,
-        collectionMint.publicKey
-      ),
-
-      createCreateAssemblerCollectionMasterEditionInstruction(
-        {
-          collectionMint: collectionMint.publicKey,
-          collectionMetadataAccount,
-          collectionMasterEdition,
-          collectionTokenAccount,
-          assembler,
-          authority,
-          payer,
-          tokenMetadataProgram: METADATA_PROGRAM_ID,
-        },
-        programId
-      )
+        payer,
+        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        tokenMetadataProgram: METADATA_PROGRAM_ID,
+      },
+      { args },
+      programId
     ),
+  ];
+
+  return {
+    tx: new web3.Transaction().add(...instructions),
     signers: [collectionMint],
-    accounts: [
-      collectionMint.publicKey,
-      collectionMetadataAccount,
-      collectionMasterEdition,
-      collectionTokenAccount,
-      assembler,
-      authority,
-      payer,
-      METADATA_PROGRAM_ID,
-    ],
+    accounts: instructions.flatMap((i) => i.keys.map((k) => k.pubkey)),
     assembler,
   };
 }

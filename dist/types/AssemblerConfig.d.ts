@@ -6,6 +6,8 @@ export type AssemblerConfig = {
     base_url: string;
     allowDuplicates?: boolean;
     defaultRoyalty?: number;
+    tokenStandard?: string;
+    ruleSet?: string;
     blocks: BlockConfig[];
     assemblerAddress?: string;
     assetProject?: string;

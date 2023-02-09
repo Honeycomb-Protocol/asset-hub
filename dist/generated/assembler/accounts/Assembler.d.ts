@@ -3,6 +3,7 @@ import * as web3 from '@solana/web3.js';
 import * as beet from '@metaplex-foundation/beet';
 import * as beetSolana from '@metaplex-foundation/beet-solana';
 import { AssemblingAction } from '../types/AssemblingAction';
+import { TokenStandard } from '../types/TokenStandard';
 export type AssemblerArgs = {
     bump: number;
     authority: web3.PublicKey;
@@ -15,6 +16,8 @@ export type AssemblerArgs = {
     nfts: number;
     allowDuplicates: boolean;
     defaultRoyalty: number;
+    tokenStandard: TokenStandard;
+    ruleSet: beet.COption<web3.PublicKey>;
 };
 export declare const assemblerDiscriminator: number[];
 export declare class Assembler implements AssemblerArgs {
@@ -29,6 +32,8 @@ export declare class Assembler implements AssemblerArgs {
     readonly nfts: number;
     readonly allowDuplicates: boolean;
     readonly defaultRoyalty: number;
+    readonly tokenStandard: TokenStandard;
+    readonly ruleSet: beet.COption<web3.PublicKey>;
     private constructor();
     static fromArgs(args: AssemblerArgs): Assembler;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [Assembler, number];
@@ -52,6 +57,8 @@ export declare class Assembler implements AssemblerArgs {
         nfts: number;
         allowDuplicates: boolean;
         defaultRoyalty: number;
+        tokenStandard: string;
+        ruleSet: web3.PublicKey;
     };
 }
 export declare const assemblerBeet: beet.FixableBeetStruct<Assembler, AssemblerArgs & {

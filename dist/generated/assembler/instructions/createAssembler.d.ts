@@ -9,7 +9,8 @@ export declare const createAssemblerStruct: beet.FixableBeetArgsStruct<CreateAss
 }>;
 export type CreateAssemblerInstructionAccounts = {
     collectionMint: web3.PublicKey;
-    collectionMetadataAccount: web3.PublicKey;
+    collectionMetadata: web3.PublicKey;
+    collectionMasterEdition: web3.PublicKey;
     assembler: web3.PublicKey;
     authority: web3.PublicKey;
     payer: web3.PublicKey;
@@ -17,6 +18,7 @@ export type CreateAssemblerInstructionAccounts = {
     tokenProgram?: web3.PublicKey;
     tokenMetadataProgram: web3.PublicKey;
     rent?: web3.PublicKey;
+    sysvarInstructions: web3.PublicKey;
     anchorRemainingAccounts?: web3.AccountMeta[];
 };
 export declare const createAssemblerInstructionDiscriminator: number[];

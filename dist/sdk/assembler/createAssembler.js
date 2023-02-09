@@ -32,38 +32,25 @@ const pdas_1 = require("../pdas");
 function createCreateAssemblerTransaction(authority, payer, args, programId = assembler_1.PROGRAM_ID) {
     const collectionMint = web3.Keypair.generate();
     const collectionTokenAccount = splToken.getAssociatedTokenAddressSync(collectionMint.publicKey, authority);
-    const [collectionMetadataAccount] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey);
+    const [collectionMetadata] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey);
     const [collectionMasterEdition] = (0, pdas_1.getMetadataAccount_)(collectionMint.publicKey, { __kind: "edition" });
     const [assembler] = (0, pdas_1.getAssemblerPda)(collectionMint.publicKey);
+    const instructions = [
+        (0, generated_1.createCreateAssemblerInstruction)({
+            collectionMint: collectionMint.publicKey,
+            collectionMetadata,
+            collectionMasterEdition,
+            assembler,
+            authority,
+            payer,
+            sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
+        }, { args }, programId),
+    ];
     return {
-        tx: new web3.Transaction().add((0, generated_1.createCreateAssemblerInstruction)({
-            collectionMint: collectionMint.publicKey,
-            collectionMetadataAccount,
-            assembler,
-            authority,
-            payer,
-            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
-        }, { args }, programId), splToken.createAssociatedTokenAccountInstruction(payer, collectionTokenAccount, authority, collectionMint.publicKey), (0, generated_1.createCreateAssemblerCollectionMasterEditionInstruction)({
-            collectionMint: collectionMint.publicKey,
-            collectionMetadataAccount,
-            collectionMasterEdition,
-            collectionTokenAccount,
-            assembler,
-            authority,
-            payer,
-            tokenMetadataProgram: pdas_1.METADATA_PROGRAM_ID,
-        }, programId)),
+        tx: new web3.Transaction().add(...instructions),
         signers: [collectionMint],
-        accounts: [
-            collectionMint.publicKey,
-            collectionMetadataAccount,
-            collectionMasterEdition,
-            collectionTokenAccount,
-            assembler,
-            authority,
-            payer,
-            pdas_1.METADATA_PROGRAM_ID,
-        ],
+        accounts: instructions.flatMap((i) => i.keys.map((k) => k.pubkey)),
         assembler,
     };
 }

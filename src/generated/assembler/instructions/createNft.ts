@@ -29,10 +29,12 @@ export const createNftStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] collectionMasterEdition
  * @property [_writable_, **signer**] nftMint
  * @property [_writable_] nftMetadata
+ * @property [_writable_] nftMasterEdition
  * @property [_writable_] nft
  * @property [] authority
  * @property [_writable_, **signer**] payer
  * @property [] tokenMetadataProgram
+ * @property [] sysvarInstructions
  * @category Instructions
  * @category CreateNft
  * @category generated
@@ -44,6 +46,7 @@ export type CreateNftInstructionAccounts = {
   collectionMasterEdition: web3.PublicKey
   nftMint: web3.PublicKey
   nftMetadata: web3.PublicKey
+  nftMasterEdition: web3.PublicKey
   nft: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
@@ -51,6 +54,7 @@ export type CreateNftInstructionAccounts = {
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
   rent?: web3.PublicKey
+  sysvarInstructions: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -105,6 +109,11 @@ export function createCreateNftInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.nftMasterEdition,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.nft,
       isWritable: true,
       isSigner: false,
@@ -136,6 +145,11 @@ export function createCreateNftInstruction(
     },
     {
       pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.sysvarInstructions,
       isWritable: false,
       isSigner: false,
     },

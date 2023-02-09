@@ -1,19 +1,153 @@
-use mpl_token_metadata::state::Data;
-
 use {
     anchor_lang::{prelude::*, solana_program},
     mpl_token_metadata::{
         self,
         instruction::{
             builders::{
-                DelegateBuilder, LockBuilder, RevokeBuilder, TransferBuilder, UnlockBuilder,
+                CreateBuilder, DelegateBuilder, LockBuilder, MintBuilder, RevokeBuilder,
+                TransferBuilder, UnlockBuilder,
             },
             create_master_edition_v3, create_metadata_accounts_v3, update_metadata_accounts,
-            DelegateArgs, InstructionBuilder, LockArgs, RevokeArgs, TransferArgs, UnlockArgs,
+            CreateArgs, DelegateArgs, InstructionBuilder, LockArgs, MintArgs, RevokeArgs,
+            TransferArgs, UnlockArgs,
         },
-        state::{Collection, CollectionDetails, Creator, Uses},
+        state::{AssetData, Collection, CollectionDetails, Creator, Data, PrintSupply, Uses},
     },
 };
+
+pub fn create_nft<'info>(
+    asset_data: AssetData,
+    initialize_mint: bool,
+    update_authority_as_signer: bool,
+    metadata: AccountInfo<'info>,
+    master_edition: AccountInfo<'info>,
+    mint: AccountInfo<'info>,
+    authority: AccountInfo<'info>,
+    payer: AccountInfo<'info>,
+    update_authority: AccountInfo<'info>,
+    system_program: AccountInfo<'info>,
+    sysvar_instructions: AccountInfo<'info>,
+    spl_token_program: AccountInfo<'info>,
+    signer_seeds: Option<&[&[&[u8]]; 1]>,
+) -> Result<()> {
+    let mut binding = CreateBuilder::new();
+    let create_builder = binding
+        .metadata(metadata.key())
+        .master_edition(master_edition.key())
+        .mint(mint.key())
+        .authority(authority.key())
+        .payer(payer.key())
+        .update_authority(update_authority.key())
+        .system_program(system_program.key())
+        .sysvar_instructions(sysvar_instructions.key())
+        .spl_token_program(spl_token_program.key())
+        .initialize_mint(initialize_mint)
+        .update_authority_as_signer(update_authority_as_signer);
+
+    let create_ix = create_builder
+        .build(CreateArgs::V1 {
+            asset_data,
+            decimals: Some(0),
+            print_supply: Some(PrintSupply::Zero),
+        })
+        .unwrap()
+        .instruction();
+
+    let account_infos = vec![
+        metadata,
+        master_edition,
+        mint,
+        authority,
+        payer,
+        update_authority,
+        system_program,
+        sysvar_instructions,
+        spl_token_program,
+    ];
+
+    if let Some(signer_seeds) = signer_seeds {
+        return solana_program::program::invoke_signed(
+            &create_ix,
+            &account_infos[..],
+            signer_seeds,
+        )
+        .map_err(Into::into);
+    } else {
+        return solana_program::program::invoke(&create_ix, &account_infos[..]).map_err(Into::into);
+    }
+}
+
+pub fn mint_nft<'info>(
+    args: MintArgs,
+    token: AccountInfo<'info>,
+    token_owner: AccountInfo<'info>,
+    metadata: AccountInfo<'info>,
+    master_edition: Option<AccountInfo<'info>>,
+    token_record: Option<AccountInfo<'info>>,
+    mint: AccountInfo<'info>,
+    authority: AccountInfo<'info>,
+    delegate_record: Option<AccountInfo<'info>>,
+    payer: AccountInfo<'info>,
+    system_program: AccountInfo<'info>,
+    sysvar_instructions: AccountInfo<'info>,
+    spl_token_program: AccountInfo<'info>,
+    spl_ata_program: AccountInfo<'info>,
+    signer_seeds: Option<&[&[&[u8]]; 1]>,
+) -> Result<()> {
+    let mut binding = MintBuilder::new();
+
+    let mint_builder = binding
+        .token(token.key())
+        .token_owner(token_owner.key())
+        .metadata(metadata.key())
+        .mint(mint.key())
+        .authority(authority.key())
+        .payer(payer.key())
+        .system_program(system_program.key())
+        .sysvar_instructions(sysvar_instructions.key())
+        .spl_token_program(spl_token_program.key())
+        .spl_ata_program(spl_ata_program.key());
+
+    let mut account_infos = vec![token, token_owner, metadata];
+
+    if let Some(master_edition) = master_edition {
+        mint_builder.master_edition(master_edition.key());
+        account_infos.push(master_edition);
+    }
+
+    if let Some(token_record) = token_record {
+        mint_builder.token_record(token_record.key());
+        account_infos.push(token_record);
+    }
+
+    account_infos = [account_infos, vec![mint, authority]].concat();
+
+    if let Some(delegate_record) = delegate_record {
+        mint_builder.delegate_record(delegate_record.key());
+        account_infos.push(delegate_record);
+    }
+
+    account_infos = [
+        account_infos,
+        vec![
+            payer,
+            system_program,
+            sysvar_instructions,
+            spl_token_program,
+            spl_ata_program,
+        ],
+    ]
+    .concat();
+
+    let mint_ix = mint_builder.build(args).unwrap().instruction();
+
+    if let Some(signer_seeds) = signer_seeds {
+        return solana_program::program::invoke_signed(&mint_ix, &account_infos[..], signer_seeds)
+            .map_err(Into::into);
+    } else {
+        return solana_program::program::invoke(&mint_ix, &account_infos[..]).map_err(Into::into);
+    }
+}
 
 pub fn create_metadata<'info>(
     name: String,
@@ -318,7 +452,7 @@ pub fn transfer<'info>(
     destination_token_account_owner: AccountInfo<'info>,
     token_mint: AccountInfo<'info>,
     token_metadata: AccountInfo<'info>,
-    token_edition: AccountInfo<'info>,
+    token_edition: Option<AccountInfo<'info>>,
     source_token_account_record: Option<AccountInfo<'info>>,
     destination_token_account_record: Option<AccountInfo<'info>>,
     authority: AccountInfo<'info>,
@@ -337,7 +471,6 @@ pub fn transfer<'info>(
         .destination_owner(destination_token_account_owner.key())
         .mint(token_mint.key())
         .metadata(token_metadata.key())
-        .edition(token_edition.key())
         .authority(authority.key())
         .payer(payer.key())
         .system_program(system_program.key())
@@ -352,8 +485,12 @@ pub fn transfer<'info>(
         destination_token_account_owner,
         token_mint,
         token_metadata,
-        token_edition,
     ];
+
+    if let Some(token_edition) = token_edition {
+        transfer_builder.edition(token_edition.key());
+        account_infos.push(token_edition);
+    }
 
     if let Some(source_token_account_record) = source_token_account_record {
         transfer_builder.owner_token_record(source_token_account_record.key());
@@ -405,7 +542,7 @@ pub fn lock<'info>(
     token_account: AccountInfo<'info>,
     token_account_owner: AccountInfo<'info>,
     token_metadata: AccountInfo<'info>,
-    token_edition: AccountInfo<'info>,
+    token_edition: Option<AccountInfo<'info>>,
     token_record: Option<AccountInfo<'info>>,
     payer: AccountInfo<'info>,
     system_program: AccountInfo<'info>,
@@ -420,7 +557,6 @@ pub fn lock<'info>(
         .token(token_account.key())
         .mint(token_mint.key())
         .metadata(token_metadata.key())
-        .edition(token_edition.key())
         .payer(payer.key())
         .system_program(system_program.key())
         .sysvar_instructions(sysvar_instructions.key())
@@ -432,8 +568,12 @@ pub fn lock<'info>(
         token_account,
         token_mint,
         token_metadata,
-        token_edition,
     ];
+
+    if let Some(token_edition) = token_edition {
+        lock_builder.edition(token_edition.key());
+        account_infos.push(token_edition);
+    }
 
     if let Some(token_record) = token_record {
         lock_builder.token_record(token_record.key());
@@ -467,7 +607,7 @@ pub fn unlock<'info>(
     token_account: AccountInfo<'info>,
     token_account_owner: AccountInfo<'info>,
     token_metadata: AccountInfo<'info>,
-    token_edition: AccountInfo<'info>,
+    token_edition: Option<AccountInfo<'info>>,
     token_record: Option<AccountInfo<'info>>,
     payer: AccountInfo<'info>,
     system_program: AccountInfo<'info>,
@@ -482,7 +622,6 @@ pub fn unlock<'info>(
         .token(token_account.key())
         .mint(token_mint.key())
         .metadata(token_metadata.key())
-        .edition(token_edition.key())
         .payer(payer.key())
         .system_program(system_program.key())
         .sysvar_instructions(sysvar_instructions.key())
@@ -494,8 +633,12 @@ pub fn unlock<'info>(
         token_account,
         token_mint,
         token_metadata,
-        token_edition,
     ];
+
+    if let Some(token_edition) = token_edition {
+        unlock_builder.edition(token_edition.key());
+        account_infos.push(token_edition);
+    }
 
     if let Some(token_record) = token_record {
         unlock_builder.token_record(token_record.key());
@@ -532,7 +675,7 @@ pub fn delegate<'info>(
     delegate_record: Option<AccountInfo<'info>>,
     delegate: AccountInfo<'info>,
     metadata: AccountInfo<'info>,
-    master_edition: AccountInfo<'info>,
+    master_edition: Option<AccountInfo<'info>>,
     token_record: Option<AccountInfo<'info>>,
     mint: AccountInfo<'info>,
     token_account: AccountInfo<'info>,
@@ -547,7 +690,6 @@ pub fn delegate<'info>(
     let delegate_builder = binding
         .delegate(delegate.key())
         .metadata(metadata.key())
-        .master_edition(master_edition.key())
         .mint(mint.key())
         .token(token_account.key())
         .authority(authority.key())
@@ -563,7 +705,12 @@ pub fn delegate<'info>(
         account_infos.push(delegate_record);
     }
 
-    account_infos = [account_infos, vec![delegate, metadata, master_edition]].concat();
+    account_infos = [account_infos, vec![delegate, metadata]].concat();
+
+    if let Some(master_edition) = master_edition {
+        delegate_builder.master_edition(master_edition.key());
+        account_infos.push(master_edition);
+    }
 
     if let Some(token_record) = token_record {
         delegate_builder.token_record(token_record.key());
@@ -604,7 +751,7 @@ pub fn revoke<'info>(
     delegate_record: Option<AccountInfo<'info>>,
     delegate: AccountInfo<'info>,
     metadata: AccountInfo<'info>,
-    master_edition: AccountInfo<'info>,
+    master_edition: Option<AccountInfo<'info>>,
     token_record: Option<AccountInfo<'info>>,
     mint: AccountInfo<'info>,
     token_account: AccountInfo<'info>,
@@ -619,7 +766,6 @@ pub fn revoke<'info>(
     let revoke_builder = binding
         .delegate(delegate.key())
         .metadata(metadata.key())
-        .master_edition(master_edition.key())
         .mint(mint.key())
         .token(token_account.key())
         .authority(authority.key())
@@ -635,7 +781,12 @@ pub fn revoke<'info>(
         account_infos.push(delegate_record);
     }
 
-    account_infos = [account_infos, vec![delegate, metadata, master_edition]].concat();
+    account_infos = [account_infos, vec![delegate, metadata]].concat();
+
+    if let Some(master_edition) = master_edition {
+        revoke_builder.master_edition(master_edition.key());
+        account_infos.push(master_edition);
+    }
 
     if let Some(token_record) = token_record {
         revoke_builder.token_record(token_record.key());

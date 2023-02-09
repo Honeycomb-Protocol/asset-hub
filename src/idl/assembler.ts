@@ -14,11 +14,19 @@ export type Assembler = {
           ]
         },
         {
-          "name": "collectionMetadataAccount",
+          "name": "collectionMetadata",
           "isMut": true,
           "isSigner": false,
           "docs": [
             "Metadata account of the collection"
+          ]
+        },
+        {
+          "name": "collectionMasterEdition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Master Edition account of the collection"
           ]
         },
         {
@@ -75,6 +83,14 @@ export type Assembler = {
           "isSigner": false,
           "docs": [
             "SYSVAR RENT"
+          ]
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE Instructions SYSVAR"
           ]
         }
       ],
@@ -463,6 +479,14 @@ export type Assembler = {
           ]
         },
         {
+          "name": "nftMasterEdition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Master Edition account of the NFT"
+          ]
+        },
+        {
           "name": "nft",
           "isMut": true,
           "isSigner": false,
@@ -516,6 +540,14 @@ export type Assembler = {
           "isSigner": false,
           "docs": [
             "SYSVAR RENT"
+          ]
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE Instructions SYSVAR"
           ]
         }
       ],
@@ -584,6 +616,7 @@ export type Assembler = {
           "name": "tokenEdition",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "docs": [
             "Attribute token edition"
           ]
@@ -726,6 +759,15 @@ export type Assembler = {
           ]
         },
         {
+          "name": "nftTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "NFT token record"
+          ]
+        },
+        {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
@@ -775,11 +817,27 @@ export type Assembler = {
           ]
         },
         {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
+          ]
+        },
+        {
           "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE Instructions SYSVAR"
           ]
         },
         {
@@ -935,6 +993,7 @@ export type Assembler = {
           "name": "tokenEdition",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "docs": [
             "Burning token edition"
           ]
@@ -1242,6 +1301,24 @@ export type Assembler = {
               "Default royalty percentage"
             ],
             "type": "u16"
+          },
+          {
+            "name": "tokenStandard",
+            "docs": [
+              "Token Standard"
+            ],
+            "type": {
+              "defined": "TokenStandard"
+            }
+          },
+          {
+            "name": "ruleSet",
+            "docs": [
+              "pNFT rule set"
+            ],
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -1546,6 +1623,20 @@ export type Assembler = {
             "name": "defaultRoyalty",
             "type": {
               "option": "u16"
+            }
+          },
+          {
+            "name": "tokenStandard",
+            "type": {
+              "option": {
+                "defined": "TokenStandard"
+              }
+            }
+          },
+          {
+            "name": "ruleSet",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -1910,6 +2001,20 @@ export type Assembler = {
           },
           {
             "name": "InitialArtGeneration"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenStandard",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NonFungible"
+          },
+          {
+            "name": "ProgrammableNonFungible"
           }
         ]
       }
@@ -2025,11 +2130,19 @@ export const IDL: Assembler = {
           ]
         },
         {
-          "name": "collectionMetadataAccount",
+          "name": "collectionMetadata",
           "isMut": true,
           "isSigner": false,
           "docs": [
             "Metadata account of the collection"
+          ]
+        },
+        {
+          "name": "collectionMasterEdition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Master Edition account of the collection"
           ]
         },
         {
@@ -2086,6 +2199,14 @@ export const IDL: Assembler = {
           "isSigner": false,
           "docs": [
             "SYSVAR RENT"
+          ]
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE Instructions SYSVAR"
           ]
         }
       ],
@@ -2474,6 +2595,14 @@ export const IDL: Assembler = {
           ]
         },
         {
+          "name": "nftMasterEdition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Master Edition account of the NFT"
+          ]
+        },
+        {
           "name": "nft",
           "isMut": true,
           "isSigner": false,
@@ -2527,6 +2656,14 @@ export const IDL: Assembler = {
           "isSigner": false,
           "docs": [
             "SYSVAR RENT"
+          ]
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE Instructions SYSVAR"
           ]
         }
       ],
@@ -2595,6 +2732,7 @@ export const IDL: Assembler = {
           "name": "tokenEdition",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "docs": [
             "Attribute token edition"
           ]
@@ -2737,6 +2875,15 @@ export const IDL: Assembler = {
           ]
         },
         {
+          "name": "nftTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "NFT token record"
+          ]
+        },
+        {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
@@ -2786,11 +2933,27 @@ export const IDL: Assembler = {
           ]
         },
         {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
+          ]
+        },
+        {
           "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE Instructions SYSVAR"
           ]
         },
         {
@@ -2946,6 +3109,7 @@ export const IDL: Assembler = {
           "name": "tokenEdition",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true,
           "docs": [
             "Burning token edition"
           ]
@@ -3253,6 +3417,24 @@ export const IDL: Assembler = {
               "Default royalty percentage"
             ],
             "type": "u16"
+          },
+          {
+            "name": "tokenStandard",
+            "docs": [
+              "Token Standard"
+            ],
+            "type": {
+              "defined": "TokenStandard"
+            }
+          },
+          {
+            "name": "ruleSet",
+            "docs": [
+              "pNFT rule set"
+            ],
+            "type": {
+              "option": "publicKey"
+            }
           }
         ]
       }
@@ -3557,6 +3739,20 @@ export const IDL: Assembler = {
             "name": "defaultRoyalty",
             "type": {
               "option": "u16"
+            }
+          },
+          {
+            "name": "tokenStandard",
+            "type": {
+              "option": {
+                "defined": "TokenStandard"
+              }
+            }
+          },
+          {
+            "name": "ruleSet",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -3921,6 +4117,20 @@ export const IDL: Assembler = {
           },
           {
             "name": "InitialArtGeneration"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenStandard",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NonFungible"
+          },
+          {
+            "name": "ProgrammableNonFungible"
           }
         ]
       }

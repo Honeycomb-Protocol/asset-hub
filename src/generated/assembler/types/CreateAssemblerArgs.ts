@@ -6,7 +6,10 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
+import * as web3 from '@solana/web3.js'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
 import { AssemblingAction, assemblingActionBeet } from './AssemblingAction'
+import { TokenStandard, tokenStandardBeet } from './TokenStandard'
 export type CreateAssemblerArgs = {
   assemblingAction: AssemblingAction
   collectionName: string
@@ -16,6 +19,8 @@ export type CreateAssemblerArgs = {
   nftBaseUri: string
   allowDuplicates: beet.COption<boolean>
   defaultRoyalty: beet.COption<number>
+  tokenStandard: beet.COption<TokenStandard>
+  ruleSet: beet.COption<web3.PublicKey>
 }
 
 /**
@@ -33,6 +38,8 @@ export const createAssemblerArgsBeet =
       ['nftBaseUri', beet.utf8String],
       ['allowDuplicates', beet.coption(beet.bool)],
       ['defaultRoyalty', beet.coption(beet.u16)],
+      ['tokenStandard', beet.coption(tokenStandardBeet)],
+      ['ruleSet', beet.coption(beetSolana.publicKey)],
     ],
     'CreateAssemblerArgs'
   )

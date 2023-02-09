@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use {super::TokenStandard, anchor_lang::prelude::*};
 
 /// Assembler state account
 #[account]
@@ -34,6 +34,12 @@ pub struct Assembler {
 
     /// Default royalty percentage
     pub default_royalty: u16,
+
+    /// Token Standard
+    pub token_standard: TokenStandard,
+
+    /// pNFT rule set
+    pub rule_set: Option<Pubkey>,
 }
 impl Assembler {
     pub const LEN: usize = 168 + 8 + (40 * 4); // base size + 8 align + string extra
