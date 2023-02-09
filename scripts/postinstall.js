@@ -1,20 +1,21 @@
 const fs = require("fs");
 const { spawnSync } = require("child_process");
-
 if (!fs.existsSync("./node_modules"))
   spawnSync("yarn", ["install"], { stdio: "inherit" });
-if (
-  fs.existsSync("../@metaplex-foundation/mpl-candy-guard") &&
-  !fs.existsSync("../@metaplex-foundation/mpl-candy-guard/dist")
-) {
-  if (!fs.existsSync("../@metaplex-foundation/mpl-candy-guard/node_modules"))
-    spawnSync("yarn", ["install"], {
+const potencialDirs = ["..", "node_modules"];
+for (let index = 0; index < potencialDirs.length; index++) {
+  const dir = potencialDirs[index] + "/@metaplex-foundation/mpl-candy-guard/";
+
+  if (fs.existsSync(dir) && !fs.existsSync(dir + "dist")) {
+    if (!fs.existsSync(dir + "node_modules"))
+      spawnSync("yarn", ["install"], {
+        stdio: "inherit",
+        cwd: dir,
+      });
+    spawnSync("yarn", ["build"], {
       stdio: "inherit",
-      cwd: "../@metaplex-foundation/mpl-candy-guard/",
+      cwd: dir,
     });
-  spawnSync("yarn", ["run build"], {
-    stdio: "inherit",
-    cwd: "../@metaplex-foundation/mpl-candy-guard/",
-  });
+  }
+  spawnSync("yarn", ["compile"], { stdio: "inherit" });
 }
-spawnSync("yarn", ["run compile"], { stdio: "inherit" });
