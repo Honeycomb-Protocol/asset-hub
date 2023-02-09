@@ -50,7 +50,6 @@ pub struct Creator {
     pub share: u8,
 }
 
-
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq)]
 pub enum TokenStandard {
     NonFungible,             // This is a master edition

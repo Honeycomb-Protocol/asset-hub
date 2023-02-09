@@ -90,6 +90,11 @@ export async function setupAssembler(
         defaultRoyalty: config.defaultRoyalty || null,
         tokenStandard: tokenStandard,
         ruleSet: config.ruleSet ? new web3.PublicKey(config.ruleSet) : null,
+        defaultCreators:
+          config.defaultCreators.map((c) => ({
+            ...c,
+            address: new web3.PublicKey(c.address),
+          })) || [],
       }
     );
     transactionGroups[0].txns.push(createAssemblerCtx);

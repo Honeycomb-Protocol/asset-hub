@@ -10,6 +10,7 @@ import * as web3 from '@solana/web3.js'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
 import { AssemblingAction, assemblingActionBeet } from './AssemblingAction'
 import { TokenStandard, tokenStandardBeet } from './TokenStandard'
+import { Creator, creatorBeet } from './Creator'
 export type CreateAssemblerArgs = {
   assemblingAction: AssemblingAction
   collectionName: string
@@ -21,6 +22,7 @@ export type CreateAssemblerArgs = {
   defaultRoyalty: beet.COption<number>
   tokenStandard: beet.COption<TokenStandard>
   ruleSet: beet.COption<web3.PublicKey>
+  defaultCreators: Creator[]
 }
 
 /**
@@ -40,6 +42,7 @@ export const createAssemblerArgsBeet =
       ['defaultRoyalty', beet.coption(beet.u16)],
       ['tokenStandard', beet.coption(tokenStandardBeet)],
       ['ruleSet', beet.coption(beetSolana.publicKey)],
+      ['defaultCreators', beet.array(creatorBeet)],
     ],
     'CreateAssemblerArgs'
   )

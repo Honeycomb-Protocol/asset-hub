@@ -26,7 +26,7 @@ export default async function (
   switch (action) {
     case "create-assembler":
       const assemblerTx = await createAssembler(mx, {
-        assemblingAction: AssemblingAction.TakeCustody,
+        assemblingAction: AssemblingAction.Freeze,
         collectionName: "Assembler Test Collection",
         collectionSymbol: "ATC",
         collectionDescription: "This is a test collection to test assembler",
@@ -36,6 +36,13 @@ export default async function (
         defaultRoyalty: 100,
         tokenStandard: TokenStandard.ProgrammableNonFungible,
         ruleSet: null,
+        defaultCreators: [
+          {
+            address: wallet.publicKey,
+            share: 100,
+            verified: false,
+          },
+        ],
       });
       console.log("Assembler address: ", assemblerTx.response);
       setDeployments({ ...deployments, assembler: assemblerTx.assembler });

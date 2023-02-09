@@ -1,4 +1,7 @@
-use {super::TokenStandard, anchor_lang::prelude::*};
+use {
+    super::{Creator, TokenStandard},
+    anchor_lang::prelude::*,
+};
 
 /// Assembler state account
 #[account]
@@ -40,9 +43,12 @@ pub struct Assembler {
 
     /// pNFT rule set
     pub rule_set: Option<Pubkey>,
+
+    /// Default creators
+    pub default_creators: Vec<Creator>,
 }
 impl Assembler {
-    pub const LEN: usize = 168 + 8 + (40 * 4); // base size + 8 align + string extra
+    pub const LEN: usize = 210 + 8 + (40 * 4); // base size + 8 align + string extra
 }
 
 /// Assembling Action

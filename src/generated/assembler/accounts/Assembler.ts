@@ -13,6 +13,7 @@ import {
   assemblingActionBeet,
 } from '../types/AssemblingAction'
 import { TokenStandard, tokenStandardBeet } from '../types/TokenStandard'
+import { Creator, creatorBeet } from '../types/Creator'
 
 /**
  * Arguments used to create {@link Assembler}
@@ -33,6 +34,7 @@ export type AssemblerArgs = {
   defaultRoyalty: number
   tokenStandard: TokenStandard
   ruleSet: beet.COption<web3.PublicKey>
+  defaultCreators: Creator[]
 }
 
 export const assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95]
@@ -57,7 +59,8 @@ export class Assembler implements AssemblerArgs {
     readonly allowDuplicates: boolean,
     readonly defaultRoyalty: number,
     readonly tokenStandard: TokenStandard,
-    readonly ruleSet: beet.COption<web3.PublicKey>
+    readonly ruleSet: beet.COption<web3.PublicKey>,
+    readonly defaultCreators: Creator[]
   ) {}
 
   /**
@@ -77,7 +80,8 @@ export class Assembler implements AssemblerArgs {
       args.allowDuplicates,
       args.defaultRoyalty,
       args.tokenStandard,
-      args.ruleSet
+      args.ruleSet,
+      args.defaultCreators
     )
   }
 
@@ -200,6 +204,7 @@ export class Assembler implements AssemblerArgs {
       defaultRoyalty: this.defaultRoyalty,
       tokenStandard: 'TokenStandard.' + TokenStandard[this.tokenStandard],
       ruleSet: this.ruleSet,
+      defaultCreators: this.defaultCreators,
     }
   }
 }
@@ -229,6 +234,7 @@ export const assemblerBeet = new beet.FixableBeetStruct<
     ['defaultRoyalty', beet.u16],
     ['tokenStandard', tokenStandardBeet],
     ['ruleSet', beet.coption(beetSolana.publicKey)],
+    ['defaultCreators', beet.array(creatorBeet)],
   ],
   Assembler.fromArgs,
   'Assembler'

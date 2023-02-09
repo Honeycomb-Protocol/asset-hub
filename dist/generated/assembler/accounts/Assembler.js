@@ -29,9 +29,10 @@ const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const AssemblingAction_1 = require("../types/AssemblingAction");
 const TokenStandard_1 = require("../types/TokenStandard");
+const Creator_1 = require("../types/Creator");
 exports.assemblerDiscriminator = [102, 198, 246, 85, 86, 197, 55, 95];
 class Assembler {
-    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, nftBaseUri, assemblingAction, nfts, allowDuplicates, defaultRoyalty, tokenStandard, ruleSet) {
+    constructor(bump, authority, collection, collectionName, collectionSymbol, collectionDescription, nftBaseUri, assemblingAction, nfts, allowDuplicates, defaultRoyalty, tokenStandard, ruleSet, defaultCreators) {
         this.bump = bump;
         this.authority = authority;
         this.collection = collection;
@@ -45,9 +46,10 @@ class Assembler {
         this.defaultRoyalty = defaultRoyalty;
         this.tokenStandard = tokenStandard;
         this.ruleSet = ruleSet;
+        this.defaultCreators = defaultCreators;
     }
     static fromArgs(args) {
-        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.nftBaseUri, args.assemblingAction, args.nfts, args.allowDuplicates, args.defaultRoyalty, args.tokenStandard, args.ruleSet);
+        return new Assembler(args.bump, args.authority, args.collection, args.collectionName, args.collectionSymbol, args.collectionDescription, args.nftBaseUri, args.assemblingAction, args.nfts, args.allowDuplicates, args.defaultRoyalty, args.tokenStandard, args.ruleSet, args.defaultCreators);
     }
     static fromAccountInfo(accountInfo, offset = 0) {
         return Assembler.deserialize(accountInfo.data, offset);
@@ -96,6 +98,7 @@ class Assembler {
             defaultRoyalty: this.defaultRoyalty,
             tokenStandard: 'TokenStandard.' + TokenStandard_1.TokenStandard[this.tokenStandard],
             ruleSet: this.ruleSet,
+            defaultCreators: this.defaultCreators,
         };
     }
 }
@@ -115,5 +118,6 @@ exports.assemblerBeet = new beet.FixableBeetStruct([
     ['defaultRoyalty', beet.u16],
     ['tokenStandard', TokenStandard_1.tokenStandardBeet],
     ['ruleSet', beet.coption(beetSolana.publicKey)],
+    ['defaultCreators', beet.array(Creator_1.creatorBeet)],
 ], Assembler.fromArgs, 'Assembler');
 //# sourceMappingURL=Assembler.js.map

@@ -17,7 +17,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./addBlock"), exports);
 __exportStar(require("./burnNft"), exports);
 __exportStar(require("./createAssembler"), exports);
-__exportStar(require("./createAssemblerCollectionMasterEdition"), exports);
 __exportStar(require("./createBlock"), exports);
 __exportStar(require("./createBlockDefinition"), exports);
 __exportStar(require("./createDelegateAuthority"), exports);

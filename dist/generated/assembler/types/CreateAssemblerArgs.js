@@ -28,6 +28,7 @@ const beet = __importStar(require("@metaplex-foundation/beet"));
 const beetSolana = __importStar(require("@metaplex-foundation/beet-solana"));
 const AssemblingAction_1 = require("./AssemblingAction");
 const TokenStandard_1 = require("./TokenStandard");
+const Creator_1 = require("./Creator");
 exports.createAssemblerArgsBeet = new beet.FixableBeetArgsStruct([
     ['assemblingAction', AssemblingAction_1.assemblingActionBeet],
     ['collectionName', beet.utf8String],
@@ -39,5 +40,6 @@ exports.createAssemblerArgsBeet = new beet.FixableBeetArgsStruct([
     ['defaultRoyalty', beet.coption(beet.u16)],
     ['tokenStandard', beet.coption(TokenStandard_1.tokenStandardBeet)],
     ['ruleSet', beet.coption(beetSolana.publicKey)],
+    ['defaultCreators', beet.array(Creator_1.creatorBeet)],
 ], 'CreateAssemblerArgs');
 //# sourceMappingURL=CreateAssemblerArgs.js.map

@@ -4,6 +4,7 @@ import * as beet from '@metaplex-foundation/beet';
 import * as beetSolana from '@metaplex-foundation/beet-solana';
 import { AssemblingAction } from '../types/AssemblingAction';
 import { TokenStandard } from '../types/TokenStandard';
+import { Creator } from '../types/Creator';
 export type AssemblerArgs = {
     bump: number;
     authority: web3.PublicKey;
@@ -18,6 +19,7 @@ export type AssemblerArgs = {
     defaultRoyalty: number;
     tokenStandard: TokenStandard;
     ruleSet: beet.COption<web3.PublicKey>;
+    defaultCreators: Creator[];
 };
 export declare const assemblerDiscriminator: number[];
 export declare class Assembler implements AssemblerArgs {
@@ -34,6 +36,7 @@ export declare class Assembler implements AssemblerArgs {
     readonly defaultRoyalty: number;
     readonly tokenStandard: TokenStandard;
     readonly ruleSet: beet.COption<web3.PublicKey>;
+    readonly defaultCreators: Creator[];
     private constructor();
     static fromArgs(args: AssemblerArgs): Assembler;
     static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset?: number): [Assembler, number];
@@ -59,6 +62,7 @@ export declare class Assembler implements AssemblerArgs {
         defaultRoyalty: number;
         tokenStandard: string;
         ruleSet: web3.PublicKey;
+        defaultCreators: Creator[];
     };
 }
 export declare const assemblerBeet: beet.FixableBeetStruct<Assembler, AssemblerArgs & {

@@ -8,6 +8,7 @@ export type AssemblerConfig = {
     defaultRoyalty?: number;
     tokenStandard?: string;
     ruleSet?: string;
+    defaultCreators?: CreatorConfig[];
     blocks: BlockConfig[];
     assemblerAddress?: string;
     assetProject?: string;
@@ -39,4 +40,9 @@ export type AssetConfig = {
     uri?: string;
     candyGuard?: string;
     address?: string;
+};
+export type CreatorConfig = {
+    address: string;
+    verified: boolean;
+    share: number;
 };

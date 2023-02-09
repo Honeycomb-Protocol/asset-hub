@@ -21,12 +21,6 @@ pub mod assembler {
         instructions::create_assembler(ctx, args)
     }
 
-    pub fn create_assembler_collection_master_edition(
-        ctx: Context<CreateAssemblerCollectionMasterEdition>,
-    ) -> Result<()> {
-        instructions::create_assembler_collection_master_edition(ctx)
-    }
-
     pub fn update_assembler(
         ctx: Context<UpdateAssembler>,
         args: UpdateAssemblerArgs,

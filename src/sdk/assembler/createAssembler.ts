@@ -4,7 +4,6 @@ import * as splToken from "@solana/spl-token";
 import {
   CreateAssemblerArgs,
   createCreateAssemblerInstruction,
-  createCreateAssemblerCollectionMasterEditionInstruction,
 } from "../../generated";
 import { PROGRAM_ID } from "../../generated/assembler";
 import { TxSignersAccounts } from "../../types";

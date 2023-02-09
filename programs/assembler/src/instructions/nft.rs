@@ -6,12 +6,12 @@ use {
             DelegateAuthority, DelegateAuthorityPermission, NFTAttribute, NFTAttributeValue,
             NFTUniqueConstraint, NFT,
         },
-        utils::{self, assert_authority, BpfWriter},
+        utils::{self, assert_authority, reallocate, BpfWriter},
     },
     anchor_lang::{prelude::*, solana_program},
     anchor_spl::{
         associated_token::AssociatedToken,
-        token::{self, Burn, CloseAccount, Mint, MintTo, Token, TokenAccount},
+        token::{self, Burn, CloseAccount, Mint, Token, TokenAccount},
     },
     mpl_token_metadata::{
         self,
@@ -133,7 +133,25 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
             symbol: nft.symbol.clone(),
             uri: nft.uri.clone(),
             seller_fee_basis_points: assembler.default_royalty,
-            creators: None,
+            creators: Some(
+                vec![
+                    vec![mpl_token_metadata::state::Creator {
+                        address: assembler.key(),
+                        verified: true,
+                        share: 0,
+                    }],
+                    assembler
+                        .default_creators
+                        .iter()
+                        .map(|c| mpl_token_metadata::state::Creator {
+                            address: c.address,
+                            verified: false,
+                            share: c.share,
+                        })
+                        .collect(),
+                ]
+                .concat(),
+            ),
             primary_sale_happened: false,
             is_mutable: true,
             token_standard: match assembler.token_standard {
@@ -433,7 +451,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
         attribute_value,
     };
 
-    NFT::reallocate(
+    reallocate(
         isize::try_from(NFTAttribute::LEN).unwrap(),
         nft.to_account_info(),
         ctx.accounts.payer.to_account_info(),
@@ -451,11 +469,11 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
 pub struct MintNFT<'info> {
     /// Assembler state account
     #[account()]
-    pub assembler: Account<'info, Assembler>,
+    pub assembler: Box<Account<'info, Assembler>>,
 
     /// NFT account
     #[account( mut, has_one = authority, has_one = assembler )]
-    pub nft: Account<'info, NFT>,
+    pub nft: Box<Account<'info, NFT>>,
 
     /// NFT mint account
     #[account(mut, constraint = nft_mint.key() == nft.mint)]
@@ -940,7 +958,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
         .position(|r| r.order == block.block_order);
 
     if let Some(index) = index {
-        NFT::reallocate(
+        reallocate(
             isize::try_from(NFTAttribute::LEN).unwrap() * -1,
             nft.to_account_info(),
             ctx.accounts.authority.to_account_info(),

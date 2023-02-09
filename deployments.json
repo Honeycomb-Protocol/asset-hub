@@ -2,13 +2,13 @@
   "assembler": {
     "devnet": {
       "program": "4cEhZgkh41JbuXsXdcKhNaeHJ2BpzmXN3VpMQ3nFPDrp",
-      "assembler": "DayzfaSUBw56UGiMx9b24CCCkrZkctBYgGsyNdLBXVen",
-      "block": "HZtvNcwzoxG9VaJsjFUWutbSEjztRi3werK3jDabRp8j",
-      "blockOrder": 9,
+      "assembler": "GnfwoU6E9Le1TgGeNC8Rhp8a5H2BZ814ziSwF62tDCqk",
+      "block": "EiMZSDiGNXC5dWKjTzHzT5UoiWPVBZ9W6mqNGTfUskKd",
+      "blockOrder": 11,
       "blockDefinitionIndex": 0,
-      "blockDefinition": "EUDxXVGiQw4vrSRER4oxu2Vy53zHFzKZSCVmv49Qe1Zc",
-      "blockDefinitionMint": "ECywhvaRAwyUP2q1BuneFEdxckJVKyKXyYJqQSCp8GVB",
-      "nftMint": "8VqgE5Vm8fEt6z3g8BpfzJhqaRZ8UYCvahqWQv9pgBBK"
+      "blockDefinition": "CUkmMbAUgVV2PNzmf4teftuUszo61zbjQGviib2fHMEa",
+      "blockDefinitionMint": "4EG4NbEfMuYfb7kc3p1iru4wkcRgBwZ4bsJpvEWgtVQt",
+      "nftMint": "CjpBt1qmkYDkDQdxXXF3BP1tLgFAvCzZPtAYGQqCDzfn"
     }
   },
   "assetmanager": {
