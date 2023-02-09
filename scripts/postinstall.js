@@ -17,5 +17,6 @@ for (let index = 0; index < potencialDirs.length; index++) {
       cwd: dir,
     });
   }
-  spawnSync("yarn", ["compile"], { stdio: "inherit" });
 }
+
+spawnSync("yarn", ["compile"], { stdio: "inherit" });
