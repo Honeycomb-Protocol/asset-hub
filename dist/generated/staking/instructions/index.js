@@ -21,6 +21,7 @@ __exportStar(require("./fundRewards"), exports);
 __exportStar(require("./initMultipliers"), exports);
 __exportStar(require("./initNft"), exports);
 __exportStar(require("./initStaker"), exports);
+__exportStar(require("./migrateCustodial"), exports);
 __exportStar(require("./stake"), exports);
 __exportStar(require("./unstake"), exports);
 __exportStar(require("./updateProject"), exports);

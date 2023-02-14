@@ -5,6 +5,7 @@ export * from './fundRewards';
 export * from './initMultipliers';
 export * from './initNft';
 export * from './initStaker';
+export * from './migrateCustodial';
 export * from './stake';
 export * from './unstake';
 export * from './updateProject';

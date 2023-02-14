@@ -25,4 +25,7 @@ pub enum ErrorCode {
 
     #[msg("Deposit account is not provided")]
     DepositAccountNotProvided,
+
+    #[msg("Not Implemented")]
+    NotImplemented,
 }

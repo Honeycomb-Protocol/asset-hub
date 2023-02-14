@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorFromName = exports.errorFromCode = exports.DepositAccountNotProvidedError = exports.CantUnstakeYetError = exports.CantStakeYetError = exports.RewardsNotAvailableError = exports.InvalidNFTError = exports.InvalidMetadataError = exports.OnlyOwnerError = exports.OverflowError = void 0;
+exports.errorFromName = exports.errorFromCode = exports.NotImplementedError = exports.DepositAccountNotProvidedError = exports.CantUnstakeYetError = exports.CantStakeYetError = exports.RewardsNotAvailableError = exports.InvalidNFTError = exports.InvalidMetadataError = exports.OnlyOwnerError = exports.OverflowError = void 0;
 const createErrorFromCodeLookup = new Map();
 const createErrorFromNameLookup = new Map();
 class OverflowError extends Error {
@@ -107,6 +107,19 @@ class DepositAccountNotProvidedError extends Error {
 exports.DepositAccountNotProvidedError = DepositAccountNotProvidedError;
 createErrorFromCodeLookup.set(0x1777, () => new DepositAccountNotProvidedError());
 createErrorFromNameLookup.set('DepositAccountNotProvided', () => new DepositAccountNotProvidedError());
+class NotImplementedError extends Error {
+    constructor() {
+        super('Not Implemented');
+        this.code = 0x1778;
+        this.name = 'NotImplemented';
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, NotImplementedError);
+        }
+    }
+}
+exports.NotImplementedError = NotImplementedError;
+createErrorFromCodeLookup.set(0x1778, () => new NotImplementedError());
+createErrorFromNameLookup.set('NotImplemented', () => new NotImplementedError());
 function errorFromCode(code) {
     const createError = createErrorFromCodeLookup.get(code);
     return createError != null ? createError() : null;

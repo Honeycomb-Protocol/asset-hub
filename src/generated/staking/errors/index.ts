@@ -184,6 +184,26 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * NotImplemented: 'Not Implemented'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class NotImplementedError extends Error {
+  readonly code: number = 0x1778
+  readonly name: string = 'NotImplemented'
+  constructor() {
+    super('Not Implemented')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, NotImplementedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1778, () => new NotImplementedError())
+createErrorFromNameLookup.set('NotImplemented', () => new NotImplementedError())
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

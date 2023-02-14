@@ -51,9 +51,6 @@ pub struct InitNFT<'info> {
 /// Init NFT
 pub fn init_nft(ctx: Context<InitNFT>) -> Result<()> {
     let project = &ctx.accounts.project;
-    if project.allowed_mints && project.authority != ctx.accounts.wallet.key() {
-        return Err(ErrorCode::OnlyOwner.into());
-    }
 
     let nft = &mut ctx.accounts.nft;
     nft.set_defaults();
@@ -74,18 +71,31 @@ pub fn init_nft(ctx: Context<InitNFT>) -> Result<()> {
         return Err(ErrorCode::InvalidMetadata.into());
     }
 
-    let validation_out = utils::validate_collection_creator(metadata, project)?;
+    let validation_out = utils::validate_collection_creator(metadata, project);
 
     match validation_out {
-        utils::ValidateCollectionCreatorOutput::Collection { address } => {
-            nft.collection = address;
+        Ok(x) => {
+            match x {
+                utils::ValidateCollectionCreatorOutput::Collection { address } => {
+                    nft.collection = address;
+                }
+                utils::ValidateCollectionCreatorOutput::Creator { address } => {
+                    nft.creator = address;
+                }
+            }
+            return Ok(());
         }
-        utils::ValidateCollectionCreatorOutput::Creator { address } => {
-            nft.creator = address;
+        Err(_) => {
+            if project.allowed_mints {
+                if project.authority == ctx.accounts.wallet.key() {
+                    return Ok(());
+                } else if project.authority != ctx.accounts.wallet.key() {
+                    return Err(ErrorCode::OnlyOwner.into());
+                }
+            }
+            return Err(ErrorCode::InvalidMetadata.into());
         }
     }
-
-    Ok(())
 }
 
 /// Accounts used in stake instruction

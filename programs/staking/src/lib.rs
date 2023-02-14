@@ -58,4 +58,8 @@ pub mod staking {
     pub fn claim_rewards(ctx: Context<ClaimRewards>) -> Result<()> {
         instructions::claim_rewards(ctx)
     }
+
+    pub fn migrate_custodial(ctx: Context<MigrateCustodial>, args: MigrateArgs) -> Result<()> {
+        instructions::migrate_custodial(ctx, args)
+    }
 }
