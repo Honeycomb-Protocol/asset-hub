@@ -35,7 +35,7 @@ export default async function (
           resetStakeDuration: false,
           startTime: Date.now() * 1000,
           endTime: Date.now() * 1000 + 3600 * 24,
-          lockType: LockType.Custoday,
+          lockType: LockType.Freeze,
         },
         undefined,
         [new web3.PublicKey(args[1])],
