@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStakedNftDepositPda = exports.getStakedNftPda = exports.getStakerPda = exports.getAssetPda = exports.getUniqueConstraintPda = exports.getBlockDefinitionPda = exports.getDelegateAuthorityPda = exports.getBlockPda = exports.getDepositPda = exports.getNftPda = exports.getAssemblerPda = exports.getMetadataAccount_ = exports.METADATA_PROGRAM_ID = void 0;
+exports.getStakedNftDepositPda = exports.getStakedNftPda = exports.getStakerPda = exports.getStakingVaultPda = exports.getStakingProjectPda = exports.getAssetPda = exports.getUniqueConstraintPda = exports.getBlockDefinitionPda = exports.getDelegateAuthorityPda = exports.getBlockPda = exports.getDepositPda = exports.getNftPda = exports.getAssemblerPda = exports.getMetadataAccount_ = exports.METADATA_PROGRAM_ID = void 0;
 const web3 = __importStar(require("@solana/web3.js"));
 const assembler_1 = require("../generated/assembler");
 const assetmanager_1 = require("../generated/assetmanager");
@@ -105,6 +105,14 @@ const getAssetPda = (mint, programId = assetmanager_1.PROGRAM_ID) => {
     return web3.PublicKey.findProgramAddressSync([Buffer.from("asset"), mint.toBuffer()], programId);
 };
 exports.getAssetPda = getAssetPda;
+const getStakingProjectPda = (projectKey, programId = staking_1.PROGRAM_ID) => {
+    return web3.PublicKey.findProgramAddressSync([Buffer.from("project"), projectKey.toBuffer()], programId);
+};
+exports.getStakingProjectPda = getStakingProjectPda;
+const getStakingVaultPda = (project, rewardMint, programId = staking_1.PROGRAM_ID) => {
+    return web3.PublicKey.findProgramAddressSync([Buffer.from("vault"), project.toBuffer(), rewardMint.toBuffer()], programId);
+};
+exports.getStakingVaultPda = getStakingVaultPda;
 const getStakerPda = (project, wallet, programId = staking_1.PROGRAM_ID) => {
     return web3.PublicKey.findProgramAddressSync([Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()], programId);
 };

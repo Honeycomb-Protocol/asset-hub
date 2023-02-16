@@ -22,6 +22,8 @@ export declare function getUniqueConstraintPda(blocks: {
     blockDefinitionIndex: number;
 }[], assembler: web3.PublicKey, programId?: web3.PublicKey): [web3.PublicKey, number];
 export declare const getAssetPda: (mint: web3.PublicKey, programId?: web3.PublicKey) => [web3.PublicKey, number];
+export declare const getStakingProjectPda: (projectKey: web3.PublicKey, programId?: web3.PublicKey) => [web3.PublicKey, number];
+export declare const getStakingVaultPda: (project: web3.PublicKey, rewardMint: web3.PublicKey, programId?: web3.PublicKey) => [web3.PublicKey, number];
 export declare const getStakerPda: (project: web3.PublicKey, wallet: web3.PublicKey, programId?: web3.PublicKey) => [web3.PublicKey, number];
 export declare const getStakedNftPda: (project: web3.PublicKey, mint: web3.PublicKey, programId?: web3.PublicKey) => [web3.PublicKey, number];
 export declare const getStakedNftDepositPda: (nftMint: web3.PublicKey, programId?: web3.PublicKey) => [web3.PublicKey, number];

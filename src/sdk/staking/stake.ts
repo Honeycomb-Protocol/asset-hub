@@ -2,7 +2,7 @@ import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { createStakeInstruction } from "../../generated";
 import { LockType, PROGRAM_ID, Project } from "../../generated/staking";
-import { TxSignersAccounts } from "../../types";
+import { AvailableNft, TxSignersAccounts } from "../../types";
 import { Metaplex } from "@metaplex-foundation/js";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 import {
@@ -10,6 +10,7 @@ import {
   getStakedNftDepositPda,
   getStakedNftPda,
   getStakerPda,
+  getStakingProjectPda,
   METADATA_PROGRAM_ID,
 } from "../pdas";
 import { getOrFetchNft, getOrFetchStaker } from "../../utils";
@@ -81,60 +82,112 @@ export function createStakeTransaction(
   };
 }
 
-export async function stake(
-  mx: Metaplex,
-  project: web3.PublicKey,
-  nftMint: web3.PublicKey
-) {
+type CreateStakeCtxArgs = {
+  metaplex: Metaplex;
+  project: Project;
+  nft: AvailableNft;
+  isFirst?: boolean;
+};
+export async function createStakeCtx({
+  metaplex: mx,
+  ...args
+}: CreateStakeCtxArgs): Promise<TxSignersAccounts> {
+  const tx = new web3.Transaction();
+  const signers: web3.Signer[] = [];
+  const accounts: web3.PublicKey[] = [];
+
   const wallet = mx.identity();
+  const [projectAddress] = getStakingProjectPda(args.project.key);
 
-  const staker = await getOrFetchStaker(
+  if (args.isFirst) {
+    const staker = await getOrFetchStaker(
+      mx.connection,
+      wallet.publicKey,
+      projectAddress
+    );
+    if (!staker) {
+      const initStakerCtx = createInitStakerTransaction(
+        projectAddress,
+        wallet.publicKey
+      );
+      tx.add(initStakerCtx.tx);
+      signers.push(...initStakerCtx.signers);
+      accounts.push(...initStakerCtx.accounts);
+    }
+  }
+
+  const nft = await getOrFetchNft(
     mx.connection,
-    wallet.publicKey,
-    project
+    args.nft.tokenMint,
+    projectAddress
   );
-  const initStakerCtx =
-    !staker && createInitStakerTransaction(project, wallet.publicKey);
-
-  const nft = await getOrFetchNft(mx.connection, nftMint, project);
-  const initNftCtx =
-    !nft && createInitNFTTransaction(project, nftMint, wallet.publicKey);
-
-  const projectAccount = await Project.fromAccountAddress(
-    mx.connection,
-    project
-  );
-  const metadata = await mx.nfts().findByMint({ mintAddress: nftMint });
+  if (!nft) {
+    const initNftCtx = createInitNFTTransaction(
+      projectAddress,
+      args.nft.tokenMint,
+      wallet.publicKey
+    );
+    tx.add(initNftCtx.tx);
+    signers.push(...initNftCtx.signers);
+    accounts.push(...initNftCtx.accounts);
+  }
 
   const stakeCtx = createStakeTransaction(
-    project,
-    nftMint,
+    projectAddress,
+    args.nft.tokenMint,
     wallet.publicKey,
-    projectAccount.lockType,
-    metadata.tokenStandard
+    args.project.lockType,
+    args.nft.tokenStandard
   );
-
-  const tx = new web3.Transaction();
-
-  initNftCtx && tx.add(initNftCtx.tx);
-
-  initStakerCtx && tx.add(initStakerCtx.tx);
-
   tx.add(stakeCtx.tx);
-
-  const blockhash = await mx.connection.getLatestBlockhash();
-
-  tx.recentBlockhash = blockhash.blockhash;
-
-  const response = await mx
-    .rpc()
-    .sendAndConfirmTransaction(tx, { skipPreflight: true }, [
-      ...(initNftCtx?.signers || []),
-      ...(initStakerCtx?.signers || []),
-      ...stakeCtx.signers,
-    ]);
+  signers.push(...stakeCtx.signers);
+  accounts.push(...stakeCtx.accounts);
 
   return {
-    response,
+    tx,
+    signers,
+    accounts,
   };
+}
+
+export async function stake(
+  metaplex: Metaplex,
+  project: Project,
+  ...nfts: AvailableNft[]
+) {
+  const wallet = metaplex.identity();
+  const txs = await Promise.all(
+    nfts.map((nft, i) =>
+      createStakeCtx({
+        metaplex,
+        project,
+        nft,
+        isFirst: i == 0,
+      })
+    )
+  );
+
+  const recentBlockhash = await metaplex.connection.getLatestBlockhash();
+  const txns: web3.Transaction[] = [];
+  for (let tx of txs) {
+    tx.tx.recentBlockhash = recentBlockhash.blockhash;
+    tx.tx.feePayer = wallet.publicKey;
+    tx.signers.length && tx.tx.partialSign(...tx.signers);
+    txns.push(tx.tx);
+  }
+  const signedTxs = await wallet.signAllTransactions(txns);
+
+  const firstTx = signedTxs.shift();
+  const firstResponse = await metaplex
+    .rpc()
+    .sendAndConfirmTransaction(firstTx, {
+      commitment: "processed",
+    });
+  const responses = await Promise.all(
+    signedTxs.map((t) =>
+      metaplex.rpc().sendAndConfirmTransaction(t, { commitment: "processed" })
+    )
+  );
+
+  return [firstResponse, ...responses];
 }

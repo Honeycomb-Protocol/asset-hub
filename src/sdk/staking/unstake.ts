@@ -1,14 +1,15 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { createUnstakeInstruction, Project } from "../../generated";
-import { LockType, PROGRAM_ID } from "../../generated/staking";
-import { TxSignersAccounts } from "../../types";
-import { Metaplex } from "@metaplex-foundation/js";
+import { LockType, MultipliersArgs, PROGRAM_ID } from "../../generated/staking";
+import { StakedNft, TxSignersAccounts } from "../../types";
+import { Metaplex, Mint } from "@metaplex-foundation/js";
 import {
   getMetadataAccount_,
   getStakedNftDepositPda,
   getStakedNftPda,
   getStakerPda,
+  getStakingProjectPda,
   METADATA_PROGRAM_ID,
 } from "../pdas";
 import { createClaimRewardsTransaction } from "./claimRewards";
@@ -80,51 +81,97 @@ export function createUnstakeTransaction(
   };
 }
 
-export async function unstake(
-  mx: Metaplex,
-  project: web3.PublicKey,
-  nftMint: web3.PublicKey
-) {
-  const projectAccount = await Project.fromAccountAddress(
-    mx.connection,
-    project
-  );
-
-  const metadata = await mx.nfts().findByMint({ mintAddress: nftMint });
-
-  const multipliers = await getOrFetchMultipliers(mx.connection, project);
+type CreateUnstakeCtxArgs = {
+  metaplex: Metaplex;
+  project: Project;
+  nft: StakedNft;
+  multipliers?:
+    | (MultipliersArgs & {
+        address: web3.PublicKey;
+      })
+    | null;
+};
+export function createUnstakeCtx({
+  metaplex: mx,
+  ...args
+}: CreateUnstakeCtxArgs) {
+  const tx = new web3.Transaction();
+  const signers: web3.Signer[] = [];
+  const accounts: web3.PublicKey[] = [];
 
   const wallet = mx.identity();
+  const [projectAddress] = getStakingProjectPda(args.project.key);
+  const nftMint =
+    args.nft.mint instanceof web3.PublicKey
+      ? args.nft.mint
+      : (args.nft.mint as Mint).address;
+
   const claimCtx = createClaimRewardsTransaction(
-    project,
+    projectAddress,
     nftMint,
-    projectAccount.rewardMint,
+    args.project.rewardMint,
     wallet.publicKey,
-    multipliers?.address
+    args.multipliers?.address
   );
+  tx.add(claimCtx.tx);
+  signers.push(...claimCtx.signers);
+  accounts.push(...claimCtx.accounts);
 
   const unstakeCtx = createUnstakeTransaction(
-    project,
+    projectAddress,
     nftMint,
     wallet.publicKey,
-    projectAccount.lockType,
-    metadata.tokenStandard
+    args.project.lockType,
+    args.nft.tokenStandard
   );
-
-  const blockhash = await mx.connection.getLatestBlockhash();
-
-  const tx = new web3.Transaction().add(claimCtx.tx, unstakeCtx.tx);
-
-  tx.recentBlockhash = blockhash.blockhash;
-
-  const response = await mx
-    .rpc()
-    .sendAndConfirmTransaction(tx, { skipPreflight: true }, [
-      ...claimCtx.signers,
-      ...unstakeCtx.signers,
-    ]);
+  tx.add(unstakeCtx.tx);
+  signers.push(...unstakeCtx.signers);
+  accounts.push(...unstakeCtx.accounts);
 
   return {
-    response,
+    tx,
+    signers,
+    accounts,
   };
+}
+
+export async function unstake(
+  metaplex: Metaplex,
+  project: Project,
+  ...nfts: StakedNft[]
+) {
+  const wallet = metaplex.identity();
+  const txs = await Promise.all(
+    nfts.map((nft, i) =>
+      createUnstakeCtx({
+        metaplex,
+        project,
+        nft,
+      })
+    )
+  );
+
+  const recentBlockhash = await metaplex.connection.getLatestBlockhash();
+  const txns: web3.Transaction[] = [];
+  for (let tx of txs) {
+    tx.tx.recentBlockhash = recentBlockhash.blockhash;
+    tx.tx.feePayer = wallet.publicKey;
+    tx.signers.length && tx.tx.partialSign(...tx.signers);
+    txns.push(tx.tx);
+  }
+  const signedTxs = await wallet.signAllTransactions(txns);
+
+  const firstTx = signedTxs.shift();
+  const firstResponse = await metaplex
+    .rpc()
+    .sendAndConfirmTransaction(firstTx, {
+      commitment: "processed",
+    });
+  const responses = await Promise.all(
+    signedTxs.map((t) =>
+      metaplex.rpc().sendAndConfirmTransaction(t, { commitment: "processed" })
+    )
+  );
+
+  return [firstResponse, ...responses];
 }

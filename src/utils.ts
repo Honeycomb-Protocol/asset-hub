@@ -21,6 +21,7 @@ import {
   Multipliers,
   NFT,
   Staker,
+  MultipliersArgs,
 } from "./generated/staking";
 
 export const sendAndConfirmTransaction = async (
@@ -551,7 +552,7 @@ export const getOrFetchMultipliers = async (
   connection: web3.Connection,
   project: web3.PublicKey,
   programId = STAKING_PROGRAM_ID
-) => {
+): Promise<(MultipliersArgs & { address: web3.PublicKey }) | null> => {
   const [multipliers] = web3.PublicKey.findProgramAddressSync(
     [Buffer.from("multipliers"), project.toBuffer()],
     programId

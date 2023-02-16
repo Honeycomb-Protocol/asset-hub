@@ -24,4 +24,5 @@ __exportStar(require("./stake"), exports);
 __exportStar(require("./unstake"), exports);
 __exportStar(require("./fundRewards"), exports);
 __exportStar(require("./claimRewards"), exports);
+__exportStar(require("./fetch"), exports);
 //# sourceMappingURL=index.js.map

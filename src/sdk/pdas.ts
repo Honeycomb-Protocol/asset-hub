@@ -159,6 +159,27 @@ export const getAssetPda = (
 
 // Staking
 
+export const getStakingProjectPda = (
+  projectKey: web3.PublicKey,
+  programId: web3.PublicKey = STAKING_PROGRAM_ID
+) => {
+  return web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("project"), projectKey.toBuffer()],
+    programId
+  );
+};
+
+export const getStakingVaultPda = (
+  project: web3.PublicKey,
+  rewardMint: web3.PublicKey,
+  programId: web3.PublicKey = STAKING_PROGRAM_ID
+) => {
+  return web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("vault"), project.toBuffer(), rewardMint.toBuffer()],
+    programId
+  );
+};
+
 export const getStakerPda = (
   project: web3.PublicKey,
   wallet: web3.PublicKey,
