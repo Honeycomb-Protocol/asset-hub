@@ -1,5 +1,5 @@
 use {
-    crate::{state::*, traits::Default, utils},
+    crate::{state::*, traits::Default},
     anchor_lang::prelude::*,
 };
 
@@ -81,7 +81,7 @@ pub struct AddMultiplierArgs {
 pub fn add_multiplier(ctx: Context<AddMultiplier>, args: AddMultiplierArgs) -> Result<()> {
     let multipliers = &mut ctx.accounts.multipliers;
 
-    utils::reallocate(
+    hpl_utils::reallocate(
         isize::try_from(Multiplier::LEN).unwrap(),
         multipliers.to_account_info(),
         ctx.accounts.payer.to_account_info(),

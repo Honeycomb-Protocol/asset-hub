@@ -5,10 +5,11 @@ use {
             Assembler, AssemblingAction, Creator, DelegateAuthority, DelegateAuthorityPermission,
             TokenStandard,
         },
-        utils::{assert_authority, create_nft},
+        utils::assert_authority,
     },
     anchor_lang::{prelude::*, solana_program},
     anchor_spl::token::{self, Mint, Token},
+    hpl_utils::create_nft,
     mpl_token_metadata::state::AssetData,
 };
 

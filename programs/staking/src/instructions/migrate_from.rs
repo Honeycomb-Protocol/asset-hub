@@ -1,5 +1,5 @@
 use {
-    crate::{errors::ErrorCode, state::*, traits::Default, utils},
+    crate::{errors::ErrorCode, state::*, traits::Default},
     anchor_lang::{prelude::*, solana_program},
     anchor_spl::{
         associated_token::AssociatedToken,
@@ -131,12 +131,14 @@ pub fn migrate_custodial(ctx: Context<MigrateCustodial>, args: MigrateArgs) -> R
         msg!("Metadata mint does not match NFT mint");
         return Err(ErrorCode::InvalidMetadata.into());
     }
-    let validation_out = utils::validate_collection_creator(metadata, project)?;
+    let validation_out =
+        hpl_utils::validate_collection_creator(metadata, &project.collections, &project.creators)?;
+
     match validation_out {
-        utils::ValidateCollectionCreatorOutput::Collection { address } => {
+        hpl_utils::ValidateCollectionCreatorOutput::Collection { address } => {
             nft.collection = address;
         }
-        utils::ValidateCollectionCreatorOutput::Creator { address } => {
+        hpl_utils::ValidateCollectionCreatorOutput::Creator { address } => {
             nft.creator = address;
         }
     }
@@ -144,7 +146,7 @@ pub fn migrate_custodial(ctx: Context<MigrateCustodial>, args: MigrateArgs) -> R
     match project.lock_type {
         LockType::Custoday => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                utils::transfer(
+                hpl_utils::transfer(
                     1,
                     ctx.accounts.nft_account.to_account_info(),
                     ctx.accounts.escrow.to_account_info(),
@@ -152,7 +154,7 @@ pub fn migrate_custodial(ctx: Context<MigrateCustodial>, args: MigrateArgs) -> R
                     staker.to_account_info(),
                     ctx.accounts.nft_mint.to_account_info(),
                     ctx.accounts.nft_metadata.to_account_info(),
-                    ctx.accounts.nft_edition.to_account_info(),
+                    Some(ctx.accounts.nft_edition.to_account_info()),
                     None,
                     None,
                     ctx.accounts.escrow.to_account_info(),

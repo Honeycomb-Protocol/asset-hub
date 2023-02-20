@@ -255,6 +255,7 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "hpl-utils",
  "mpl-token-metadata",
 ]
 
@@ -844,6 +845,16 @@ dependencies = [
  "digest 0.9.0",
  "generic-array",
  "hmac 0.8.1",
+]
+
+[[package]]
+name = "hpl-utils"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b52429ab72dc9c4645388dec8b52e1b0cfa1086cb4c947881cb2fadb542231e"
+dependencies = [
+ "anchor-lang",
+ "mpl-token-metadata",
 ]
 
 [[package]]
@@ -1882,6 +1893,7 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "hpl-utils",
  "mpl-token-metadata",
 ]
 

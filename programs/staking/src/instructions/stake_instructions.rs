@@ -1,5 +1,5 @@
 use {
-    crate::{errors::ErrorCode, state::*, traits::Default, utils},
+    crate::{errors::ErrorCode, state::*, traits::Default},
     anchor_lang::{prelude::*, solana_program},
     anchor_spl::{
         associated_token::AssociatedToken,
@@ -71,15 +71,16 @@ pub fn init_nft(ctx: Context<InitNFT>) -> Result<()> {
         return Err(ErrorCode::InvalidMetadata.into());
     }
 
-    let validation_out = utils::validate_collection_creator(metadata, project);
+    let validation_out =
+        hpl_utils::validate_collection_creator(metadata, &project.collections, &project.creators);
 
     match validation_out {
         Ok(x) => {
             match x {
-                utils::ValidateCollectionCreatorOutput::Collection { address } => {
+                hpl_utils::ValidateCollectionCreatorOutput::Collection { address } => {
                     nft.collection = address;
                 }
-                utils::ValidateCollectionCreatorOutput::Creator { address } => {
+                hpl_utils::ValidateCollectionCreatorOutput::Creator { address } => {
                     nft.creator = address;
                 }
             }
@@ -235,12 +236,12 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
                 None => Err(ErrorCode::InvalidMetadata.into()),
             };
 
-            utils::delegate(
+            hpl_utils::delegate(
                 args.unwrap(),
                 None,
                 staker.to_account_info(),
                 ctx.accounts.nft_metadata.to_account_info(),
-                ctx.accounts.nft_edition.to_account_info(),
+                Some(ctx.accounts.nft_edition.to_account_info()),
                 ctx.accounts.nft_token_record.clone(),
                 ctx.accounts.nft_mint.to_account_info(),
                 ctx.accounts.nft_account.to_account_info(),
@@ -252,13 +253,13 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
                 None,
             )?;
 
-            utils::lock(
+            hpl_utils::lock(
                 staker.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
                 ctx.accounts.nft_account.to_account_info(),
                 ctx.accounts.wallet.to_account_info(),
                 ctx.accounts.nft_metadata.to_account_info(),
-                ctx.accounts.nft_edition.to_account_info(),
+                Some(ctx.accounts.nft_edition.to_account_info()),
                 ctx.accounts.nft_token_record.clone(),
                 ctx.accounts.wallet.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
@@ -269,7 +270,7 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
         }
         LockType::Custoday => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                utils::transfer(
+                hpl_utils::transfer(
                     1,
                     ctx.accounts.nft_account.to_account_info(),
                     ctx.accounts.wallet.to_account_info(),
@@ -277,7 +278,7 @@ pub fn stake(ctx: Context<Stake>) -> Result<()> {
                     staker.to_account_info(),
                     ctx.accounts.nft_mint.to_account_info(),
                     ctx.accounts.nft_metadata.to_account_info(),
-                    ctx.accounts.nft_edition.to_account_info(),
+                    Some(ctx.accounts.nft_edition.to_account_info()),
                     ctx.accounts.nft_token_record.clone(),
                     ctx.accounts.deposit_token_record.clone(),
                     ctx.accounts.wallet.to_account_info(),
@@ -438,13 +439,13 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                 None => Err(ErrorCode::InvalidMetadata.into()),
             };
 
-            utils::unlock(
+            hpl_utils::unlock(
                 staker.to_account_info(),
                 ctx.accounts.nft_mint.to_account_info(),
                 ctx.accounts.nft_account.to_account_info(),
                 ctx.accounts.wallet.to_account_info(),
                 ctx.accounts.nft_metadata.to_account_info(),
-                ctx.accounts.nft_edition.to_account_info(),
+                Some(ctx.accounts.nft_edition.to_account_info()),
                 ctx.accounts.nft_token_record.clone(),
                 ctx.accounts.wallet.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
@@ -453,12 +454,12 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                 Some(staker_signer),
             )?;
 
-            utils::revoke(
+            hpl_utils::revoke(
                 args.unwrap(),
                 None,
                 staker.to_account_info(),
                 ctx.accounts.nft_metadata.to_account_info(),
-                ctx.accounts.nft_edition.to_account_info(),
+                Some(ctx.accounts.nft_edition.to_account_info()),
                 ctx.accounts.nft_token_record.clone(),
                 ctx.accounts.nft_mint.to_account_info(),
                 ctx.accounts.nft_account.to_account_info(),
@@ -472,7 +473,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
         }
         LockType::Custoday => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                utils::transfer(
+                hpl_utils::transfer(
                     1,
                     deposit_account.to_account_info(),
                     staker.to_account_info(),
@@ -480,7 +481,7 @@ pub fn unstake(ctx: Context<Unstake>) -> Result<()> {
                     ctx.accounts.wallet.to_account_info(),
                     ctx.accounts.nft_mint.to_account_info(),
                     ctx.accounts.nft_metadata.to_account_info(),
-                    ctx.accounts.nft_edition.to_account_info(),
+                    Some(ctx.accounts.nft_edition.to_account_info()),
                     ctx.accounts.deposit_token_record.clone(),
                     ctx.accounts.nft_token_record.clone(),
                     staker.to_account_info(),

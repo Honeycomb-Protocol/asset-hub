@@ -1,21 +1,27 @@
+use mpl_token_metadata::state::Data;
+
 use {
     crate::{
         errors::ErrorCode,
         state::{
-            Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue, Creator,
+            Assembler, AssemblingAction, Block, BlockDefinition, BlockDefinitionValue,
             DelegateAuthority, DelegateAuthorityPermission, NFTAttribute, NFTAttributeValue,
             NFTUniqueConstraint, NFT,
         },
-        utils::{self, assert_authority, reallocate, BpfWriter},
+        utils::assert_authority,
     },
     anchor_lang::{prelude::*, solana_program},
     anchor_spl::{
         associated_token::AssociatedToken,
         token::{self, Burn, CloseAccount, Mint, Token, TokenAccount},
     },
+    hpl_utils::{self, reallocate, BpfWriter},
     mpl_token_metadata::{
         self,
-        instruction::{DelegateArgs, MintArgs, RevokeArgs},
+        instruction::{
+            CollectionDetailsToggle, CollectionToggle, DelegateArgs, MintArgs, RevokeArgs,
+            RuleSetToggle, UpdateArgs, UsesToggle,
+        },
         state::{AssetData, Metadata, TokenMetadataAccount, TokenStandard},
     },
 };
@@ -127,7 +133,7 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    utils::create_nft(
+    hpl_utils::create_nft(
         AssetData {
             name: nft.name.clone(),
             symbol: nft.symbol.clone(),
@@ -381,7 +387,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
             ];
             let assembler_signer = &[&assembler_seeds[..]];
 
-            utils::delegate(
+            hpl_utils::delegate(
                 DelegateArgs::StakingV1 {
                     amount: 1 * 10u64.pow(token_mint.decimals.into()),
                     authorization_data: None,
@@ -401,7 +407,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 None,
             )?;
 
-            utils::lock(
+            hpl_utils::lock(
                 assembler.to_account_info(),
                 ctx.accounts.token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
@@ -418,7 +424,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
         }
         AssemblingAction::TakeCustody => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                utils::transfer(
+                hpl_utils::transfer(
                     1 * 10u64.pow(token_mint.decimals.into()),
                     ctx.accounts.token_account.to_account_info(),
                     ctx.accounts.authority.to_account_info(),
@@ -521,10 +527,6 @@ pub struct MintNFT<'info> {
     /// ASSOCIATED TOKEN PROGRAM
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// METAPLEX TOKEN METADATA PROGRAM
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub token_metadata_program: AccountInfo<'info>,
-
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
@@ -620,7 +622,7 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    utils::mint_nft(
+    hpl_utils::mint(
         MintArgs::V1 {
             amount: 1,
             authorization_data: None,
@@ -666,6 +668,11 @@ pub struct BurnNFT<'info> {
     #[account(mut)]
     pub nft_metadata: AccountInfo<'info>,
 
+    /// Master Edition account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_master_edition: AccountInfo<'info>,
+
     /// NFT token account
     #[account(mut, constraint = token_account.mint == nft_mint.key() && token_account.owner == authority.key())]
     pub token_account: Account<'info, TokenAccount>,
@@ -677,6 +684,9 @@ pub struct BurnNFT<'info> {
     /// The wallet that holds the pre mint authority over this NFT
     pub authority: Signer<'info>,
 
+    /// NATIVE SYSTEM PROGRAM
+    pub system_program: Program<'info, System>,
+
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
@@ -684,6 +694,11 @@ pub struct BurnNFT<'info> {
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: AccountInfo<'info>,
+
+    /// NATIVE Instructions SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 }
 
 /// Burn a nft
@@ -722,12 +737,27 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    utils::update_metadata(
-        Some(metadata.data),
-        metadata_account_info.clone(),
+    hpl_utils::update(
+        UpdateArgs::V1 {
+            new_update_authority: None,
+            data: Some(metadata.data),
+            primary_sale_happened: None,
+            is_mutable: None,
+            collection: CollectionToggle::None,
+            collection_details: CollectionDetailsToggle::None,
+            uses: UsesToggle::None,
+            rule_set: RuleSetToggle::None,
+            authorization_data: None,
+        },
+        None,
+        None,
+        ctx.accounts.nft_mint.to_account_info(),
+        ctx.accounts.nft_metadata.to_account_info(),
+        ctx.accounts.nft_master_edition.to_account_info(),
         assembler.to_account_info(),
-        Some(true),
-        ctx.accounts.token_metadata_program.clone(),
+        ctx.accounts.authority.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
         Some(assembler_signer),
     )?;
 
@@ -883,7 +913,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
             return Err(ErrorCode::NFTNotBurnable.into());
         }
         AssemblingAction::Freeze => {
-            utils::unlock(
+            hpl_utils::unlock(
                 assembler.to_account_info(),
                 token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
@@ -898,7 +928,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 Some(assembler_signer),
             )?;
 
-            utils::revoke(
+            hpl_utils::revoke(
                 RevokeArgs::StakingV1,
                 None,
                 assembler.to_account_info(),
@@ -917,7 +947,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
         }
         AssemblingAction::TakeCustody => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                utils::transfer(
+                hpl_utils::transfer(
                     1 * 10u64.pow(token_mint.decimals.into()),
                     deposit_account.to_account_info(),
                     assembler.to_account_info(),
@@ -992,10 +1022,19 @@ pub struct SetNFTGenerated<'info> {
     )]
     pub nft: Account<'info, NFT>,
 
+    /// NFT mint account
+    #[account(mut, constraint = nft_mint.key() == nft.mint)]
+    pub nft_mint: Account<'info, Mint>,
+
     /// Metadata account of the NFT
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
     pub nft_metadata: AccountInfo<'info>,
+
+    /// Master Edition account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_master_edition: AccountInfo<'info>,
 
     /// The wallet that holds the authority to execute this instruction
     pub authority: Signer<'info>,
@@ -1013,9 +1052,17 @@ pub struct SetNFTGenerated<'info> {
     )]
     pub delegate: Option<Account<'info, DelegateAuthority>>,
 
-    /// METAPLEX TOKEN METADATA PROGRAM
+    /// NATIVE SYSTEM PROGRAM
+    pub system_program: Program<'info, System>,
+
+    /// SPL TOKEN PROGRAM
+    #[account(address = token::ID)]
+    pub token_program: Program<'info, Token>,
+
+    /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
-    pub token_metadata_program: AccountInfo<'info>,
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -1055,12 +1102,27 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
         ];
         let assembler_signer = &[&assembler_seeds[..]];
 
-        utils::update_metadata(
-            Some(metadata.data),
-            metadata_account_info.clone(),
+        hpl_utils::update(
+            UpdateArgs::V1 {
+                new_update_authority: None,
+                data: Some(metadata.data),
+                primary_sale_happened: None,
+                is_mutable: None,
+                collection: CollectionToggle::None,
+                collection_details: CollectionDetailsToggle::None,
+                uses: UsesToggle::None,
+                rule_set: RuleSetToggle::None,
+                authorization_data: None,
+            },
+            None,
+            None,
+            ctx.accounts.nft_mint.to_account_info(),
+            ctx.accounts.nft_metadata.to_account_info(),
+            ctx.accounts.nft_master_edition.to_account_info(),
             assembler.to_account_info(),
-            Some(true),
-            ctx.accounts.token_metadata_program.clone(),
+            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.sysvar_instructions.to_account_info(),
             Some(assembler_signer),
         )?;
     }
@@ -1078,10 +1140,19 @@ pub struct UpdateMetadata<'info> {
     #[account( has_one = assembler )]
     pub nft: Account<'info, NFT>,
 
+    /// NFT mint account
+    #[account(mut, constraint = nft_mint.key() == nft.mint)]
+    pub nft_mint: Account<'info, Mint>,
+
     /// Metadata account of the NFT
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(mut)]
-    pub metadata: AccountInfo<'info>,
+    pub nft_metadata: AccountInfo<'info>,
+
+    /// Master Edition account of the NFT
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub nft_master_edition: AccountInfo<'info>,
 
     /// The wallet that holds the authority to execute this instruction
     pub authority: Signer<'info>,
@@ -1099,9 +1170,17 @@ pub struct UpdateMetadata<'info> {
     )]
     pub delegate: Option<Account<'info, DelegateAuthority>>,
 
-    /// METAPLEX TOKEN METADATA PROGRAM
+    /// NATIVE SYSTEM PROGRAM
+    pub system_program: Program<'info, System>,
+
+    /// SPL TOKEN PROGRAM
+    #[account(address = token::ID)]
+    pub token_program: Program<'info, Token>,
+
+    /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
-    pub token_metadata_program: AccountInfo<'info>,
+    #[account(address = solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -1134,31 +1213,33 @@ pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    // let mut creators: Option<Vec<mpl_token_metadata::state::Creator>> = None;
-    // if let Some(arg_creators) = args.creators {
-    //     let creators_vec = arg_creators
-    //         .iter()
-    //         .map(|x| mpl_token_metadata::state::Creator {
-    //             address: x.address,
-    //             verified: false,
-    //             share: x.share,
-    //         })
-    //         .collect::<Vec<_>>();
-    //     creators = Some(creators_vec);
-    // }
-
-    utils::update_metadata(
-        Some(mpl_token_metadata::state::Data {
-            name: args.name,
-            symbol: args.symbol,
-            uri: args.uri,
-            seller_fee_basis_points: args.seller_fee_basis_points,
-            creators: None,
-        }),
-        ctx.accounts.metadata.clone(),
+    hpl_utils::update(
+        UpdateArgs::V1 {
+            new_update_authority: None,
+            data: Some(Data {
+                name: args.name,
+                symbol: args.symbol,
+                uri: args.uri,
+                seller_fee_basis_points: args.seller_fee_basis_points,
+                creators: None,
+            }),
+            primary_sale_happened: None,
+            is_mutable: None,
+            collection: CollectionToggle::None,
+            collection_details: CollectionDetailsToggle::None,
+            uses: UsesToggle::None,
+            rule_set: RuleSetToggle::None,
+            authorization_data: None,
+        },
+        None,
+        None,
+        ctx.accounts.nft_mint.to_account_info(),
+        ctx.accounts.nft_metadata.to_account_info(),
+        ctx.accounts.nft_master_edition.to_account_info(),
         ctx.accounts.assembler.to_account_info(),
-        Some(true),
-        ctx.accounts.token_metadata_program.clone(),
+        ctx.accounts.authority.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.sysvar_instructions.to_account_info(),
         Some(assembler_signer),
     )?;
 

@@ -2,7 +2,6 @@ pub mod errors;
 pub mod instructions;
 pub mod state;
 pub mod traits;
-pub mod utils;
 
 use {anchor_lang::prelude::*, instructions::*};
 

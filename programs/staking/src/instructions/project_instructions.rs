@@ -1,5 +1,5 @@
 use {
-    crate::{state::*, traits::Default, utils},
+    crate::{state::*, traits::Default},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, Token, TokenAccount},
 };
@@ -180,7 +180,7 @@ pub fn update_project(ctx: Context<UpdateProject>, args: UpdateProjectArgs) -> R
     }
 
     if let Some(collection) = &ctx.accounts.collection {
-        utils::reallocate(
+        hpl_utils::reallocate(
             32,
             project.to_account_info(),
             ctx.accounts.authority.to_account_info(),
@@ -191,7 +191,7 @@ pub fn update_project(ctx: Context<UpdateProject>, args: UpdateProjectArgs) -> R
     }
 
     if let Some(creator) = &ctx.accounts.creator {
-        utils::reallocate(
+        hpl_utils::reallocate(
             32,
             project.to_account_info(),
             ctx.accounts.authority.to_account_info(),
