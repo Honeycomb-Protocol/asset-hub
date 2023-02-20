@@ -246,8 +246,8 @@ pub struct CreateDelegateAuthority<'info> {
         seeds = [
             b"delegate".as_ref(),
             assembler.key().as_ref(),
-            assembler.authority.as_ref(),
             authority.key().as_ref(),
+            delegate.key().as_ref(),
             format!("{:?}", args.permission).as_ref(),
         ],
         bump,
