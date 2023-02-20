@@ -4,8 +4,6 @@ import {
   PROGRAM_ID as ASSEMBLER_PROGRAM_ID,
 } from "../generated/assembler";
 import { PROGRAM_ID as ASSETMANAGER_PROGRAM_ID } from "../generated/assetmanager";
-import { PROGRAM_ID as STAKING_PROGRAM_ID } from "../generated/staking";
-
 type MetadataPDaType =
   | { __kind: "edition" }
   | { __kind: "token_record"; tokenAccount: web3.PublicKey }
@@ -153,61 +151,6 @@ export const getAssetPda = (
 ) => {
   return web3.PublicKey.findProgramAddressSync(
     [Buffer.from("asset"), mint.toBuffer()],
-    programId
-  );
-};
-
-// Staking
-
-export const getStakingProjectPda = (
-  projectKey: web3.PublicKey,
-  programId: web3.PublicKey = STAKING_PROGRAM_ID
-) => {
-  return web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("project"), projectKey.toBuffer()],
-    programId
-  );
-};
-
-export const getStakingVaultPda = (
-  project: web3.PublicKey,
-  rewardMint: web3.PublicKey,
-  programId: web3.PublicKey = STAKING_PROGRAM_ID
-) => {
-  return web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("vault"), project.toBuffer(), rewardMint.toBuffer()],
-    programId
-  );
-};
-
-export const getStakerPda = (
-  project: web3.PublicKey,
-  wallet: web3.PublicKey,
-  programId: web3.PublicKey = STAKING_PROGRAM_ID
-) => {
-  return web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("staker"), wallet.toBuffer(), project.toBuffer()],
-    programId
-  );
-};
-
-export const getStakedNftPda = (
-  project: web3.PublicKey,
-  mint: web3.PublicKey,
-  programId: web3.PublicKey = STAKING_PROGRAM_ID
-) => {
-  return web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("nft"), mint.toBuffer(), project.toBuffer()],
-    programId
-  );
-};
-
-export const getStakedNftDepositPda = (
-  nftMint: web3.PublicKey,
-  programId = STAKING_PROGRAM_ID
-) => {
-  return web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("deposit"), nftMint.toBuffer()],
     programId
   );
 };
