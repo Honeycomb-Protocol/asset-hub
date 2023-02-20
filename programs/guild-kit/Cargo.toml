@@ -1,6 +1,6 @@
 [package]
-name = "assembler"
-description = "Honeycomb protocol library assembler program"
+name = "guild-kit"
+description = "Honeycomb protocol library guild kit program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
 version = "0.1.0"
 edition = "2021"
@@ -8,7 +8,7 @@ license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "assembler"
+name = "guild_kit"
 
 [features]
 no-entrypoint = []
@@ -19,5 +19,3 @@ default = []
 
 [dependencies]
 anchor-lang = "0.26.0"
-anchor-spl = "0.26.0"
-mpl-token-metadata = { version="1.8.0", features = [ "no-entrypoint" ] }
