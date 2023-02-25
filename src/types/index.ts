@@ -25,5 +25,3 @@ export type CreateAndMintNftArgs = {
     blockDefinitionIndex: number;
   }[];
 };
-
-export * from "./AssemblerConfig";

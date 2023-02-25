@@ -92,6 +92,33 @@ export type Assembler = {
                     "docs": [
                         "NATIVE Instructions SYSVAR"
                     ];
+                },
+                {
+                    "name": "project";
+                    "isMut": true;
+                    "isSigner": false;
+                    "docs": [
+                        "HIVE CONTROL"
+                    ];
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
+                },
+                {
+                    "name": "hiveControl";
+                    "isMut": false;
+                    "isSigner": false;
+                    "docs": [
+                        "HIVE CONTROL PROGRAM"
+                    ];
                 }
             ];
             "args": [
@@ -123,22 +150,33 @@ export type Assembler = {
                     ];
                 },
                 {
-                    "name": "delegate";
+                    "name": "payer";
                     "isMut": false;
-                    "isSigner": false;
-                    "isOptional": true;
+                    "isSigner": true;
                     "docs": [
-                        "[Optional] the delegate of the assembler"
+                        "The wallet that pays for the rent"
                     ];
                 },
                 {
-                    "name": "newAuthority";
+                    "name": "systemProgram";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
                     "isMut": false;
                     "isSigner": false;
                     "isOptional": true;
-                    "docs": [
-                        "[Optional] The new wallet that will hold the authority over the assembler"
-                    ];
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [
@@ -146,67 +184,6 @@ export type Assembler = {
                     "name": "args";
                     "type": {
                         "defined": "UpdateAssemblerArgs";
-                    };
-                }
-            ];
-        },
-        {
-            "name": "createDelegateAuthority";
-            "accounts": [
-                {
-                    "name": "assembler";
-                    "isMut": true;
-                    "isSigner": false;
-                    "docs": [
-                        "Assembler state account"
-                    ];
-                },
-                {
-                    "name": "delegateAuthority";
-                    "isMut": true;
-                    "isSigner": false;
-                    "docs": [
-                        "the delegate authority account"
-                    ];
-                },
-                {
-                    "name": "delegate";
-                    "isMut": false;
-                    "isSigner": false;
-                    "docs": [
-                        "the wallet that holds delegate authority"
-                    ];
-                },
-                {
-                    "name": "authority";
-                    "isMut": false;
-                    "isSigner": true;
-                    "docs": [
-                        "The wallet that holds the authority over the assembler"
-                    ];
-                },
-                {
-                    "name": "payer";
-                    "isMut": true;
-                    "isSigner": true;
-                    "docs": [
-                        "The wallet that pays for everything"
-                    ];
-                },
-                {
-                    "name": "systemProgram";
-                    "isMut": false;
-                    "isSigner": false;
-                    "docs": [
-                        "NATIVE SYSTEM PROGRAM"
-                    ];
-                }
-            ];
-            "args": [
-                {
-                    "name": "args";
-                    "type": {
-                        "defined": "CreateDelegateAuthorityArgs";
                     };
                 }
             ];
@@ -253,6 +230,22 @@ export type Assembler = {
                     "docs": [
                         "NATIVE SYSTEM PROGRAM"
                     ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [
@@ -322,6 +315,22 @@ export type Assembler = {
                     "docs": [
                         "NATIVE SYSTEM PROGRAM"
                     ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [
@@ -455,6 +464,22 @@ export type Assembler = {
                     "docs": [
                         "NATIVE Instructions SYSVAR"
                     ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [];
@@ -617,6 +642,22 @@ export type Assembler = {
                     "docs": [
                         "SYSVAR RENT"
                     ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [];
@@ -731,14 +772,6 @@ export type Assembler = {
                     ];
                 },
                 {
-                    "name": "tokenMetadataProgram";
-                    "isMut": false;
-                    "isSigner": false;
-                    "docs": [
-                        "METAPLEX TOKEN METADATA PROGRAM"
-                    ];
-                },
-                {
                     "name": "sysvarInstructions";
                     "isMut": false;
                     "isSigner": false;
@@ -753,6 +786,22 @@ export type Assembler = {
                     "docs": [
                         "SYSVAR RENT"
                     ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [];
@@ -793,6 +842,14 @@ export type Assembler = {
                     ];
                 },
                 {
+                    "name": "nftMasterEdition";
+                    "isMut": true;
+                    "isSigner": false;
+                    "docs": [
+                        "Master Edition account of the NFT"
+                    ];
+                },
+                {
                     "name": "tokenAccount";
                     "isMut": true;
                     "isSigner": false;
@@ -818,6 +875,22 @@ export type Assembler = {
                     ];
                 },
                 {
+                    "name": "payer";
+                    "isMut": false;
+                    "isSigner": true;
+                    "docs": [
+                        "Payer account"
+                    ];
+                },
+                {
+                    "name": "systemProgram";
+                    "isMut": false;
+                    "isSigner": false;
+                    "docs": [
+                        "NATIVE SYSTEM PROGRAM"
+                    ];
+                },
+                {
                     "name": "tokenProgram";
                     "isMut": false;
                     "isSigner": false;
@@ -832,6 +905,30 @@ export type Assembler = {
                     "docs": [
                         "METAPLEX TOKEN METADATA PROGRAM"
                     ];
+                },
+                {
+                    "name": "sysvarInstructions";
+                    "isMut": false;
+                    "isSigner": false;
+                    "docs": [
+                        "NATIVE Instructions SYSVAR"
+                    ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [];
@@ -841,7 +938,7 @@ export type Assembler = {
             "accounts": [
                 {
                     "name": "assembler";
-                    "isMut": true;
+                    "isMut": false;
                     "isSigner": false;
                     "docs": [
                         "Assembler state account"
@@ -994,6 +1091,22 @@ export type Assembler = {
                     "docs": [
                         "RENT PROGRAM"
                     ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [];
@@ -1003,7 +1116,7 @@ export type Assembler = {
             "accounts": [
                 {
                     "name": "assembler";
-                    "isMut": true;
+                    "isMut": false;
                     "isSigner": false;
                     "docs": [
                         "Assembler state account"
@@ -1018,11 +1131,27 @@ export type Assembler = {
                     ];
                 },
                 {
+                    "name": "nftMint";
+                    "isMut": true;
+                    "isSigner": false;
+                    "docs": [
+                        "NFT mint account"
+                    ];
+                },
+                {
                     "name": "nftMetadata";
                     "isMut": true;
                     "isSigner": false;
                     "docs": [
                         "Metadata account of the NFT"
+                    ];
+                },
+                {
+                    "name": "nftMasterEdition";
+                    "isMut": true;
+                    "isSigner": false;
+                    "docs": [
+                        "Master Edition account of the NFT"
                     ];
                 },
                 {
@@ -1034,21 +1163,52 @@ export type Assembler = {
                     ];
                 },
                 {
-                    "name": "delegate";
+                    "name": "payer";
                     "isMut": false;
-                    "isSigner": false;
-                    "isOptional": true;
+                    "isSigner": true;
                     "docs": [
-                        "[Optional] the delegate of the assembler"
+                        "The payer account"
                     ];
                 },
                 {
-                    "name": "tokenMetadataProgram";
+                    "name": "systemProgram";
                     "isMut": false;
                     "isSigner": false;
                     "docs": [
-                        "METAPLEX TOKEN METADATA PROGRAM"
+                        "NATIVE SYSTEM PROGRAM"
                     ];
+                },
+                {
+                    "name": "tokenProgram";
+                    "isMut": false;
+                    "isSigner": false;
+                    "docs": [
+                        "SPL TOKEN PROGRAM"
+                    ];
+                },
+                {
+                    "name": "sysvarInstructions";
+                    "isMut": false;
+                    "isSigner": false;
+                    "docs": [
+                        "NATIVE Instructions SYSVAR"
+                    ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [
@@ -1065,7 +1225,7 @@ export type Assembler = {
             "accounts": [
                 {
                     "name": "assembler";
-                    "isMut": true;
+                    "isMut": false;
                     "isSigner": false;
                     "docs": [
                         "Assembler state account"
@@ -1080,11 +1240,27 @@ export type Assembler = {
                     ];
                 },
                 {
-                    "name": "metadata";
+                    "name": "nftMint";
+                    "isMut": true;
+                    "isSigner": false;
+                    "docs": [
+                        "NFT mint account"
+                    ];
+                },
+                {
+                    "name": "nftMetadata";
                     "isMut": true;
                     "isSigner": false;
                     "docs": [
                         "Metadata account of the NFT"
+                    ];
+                },
+                {
+                    "name": "nftMasterEdition";
+                    "isMut": true;
+                    "isSigner": false;
+                    "docs": [
+                        "Master Edition account of the NFT"
                     ];
                 },
                 {
@@ -1096,21 +1272,52 @@ export type Assembler = {
                     ];
                 },
                 {
-                    "name": "delegate";
+                    "name": "payer";
                     "isMut": false;
-                    "isSigner": false;
-                    "isOptional": true;
+                    "isSigner": true;
                     "docs": [
-                        "[Optional] the delegate of the assembler"
+                        "The payer account"
                     ];
                 },
                 {
-                    "name": "tokenMetadataProgram";
+                    "name": "systemProgram";
                     "isMut": false;
                     "isSigner": false;
                     "docs": [
-                        "METAPLEX TOKEN METADATA PROGRAM"
+                        "NATIVE SYSTEM PROGRAM"
                     ];
+                },
+                {
+                    "name": "tokenProgram";
+                    "isMut": false;
+                    "isSigner": false;
+                    "docs": [
+                        "SPL TOKEN PROGRAM"
+                    ];
+                },
+                {
+                    "name": "sysvarInstructions";
+                    "isMut": false;
+                    "isSigner": false;
+                    "docs": [
+                        "NATIVE Instructions SYSVAR"
+                    ];
+                },
+                {
+                    "name": "project";
+                    "isMut": false;
+                    "isSigner": false;
+                },
+                {
+                    "name": "delegateAuthority";
+                    "isMut": false;
+                    "isSigner": false;
+                    "isOptional": true;
+                },
+                {
+                    "name": "vault";
+                    "isMut": true;
+                    "isSigner": false;
                 }
             ];
             "args": [
@@ -1137,7 +1344,7 @@ export type Assembler = {
                         "type": "u8";
                     },
                     {
-                        "name": "authority";
+                        "name": "project";
                         "docs": [
                             "The wallet that has authority to modify the assembler"
                         ];
@@ -1465,37 +1672,6 @@ export type Assembler = {
                     }
                 ];
             };
-        },
-        {
-            "name": "delegateAuthority";
-            "docs": [
-                "Delegate Authority"
-            ];
-            "type": {
-                "kind": "struct";
-                "fields": [
-                    {
-                        "name": "bump";
-                        "type": "u8";
-                    },
-                    {
-                        "name": "authority";
-                        "docs": [
-                            "The delegate authority"
-                        ];
-                        "type": "publicKey";
-                    },
-                    {
-                        "name": "permission";
-                        "docs": [
-                            "The permission of the delegate authority"
-                        ];
-                        "type": {
-                            "defined": "DelegateAuthorityPermission";
-                        };
-                    }
-                ];
-            };
         }
     ];
     "types": [
@@ -1592,20 +1768,6 @@ export type Assembler = {
                         "name": "defaultRoyalty";
                         "type": {
                             "option": "u16";
-                        };
-                    }
-                ];
-            };
-        },
-        {
-            "name": "CreateDelegateAuthorityArgs";
-            "type": {
-                "kind": "struct";
-                "fields": [
-                    {
-                        "name": "permission";
-                        "type": {
-                            "defined": "DelegateAuthorityPermission";
                         };
                     }
                 ];
@@ -1880,35 +2042,6 @@ export type Assembler = {
                                 "type": "u64";
                             }
                         ];
-                    }
-                ];
-            };
-        },
-        {
-            "name": "DelegateAuthorityPermission";
-            "docs": [
-                "Delegate Authority Permission"
-            ];
-            "type": {
-                "kind": "enum";
-                "variants": [
-                    {
-                        "name": "Master";
-                    },
-                    {
-                        "name": "UpdateAssembler";
-                    },
-                    {
-                        "name": "UpdateBlock";
-                    },
-                    {
-                        "name": "UpdateBlockDefinition";
-                    },
-                    {
-                        "name": "UpdateNFT";
-                    },
-                    {
-                        "name": "InitialArtGeneration";
                     }
                 ];
             };

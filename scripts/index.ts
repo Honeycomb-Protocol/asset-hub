@@ -6,7 +6,6 @@ import {
 } from "./types";
 import assembler from "./assembler";
 import assetmanager from "./assetmanager";
-import staking from "./staking";
 
 function main() {
   const args = process.argv.slice(2);
@@ -23,9 +22,6 @@ function main() {
         network,
         ...args.slice(2)
       );
-      break;
-    case "staking":
-      staking(action as StakingProgramAction, network, ...args.slice(2));
       break;
     default:
       throw new Error("Invalid program name");

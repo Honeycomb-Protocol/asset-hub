@@ -1,10 +1,8 @@
 import * as web3 from "@solana/web3.js";
-import * as anchor from "@project-serum/anchor";
 import key from "../key.json";
 import fs from "fs";
 import { PROGRAM_ADDRESS } from "../src";
 import { Config, ProgramName } from "./types";
-import { keypairIdentity, Metaplex } from "@metaplex-foundation/js";
 
 export const METADATA_PROGRAM_ID = new web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -30,7 +28,7 @@ export const getDeployments = (
   let deployments = {};
   try {
     deployments = JSON.parse(fs.readFileSync("./deployments.json").toString());
-  } catch (e) { }
+  } catch (e) {}
 
   if (!Object.keys(deployments).includes(program))
     throw new Error(`Deployment for ${program} not found!`);
@@ -52,7 +50,7 @@ export const setDeployments = (
     deploymentsMap = JSON.parse(
       fs.readFileSync("./deployments.json").toString()
     );
-  } catch (e) { }
+  } catch (e) {}
 
   if (!Object.keys(deploymentsMap).includes(program))
     deploymentsMap[program] = {};
@@ -73,13 +71,7 @@ export const getDependencies = (
 ) => {
   const config = network === "mainnet" ? mainnetConfig : devnetConfig;
   const keypair = web3.Keypair.fromSecretKey(Uint8Array.from(key));
-
-  const wallet = new anchor.Wallet(
-    keypair
-  );
   const connection = new web3.Connection(config.endpoint);
-  const mx = new Metaplex(connection);
-  mx.use(keypairIdentity(keypair));
 
   const setDeploymentsLocal = (deployments) =>
     setDeployments(programName, network, deployments);
@@ -95,38 +87,9 @@ export const getDependencies = (
 
   return {
     config,
-    wallet,
+    signer: keypair,
     connection,
     deployments,
-    mx,
     setDeployments: setDeploymentsLocal,
   };
 };
-
-export const sendAndConfirmTransaction = async (
-  tx: web3.Transaction,
-  connection: web3.Connection,
-  wallet: anchor.Wallet,
-  signers: web3.Signer[] = [],
-  sendOpts: web3.SendOptions = {}
-) => {
-  const block = await connection.getLatestBlockhash();
-  tx.recentBlockhash = block.blockhash;
-  tx.feePayer = wallet.publicKey;
-  signers.length && (await tx.partialSign(...signers));
-  const signedTx = await wallet.signTransaction(tx);
-  const txId = await connection.sendRawTransaction(signedTx.serialize(), {
-    preflightCommitment: "processed",
-    ...sendOpts,
-  });
-  await connection.confirmTransaction(
-    {
-      blockhash: block.blockhash,
-      lastValidBlockHeight: block.lastValidBlockHeight,
-      signature: txId,
-    },
-    "processed"
-  );
-  return txId;
-};
-
