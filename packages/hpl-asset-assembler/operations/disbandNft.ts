@@ -199,8 +199,7 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
     })
   );
 
-  const prepared = await honeycomb.rpc().prepareTransactions(ctxs);
-  const preparedCtxs = prepared.ctxs;
+  const preparedCtxs = await honeycomb.rpc().prepareTransactions(ctxs);
 
   return await honeycomb
     .rpc()
