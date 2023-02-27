@@ -7,8 +7,6 @@ import {
   Assembler,
   AssemblingAction,
   PROGRAM_ID,
-  BlockDefinition,
-  NFTArgs,
 } from "../generated";
 import {
   getDepositPda,
@@ -27,6 +25,10 @@ import {
   AssetAssemblerBlockDefinition,
   AssetAssemblerNft,
 } from "../AssetAssembler";
+import {
+  Metadata,
+  TokenStandard,
+} from "@metaplex-foundation/mpl-token-metadata";
 
 type CreateCreateNftCtxArgs = {
   project: web3.PublicKey;
@@ -95,7 +97,8 @@ type CreateAddBlockCtx = {
   tokenMint: web3.PublicKey;
   authority: web3.PublicKey;
   payer: web3.PublicKey;
-  assemblingAction: AssemblingAction; // default: AssemblingAction.Freeze,
+  assemblingAction?: AssemblingAction; // default: AssemblingAction.Freeze,
+  tokenStandard?: TokenStandard;
   delegateAuthority?: web3.PublicKey;
   programId?: web3.PublicKey;
 };
@@ -117,7 +120,7 @@ export function createAddBlockCtx(args: CreateAddBlockCtx) {
     depositTokenRecord: web3.PublicKey | undefined = undefined,
     tokenEdition: web3.PublicKey | undefined = undefined;
 
-  if (false) {
+  if (args.tokenStandard === TokenStandard.ProgrammableNonFungible) {
     [tokenEdition] = getMetadataAccount_(args.tokenMint, {
       __kind: "edition",
     });
@@ -236,6 +239,7 @@ export type CreateCreateAndMintNftCtxsArgs = {
     tokenMint: web3.PublicKey;
     order: number;
     blockDefinitionIndex: number;
+    tokenStandard?: TokenStandard;
   }[];
   delegateAuthority?: web3.PublicKey;
   programId?: web3.PublicKey;
@@ -272,6 +276,7 @@ export async function createCreateAndMintNftCtxs(
         authority: args.wallet,
         payer: args.wallet,
         assemblingAction: args.assembler.assemblingAction,
+        tokenStandard: block.tokenStandard,
         delegateAuthority: args.delegateAuthority,
         programId: args.programId,
       })
@@ -313,6 +318,7 @@ export type CreateCreateAndMintNftArgs = {
     tokenMint: web3.PublicKey;
     order: number;
     blockDefinitionIndex: number;
+    tokenStandard?: TokenStandard;
   }[];
   programId?: web3.PublicKey;
 };
@@ -379,6 +385,12 @@ export type AddBlockArgs = {
   programId?: web3.PublicKey;
 };
 export async function addBlock(honeycomb: Honeycomb, args: AddBlockArgs) {
+  const [metadata] = getMetadataAccount_(args.blockDefinition.mint);
+  const { tokenStandard } = await Metadata.fromAccountAddress(
+    honeycomb.connection,
+    metadata
+  );
+
   const ctx = createAddBlockCtx({
     project: honeycomb.projectAddress,
     assembler: honeycomb.assembler().assemblerAddress,
@@ -389,6 +401,7 @@ export async function addBlock(honeycomb: Honeycomb, args: AddBlockArgs) {
     authority: honeycomb.identity().publicKey,
     payer: honeycomb.identity().publicKey,
     assemblingAction: honeycomb.assembler().assemblingAction,
+    tokenStandard: tokenStandard || undefined,
     delegateAuthority: honeycomb.identity().getDelegateAuthority()
       .delegateAuthorityAddress,
     programId: args.programId,
