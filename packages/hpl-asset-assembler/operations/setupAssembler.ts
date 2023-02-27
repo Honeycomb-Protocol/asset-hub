@@ -1,4 +1,6 @@
 export {};
+export const setupAssembler: any = {};
+export const uploadFiles: any = {};
 
 // import * as web3 from "@solana/web3.js";
 // import fetch from "node-fetch";

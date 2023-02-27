@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { setupAssembler, uploadFiles } from "../sdk";
+import { setupAssembler, uploadFiles } from "../operations";
 import { Block, BlockDefinition } from "../generated";
 import {
   bundlrStorage,
@@ -14,7 +14,7 @@ import {
   toMetaplexFile,
 } from "@metaplex-foundation/js";
 import { web3 } from "@project-serum/anchor";
-import { AssemblerConfig } from "src/types";
+import { AssemblerConfig } from "../types";
 
 yargs(hideBin(process.argv))
   .command(
