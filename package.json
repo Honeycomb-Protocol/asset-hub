@@ -8,14 +8,16 @@
     "honeycomb": "./dist/bin/index.ts"
   },
   "scripts": {
+    "prepare": "husky install",
+    "copyPackages": "copyfiles -u 1 packages/**/package.json dist/",
+    "precommit": "node ./scripts/precommit.js && git add programs/**/Cargo.toml && git add Cargo.lock",
+    "publishall": "node ./scripts/publishall.js",
+    "compile": "tsc",
+    "postcompile": "yarn copyPackages",
     "build:program": "anchor build",
-    "build:sdk": "rm -rf dist && solita",
-    "build:all": "yarn build:program & yarn build:sdk",
-    "precompile": "cp target/types/* src/idl",
-    "compile": "yarn precompile && tsc",
-    "build": "yarn build:all && yarn compile",
+    "build:sdk": "yarn solita && yarn compile",
+    "build": "yarn build:program & yarn build:sdk",
     "deploy": "anchor deploy",
-    "honeycomb:dev": "ts-node src/bin/index.ts",
     "build-deploy": "yarn build && yarn deploy",
     "assembler": "ts-node ./scripts/index.ts assembler",
     "assetmanager": "ts-node ./scripts/index.ts assetmanager",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@metaplex-foundation/solita": "^0.19.3",
     "@types/bn.js": "^5.1.0",
+    "husky": "^8.0.3",
     "prettier": "^2.6.2",
     "typescript": "^4.3.5"
   }
