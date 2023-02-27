@@ -2,72 +2,94 @@ import * as web3 from "@solana/web3.js";
 import {
   Metaplex,
   toBigNumber,
-  walletAdapterIdentity,
+  keypairIdentity,
 } from "@metaplex-foundation/js";
-import { AssetManagerProgramAction } from "./types";
 import { getDependencies } from "./utils";
-import { createAsset, mintAsset } from "../src";
+import { Honeycomb, identityModule } from "@honeycomb-protocol/hive-control";
+import {
+  AssetHubManager,
+  AssetManagerAsset,
+} from "../packages/hpl-asset-manager";
 
 export default async function (
-  action: AssetManagerProgramAction,
+  action: string,
   network: "mainnet" | "devnet" = "devnet",
   ...args: string[]
 ) {
-  // const { connection, wallet, deployments, mx, setDeployments } = getDependencies(
-  //   network,
-  //   "assetmanager"
-  // );
-  // console.log(deployments)
-  // switch (action) {
-  //   case "create-asset":
-  //     const candyGuardBuilder = mx
-  //       .candyMachines()
-  //       .builders()
-  //       .createCandyGuard({
-  //         guards: {
-  //           solPayment: {
-  //             amount: {
-  //               basisPoints: toBigNumber(10000000),
-  //               currency: {
-  //                 symbol: "SOL",
-  //                 decimals: 9,
-  //               },
-  //             },
-  //             destination: wallet.publicKey,
-  //           },
-  //         },
-  //       });
-  //     const createAssetCtx = await createAsset(
-  //       mx,
-  //       {
-  //         candyGuard: candyGuardBuilder.getContext().candyGuardAddress,
-  //         name: "Test Asset",
-  //         symbol: "TST",
-  //         uri: "https://example.com",
-  //       },
-  //       candyGuardBuilder,
-  //     );
-  //     console.log("Tx:", createAssetCtx.response);
-  //     console.log("Asset: ", createAssetCtx.mint.toString());
-  //     setDeployments({
-  //       ...deployments,
-  //       mint: createAssetCtx.mint,
-  //       candyGuard: candyGuardBuilder.getContext().candyGuardAddress,
-  //     });
-  //     break;
-  //   case "mint-asset":
-  //     if (!deployments.asset)
-  //       throw new Error(
-  //         "Asset not found in deployments, Please create asset first"
-  //       );
-  //     const mintAssetCtx = await mintAsset(
-  //       mx,
-  //       new web3.PublicKey(deployments.asset),
-  //       1
-  //     );
-  //     console.log("Tx:", mintAssetCtx.response);
-  //     break;
-  //   default:
-  //     throw new Error("Invalid Asset manager program action");
-  // }
+  const { connection, signer, deployments, setDeployments } = getDependencies(
+    network,
+    "assetmanager"
+  );
+
+  const honeycomb = await Honeycomb.fromAddress(
+    connection,
+    new web3.PublicKey("HEHH65goNqxcWpxDpgPqKwernLawqbQJ7L9aocNkm2YT")
+  );
+  honeycomb.use(identityModule(signer));
+  await honeycomb.identity().loadDelegateAuthority();
+
+  if (action === "create-asset-manager") {
+    const assetManager = await AssetHubManager.new(honeycomb);
+    console.log("Asset Manager address: ", assetManager.assetManagerAddress);
+    setDeployments({
+      ...deployments,
+      assetManager: assetManager.assetManagerAddress,
+    });
+  } else {
+    honeycomb.use(
+      await AssetHubManager.fromAddress(
+        honeycomb.connection,
+        new web3.PublicKey(deployments.assetManager)
+      )
+    );
+
+    let asset: AssetManagerAsset;
+    switch (action) {
+      case "create-asset":
+        const mx = new Metaplex(honeycomb.connection);
+        mx.use(keypairIdentity(signer));
+        const candyGuardBuilder = mx
+          .candyMachines()
+          .builders()
+          .createCandyGuard({
+            guards: {
+              solPayment: {
+                amount: {
+                  basisPoints: toBigNumber(10000000),
+                  currency: {
+                    symbol: "SOL",
+                    decimals: 9,
+                  },
+                },
+                destination: signer.publicKey,
+              },
+            },
+          });
+
+        asset = await honeycomb
+          .assetManager()
+          .create()
+          .asset({
+            args: {
+              candyGuard: candyGuardBuilder.getContext().candyGuardAddress,
+              name: "Test Asset",
+              symbol: "TST",
+              uri: "https://example.com",
+              supply: 10,
+            },
+            candyGuardBuilder,
+          });
+
+        console.log("Asset: ", asset.assetAddress);
+        break;
+      case "mint-asset":
+        await honeycomb.assetManager().loadAssets();
+        [asset] = honeycomb.assetManager().assets();
+        const ctx = await asset.mint(1);
+        console.log("Tx:", ctx.signature);
+        break;
+      default:
+        throw new Error("Invalid Asset manager program action");
+    }
+  }
 }

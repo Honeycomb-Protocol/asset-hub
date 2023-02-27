@@ -1,7 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import key from "../key.json";
 import fs from "fs";
-import { PROGRAM_ADDRESS } from "../src";
 import { Config, ProgramName } from "./types";
 
 export const METADATA_PROGRAM_ID = new web3.PublicKey(
@@ -76,9 +75,7 @@ export const getDependencies = (
   const setDeploymentsLocal = (deployments) =>
     setDeployments(programName, network, deployments);
 
-  let deployments: any = {
-    program: PROGRAM_ADDRESS,
-  };
+  let deployments: any = {};
   try {
     deployments = getDeployments(programName, network);
   } catch {

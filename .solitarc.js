@@ -1,8 +1,8 @@
 const path = require("path");
 
-const programId = "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz"
+const programId = "7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd"
 const prefix = "hpl asset"
-const programName = "assembler"; // with spaces
+const programName = "manager"; // with spaces
 const programFullName = prefix + " " + programName;
 
 module.exports = {

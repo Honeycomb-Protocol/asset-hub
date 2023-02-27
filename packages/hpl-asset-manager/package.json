@@ -1,5 +1,5 @@
 {
-  "name": "@honeycomb-protocol/asset-assembler",
+  "name": "@honeycomb-protocol/asset-manager",
   "version": "0.0.1",
   "private": false,
   "dependencies": {

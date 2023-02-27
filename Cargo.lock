@@ -256,15 +256,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
 
 [[package]]
-name = "assetmanager"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "mpl-token-metadata",
-]
-
-[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -836,7 +827,18 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-hive-control",
+ "hpl-hive-control 0.0.23",
+ "hpl-utils",
+ "mpl-token-metadata",
+]
+
+[[package]]
+name = "hpl-asset-manager"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "hpl-hive-control 0.0.27",
  "hpl-utils",
  "mpl-token-metadata",
 ]
@@ -846,6 +848,16 @@ name = "hpl-hive-control"
 version = "0.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef90e7da18f3ef4d39082009c02b936c21f362ab901754fd13642ada65df5450"
+dependencies = [
+ "anchor-lang",
+ "hpl-utils",
+]
+
+[[package]]
+name = "hpl-hive-control"
+version = "0.0.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8085aa78ac577f2eb6bd3822ee1a3d61a7e27c61ade82d166b701dbeecde91af"
 dependencies = [
  "anchor-lang",
  "hpl-utils",

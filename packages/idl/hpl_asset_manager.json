@@ -1,0 +1,410 @@
+{
+  "version": "0.1.0",
+  "name": "hpl_asset_manager",
+  "instructions": [
+    {
+      "name": "createAssetManager",
+      "accounts": [
+        {
+          "name": "assetManager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL"
+          ]
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "RENT SYSVAR"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createAsset",
+      "accounts": [
+        {
+          "name": "assetManager",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Mint of the asset"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Metadata account of the asset"
+          ]
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Master Edition account of the asset"
+          ]
+        },
+        {
+          "name": "asset",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the assembler"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The system program."
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "METAPLEX TOKEN METADATA PROGRAM"
+          ]
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SYSVAR RENT"
+          ]
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE Instructions SYSVAR"
+          ]
+        },
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CreateAssetArgs"
+          }
+        },
+        {
+          "name": "proofIndex",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "mintAsset",
+      "accounts": [
+        {
+          "name": "assetManager",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "asset",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The asset state account."
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Mint of the asset"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The token account of user wallet."
+          ]
+        },
+        {
+          "name": "candyGuard",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Candy guard address of the asset"
+          ]
+        },
+        {
+          "name": "wallet",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet holds the complete authority over the asset manager."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The system program."
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AssetManager",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "project",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Asset",
+      "docs": [
+        "The Asset."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "assetManager",
+            "docs": [
+              "The asset manager this asset is associated to"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "candyGuard",
+            "docs": [
+              "Candy Guard address if any"
+            ],
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "mint",
+            "docs": [
+              "The mint address of this Asset"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "supply",
+            "docs": [
+              "Total supply of asset"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "itemsRedeemed",
+            "docs": [
+              "Total items minted"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "uri",
+            "docs": [
+              "The uri of the metadata of the Asset"
+            ],
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateAssetArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "candyGuard",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "supply",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnauthorizedMint",
+      "msg": "Unauthorized to mints"
+    }
+  ],
+  "metadata": {
+    "address": "7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd",
+    "origin": "anchor",
+    "binaryVersion": "0.26.0",
+    "libVersion": "0.26.0"
+  }
+}
