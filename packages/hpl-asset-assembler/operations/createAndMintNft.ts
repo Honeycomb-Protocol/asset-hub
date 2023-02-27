@@ -337,8 +337,7 @@ export async function createAndMintNft(
     programId: args.programId,
   });
 
-  const prepared = await honeycomb.rpc().prepareTransactions(ctxs);
-  const preparedCtxs = prepared.ctxs;
+  const preparedCtxs = await honeycomb.rpc().prepareTransactions(ctxs);
 
   const responses = await honeycomb
     .rpc()
