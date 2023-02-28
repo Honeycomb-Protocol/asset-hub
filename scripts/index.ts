@@ -2,6 +2,7 @@ import {
   AssemblerProgramAction,
   AssetManagerProgramAction,
   ProgramName,
+  StakingProgramAction,
 } from "./types";
 import assembler from "./assembler";
 import assetmanager from "./assetmanager";

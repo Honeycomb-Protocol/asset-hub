@@ -5,10 +5,11 @@ export type Config = {
   endpoint: string;
 };
 
-export type ProgramName = "assembler" | "assetmanager";
+export type ProgramName = "assembler" | "assetmanager" | "staking";
 
 export type AssemblerProgramAction =
   | "create-assembler"
+  | "update-assembler"
   | "create-block"
   | "create-block-definition"
   | "create-and-mint-nft"
@@ -18,6 +19,13 @@ export type AssetManagerProgramAction =
   | "create-asset-manager"
   | "create-asset"
   | "mint-asset";
+
+export type StakingProgramAction =
+  | "create-project"
+  | "stake"
+  | "unstake"
+  | "fund-rewards"
+  | "claim-rewards";
 
 export type TxSigners = {
   tx: web3.Transaction;

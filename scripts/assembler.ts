@@ -1,160 +1,178 @@
 import * as web3 from "@solana/web3.js";
 import { AssemblerProgramAction } from "./types";
 import { getDependencies } from "./utils";
+import { Honeycomb, identityModule } from "@honeycomb-protocol/hive-control";
 import {
-  createAssembler,
-  createBlock,
-  createBlockDefinition,
-  createAndMintNft,
-  disbandNft,
   AssemblingAction,
-  BlockType,
+  AssetAssembler,
+  AssetAssemblerBlock,
+  AssetAssemblerBlockDefinition,
+  AssetAssemblerNft,
   BlockDefinitionValue,
-  Block,
-} from "../src";
+  BlockType,
+  TokenStandard,
+} from "../packages/hpl-asset-assembler";
 
 export default async function (
   action: AssemblerProgramAction,
   network: "mainnet" | "devnet" = "devnet",
   ...args: string[]
 ) {
-  const { connection, wallet, deployments, setDeployments } = getDependencies(
+  const { connection, signer, deployments, setDeployments } = getDependencies(
     network,
     "assembler"
   );
 
-  switch (action) {
-    case "create-assembler":
-      const assemblerAddress = await createAssembler(connection, wallet, {
-        assemblingAction: AssemblingAction.TakeCustody,
-        collectionName: "Assembler Test Collection",
-        collectionSymbol: "ATC",
-        collectionDescription: "This is a test collection to test assembler",
-        collectionUri: "https://assembler.test",
-        nftBaseUri: "https://api.eboy.dev/u/temp",
-      });
-      console.log("Assembler address: ", assemblerAddress.toString());
-      setDeployments({ ...deployments, assembler: assemblerAddress.assembler });
-      break;
+  const honeycomb = await Honeycomb.fromAddress(
+    connection,
+    new web3.PublicKey("HEHH65goNqxcWpxDpgPqKwernLawqbQJ7L9aocNkm2YT")
+  );
+  honeycomb.use(identityModule(signer));
+  await honeycomb.identity().loadDelegateAuthority();
 
-    case "create-block":
-      if (!deployments.assembler)
-        throw new Error(
-          "Assembler address not found in deployments, Please create assembler first"
-        );
-      const blockAddress = await createBlock(
-        connection,
-        wallet,
-        new web3.PublicKey(deployments.assembler),
+  if (action === "create-assembler") {
+    const assetAssembler = await AssetAssembler.new(honeycomb, {
+      assemblingAction: AssemblingAction.TakeCustody,
+      collectionName: "Assembler Test Collection",
+      collectionSymbol: "ATC",
+      collectionDescription: "This is a test collection to test assembler",
+      collectionUri: "https://assembler.test",
+      nftBaseUri: "https://api.eboy.dev/u/temp",
+      allowDuplicates: false,
+      defaultRoyalty: 100,
+      tokenStandard: TokenStandard.ProgrammableNonFungible,
+      ruleSet: null,
+      defaultCreators: [
         {
-          blockName: "Block 1",
-          blockOrder: 1,
+          address: honeycomb.identity().publicKey,
+          share: 100,
+        },
+      ],
+    });
+
+    console.log("Assembler address: ", assetAssembler.assemblerAddress);
+    setDeployments({
+      ...deployments,
+      assembler: assetAssembler.assemblerAddress,
+    });
+  } else {
+    console.log("Fetching assemmbler");
+    honeycomb.use(
+      await AssetAssembler.fromAddress(
+        honeycomb.connection,
+        new web3.PublicKey(deployments.assembler)
+      )
+    );
+    console.log("Assembler fetched loading data");
+    await honeycomb.assembler().load();
+    console.log("Proceeding with action: ", action);
+
+    let block: AssetAssemblerBlock;
+    let blockDefinition: AssetAssemblerBlockDefinition;
+    let nft: AssetAssemblerNft;
+
+    switch (action) {
+      case "update-assembler":
+        await honeycomb.assembler().update({
+          assemblingAction: AssemblingAction.Burn,
+          nftBaseUri: "https://api.eboy.dev/u/loading.json",
+          allowDuplicates: false,
+          defaultRoyalty: 100,
+        });
+        console.log(
+          "Assembler address: ",
+          honeycomb.assembler().assemblerAddress
+        );
+        break;
+
+      case "create-block":
+        block = await honeycomb.assembler().create().block({
+          blockName: `Block`,
           blockType: BlockType.Enum,
           isGraphical: false,
+        });
+        console.log("Block:", block.address.toString());
+        break;
+
+      case "create-block-definition":
+        block = honeycomb.assembler().blocks()[0];
+
+        let blockDefArgs: BlockDefinitionValue;
+        if (block.blockType === BlockType.Enum) {
+          blockDefArgs = {
+            __kind: "Enum",
+            value: "test",
+            isCollection: false,
+            image: null,
+          };
+        } else if (block.blockType === BlockType.Boolean) {
+          blockDefArgs = {
+            __kind: "Boolean",
+            value: true,
+          };
+        } else if (
+          block.blockType === BlockType.Random ||
+          block.blockType === BlockType.Computed
+        ) {
+          blockDefArgs = {
+            __kind: "Number",
+            min: 0,
+            max: 100,
+          };
+        } else {
+          throw new Error("Invalid block type");
         }
-      );
-      console.log("Block address: ", blockAddress.toString());
-      setDeployments({ ...deployments, block: blockAddress.block });
-      break;
 
-    case "create-block-definition":
-      if (!args[0])
-        throw new Error("Block definition mint address not provided");
-      if (!deployments.block)
-        throw new Error(
-          "Block address not found in deployments, Please create block first"
-        );
+        blockDefinition = await honeycomb
+          .assembler()
+          .create()
+          .blockDefinition({
+            value: blockDefArgs,
+            block: block.address,
+            mint: new web3.PublicKey(args[0]),
+          });
 
-      const block = new web3.PublicKey(deployments.block);
-      const blockAccount = await Block.fromAccountAddress(connection, block);
+        console.log("Block definition:", blockDefinition.address);
+        break;
 
-      let blockDefArgs: BlockDefinitionValue;
-      if (blockAccount.blockType === BlockType.Enum) {
-        blockDefArgs = {
-          __kind: "Enum",
-          value: "test",
-          isCollection: true,
-          image: null,
-        };
-      } else if (blockAccount.blockType === BlockType.Boolean) {
-        blockDefArgs = {
-          __kind: "Boolean",
-          value: true,
-        };
-      } else if (
-        blockAccount.blockType === BlockType.Random ||
-        blockAccount.blockType === BlockType.Computed
-      ) {
-        blockDefArgs = {
-          __kind: "Number",
-          min: 0,
-          max: 100,
-        };
-      } else {
-        throw new Error("Invalid block type");
-      }
+      case "create-and-mint-nft":
+        block = honeycomb.assembler().blocks()[0];
+        blockDefinition = block.blockDefinitions[0];
 
-      const blockDefinitionAddress = await createBlockDefinition(
-        connection,
-        wallet,
-        blockAccount.assembler,
-        block,
-        new web3.PublicKey(args[0]),
-        blockDefArgs
-      );
-      console.log(
-        "Block definition address: ",
-        blockDefinitionAddress.toString()
-      );
-      setDeployments({
-        ...deployments,
-        blockDefinition: blockDefinitionAddress.blockDefinition,
-        blockDefinitionMint: args[0],
-      });
-      break;
+        console.log("Creating NFT");
+        nft = await honeycomb.assembler().create().nft();
+        console.log("NFT created", nft.mintAddress.toString());
 
-    case "create-and-mint-nft":
-      if (
-        !deployments.assembler ||
-        !deployments.block ||
-        !deployments.blockDefinition ||
-        !deployments.blockDefinitionMint
-      )
-        throw new Error(
-          "Dependencies not found in deployments, Please create assembler, block and block definition first"
-        );
+        console.log("Adding block definition to NFT", block);
+        await nft.addBlock(blockDefinition);
+        console.log("Block definition added to NFT");
 
-      const mint = await createAndMintNft(
-        connection,
-        wallet,
-        new web3.PublicKey(deployments.assembler),
-        [
-          {
-            block: new web3.PublicKey(deployments.block),
-            blockDefinition: new web3.PublicKey(deployments.blockDefinition),
-            tokenMint: new web3.PublicKey(deployments.blockDefinitionMint),
-          },
-        ]
-      );
-      console.log("Mint address: ", mint.toString());
-      setDeployments({
-        ...deployments,
-        nftMint: mint.mint,
-      });
-      break;
+        console.log("Minting NFT");
+        await nft.mint();
+        console.log("NFT minted");
+        break;
 
-    case "disband-nft":
-      if (!deployments.nftMint)
-        throw new Error("NFT mint address not found in deployments");
+      case "disband-nft":
+        block = honeycomb.assembler().blocks()[0];
+        blockDefinition = block.blockDefinitions[0];
+        nft = (
+          await honeycomb
+            .assembler()
+            .fetch()
+            .nftsByWallet(honeycomb.identity().publicKey)
+        )[0];
 
-      await disbandNft(
-        connection,
-        wallet,
-        new web3.PublicKey(deployments.nftMint)
-      );
-      break;
+        console.log("Burning NFT");
+        await nft.burn();
+        console.log("NFT burned");
 
-    default:
-      throw new Error("Invalid Assembler program action");
+        console.log("Removing block definition from NFT");
+        await nft.removeBlock(blockDefinition);
+        console.log("Block definition removed from NFT");
+        break;
+
+      default:
+        throw new Error("Invalid Assembler program action");
+    }
   }
 }
