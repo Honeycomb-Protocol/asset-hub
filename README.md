@@ -1,5 +1,4 @@
-# Asset Hub
-## The Composability Suite
+# Asset Hub (The Composability Suite)
 The Asset Hub is a set of suite tools for NFT and SFT Composability. Allowing projects to create and manage custom in-game assets for games and digital applications. The Asset Hub is designed to be modular and can be integrated directly with other programs in Honeycomb. Hive Control can be utilized to create engaging in-game experiences, such as player avatars that are linked with each unique user identify and managed through the master program.
 ## Assembler Program
 The Assembler is designed to make it easy for developers to compose and manage in-game digital assets as NFTs. The program is designed using a block architecture for the computed logic. Developers can define variables within each block definition to generate dynamic blocks, enabling endless possibilities for digital asset creation. The Assembler also allows for simple dismantling of NFTs to be managed by the Asset Manager Program.
