@@ -52,9 +52,9 @@ pub mod hpl_asset_assembler {
         args: UpdateAssemblerArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index as usize, ctx.accounts.assembler.key())),
+            Some((proof_index, ctx.accounts.assembler.key())),
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
             ctx.accounts.payer.to_account_info(),
@@ -71,9 +71,9 @@ pub mod hpl_asset_assembler {
         args: CreateBlockArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index as usize, ctx.accounts.assembler.key())),
+            Some((proof_index, ctx.accounts.assembler.key())),
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
             ctx.accounts.payer.to_account_info(),
@@ -90,9 +90,9 @@ pub mod hpl_asset_assembler {
         args: BlockDefinitionValue,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index as usize, ctx.accounts.assembler.key())),
+            Some((proof_index, ctx.accounts.assembler.key())),
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
             ctx.accounts.payer.to_account_info(),
@@ -105,7 +105,7 @@ pub mod hpl_asset_assembler {
     }
 
     pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.public_low,
             None,
             &ctx.accounts.project,
@@ -120,7 +120,7 @@ pub mod hpl_asset_assembler {
     }
 
     pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.public_high,
             None,
             &ctx.accounts.project,
@@ -135,7 +135,7 @@ pub mod hpl_asset_assembler {
     }
 
     pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.public_low,
             None,
             &ctx.accounts.project,
@@ -150,7 +150,7 @@ pub mod hpl_asset_assembler {
     }
 
     pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.public_low,
             None,
             &ctx.accounts.project,
@@ -165,7 +165,7 @@ pub mod hpl_asset_assembler {
     }
 
     pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.public_high,
             None,
             &ctx.accounts.project,
@@ -184,9 +184,9 @@ pub mod hpl_asset_assembler {
         args: SetNFTGeneratedArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index as usize, ctx.accounts.assembler.key())),
+            Some((proof_index, ctx.accounts.assembler.key())),
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
             ctx.accounts.payer.to_account_info(),
@@ -203,9 +203,9 @@ pub mod hpl_asset_assembler {
         args: UpdateMetadataArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index as usize, ctx.accounts.assembler.key())),
+            Some((proof_index, ctx.accounts.assembler.key())),
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
             ctx.accounts.payer.to_account_info(),
