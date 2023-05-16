@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.1",
   "name": "hpl_asset_assembler",
   "instructions": [
     {
@@ -2180,11 +2180,5 @@
       "name": "InitialArtGenerated",
       "msg": "The initial generation of art is already complete"
     }
-  ],
-  "metadata": {
-    "address": "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz",
-    "origin": "anchor",
-    "binaryVersion": "0.26.0",
-    "libVersion": "0.26.0"
-  }
+  ]
 }
