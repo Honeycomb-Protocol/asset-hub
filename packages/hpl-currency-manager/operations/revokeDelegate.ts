@@ -9,7 +9,10 @@ import { createRevokeDelegateInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
 
 type CreateRevokeDelegateCtxArgs = {
+  currency: web3.PublicKey;
+  mint: web3.PublicKey;
   holderAccount: web3.PublicKey;
+  tokenAccount: web3.PublicKey;
   authority: web3.PublicKey;
   programId?: web3.PublicKey;
 };
@@ -21,7 +24,10 @@ export function createRevokeDelegateCtx(
   const instructions = [
     createRevokeDelegateInstruction(
       {
+        currency: args.currency,
+        mint: args.mint,
         holderAccount: args.holderAccount,
+        tokenAccount: args.tokenAccount,
         authority: args.authority,
       },
       programId
@@ -40,10 +46,15 @@ export async function revokeDelegate(
   args: RevokeDelegateArgs
 ): Promise<ConfirmedContext> {
   const ctx = createRevokeDelegateCtx({
+    currency: args.holderAccount.currency().address,
+    mint: args.holderAccount.currency().mint,
     holderAccount: args.holderAccount.address,
+    tokenAccount: args.holderAccount.tokenAccount,
     authority: honeycomb.identity().publicKey,
     programId: args.programId,
   });
 
-  return honeycomb.rpc().sendAndConfirmTransaction(ctx);
+  return honeycomb
+    .rpc()
+    .sendAndConfirmTransaction(ctx, { skipPreflight: true });
 }

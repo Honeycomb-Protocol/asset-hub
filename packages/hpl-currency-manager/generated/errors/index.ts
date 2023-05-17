@@ -52,6 +52,26 @@ createErrorFromCodeLookup.set(0x1771, () => new UnauthorizedError())
 createErrorFromNameLookup.set('Unauthorized', () => new UnauthorizedError())
 
 /**
+ * InactiveHolder: 'The holder account is currrently Inactive'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class InactiveHolderError extends Error {
+  readonly code: number = 0x1772
+  readonly name: string = 'InactiveHolder'
+  constructor() {
+    super('The holder account is currrently Inactive')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, InactiveHolderError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1772, () => new InactiveHolderError())
+createErrorFromNameLookup.set('InactiveHolder', () => new InactiveHolderError())
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

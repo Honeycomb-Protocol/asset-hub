@@ -12,7 +12,7 @@ import {
   CreateCurrencyArgs as CreateCurrencyArgsChain,
   PROGRAM_ID,
 } from "../generated";
-import { currencyPda, metadataPda } from "../utils";
+import { METADATA_PROGRAM_ID, currencyPda, metadataPda } from "../utils";
 
 type CreateCreateCurrencyCtxArgs = {
   args: CreateCurrencyArgsChain;
@@ -43,6 +43,7 @@ export function createCreateCurrencyCtx(
         payer: args.payer,
         vault: VAULT,
         sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        tokenMetadataProgram: METADATA_PROGRAM_ID,
         hiveControlProgram: HIVECONTROL_PROGRAM_ID,
       },
       {

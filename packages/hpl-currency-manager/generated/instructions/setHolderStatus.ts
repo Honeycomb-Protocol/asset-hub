@@ -37,6 +37,7 @@ export const setHolderStatusStruct = new beet.BeetArgsStruct<
  * Accounts required by the _setHolderStatus_ instruction
  *
  * @property [_writable_] holderAccount
+ * @property [_writable_] tokenAccount
  * @property [**signer**] authority
  * @category Instructions
  * @category SetHolderStatus
@@ -44,6 +45,7 @@ export const setHolderStatusStruct = new beet.BeetArgsStruct<
  */
 export type SetHolderStatusInstructionAccounts = {
   holderAccount: web3.PublicKey
+  tokenAccount: web3.PublicKey
   authority: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -74,6 +76,11 @@ export function createSetHolderStatusInstruction(
   const keys: web3.AccountMeta[] = [
     {
       pubkey: accounts.holderAccount,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenAccount,
       isWritable: true,
       isSigner: false,
     },

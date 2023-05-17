@@ -5,6 +5,7 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
+import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 
@@ -22,15 +23,22 @@ export const revokeDelegateStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _revokeDelegate_ instruction
  *
- * @property [_writable_] holderAccount
+ * @property [] currency
+ * @property [] mint
+ * @property [] holderAccount
+ * @property [_writable_] tokenAccount
  * @property [**signer**] authority
  * @category Instructions
  * @category RevokeDelegate
  * @category generated
  */
 export type RevokeDelegateInstructionAccounts = {
+  currency: web3.PublicKey
+  mint: web3.PublicKey
   holderAccount: web3.PublicKey
+  tokenAccount: web3.PublicKey
   authority: web3.PublicKey
+  tokenProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -55,7 +63,22 @@ export function createRevokeDelegateInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.currency,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.mint,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.holderAccount,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenAccount,
       isWritable: true,
       isSigner: false,
     },
@@ -63,6 +86,11 @@ export function createRevokeDelegateInstruction(
       pubkey: accounts.authority,
       isWritable: false,
       isSigner: true,
+    },
+    {
+      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
     },
   ]
 

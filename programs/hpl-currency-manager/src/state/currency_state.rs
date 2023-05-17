@@ -16,7 +16,7 @@ pub struct Currency {
     pub currency_type: CurrencyType,
 }
 impl Default for Currency {
-    const LEN: usize = 8 + 113;
+    const LEN: usize = 8 + 66;
 
     fn set_defaults(&mut self) {
         self.bump = 0;

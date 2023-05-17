@@ -7,4 +7,7 @@ pub enum ErrorCode {
 
     #[msg("You are not authorized to perform this action")]
     Unauthorized,
+
+    #[msg("The holder account is currrently Inactive")]
+    InactiveHolder,
 }

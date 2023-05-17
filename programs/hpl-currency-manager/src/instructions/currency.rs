@@ -1,9 +1,11 @@
 use {
-    crate::state::*,
-    anchor_lang::prelude::*,
-    anchor_spl::token::{
-        self, Approve, FreezeAccount, Mint, MintTo, Revoke, ThawAccount, Token, TokenAccount,
+    crate::{
+        errors::ErrorCode,
+        state::*,
+        utils::{post_actions, pre_actions},
     },
+    anchor_lang::prelude::*,
+    anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount},
     hpl_hive_control::{
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
@@ -66,6 +68,9 @@ pub struct CreateCurrency<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub sysvar_instructions: AccountInfo<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = mpl_token_metadata::ID)]
+    pub token_metadata_program: AccountInfo<'info>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
     pub hive_control_program: Program<'info, HplHiveControl>,
@@ -179,33 +184,16 @@ pub struct MintCurrency<'info> {
 
 /// mint currency
 pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
-    if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
-        let holder_seeds = &[
-            b"holder_account",
-            ctx.accounts.holder_account.token_account.as_ref(),
-            &[ctx.accounts.holder_account.bump],
-        ];
-        let holder_signer = &[&holder_seeds[..]];
-
-        token::thaw_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                account: ctx.accounts.token_account.to_account_info(),
-                mint: ctx.accounts.mint.to_account_info(),
-                authority: ctx.accounts.holder_account.to_account_info(),
-            },
-            holder_signer,
-        ))?;
-
-        token::revoke(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            Revoke {
-                source: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.holder_account.to_account_info(),
-            },
-            holder_signer,
-        ))?;
+    if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
     }
+
+    pre_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
 
     let currency_seeds = &[
         b"currency".as_ref(),
@@ -227,36 +215,12 @@ pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
         amount,
     )?;
 
-    if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
-        let holder_seeds = &[
-            b"holder_account",
-            ctx.accounts.holder_account.token_account.as_ref(),
-            &[ctx.accounts.holder_account.bump],
-        ];
-        let holder_signer = &[&holder_seeds[..]];
-
-        token::approve(
-            CpiContext::new(
-                ctx.accounts.token_program.to_account_info(),
-                Approve {
-                    delegate: ctx.accounts.holder_account.to_account_info(),
-                    to: ctx.accounts.token_account.to_account_info(),
-                    authority: ctx.accounts.authority.to_account_info(),
-                },
-            ),
-            ctx.accounts.token_account.amount,
-        )?;
-
-        token::freeze_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            FreezeAccount {
-                mint: ctx.accounts.mint.to_account_info(),
-                account: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.authority.to_account_info(),
-            },
-            holder_signer,
-        ))?;
-    }
+    post_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
 
     Ok(())
 }

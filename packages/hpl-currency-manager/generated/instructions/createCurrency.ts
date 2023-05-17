@@ -49,6 +49,7 @@ export const createCurrencyStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] sysvarInstructions
+ * @property [] tokenMetadataProgram
  * @property [] hiveControlProgram
  * @category Instructions
  * @category CreateCurrency
@@ -65,6 +66,7 @@ export type CreateCurrencyInstructionAccounts = {
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   sysvarInstructions: web3.PublicKey
+  tokenMetadataProgram: web3.PublicKey
   tokenProgram?: web3.PublicKey
   hiveControlProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -150,6 +152,11 @@ export function createCreateCurrencyInstruction(
   })
   keys.push({
     pubkey: accounts.sysvarInstructions,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenMetadataProgram,
     isWritable: false,
     isSigner: false,
   })

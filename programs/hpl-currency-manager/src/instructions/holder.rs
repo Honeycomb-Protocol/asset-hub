@@ -1,10 +1,12 @@
 use {
-    crate::{errors::ErrorCode, id, state::*},
-    anchor_lang::prelude::*,
-    anchor_spl::token::{
-        self, Approve, Burn, FreezeAccount, Mint, Revoke, ThawAccount, Token, TokenAccount,
-        Transfer,
+    crate::{
+        errors::ErrorCode,
+        id,
+        state::*,
+        utils::{post_actions, pre_actions},
     },
+    anchor_lang::prelude::*,
+    anchor_spl::token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
     hpl_utils::traits::Default,
 };
 
@@ -76,36 +78,12 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     holder_account.owner = ctx.accounts.owner.key();
     holder_account.token_account = ctx.accounts.token_account.key();
 
-    if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
-        let holder_seeds = &[
-            b"holder_account",
-            holder_account.token_account.as_ref(),
-            &[holder_account.bump],
-        ];
-        let holder_signer = &[&holder_seeds[..]];
-
-        token::approve(
-            CpiContext::new(
-                ctx.accounts.token_program.to_account_info(),
-                Approve {
-                    delegate: holder_account.to_account_info(),
-                    to: ctx.accounts.token_account.to_account_info(),
-                    authority: ctx.accounts.owner.to_account_info(),
-                },
-            ),
-            ctx.accounts.token_account.amount,
-        )?;
-
-        token::freeze_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            FreezeAccount {
-                mint: ctx.accounts.mint.to_account_info(),
-                account: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.owner.to_account_info(),
-            },
-            holder_signer,
-        ))?;
-    }
+    post_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
 
     Ok(())
 }
@@ -137,77 +115,58 @@ pub struct BurnCurrency<'info> {
 
 /// Burn currency
 pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
-    if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
-        let holder_seeds = &[
-            b"holder_account",
-            ctx.accounts.holder_account.token_account.as_ref(),
-            &[ctx.accounts.holder_account.bump],
-        ];
-        let holder_signer = &[&holder_seeds[..]];
-
-        token::thaw_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                account: ctx.accounts.token_account.to_account_info(),
-                mint: ctx.accounts.mint.to_account_info(),
-                authority: ctx.accounts.holder_account.to_account_info(),
-            },
-            holder_signer,
-        ))?;
-
-        token::revoke(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            Revoke {
-                source: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.holder_account.to_account_info(),
-            },
-            holder_signer,
-        ))?;
+    if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
     }
 
-    token::burn(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            Burn {
-                mint: ctx.accounts.mint.to_account_info(),
-                from: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.owner.to_account_info(),
-            },
-        ),
-        amount,
+    pre_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
     )?;
 
-    if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
+    if ctx.accounts.currency.currency_type == CurrencyType::Custodial {
         let holder_seeds = &[
             b"holder_account",
-            ctx.accounts.holder_account.token_account.as_ref(),
+            ctx.accounts.holder_account.owner.as_ref(),
+            ctx.accounts.currency.mint.as_ref(),
             &[ctx.accounts.holder_account.bump],
         ];
         let holder_signer = &[&holder_seeds[..]];
 
-        token::approve(
+        token::burn(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                Burn {
+                    mint: ctx.accounts.mint.to_account_info(),
+                    from: ctx.accounts.token_account.to_account_info(),
+                    authority: ctx.accounts.holder_account.to_account_info(),
+                },
+                holder_signer,
+            ),
+            amount,
+        )?;
+    } else {
+        token::burn(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
-                Approve {
-                    delegate: ctx.accounts.holder_account.to_account_info(),
-                    to: ctx.accounts.token_account.to_account_info(),
+                Burn {
+                    mint: ctx.accounts.mint.to_account_info(),
+                    from: ctx.accounts.token_account.to_account_info(),
                     authority: ctx.accounts.owner.to_account_info(),
                 },
             ),
-            ctx.accounts.token_account.amount,
+            amount,
         )?;
-
-        token::freeze_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            FreezeAccount {
-                mint: ctx.accounts.mint.to_account_info(),
-                account: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.owner.to_account_info(),
-            },
-            holder_signer,
-        ))?;
     }
 
+    post_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
     Ok(())
 }
 
@@ -231,7 +190,7 @@ pub struct TransferCurrency<'info> {
     pub sender_token_account: Account<'info, TokenAccount>,
 
     /// Reciever Holder account
-    #[account(has_one = currency, has_one = owner, constraint = receiver_holder_account.token_account == receiver_token_account.key())]
+    #[account(has_one = currency, constraint = receiver_holder_account.token_account == receiver_token_account.key())]
     pub receiver_holder_account: Account<'info, HolderAccount>,
 
     /// Receiver Token account holding the currency
@@ -246,117 +205,217 @@ pub struct TransferCurrency<'info> {
 
 /// Transger currency
 pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
-    if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
+    if ctx.accounts.sender_holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
+    if ctx.accounts.receiver_holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
+    pre_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.sender_token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
+
+    pre_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.receiver_token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
+
+    if ctx.accounts.currency.currency_type == CurrencyType::Custodial {
         let holder_seeds = &[
             b"holder_account",
-            ctx.accounts.sender_holder_account.token_account.as_ref(),
+            ctx.accounts.sender_holder_account.owner.as_ref(),
+            ctx.accounts.currency.mint.as_ref(),
             &[ctx.accounts.sender_holder_account.bump],
         ];
         let holder_signer = &[&holder_seeds[..]];
 
-        token::thaw_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                account: ctx.accounts.sender_token_account.to_account_info(),
-                mint: ctx.accounts.mint.to_account_info(),
-                authority: ctx.accounts.sender_holder_account.to_account_info(),
-            },
-            holder_signer,
-        ))?;
-
-        token::revoke(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            Revoke {
-                source: ctx.accounts.sender_token_account.to_account_info(),
-                authority: ctx.accounts.sender_holder_account.to_account_info(),
-            },
-            holder_signer,
-        ))?;
+        token::transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                Transfer {
+                    from: ctx.accounts.sender_token_account.to_account_info(),
+                    to: ctx.accounts.receiver_token_account.to_account_info(),
+                    authority: ctx.accounts.sender_holder_account.to_account_info(),
+                },
+                holder_signer,
+            ),
+            amount,
+        )?;
+    } else {
+        token::transfer(
+            CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                Transfer {
+                    from: ctx.accounts.sender_token_account.to_account_info(),
+                    to: ctx.accounts.receiver_token_account.to_account_info(),
+                    authority: ctx.accounts.owner.to_account_info(),
+                },
+            ),
+            amount,
+        )?;
     }
 
-    token::transfer(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            Transfer {
-                from: ctx.accounts.sender_token_account.to_account_info(),
-                to: ctx.accounts.receiver_token_account.to_account_info(),
-                authority: ctx.accounts.owner.to_account_info(),
-            },
-        ),
-        amount,
+    post_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.sender_token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
     )?;
 
-    if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
+    post_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.receiver_token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
+    Ok(())
+}
+
+/// Accounts used in approve currency instruction
+#[derive(Accounts)]
+pub struct ApproveDelegate<'info> {
+    /// Currency account
+    #[account(has_one = mint)]
+    pub currency: Account<'info, Currency>,
+
+    /// Currency mint
+    #[account()]
+    pub mint: Account<'info, Mint>,
+
+    /// Holder account
+    #[account(has_one = currency, has_one = token_account, has_one = owner)]
+    pub holder_account: Account<'info, HolderAccount>,
+
+    /// Token account holding the currency
+    #[account(mut)]
+    pub token_account: Account<'info, TokenAccount>,
+
+    /// The delegate authority account
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub delegate: AccountInfo<'info>,
+
+    /// The wallet that holds the authority over the project
+    pub owner: Signer<'info>,
+
+    pub token_program: Program<'info, Token>,
+}
+
+/// Approve currency
+pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()> {
+    if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
+    pre_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
+
+    if ctx.accounts.currency.currency_type == CurrencyType::Custodial {
         let holder_seeds = &[
             b"holder_account",
-            ctx.accounts.sender_holder_account.token_account.as_ref(),
-            &[ctx.accounts.sender_holder_account.bump],
+            ctx.accounts.holder_account.owner.as_ref(),
+            ctx.accounts.currency.mint.as_ref(),
+            &[ctx.accounts.holder_account.bump],
         ];
         let holder_signer = &[&holder_seeds[..]];
 
         token::approve(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                Approve {
+                    to: ctx.accounts.token_account.to_account_info(),
+                    delegate: ctx.accounts.delegate.to_account_info(),
+                    authority: ctx.accounts.holder_account.to_account_info(),
+                },
+                holder_signer,
+            ),
+            amount,
+        )?;
+    } else {
+        token::approve(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
                 Approve {
-                    delegate: ctx.accounts.sender_holder_account.to_account_info(),
-                    to: ctx.accounts.sender_token_account.to_account_info(),
+                    to: ctx.accounts.token_account.to_account_info(),
+                    delegate: ctx.accounts.delegate.to_account_info(),
                     authority: ctx.accounts.owner.to_account_info(),
                 },
             ),
-            ctx.accounts.sender_token_account.amount,
+            amount,
         )?;
-
-        token::freeze_account(CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            FreezeAccount {
-                mint: ctx.accounts.mint.to_account_info(),
-                account: ctx.accounts.sender_token_account.to_account_info(),
-                authority: ctx.accounts.owner.to_account_info(),
-            },
-            holder_signer,
-        ))?;
     }
 
-    Ok(())
-}
-
-/// Accounts used in approve delegate instruction
-#[derive(Accounts)]
-pub struct ApproveDelegate<'info> {
-    /// Holder account
-    #[account(mut, has_one = owner)]
-    pub holder_account: Account<'info, HolderAccount>,
-
-    /// Delegate authority
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub delegate: AccountInfo<'info>,
-
-    /// The wallet that will own the token_account
-    pub owner: Signer<'info>,
-}
-
-/// Approve Delegate
-pub fn approve_delegate(ctx: Context<ApproveDelegate>) -> Result<()> {
-    let holder_account = &mut ctx.accounts.holder_account;
-    holder_account.delegate = Some(ctx.accounts.delegate.key());
+    post_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
     Ok(())
 }
 
 /// Accounts used in revoke delegate instruction
 #[derive(Accounts)]
 pub struct RevokeDelegate<'info> {
+    /// Currency account
+    #[account(has_one = mint)]
+    pub currency: Account<'info, Currency>,
+
+    /// Currency mint
+    #[account()]
+    pub mint: Account<'info, Mint>,
+
     /// Holder account
-    #[account(mut, constraint = holder_account.delegate.is_some() && holder_account.delegate.unwrap() == authority.key())]
+    #[account(has_one = currency, has_one = token_account)]
     pub holder_account: Account<'info, HolderAccount>,
 
-    /// The wallet that will own the token_account
+    /// Token account holding the currency
+    #[account(mut)]
+    pub token_account: Account<'info, TokenAccount>,
+
+    /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
+
+    pub token_program: Program<'info, Token>,
 }
 
-/// Revoke Delegate
+/// Approve currency
 pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
-    let holder_account = &mut ctx.accounts.holder_account;
-    holder_account.delegate = None;
+    if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
+    pre_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
+
+    token::revoke(CpiContext::new(
+        ctx.accounts.token_program.to_account_info(),
+        Revoke {
+            source: ctx.accounts.token_account.to_account_info(),
+            authority: ctx.accounts.authority.to_account_info(),
+        },
+    ))?;
+
+    post_actions(
+        &ctx.accounts.currency,
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.token_account.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+    )?;
     Ok(())
 }
 
@@ -364,8 +423,12 @@ pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
 #[derive(Accounts)]
 pub struct SetHolderStatus<'info> {
     /// Holder account
-    #[account(mut)]
+    #[account(mut, has_one = token_account)]
     pub holder_account: Account<'info, HolderAccount>,
+
+    /// Holder account
+    #[account(mut)]
+    pub token_account: Account<'info, TokenAccount>,
 
     /// The wallet that will own the token_account
     pub authority: Signer<'info>,
@@ -375,8 +438,8 @@ pub struct SetHolderStatus<'info> {
 pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
 
-    if holder_account.delegate.is_some() {
-        if holder_account.delegate.unwrap() != ctx.accounts.authority.key() {
+    if ctx.accounts.token_account.delegate.is_some() {
+        if ctx.accounts.token_account.delegate.unwrap() != ctx.accounts.authority.key() {
             return Err(ErrorCode::Unauthorized.into());
         }
     } else if holder_account.owner != ctx.accounts.authority.key() {

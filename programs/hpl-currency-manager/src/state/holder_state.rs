@@ -12,20 +12,17 @@ pub struct HolderAccount {
     pub owner: Pubkey,
     /// The token account that holds the currency.
     pub token_account: Pubkey,
-    /// Delegate authority for this account
-    pub delegate: Option<Pubkey>,
     /// Holder status
     pub status: HolderStatus,
 }
 impl Default for HolderAccount {
-    const LEN: usize = 8 + 96;
+    const LEN: usize = 8 + 131;
 
     fn set_defaults(&mut self) {
         self.bump = 0;
         self.currency = Pubkey::default();
         self.owner = Pubkey::default();
         self.token_account = Pubkey::default();
-        self.delegate = None;
         self.status = HolderStatus::Active;
     }
 }

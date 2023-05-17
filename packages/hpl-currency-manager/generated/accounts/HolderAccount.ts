@@ -20,7 +20,6 @@ export type HolderAccountArgs = {
   currency: web3.PublicKey
   owner: web3.PublicKey
   tokenAccount: web3.PublicKey
-  delegate: beet.COption<web3.PublicKey>
   status: HolderStatus
 }
 
@@ -38,7 +37,6 @@ export class HolderAccount implements HolderAccountArgs {
     readonly currency: web3.PublicKey,
     readonly owner: web3.PublicKey,
     readonly tokenAccount: web3.PublicKey,
-    readonly delegate: beet.COption<web3.PublicKey>,
     readonly status: HolderStatus
   ) {}
 
@@ -51,7 +49,6 @@ export class HolderAccount implements HolderAccountArgs {
       args.currency,
       args.owner,
       args.tokenAccount,
-      args.delegate,
       args.status
     )
   }
@@ -123,36 +120,34 @@ export class HolderAccount implements HolderAccountArgs {
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link HolderAccount} for the provided args.
-   *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
+   * {@link HolderAccount}
    */
-  static byteSize(args: HolderAccountArgs) {
-    const instance = HolderAccount.fromArgs(args)
-    return holderAccountBeet.toFixedFromValue({
-      accountDiscriminator: holderAccountDiscriminator,
-      ...instance,
-    }).byteSize
+  static get byteSize() {
+    return holderAccountBeet.byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
    * {@link HolderAccount} data from rent
    *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
    * @param connection used to retrieve the rent exemption information
    */
   static async getMinimumBalanceForRentExemption(
-    args: HolderAccountArgs,
     connection: web3.Connection,
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      HolderAccount.byteSize(args),
+      HolderAccount.byteSize,
       commitment
     )
+  }
+
+  /**
+   * Determines if the provided {@link Buffer} has the correct byte size to
+   * hold {@link HolderAccount} data.
+   */
+  static hasCorrectByteSize(buf: Buffer, offset = 0) {
+    return buf.byteLength - offset === HolderAccount.byteSize
   }
 
   /**
@@ -165,7 +160,6 @@ export class HolderAccount implements HolderAccountArgs {
       currency: this.currency.toBase58(),
       owner: this.owner.toBase58(),
       tokenAccount: this.tokenAccount.toBase58(),
-      delegate: this.delegate,
       status: 'HolderStatus.' + HolderStatus[this.status],
     }
   }
@@ -175,7 +169,7 @@ export class HolderAccount implements HolderAccountArgs {
  * @category Accounts
  * @category generated
  */
-export const holderAccountBeet = new beet.FixableBeetStruct<
+export const holderAccountBeet = new beet.BeetStruct<
   HolderAccount,
   HolderAccountArgs & {
     accountDiscriminator: number[] /* size: 8 */
@@ -187,7 +181,6 @@ export const holderAccountBeet = new beet.FixableBeetStruct<
     ['currency', beetSolana.publicKey],
     ['owner', beetSolana.publicKey],
     ['tokenAccount', beetSolana.publicKey],
-    ['delegate', beet.coption(beetSolana.publicKey)],
     ['status', holderStatusBeet],
   ],
   HolderAccount.fromArgs,

@@ -9,8 +9,10 @@
   },
   "scripts": {
     "prepare": "husky install",
+    "postinstall": "node scripts/postinstall.js",
     "copyPackages": "copyfiles -u 1 packages/**/package.json dist/",
     "precommit": "node ./scripts/precommit.js && git add programs/**/Cargo.toml && git add Cargo.lock",
+    "prepush": "echo LFG",
     "publishall": "node ./scripts/publishall.js",
     "compile": "tsc",
     "postcompile": "yarn copyPackages",
@@ -18,11 +20,8 @@
     "build:sdk": "yarn solita && yarn compile",
     "build": "yarn build:program & yarn build:sdk",
     "deploy": "anchor deploy",
-    "build-deploy": "yarn build && yarn deploy",
-    "assembler": "ts-node ./scripts/index.ts assembler",
-    "assetmanager": "ts-node ./scripts/index.ts assetmanager",
-    "staking": "ts-node ./scripts/index.ts staking",
-    "postinstall": "node scripts/postinstall.js"
+    "test": "jest --verbose",
+    "build-deploy": "yarn build && yarn deploy"
   },
   "dependencies": {
     "@honeycomb-protocol/hive-control": "^0.0.98",
@@ -38,9 +37,13 @@
     "@metaplex-foundation/solita": "^0.19.3",
     "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.7",
+    "@types/jest": "^29.5.1",
     "copyfiles": "^2.4.1",
+    "dotenv": "^16.0.3",
     "husky": "^8.0.3",
+    "jest": "^29.5.0",
     "prettier": "^2.6.2",
+    "ts-jest": "^29.1.0",
     "typescript": "^4.3.5"
   }
 }

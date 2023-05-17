@@ -15,6 +15,7 @@ import { HplHolderAccount } from "../HplCurrency";
 type CreateSetHolderStatusCtxArgs = {
   status: HolderStatus;
   holderAccount: web3.PublicKey;
+  tokenAccount: web3.PublicKey;
   authority: web3.PublicKey;
   programId?: web3.PublicKey;
 };
@@ -27,6 +28,7 @@ export function createSetHolderStatusCtx(
     createSetHolderStatusInstruction(
       {
         holderAccount: args.holderAccount,
+        tokenAccount: args.tokenAccount,
         authority: args.authority,
       },
       {
@@ -51,6 +53,7 @@ export async function setHolderStatus(
   const ctx = createSetHolderStatusCtx({
     status: args.status,
     holderAccount: args.holderAccount.address,
+    tokenAccount: args.holderAccount.tokenAccount,
     authority: honeycomb.identity().publicKey,
     programId: args.programId,
   });

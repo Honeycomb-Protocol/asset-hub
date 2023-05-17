@@ -167,10 +167,6 @@ export class HplHolderAccount {
     return this._holderAccount.tokenAccount;
   }
 
-  public get delegate() {
-    return this._holderAccount.delegate;
-  }
-
   public get status() {
     return this._holderAccount.status;
   }
@@ -207,8 +203,9 @@ export class HplHolderAccount {
     });
   }
 
-  public approveDelegate(delegate: web3.PublicKey) {
+  public approveDelegate(amount: number, delegate: web3.PublicKey) {
     return approveDelegate(this.currency().honeycomb(), {
+      amount,
       delegate,
       holderAccount: this,
       programId: PROGRAM_ID,

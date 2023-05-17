@@ -78,6 +78,11 @@
           "isSigner": false
         },
         {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -402,11 +407,35 @@
       "name": "approveDelegate",
       "accounts": [
         {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
           "name": "holderAccount",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false,
           "docs": [
             "Holder account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account holding the currency"
           ]
         },
         {
@@ -414,7 +443,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Delegate authority"
+            "The delegate authority account"
           ]
         },
         {
@@ -422,21 +451,55 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that will own the token_account"
+            "The wallet that holds the authority over the project"
           ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "revokeDelegate",
       "accounts": [
         {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
           "name": "holderAccount",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false,
           "docs": [
             "Holder account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account holding the currency"
           ]
         },
         {
@@ -444,8 +507,13 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that will own the token_account"
+            "The wallet that holds the authority over the project"
           ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -455,6 +523,14 @@
       "accounts": [
         {
           "name": "holderAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -555,15 +631,6 @@
             "type": "publicKey"
           },
           {
-            "name": "delegate",
-            "docs": [
-              "Delegate authority for this account"
-            ],
-            "type": {
-              "option": "publicKey"
-            }
-          },
-          {
             "name": "status",
             "docs": [
               "Holder status"
@@ -653,6 +720,11 @@
       "code": 6001,
       "name": "Unauthorized",
       "msg": "You are not authorized to perform this action"
+    },
+    {
+      "code": 6002,
+      "name": "InactiveHolder",
+      "msg": "The holder account is currrently Inactive"
     }
   ],
   "metadata": {
