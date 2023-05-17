@@ -964,7 +964,7 @@ version = "0.0.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-hive-control 0.0.92",
+ "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
 ]
@@ -975,7 +975,7 @@ version = "0.0.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-hive-control 0.0.27",
+ "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
 ]
@@ -986,19 +986,9 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-hive-control 0.0.92",
+ "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
-]
-
-[[package]]
-name = "hpl-hive-control"
-version = "0.0.27"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8085aa78ac577f2eb6bd3822ee1a3d61a7e27c61ade82d166b701dbeecde91af"
-dependencies = [
- "anchor-lang",
- "hpl-utils",
 ]
 
 [[package]]

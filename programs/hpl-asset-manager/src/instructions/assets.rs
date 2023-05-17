@@ -182,7 +182,7 @@ pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<
         false,
         true,
         ctx.accounts.metadata.to_account_info(),
-        ctx.accounts.edition.to_account_info(),
+        Some(ctx.accounts.edition.to_account_info()),
         ctx.accounts.mint.to_account_info(),
         asset.to_account_info(),
         ctx.accounts.payer.to_account_info(),
