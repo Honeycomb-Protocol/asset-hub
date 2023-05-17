@@ -2180,5 +2180,11 @@
       "name": "InitialArtGenerated",
       "msg": "The initial generation of art is already complete"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz",
+    "origin": "anchor",
+    "binaryVersion": "0.26.0",
+    "libVersion": "0.26.0"
+  }
 }

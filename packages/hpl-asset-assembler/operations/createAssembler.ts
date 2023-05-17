@@ -76,10 +76,10 @@ export async function createAssembler(
   const wallet = honeycomb.identity();
   const ctx = createCreateAssemblerCtx({
     args: args.args,
-    project: honeycomb.projectAddress,
+    project: honeycomb.project().address,
     authority: wallet.publicKey,
     payer: wallet.publicKey,
-    delegateAuthority: wallet.getDelegateAuthority().delegateAuthorityAddress,
+    delegateAuthority: wallet.delegateAuthority().address,
     programId: args.programId,
   });
 

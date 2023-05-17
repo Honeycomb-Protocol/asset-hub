@@ -5,75 +5,73 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
+import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
-import {
-  BlockDefinitionValue,
-  blockDefinitionValueBeet,
-} from '../types/BlockDefinitionValue'
 
 /**
  * @category Instructions
- * @category CreateBlockDefinition
+ * @category MintCurrency
  * @category generated
  */
-export type CreateBlockDefinitionInstructionArgs = {
-  args: BlockDefinitionValue
-  proofIndex: number
+export type MintCurrencyInstructionArgs = {
+  amount: beet.bignum
 }
 /**
  * @category Instructions
- * @category CreateBlockDefinition
+ * @category MintCurrency
  * @category generated
  */
-export const createBlockDefinitionStruct = new beet.FixableBeetArgsStruct<
-  CreateBlockDefinitionInstructionArgs & {
+export const mintCurrencyStruct = new beet.BeetArgsStruct<
+  MintCurrencyInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', blockDefinitionValueBeet],
-    ['proofIndex', beet.u8],
+    ['amount', beet.u64],
   ],
-  'CreateBlockDefinitionInstructionArgs'
+  'MintCurrencyInstructionArgs'
 )
 /**
- * Accounts required by the _createBlockDefinition_ instruction
+ * Accounts required by the _mintCurrency_ instruction
  *
- * @property [] assembler
- * @property [_writable_] block
- * @property [_writable_] blockDefinition
- * @property [_writable_] blockDefinitionMint
+ * @property [] currency
+ * @property [] holderAccount
+ * @property [_writable_] mint
+ * @property [_writable_] tokenAccount
+ * @property [_writable_] project
+ * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
- * @property [] project
- * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
+ * @property [] hiveControlProgram
  * @category Instructions
- * @category CreateBlockDefinition
+ * @category MintCurrency
  * @category generated
  */
-export type CreateBlockDefinitionInstructionAccounts = {
-  assembler: web3.PublicKey
-  block: web3.PublicKey
-  blockDefinition: web3.PublicKey
-  blockDefinitionMint: web3.PublicKey
-  authority: web3.PublicKey
-  payer: web3.PublicKey
-  systemProgram?: web3.PublicKey
+export type MintCurrencyInstructionAccounts = {
+  currency: web3.PublicKey
+  holderAccount: web3.PublicKey
+  mint: web3.PublicKey
+  tokenAccount: web3.PublicKey
   project: web3.PublicKey
   delegateAuthority?: web3.PublicKey
+  authority: web3.PublicKey
+  payer: web3.PublicKey
   vault: web3.PublicKey
+  systemProgram?: web3.PublicKey
+  tokenProgram?: web3.PublicKey
+  hiveControlProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const createBlockDefinitionInstructionDiscriminator = [
-  84, 173, 223, 150, 100, 247, 106, 4,
+export const mintCurrencyInstructionDiscriminator = [
+  118, 52, 121, 137, 250, 38, 117, 62,
 ]
 
 /**
- * Creates a _CreateBlockDefinition_ instruction.
+ * Creates a _MintCurrency_ instruction.
  *
  * Optional accounts that are not provided will be omitted from the accounts
  * array passed with the instruction.
@@ -84,57 +82,42 @@ export const createBlockDefinitionInstructionDiscriminator = [
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CreateBlockDefinition
+ * @category MintCurrency
  * @category generated
  */
-export function createCreateBlockDefinitionInstruction(
-  accounts: CreateBlockDefinitionInstructionAccounts,
-  args: CreateBlockDefinitionInstructionArgs,
-  programId = new web3.PublicKey('Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz')
+export function createMintCurrencyInstruction(
+  accounts: MintCurrencyInstructionAccounts,
+  args: MintCurrencyInstructionArgs,
+  programId = new web3.PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
 ) {
-  const [data] = createBlockDefinitionStruct.serialize({
-    instructionDiscriminator: createBlockDefinitionInstructionDiscriminator,
+  const [data] = mintCurrencyStruct.serialize({
+    instructionDiscriminator: mintCurrencyInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.assembler,
+      pubkey: accounts.currency,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.block,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.blockDefinition,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.blockDefinitionMint,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.authority,
+      pubkey: accounts.holderAccount,
       isWritable: false,
-      isSigner: true,
+      isSigner: false,
     },
     {
-      pubkey: accounts.payer,
+      pubkey: accounts.mint,
       isWritable: true,
-      isSigner: true,
+      isSigner: false,
     },
     {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
+      pubkey: accounts.tokenAccount,
+      isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.project,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
   ]
@@ -147,8 +130,33 @@ export function createCreateBlockDefinitionInstruction(
     })
   }
   keys.push({
+    pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: true,
+    isSigner: true,
+  })
+  keys.push({
     pubkey: accounts.vault,
     isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControlProgram,
+    isWritable: false,
     isSigner: false,
   })
 

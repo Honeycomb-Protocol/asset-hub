@@ -133,14 +133,13 @@ type MintAssetArgs = {
 export async function mintAsset(honeycomb: Honeycomb, args: MintAssetArgs) {
   const ctx = await createMintAssetCtx(new Metaplex(honeycomb.connection), {
     amount: args.amount,
-    project: honeycomb.projectAddress,
+    project: honeycomb.project().address,
     assetManager: honeycomb.assetManager().assetManagerAddress,
     asset: args.asset.assetAddress,
     mint: args.asset.mintAddress,
     wallet: honeycomb.identity().publicKey,
     walletSigner: honeycomb.identity().signer,
-    delegateAuthority: honeycomb.identity().getDelegateAuthority()
-      .delegateAuthorityAddress,
+    delegateAuthority: honeycomb.identity().delegateAuthority().address,
     candyGuard: args.asset.candyGuard,
     checkAssociatedTokenAccount: true,
     group: args.group,

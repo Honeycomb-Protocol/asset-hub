@@ -73,13 +73,13 @@ export async function createBlockDefinition(
   const ctx = createCreateBlockDefinitionCtx(
     {
       args: args.args,
-      project: honeycomb.projectAddress,
+      project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
       block: args.block,
       blockDefinitionMint: args.blockDefinitionMint,
       authority: wallet.publicKey,
       payer: wallet.publicKey,
-      delegateAuthority: wallet.getDelegateAuthority().delegateAuthorityAddress,
+      delegateAuthority: wallet.delegateAuthority().address,
       programId: args.programId,
     },
     proofIndex

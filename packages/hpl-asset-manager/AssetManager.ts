@@ -24,9 +24,8 @@ type CreateAssetArgs = {
   candyGuardBuilder?: TransactionBuilder<CreateCandyGuardBuilderContext>;
 };
 
-export class AssetHubManager implements Module {
+export class AssetHubManager extends Module {
   readonly programId: web3.PublicKey = PROGRAM_ID;
-  private _honeycomb: Honeycomb;
   private _proofIndex: number;
   private _fetch: AssetManagerFetch;
   private _create: AssetManagerCreate;
@@ -37,6 +36,7 @@ export class AssetHubManager implements Module {
     readonly assetManagerAddress: web3.PublicKey,
     private _assetManager: AssetManager
   ) {
+    super();
     this._fetch = new AssetManagerFetch(this);
     this._create = new AssetManagerCreate(this);
   }
@@ -101,12 +101,14 @@ export class AssetHubManager implements Module {
   install(honeycomb: Honeycomb): Honeycomb {
     honeycomb.assetManager = () => this;
     this._honeycomb = honeycomb;
-    this._proofIndex = honeycomb.services.findIndex(
-      (service) =>
-        service.__kind === "AssetManager" &&
-        service.assetManagerId.toBase58() ===
-          this.assetManagerAddress.toBase58()
-    );
+    this._proofIndex = honeycomb
+      .project()
+      .services.findIndex(
+        (service) =>
+          service.__kind === "AssetManager" &&
+          service.assetManagerId.toBase58() ===
+            this.assetManagerAddress.toBase58()
+      );
     if (this._proofIndex === -1)
       throw new Error("AssetHubManager not found in honeycomb services");
     return honeycomb;

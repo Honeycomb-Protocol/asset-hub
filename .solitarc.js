@@ -3,7 +3,7 @@ const path = require("path");
 const createConfig = (name, programId) => {
 
   const packageName = "hpl-" + name;
-  const programName = "hpl_" + name;
+  const programName = "hpl_" + name.replaceAll(/-/g, "_");
 
   return {
     idlGenerator: "anchor",
@@ -43,7 +43,7 @@ const configs = {
   "currency-manager": createConfig("currency-manager", "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"),
 };
 
-const defaultProgram = Object.keys(configs)[0];
+const defaultProgram = "currency-manager" || Object.keys(configs)[0];
 const activeConfig =
   configs[process.env.SOLITA_HPL_PROGRAM || defaultProgram] ||
   configs[defaultProgram];

@@ -67,13 +67,12 @@ export async function setNftGenerated(
   const ctx = await createSetNftGeneratedCtx(
     {
       args: args.args,
-      project: honeycomb.projectAddress,
+      project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
       nftMint: args.nftMint,
       authority: honeycomb.identity().publicKey,
       payer: honeycomb.identity().publicKey,
-      delegateAuthority: honeycomb.identity().getDelegateAuthority()
-        .delegateAuthorityAddress,
+      delegateAuthority: honeycomb.identity().delegateAuthority().address,
       programId: args.programId,
     },
     proofIndex

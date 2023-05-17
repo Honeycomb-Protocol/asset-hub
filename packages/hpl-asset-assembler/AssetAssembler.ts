@@ -67,9 +67,8 @@ type CreateBlockDefinitionArgs = {
   mint: web3.PublicKey;
 };
 
-export class AssetAssembler implements Module {
+export class AssetAssembler extends Module {
   readonly programId: web3.PublicKey = PROGRAM_ID;
-  private _honeycomb: Honeycomb;
   private _proofIndex: number;
   private _fetch: AssetAssemblerFetch;
   private _create: AssetAssemblerCreate;
@@ -95,6 +94,8 @@ export class AssetAssembler implements Module {
     readonly assemblerAddress: web3.PublicKey,
     private _assembler: Assembler
   ) {
+    super();
+
     this.project = _assembler.project;
     this.collection = _assembler.collection;
     this.collectionName = _assembler.collectionName;
@@ -225,11 +226,13 @@ export class AssetAssembler implements Module {
   install(honeycomb: Honeycomb): Honeycomb {
     honeycomb.assembler = () => this;
     this._honeycomb = honeycomb;
-    this._proofIndex = honeycomb.services.findIndex(
-      (service) =>
-        service.__kind === "Assembler" &&
-        service.assemblerId.toBase58() === this.assemblerAddress.toBase58()
-    );
+    this._proofIndex = honeycomb
+      .project()
+      .services.findIndex(
+        (service) =>
+          service.__kind === "Assembler" &&
+          service.assemblerId.toBase58() === this.assemblerAddress.toBase58()
+      );
     if (this._proofIndex === -1)
       throw new Error("Assembler not found in honeycomb services");
     return honeycomb;

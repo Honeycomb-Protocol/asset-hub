@@ -30,17 +30,17 @@ export const addBlockStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] tokenMint
  * @property [_writable_] tokenAccount
  * @property [_writable_] tokenMetadata
- * @property [] tokenEdition
- * @property [_writable_] tokenRecord
- * @property [_writable_] depositAccount
- * @property [_writable_] depositTokenRecord
+ * @property [] tokenEdition (optional)
+ * @property [_writable_] tokenRecord (optional)
+ * @property [_writable_] depositAccount (optional)
+ * @property [_writable_] depositTokenRecord (optional)
  * @property [_writable_, **signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [] associatedTokenProgram
  * @property [] tokenMetadataProgram
  * @property [] sysvarInstructions
  * @property [] project
- * @property [] delegateAuthority
+ * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
  * @category Instructions
  * @category AddBlock
@@ -54,10 +54,10 @@ export type AddBlockInstructionAccounts = {
   tokenMint: web3.PublicKey
   tokenAccount: web3.PublicKey
   tokenMetadata: web3.PublicKey
-  tokenEdition: web3.PublicKey
-  tokenRecord: web3.PublicKey
-  depositAccount: web3.PublicKey
-  depositTokenRecord: web3.PublicKey
+  tokenEdition?: web3.PublicKey
+  tokenRecord?: web3.PublicKey
+  depositAccount?: web3.PublicKey
+  depositTokenRecord?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -67,7 +67,7 @@ export type AddBlockInstructionAccounts = {
   sysvarInstructions: web3.PublicKey
   rent?: web3.PublicKey
   project: web3.PublicKey
-  delegateAuthority: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -78,6 +78,11 @@ export const addBlockInstructionDiscriminator = [
 
 /**
  * Creates a _AddBlock_ instruction.
+ *
+ * Optional accounts that are not provided will be omitted from the accounts
+ * array passed with the instruction.
+ * An optional account that is set cannot follow an optional account that is unset.
+ * Otherwise an Error is raised.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @category Instructions
@@ -127,82 +132,122 @@ export function createAddBlockInstruction(
       isWritable: true,
       isSigner: false,
     },
-    {
+  ]
+
+  if (accounts.tokenEdition != null) {
+    keys.push({
       pubkey: accounts.tokenEdition,
       isWritable: false,
       isSigner: false,
-    },
-    {
+    })
+  }
+  if (accounts.tokenRecord != null) {
+    if (accounts.tokenEdition == null) {
+      throw new Error(
+        "When providing 'tokenRecord' then 'accounts.tokenEdition' need(s) to be provided as well."
+      )
+    }
+    keys.push({
       pubkey: accounts.tokenRecord,
       isWritable: true,
       isSigner: false,
-    },
-    {
+    })
+  }
+  if (accounts.depositAccount != null) {
+    if (accounts.tokenEdition == null || accounts.tokenRecord == null) {
+      throw new Error(
+        "When providing 'depositAccount' then 'accounts.tokenEdition', 'accounts.tokenRecord' need(s) to be provided as well."
+      )
+    }
+    keys.push({
       pubkey: accounts.depositAccount,
       isWritable: true,
       isSigner: false,
-    },
-    {
+    })
+  }
+  if (accounts.depositTokenRecord != null) {
+    if (
+      accounts.tokenEdition == null ||
+      accounts.tokenRecord == null ||
+      accounts.depositAccount == null
+    ) {
+      throw new Error(
+        "When providing 'depositTokenRecord' then 'accounts.tokenEdition', 'accounts.tokenRecord', 'accounts.depositAccount' need(s) to be provided as well."
+      )
+    }
+    keys.push({
       pubkey: accounts.depositTokenRecord,
       isWritable: true,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.authority,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.associatedTokenProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenMetadataProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.sysvarInstructions,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
+    })
+  }
+  keys.push({
+    pubkey: accounts.authority,
+    isWritable: true,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: true,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.associatedTokenProgram,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenMetadataProgram,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.sysvarInstructions,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.project,
+    isWritable: false,
+    isSigner: false,
+  })
+  if (accounts.delegateAuthority != null) {
+    if (
+      accounts.tokenEdition == null ||
+      accounts.tokenRecord == null ||
+      accounts.depositAccount == null ||
+      accounts.depositTokenRecord == null
+    ) {
+      throw new Error(
+        "When providing 'delegateAuthority' then 'accounts.tokenEdition', 'accounts.tokenRecord', 'accounts.depositAccount', 'accounts.depositTokenRecord' need(s) to be provided as well."
+      )
+    }
+    keys.push({
       pubkey: accounts.delegateAuthority,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.vault,
-      isWritable: true,
-      isSigner: false,
-    },
-  ]
+    })
+  }
+  keys.push({
+    pubkey: accounts.vault,
+    isWritable: true,
+    isSigner: false,
+  })
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {
