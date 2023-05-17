@@ -1,5 +1,5 @@
 use {
-    crate::{id, state::*},
+    crate::{errors::ErrorCode, id, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{
         self, Approve, Burn, FreezeAccount, Mint, Revoke, ThawAccount, Token, TokenAccount,
@@ -8,7 +8,7 @@ use {
     hpl_utils::traits::Default,
 };
 
-/// Accounts used in create staking_pool instruction
+/// Accounts used in create create holder_account instruction
 #[derive(Accounts)]
 pub struct CreateHolderAccount<'info> {
     /// Currency account
@@ -65,7 +65,7 @@ pub struct CreateHolderAccount<'info> {
     pub sysvar_instructions: AccountInfo<'info>,
 }
 
-/// Create a new currency
+/// Create a holder account
 pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
 
@@ -209,7 +209,7 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
     Ok(())
 }
 
-/// Accounts used in burn currency instruction
+/// Accounts used in transfer currency instruction
 #[derive(Accounts)]
 pub struct TransferCurrency<'info> {
     /// Currency account
@@ -242,7 +242,7 @@ pub struct TransferCurrency<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-/// Burn currency
+/// Transger currency
 pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
     if ctx.accounts.currency.currency_type == CurrencyType::NonCustodial {
         let holder_seeds = &[
@@ -315,5 +315,72 @@ pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<
         ))?;
     }
 
+    Ok(())
+}
+
+/// Accounts used in approve delegate instruction
+#[derive(Accounts)]
+pub struct ApproveDelegate<'info> {
+    /// Holder account
+    #[account(mut, has_one = owner)]
+    pub holder_account: Account<'info, HolderAccount>,
+
+    /// Delegate authority
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub delegate: AccountInfo<'info>,
+
+    /// The wallet that will own the token_account
+    pub owner: Signer<'info>,
+}
+
+/// Approve Delegate
+pub fn approve_delegate(ctx: Context<ApproveDelegate>) -> Result<()> {
+    let holder_account = &mut ctx.accounts.holder_account;
+    holder_account.delegate = Some(ctx.accounts.delegate.key());
+    Ok(())
+}
+
+/// Accounts used in revoke delegate instruction
+#[derive(Accounts)]
+pub struct RevokeDelegate<'info> {
+    /// Holder account
+    #[account(mut, constraint = holder_account.delegate.is_some() && holder_account.delegate.unwrap() == authority.key())]
+    pub holder_account: Account<'info, HolderAccount>,
+
+    /// The wallet that will own the token_account
+    pub authority: Signer<'info>,
+}
+
+/// Revoke Delegate
+pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
+    let holder_account = &mut ctx.accounts.holder_account;
+    holder_account.delegate = None;
+    Ok(())
+}
+
+/// Accounts used in set holder status instruction
+#[derive(Accounts)]
+pub struct SetHolderStatus<'info> {
+    /// Holder account
+    #[account(mut)]
+    pub holder_account: Account<'info, HolderAccount>,
+
+    /// The wallet that will own the token_account
+    pub authority: Signer<'info>,
+}
+
+/// Set holder status
+pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
+    let holder_account = &mut ctx.accounts.holder_account;
+
+    if !((holder_account.delegate.is_some()
+        && holder_account.delegate.unwrap() == ctx.accounts.authority.key())
+        || (holder_account.delegate.is_none()
+            && holder_account.owner == ctx.accounts.authority.key()))
+    {
+        return Err(ErrorCode::Unauthorized.into());
+    }
+
+    holder_account.status = status;
     Ok(())
 }
