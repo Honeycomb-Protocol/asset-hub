@@ -40,7 +40,7 @@ const createConfig = (name, programId) => {
 const configs = {
   "asset-assembler": createConfig("asset-assembler", "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz"),
   "asset-manager": createConfig("asset-manager", "7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd"),
-  "currency-manager": createConfig("currency-manager", "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"),
+  "currency-manager": createConfig("currency-manager", "3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7"),
 };
 
 const defaultProgram = "currency-manager" || Object.keys(configs)[0];

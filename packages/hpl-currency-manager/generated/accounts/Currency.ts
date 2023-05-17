@@ -85,7 +85,7 @@ export class Currency implements CurrencyArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS'
+      '3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, currencyBeet)

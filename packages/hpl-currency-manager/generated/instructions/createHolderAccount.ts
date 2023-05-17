@@ -24,11 +24,11 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
  * Accounts required by the _createHolderAccount_ instruction
  *
  * @property [] currency
+ * @property [_writable_] holderAccount
  * @property [] mint
  * @property [_writable_] metadata
  * @property [_writable_] tokenAccount
- * @property [_writable_] holderAccount
- * @property [**signer**] owner
+ * @property [] owner
  * @property [_writable_, **signer**] payer
  * @property [] sysvarInstructions
  * @category Instructions
@@ -37,10 +37,10 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
  */
 export type CreateHolderAccountInstructionAccounts = {
   currency: web3.PublicKey
+  holderAccount: web3.PublicKey
   mint: web3.PublicKey
   metadata: web3.PublicKey
   tokenAccount: web3.PublicKey
-  holderAccount: web3.PublicKey
   owner: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -63,7 +63,7 @@ export const createHolderAccountInstructionDiscriminator = [
  */
 export function createCreateHolderAccountInstruction(
   accounts: CreateHolderAccountInstructionAccounts,
-  programId = new web3.PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
+  programId = new web3.PublicKey('3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7')
 ) {
   const [data] = createHolderAccountStruct.serialize({
     instructionDiscriminator: createHolderAccountInstructionDiscriminator,
@@ -72,6 +72,11 @@ export function createCreateHolderAccountInstruction(
     {
       pubkey: accounts.currency,
       isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.holderAccount,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -90,14 +95,9 @@ export function createCreateHolderAccountInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.holderAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.owner,
       isWritable: false,
-      isSigner: true,
+      isSigner: false,
     },
     {
       pubkey: accounts.payer,

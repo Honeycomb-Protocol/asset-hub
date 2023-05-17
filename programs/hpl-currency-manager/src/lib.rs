@@ -4,7 +4,7 @@ pub mod errors;
 pub mod instructions;
 pub mod state;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7");
 
 use {instructions::*, state::HolderStatus};
 

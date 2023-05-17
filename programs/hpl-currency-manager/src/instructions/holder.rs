@@ -15,6 +15,19 @@ pub struct CreateHolderAccount<'info> {
     #[account(has_one = mint)]
     pub currency: Account<'info, Currency>,
 
+    /// Holder account
+    #[account(
+        init, payer = payer,
+        space = HolderAccount::LEN,
+        seeds = [
+            b"holder_account",
+            owner.key().as_ref(),
+            mint.key().as_ref()
+        ],
+        bump
+    )]
+    pub holder_account: Account<'info, HolderAccount>,
+
     /// Currency mint
     #[account()]
     pub mint: Account<'info, Mint>,
@@ -39,20 +52,9 @@ pub struct CreateHolderAccount<'info> {
     )]
     pub token_account: Account<'info, TokenAccount>,
 
-    /// Holder account
-    #[account(
-      init, payer = payer,
-      space = HolderAccount::LEN,
-      seeds = [
-        b"holder_account",
-        token_account.key().as_ref()
-      ],
-      bump
-    )]
-    pub holder_account: Account<'info, HolderAccount>,
-
     /// The wallet that will own the token_account
-    pub owner: Signer<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub owner: AccountInfo<'info>,
 
     /// The wallet that pays for the rent
     #[account(mut)]
@@ -373,11 +375,11 @@ pub struct SetHolderStatus<'info> {
 pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
 
-    if !((holder_account.delegate.is_some()
-        && holder_account.delegate.unwrap() == ctx.accounts.authority.key())
-        || (holder_account.delegate.is_none()
-            && holder_account.owner == ctx.accounts.authority.key()))
-    {
+    if holder_account.delegate.is_some() {
+        if holder_account.delegate.unwrap() != ctx.accounts.authority.key() {
+            return Err(ErrorCode::Unauthorized.into());
+        }
+    } else if holder_account.owner != ctx.accounts.authority.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
