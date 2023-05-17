@@ -13,3 +13,4 @@ dist
 assembler.json
 *backup*
 deployments.json
+.env
