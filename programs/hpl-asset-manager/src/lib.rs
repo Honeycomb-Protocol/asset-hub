@@ -48,9 +48,9 @@ pub mod hpl_asset_manager {
         args: CreateAssetArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assets,
-            Some((proof_index as usize, ctx.accounts.asset_manager.key())),
+            Some((proof_index, ctx.accounts.asset_manager.key())),
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
             ctx.accounts.payer.to_account_info(),
@@ -63,7 +63,7 @@ pub mod hpl_asset_manager {
     }
 
     pub fn mint_asset(ctx: Context<MintAsset>, amount: u64) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate(
+        hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.public_high,
             None,
             &ctx.accounts.project,

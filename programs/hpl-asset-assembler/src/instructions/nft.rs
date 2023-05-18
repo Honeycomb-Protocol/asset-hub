@@ -422,13 +422,15 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
                 None,
+                None,
+                None,
             )?;
 
             hpl_utils::lock(
                 assembler.to_account_info(),
                 ctx.accounts.token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
-                ctx.accounts.authority.to_account_info(),
+                Some(ctx.accounts.authority.to_account_info()),
                 ctx.accounts.token_metadata.to_account_info(),
                 ctx.accounts.token_edition.clone(),
                 ctx.accounts.token_record.clone(),
@@ -436,6 +438,8 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 ctx.accounts.system_program.to_account_info(),
                 ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
+                None,
+                None,
                 Some(assembler_signer),
             )?;
         }
@@ -458,6 +462,8 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                     ctx.accounts.token_program.to_account_info(),
                     ctx.accounts.associated_token_program.to_account_info(),
                     ctx.accounts.sysvar_instructions.to_account_info(),
+                    None,
+                    None,
                     None,
                 )?;
             } else {
@@ -658,7 +664,7 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
             authorization_data: None,
         },
         ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.authority.to_account_info(),
+        Some(ctx.accounts.authority.to_account_info()),
         ctx.accounts.nft_metadata.to_account_info(),
         Some(ctx.accounts.nft_master_edition.to_account_info()),
         ctx.accounts.nft_token_record.clone(),
@@ -670,6 +676,8 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
         ctx.accounts.sysvar_instructions.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
         ctx.accounts.rent.to_account_info(),
+        None,
+        None,
         Some(assembler_signer),
     )?;
 
@@ -968,7 +976,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 assembler.to_account_info(),
                 token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
-                ctx.accounts.authority.to_account_info(),
+                Some(ctx.accounts.authority.to_account_info()),
                 ctx.accounts.token_metadata.to_account_info(),
                 ctx.accounts.token_edition.clone(),
                 ctx.accounts.token_record.clone(),
@@ -976,6 +984,8 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 ctx.accounts.system_program.to_account_info(),
                 ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
+                None,
+                None,
                 Some(assembler_signer),
             )?;
 
@@ -993,43 +1003,47 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 ctx.accounts.system_program.to_account_info(),
                 ctx.accounts.sysvar_instructions.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
+                None,
+                None,
                 Some(assembler_signer),
             )?;
         }
         AssemblingAction::TakeCustody => {
-            if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                hpl_utils::transfer(
-                    1 * 10u64.pow(token_mint.decimals.into()),
-                    deposit_account.to_account_info(),
-                    assembler.to_account_info(),
-                    ctx.accounts.token_account.to_account_info(),
-                    ctx.accounts.authority.to_account_info(),
-                    ctx.accounts.token_mint.to_account_info(),
-                    ctx.accounts.token_metadata.to_account_info(),
-                    ctx.accounts.token_edition.clone(),
-                    ctx.accounts.deposit_token_record.clone(),
-                    ctx.accounts.token_record.clone(),
-                    assembler.to_account_info(),
-                    ctx.accounts.payer.to_account_info(),
-                    ctx.accounts.system_program.to_account_info(),
-                    ctx.accounts.token_program.to_account_info(),
-                    ctx.accounts.associated_token_program.to_account_info(),
-                    ctx.accounts.sysvar_instructions.to_account_info(),
-                    Some(assembler_signer),
-                )?;
-
-                token::close_account(CpiContext::new_with_signer(
-                    ctx.accounts.token_program.to_account_info(),
-                    CloseAccount {
-                        account: deposit_account.to_account_info(),
-                        destination: ctx.accounts.authority.to_account_info(),
-                        authority: assembler.to_account_info(),
-                    },
-                    assembler_signer,
-                ))?;
-            } else {
+            if ctx.accounts.deposit_account.is_none() {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
             }
+            let deposit_account = &ctx.accounts.deposit_account.clone().unwrap();
+            hpl_utils::transfer(
+                1 * 10u64.pow(token_mint.decimals.into()),
+                deposit_account.to_account_info(),
+                assembler.to_account_info(),
+                ctx.accounts.token_account.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.token_mint.to_account_info(),
+                ctx.accounts.token_metadata.to_account_info(),
+                ctx.accounts.token_edition.clone(),
+                ctx.accounts.deposit_token_record.clone(),
+                ctx.accounts.token_record.clone(),
+                assembler.to_account_info(),
+                ctx.accounts.payer.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                ctx.accounts.associated_token_program.to_account_info(),
+                ctx.accounts.sysvar_instructions.to_account_info(),
+                None,
+                None,
+                Some(assembler_signer),
+            )?;
+
+            token::close_account(CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                CloseAccount {
+                    account: deposit_account.to_account_info(),
+                    destination: ctx.accounts.authority.to_account_info(),
+                    authority: assembler.to_account_info(),
+                },
+                assembler_signer,
+            ))?;
         }
     }
 

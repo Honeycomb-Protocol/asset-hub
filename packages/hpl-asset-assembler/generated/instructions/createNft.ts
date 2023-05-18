@@ -36,7 +36,7 @@ export const createNftStruct = new beet.BeetArgsStruct<{
  * @property [] tokenMetadataProgram
  * @property [] sysvarInstructions
  * @property [] project
- * @property [] delegateAuthority
+ * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
  * @category Instructions
  * @category CreateNft
@@ -59,7 +59,7 @@ export type CreateNftInstructionAccounts = {
   rent?: web3.PublicKey
   sysvarInstructions: web3.PublicKey
   project: web3.PublicKey
-  delegateAuthority: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -70,6 +70,11 @@ export const createNftInstructionDiscriminator = [
 
 /**
  * Creates a _CreateNft_ instruction.
+ *
+ * Optional accounts that are not provided will be omitted from the accounts
+ * array passed with the instruction.
+ * An optional account that is set cannot follow an optional account that is unset.
+ * Otherwise an Error is raised.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @category Instructions
@@ -164,17 +169,20 @@ export function createCreateNftInstruction(
       isWritable: false,
       isSigner: false,
     },
-    {
+  ]
+
+  if (accounts.delegateAuthority != null) {
+    keys.push({
       pubkey: accounts.delegateAuthority,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.vault,
-      isWritable: true,
-      isSigner: false,
-    },
-  ]
+    })
+  }
+  keys.push({
+    pubkey: accounts.vault,
+    isWritable: true,
+    isSigner: false,
+  })
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

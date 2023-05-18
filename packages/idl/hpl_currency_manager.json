@@ -1,0 +1,736 @@
+{
+  "version": "0.0.1",
+  "name": "hpl_currency_manager",
+  "instructions": [
+    {
+      "name": "createCurrency",
+      "accounts": [
+        {
+          "name": "currency",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency metadata"
+          ]
+        },
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "[Option] Delegate authority account containing permissions of the wallet for the project"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "hiveControlProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CreateCurrencyArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createHolderAccount",
+      "accounts": [
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "holderAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency metadata"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "token account holding the token"
+          ]
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The wallet that will own the token_account"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sysvarInstructions",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "mintCurrency",
+      "accounts": [
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "holderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account holding the currency"
+          ]
+        },
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "[Option] Delegate authority account containing permissions of the wallet for the project"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "hiveControlProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "burnCurrency",
+      "accounts": [
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "holderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account holding the currency"
+          ]
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transferCurrency",
+      "accounts": [
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "senderHolderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Sender Holder account"
+          ]
+        },
+        {
+          "name": "senderTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Sender Token account holding the currency"
+          ]
+        },
+        {
+          "name": "receiverHolderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Reciever Holder account"
+          ]
+        },
+        {
+          "name": "receiverTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Receiver Token account holding the currency"
+          ]
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "approveDelegate",
+      "accounts": [
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "holderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account holding the currency"
+          ]
+        },
+        {
+          "name": "delegate",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The delegate authority account"
+          ]
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "revokeDelegate",
+      "accounts": [
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "holderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account holding the currency"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setHolderStatus",
+      "accounts": [
+        {
+          "name": "holderAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Holder account"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that will own the token_account"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "status",
+          "type": {
+            "defined": "HolderStatus"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Currency",
+      "docs": [
+        "A currency is a project associated spl token.",
+        "It is used as in-game utility currency."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "project",
+            "docs": [
+              "The project this currency is associated with."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "docs": [
+              "The spl mint of the currency."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "currencyType",
+            "docs": [
+              "The type of currency."
+            ],
+            "type": {
+              "defined": "CurrencyType"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "HolderAccount",
+      "docs": [
+        "A holder is a middle man account between wallet and currency.",
+        "It contains detail about the token account that holds the currency"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "currency",
+            "docs": [
+              "The currency associated with this account"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "docs": [
+              "The owner of this account."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAccount",
+            "docs": [
+              "The token account that holds the currency."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "status",
+            "docs": [
+              "Holder status"
+            ],
+            "type": {
+              "defined": "HolderStatus"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateCurrencyArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "currencyType",
+            "type": {
+              "option": {
+                "defined": "CurrencyType"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CurrencyType",
+      "docs": [
+        "The type of currency.",
+        "Custodial currencies are held by the program for the user.",
+        "NonCustodial currencies are transfered to holders wallet."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Custodial"
+          },
+          {
+            "name": "NonCustodial"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HolderStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Inactive"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Overflow",
+      "msg": "Opertaion overflowed"
+    },
+    {
+      "code": 6001,
+      "name": "Unauthorized",
+      "msg": "You are not authorized to perform this action"
+    },
+    {
+      "code": 6002,
+      "name": "InactiveHolder",
+      "msg": "The holder account is currrently Inactive"
+    }
+  ],
+  "metadata": {
+    "address": "3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7",
+    "origin": "anchor",
+    "binaryVersion": "0.26.0",
+    "libVersion": "0.26.0"
+  }
+}

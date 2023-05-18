@@ -43,7 +43,7 @@ export const createBlockStruct = new beet.FixableBeetArgsStruct<
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [] project
- * @property [] delegateAuthority
+ * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
  * @category Instructions
  * @category CreateBlock
@@ -56,7 +56,7 @@ export type CreateBlockInstructionAccounts = {
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
   project: web3.PublicKey
-  delegateAuthority: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -67,6 +67,11 @@ export const createBlockInstructionDiscriminator = [
 
 /**
  * Creates a _CreateBlock_ instruction.
+ *
+ * Optional accounts that are not provided will be omitted from the accounts
+ * array passed with the instruction.
+ * An optional account that is set cannot follow an optional account that is unset.
+ * Otherwise an Error is raised.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
@@ -115,17 +120,20 @@ export function createCreateBlockInstruction(
       isWritable: false,
       isSigner: false,
     },
-    {
+  ]
+
+  if (accounts.delegateAuthority != null) {
+    keys.push({
       pubkey: accounts.delegateAuthority,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.vault,
-      isWritable: true,
-      isSigner: false,
-    },
-  ]
+    })
+  }
+  keys.push({
+    pubkey: accounts.vault,
+    isWritable: true,
+    isSigner: false,
+  })
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

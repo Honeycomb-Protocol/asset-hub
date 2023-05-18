@@ -169,7 +169,7 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
       const [blockDefinition] = getBlockDefinitionPda(block, attribute.mint);
 
       return createRemoveBlockCtx({
-        project: honeycomb.projectAddress,
+        project: honeycomb.project().address,
         assembler: honeycomb.assembler().assemblerAddress,
         nftMint: args.nft.mintAddress,
         block,
@@ -178,8 +178,7 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
         authority: honeycomb.identity().publicKey,
         payer: honeycomb.identity().publicKey,
         assemblingAction: honeycomb.assembler().assemblingAction,
-        delegateAuthority: honeycomb.identity().getDelegateAuthority()
-          .delegateAuthorityAddress,
+        delegateAuthority: honeycomb.identity().delegateAuthority().address,
         programId: args.programId,
       });
     })
@@ -187,14 +186,13 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
 
   ctxs.unshift(
     createBurnNFTCtx({
-      project: honeycomb.projectAddress,
+      project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
       nftMint: args.nft.mintAddress,
       uniqueConstraint,
       authority: honeycomb.identity().publicKey,
       payer: honeycomb.identity().publicKey,
-      delegateAuthority: honeycomb.identity().getDelegateAuthority()
-        .delegateAuthorityAddress,
+      delegateAuthority: honeycomb.identity().delegateAuthority().address,
       programId: args.programId,
     })
   );
@@ -224,14 +222,13 @@ export async function burnNft(honeycomb: Honeycomb, args: BurnNftArgs) {
   }
 
   const ctx = createBurnNFTCtx({
-    project: honeycomb.projectAddress,
+    project: honeycomb.project().address,
     assembler: honeycomb.assembler().assemblerAddress,
     nftMint: args.nft.mintAddress,
     authority: honeycomb.identity().publicKey,
     payer: honeycomb.identity().publicKey,
     uniqueConstraint,
-    delegateAuthority: honeycomb.identity().getDelegateAuthority()
-      .delegateAuthorityAddress,
+    delegateAuthority: honeycomb.identity().delegateAuthority().address,
     programId: args.programId,
   });
 
@@ -248,7 +245,7 @@ type RemoveBlockArgs = {
 };
 export async function removeBlock(honeycomb: Honeycomb, args: RemoveBlockArgs) {
   const ctx = createRemoveBlockCtx({
-    project: honeycomb.projectAddress,
+    project: honeycomb.project().address,
     assembler: honeycomb.assembler().assemblerAddress,
     nftMint: args.nft.mintAddress,
     block: args.blockDefinition.block,
@@ -256,8 +253,7 @@ export async function removeBlock(honeycomb: Honeycomb, args: RemoveBlockArgs) {
     tokenMint: args.blockDefinition.mint,
     authority: honeycomb.identity().publicKey,
     payer: honeycomb.identity().publicKey,
-    delegateAuthority: honeycomb.identity().getDelegateAuthority()
-      .delegateAuthorityAddress,
+    delegateAuthority: honeycomb.identity().delegateAuthority().address,
     assemblingAction: honeycomb.assembler().assemblingAction,
     programId: args.programId,
   });

@@ -29,13 +29,13 @@ export const burnNftStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] nftMetadata
  * @property [_writable_] nftMasterEdition
  * @property [_writable_] tokenAccount
- * @property [_writable_] uniqueConstraint
+ * @property [_writable_] uniqueConstraint (optional)
  * @property [**signer**] authority
  * @property [**signer**] payer
  * @property [] tokenMetadataProgram
  * @property [] sysvarInstructions
  * @property [] project
- * @property [] delegateAuthority
+ * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
  * @category Instructions
  * @category BurnNft
@@ -48,7 +48,7 @@ export type BurnNftInstructionAccounts = {
   nftMetadata: web3.PublicKey
   nftMasterEdition: web3.PublicKey
   tokenAccount: web3.PublicKey
-  uniqueConstraint: web3.PublicKey
+  uniqueConstraint?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -56,7 +56,7 @@ export type BurnNftInstructionAccounts = {
   tokenMetadataProgram: web3.PublicKey
   sysvarInstructions: web3.PublicKey
   project: web3.PublicKey
-  delegateAuthority: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -67,6 +67,11 @@ export const burnNftInstructionDiscriminator = [
 
 /**
  * Creates a _BurnNft_ instruction.
+ *
+ * Optional accounts that are not provided will be omitted from the accounts
+ * array passed with the instruction.
+ * An optional account that is set cannot follow an optional account that is unset.
+ * Otherwise an Error is raised.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @category Instructions
@@ -111,57 +116,67 @@ export function createBurnNftInstruction(
       isWritable: true,
       isSigner: false,
     },
-    {
+  ]
+
+  if (accounts.uniqueConstraint != null) {
+    keys.push({
       pubkey: accounts.uniqueConstraint,
       isWritable: true,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.authority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenMetadataProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.sysvarInstructions,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
+    })
+  }
+  keys.push({
+    pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenMetadataProgram,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.sysvarInstructions,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.project,
+    isWritable: false,
+    isSigner: false,
+  })
+  if (accounts.delegateAuthority != null) {
+    if (accounts.uniqueConstraint == null) {
+      throw new Error(
+        "When providing 'delegateAuthority' then 'accounts.uniqueConstraint' need(s) to be provided as well."
+      )
+    }
+    keys.push({
       pubkey: accounts.delegateAuthority,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.vault,
-      isWritable: true,
-      isSigner: false,
-    },
-  ]
+    })
+  }
+  keys.push({
+    pubkey: accounts.vault,
+    isWritable: true,
+    isSigner: false,
+  })
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

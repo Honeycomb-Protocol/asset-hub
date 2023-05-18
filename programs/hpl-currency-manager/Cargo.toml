@@ -1,0 +1,23 @@
+[package]
+name = "hpl-currency-manager"
+version = "0.0.1"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "hpl_currency_manager"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.26.0"
+anchor-spl = "0.26.0"
+hpl-utils = "0.1.6"
+hpl-hive-control = { version="0.0.92", features = ["cpi"] }
+mpl-token-metadata = { version="1.9.0", features = [ "no-entrypoint" ] }

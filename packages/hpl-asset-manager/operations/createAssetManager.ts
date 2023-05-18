@@ -58,12 +58,11 @@ export async function createAssetManager(
   args: CreataeAssetManagerArgs
 ) {
   const ctx = createCreateAssetManagerCtx({
-    project: honeycomb.projectAddress,
-    serviceIndex: honeycomb.services.length,
+    project: honeycomb.project().address,
+    serviceIndex: honeycomb.project().services.length,
     authority: honeycomb.identity().publicKey,
     payer: honeycomb.identity().publicKey,
-    delegateAuthority: honeycomb.identity().getDelegateAuthority()
-      .delegateAuthorityAddress,
+    delegateAuthority: honeycomb.identity().delegateAuthority().address,
     programId: args.programId,
   });
 

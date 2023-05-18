@@ -79,12 +79,11 @@ export async function createAsset(
   const ctx = createCreateAssetCtx(
     {
       args: args.args,
-      project: honeycomb.projectAddress,
+      project: honeycomb.project().address,
       assetManager: honeycomb.assetManager().assetManagerAddress,
       authority: honeycomb.identity().publicKey,
       payer: honeycomb.identity().publicKey,
-      delegateAuthority: honeycomb.identity().getDelegateAuthority()
-        .delegateAuthorityAddress,
+      delegateAuthority: honeycomb.identity().delegateAuthority().address,
       programId: args.programId,
     },
     honeycomb.assetManager().proofIndex()
