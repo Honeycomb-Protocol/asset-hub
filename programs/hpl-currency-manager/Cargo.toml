@@ -1,8 +1,10 @@
 [package]
 name = "hpl-currency-manager"
-version = "0.0.1"
-description = "Created with Anchor"
+description = "Honeycomb protocol library currency manager program"
+author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
+version = "0.0.2"
 edition = "2021"
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "lib"]
