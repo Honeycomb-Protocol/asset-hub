@@ -960,7 +960,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -971,7 +971,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -982,7 +982,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -993,9 +993,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.0.92"
+version = "0.0.99"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72ecd83db845712bbcc54d1502be7b0fbfb35ed196fb0d837b0e06050df569bf"
+checksum = "f5f120bb8e77e494dbbf1c8966d8154969b354330b5f5acd64985acca78ecadf"
 dependencies = [
  "anchor-lang",
  "hpl-utils",

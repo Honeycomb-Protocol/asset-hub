@@ -1,12 +1,14 @@
 {
   "name": "@honeycomb-protocol/asset-manager",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": false,
   "dependencies": {
     "@metaplex-foundation/mpl-candy-guard": "^0.4.2",
-    "@honeycomb-protocol/hive-control": "^0.0.21",
     "@metaplex-foundation/js": "^0.18.1",
     "@solana/spl-token": "^0.3.7",
     "@solana/web3.js": "^1.73.2"
+  },
+  "peerDependencies": {
+    "@honeycomb-protocol/hive-control": "^0.0.99"
   }
 }
