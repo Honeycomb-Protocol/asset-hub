@@ -10,15 +10,15 @@ import * as beet from '@metaplex-foundation/beet'
  * @category enums
  * @category generated
  */
-export enum CurrencyType {
-  Custodial,
+export enum PermissionedCurrencyKind {
   NonCustodial,
+  Custodial,
 }
 
 /**
  * @category userTypes
  * @category generated
  */
-export const currencyTypeBeet = beet.fixedScalarEnum(
-  CurrencyType
-) as beet.FixedSizeBeet<CurrencyType, CurrencyType>
+export const permissionedCurrencyKindBeet = beet.fixedScalarEnum(
+  PermissionedCurrencyKind
+) as beet.FixedSizeBeet<PermissionedCurrencyKind, PermissionedCurrencyKind>

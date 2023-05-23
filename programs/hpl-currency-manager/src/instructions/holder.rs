@@ -1,10 +1,5 @@
 use {
-    crate::{
-        errors::ErrorCode,
-        id,
-        state::*,
-        utils::{post_actions, pre_actions},
-    },
+    crate::{errors::ErrorCode, id, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
     hpl_utils::traits::Default,
@@ -43,14 +38,14 @@ pub struct CreateHolderAccount<'info> {
     #[account(
       init, payer = payer,
       seeds = [
-        if currency.currency_type == CurrencyType::Custodial { holder_account.to_account_info() } else { owner.to_account_info() }.key().as_ref(),
+        if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } )  { holder_account.to_account_info() } else { owner.to_account_info() }.key().as_ref(),
         mint.key().as_ref(),
         id().as_ref(),
         token_program.key().as_ref(),
       ],
       bump,
       token::mint = mint,
-      token::authority = if currency.currency_type == CurrencyType::Custodial { holder_account.to_account_info() } else { owner.to_account_info() }
+      token::authority = if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } ) { holder_account.to_account_info() } else { owner.to_account_info() }
     )]
     pub token_account: Account<'info, TokenAccount>,
 
@@ -77,13 +72,6 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     holder_account.currency = ctx.accounts.currency.key();
     holder_account.owner = ctx.accounts.owner.key();
     holder_account.token_account = ctx.accounts.token_account.key();
-
-    post_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
 
     Ok(())
 }
@@ -119,14 +107,11 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
         return Err(ErrorCode::InactiveHolder.into());
     }
 
-    pre_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
-
-    if ctx.accounts.currency.currency_type == CurrencyType::Custodial {
+    if ctx.accounts.currency.kind
+        == (CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::Custodial,
+        })
+    {
         let holder_seeds = &[
             b"holder_account",
             ctx.accounts.holder_account.owner.as_ref(),
@@ -161,12 +146,6 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
         )?;
     }
 
-    post_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
     Ok(())
 }
 
@@ -205,29 +184,11 @@ pub struct TransferCurrency<'info> {
 
 /// Transger currency
 pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
-    if ctx.accounts.sender_holder_account.status == HolderStatus::Inactive {
-        return Err(ErrorCode::InactiveHolder.into());
-    }
-
-    if ctx.accounts.receiver_holder_account.status == HolderStatus::Inactive {
-        return Err(ErrorCode::InactiveHolder.into());
-    }
-
-    pre_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.sender_token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
-
-    pre_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.receiver_token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
-
-    if ctx.accounts.currency.currency_type == CurrencyType::Custodial {
+    if ctx.accounts.currency.kind
+        == (CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::Custodial,
+        })
+    {
         let holder_seeds = &[
             b"holder_account",
             ctx.accounts.sender_holder_account.owner.as_ref(),
@@ -261,20 +222,6 @@ pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<
             amount,
         )?;
     }
-
-    post_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.sender_token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
-
-    post_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.receiver_token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
     Ok(())
 }
 
@@ -313,14 +260,11 @@ pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()
         return Err(ErrorCode::InactiveHolder.into());
     }
 
-    pre_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
-
-    if ctx.accounts.currency.currency_type == CurrencyType::Custodial {
+    if ctx.accounts.currency.kind
+        == (CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::Custodial,
+        })
+    {
         let holder_seeds = &[
             b"holder_account",
             ctx.accounts.holder_account.owner.as_ref(),
@@ -355,12 +299,6 @@ pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()
         )?;
     }
 
-    post_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
     Ok(())
 }
 
@@ -391,17 +329,6 @@ pub struct RevokeDelegate<'info> {
 
 /// Approve currency
 pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
-    if ctx.accounts.holder_account.status == HolderStatus::Inactive {
-        return Err(ErrorCode::InactiveHolder.into());
-    }
-
-    pre_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
-
     token::revoke(CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Revoke {
@@ -409,13 +336,6 @@ pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
             authority: ctx.accounts.authority.to_account_info(),
         },
     ))?;
-
-    post_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
     Ok(())
 }
 

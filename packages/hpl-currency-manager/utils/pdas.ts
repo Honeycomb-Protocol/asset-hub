@@ -1,6 +1,10 @@
 import { PublicKey } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { CurrencyType, PROGRAM_ID } from "../generated";
+import {
+  CurrencyKind,
+  PROGRAM_ID,
+  PermissionedCurrencyKind,
+} from "../generated";
 
 type MetadataPDaType =
   | { __kind: "edition" }
@@ -74,13 +78,16 @@ export const tokenAccountPda = (
 export const holderAccountPdas = (
   owner: PublicKey,
   mint: PublicKey,
-  currencyType: CurrencyType,
+  currencyKind: CurrencyKind,
   tokenProgram = TOKEN_PROGRAM_ID,
   programId = PROGRAM_ID
 ) => {
   const [holderAccount] = holderAccountPda(owner, mint);
   const [tokenAccount] = tokenAccountPda(
-    currencyType === CurrencyType.Custodial ? holderAccount : owner,
+    currencyKind.__kind === "Permissioned" &&
+      currencyKind.kind === PermissionedCurrencyKind.Custodial
+      ? holderAccount
+      : owner,
     mint,
     tokenProgram,
     programId

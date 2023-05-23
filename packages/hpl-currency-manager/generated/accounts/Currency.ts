@@ -8,7 +8,7 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import { CurrencyType, currencyTypeBeet } from '../types/CurrencyType'
+import { CurrencyKind, currencyKindBeet } from '../types/CurrencyKind'
 
 /**
  * Arguments used to create {@link Currency}
@@ -19,7 +19,7 @@ export type CurrencyArgs = {
   bump: number
   project: web3.PublicKey
   mint: web3.PublicKey
-  currencyType: CurrencyType
+  kind: CurrencyKind
 }
 
 export const currencyDiscriminator = [191, 62, 116, 219, 163, 67, 229, 200]
@@ -35,14 +35,14 @@ export class Currency implements CurrencyArgs {
     readonly bump: number,
     readonly project: web3.PublicKey,
     readonly mint: web3.PublicKey,
-    readonly currencyType: CurrencyType
+    readonly kind: CurrencyKind
   ) {}
 
   /**
    * Creates a {@link Currency} instance from the provided args.
    */
   static fromArgs(args: CurrencyArgs) {
-    return new Currency(args.bump, args.project, args.mint, args.currencyType)
+    return new Currency(args.bump, args.project, args.mint, args.kind)
   }
 
   /**
@@ -112,34 +112,36 @@ export class Currency implements CurrencyArgs {
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link Currency}
+   * {@link Currency} for the provided args.
+   *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    */
-  static get byteSize() {
-    return currencyBeet.byteSize
+  static byteSize(args: CurrencyArgs) {
+    const instance = Currency.fromArgs(args)
+    return currencyBeet.toFixedFromValue({
+      accountDiscriminator: currencyDiscriminator,
+      ...instance,
+    }).byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
    * {@link Currency} data from rent
    *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    * @param connection used to retrieve the rent exemption information
    */
   static async getMinimumBalanceForRentExemption(
+    args: CurrencyArgs,
     connection: web3.Connection,
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      Currency.byteSize,
+      Currency.byteSize(args),
       commitment
     )
-  }
-
-  /**
-   * Determines if the provided {@link Buffer} has the correct byte size to
-   * hold {@link Currency} data.
-   */
-  static hasCorrectByteSize(buf: Buffer, offset = 0) {
-    return buf.byteLength - offset === Currency.byteSize
   }
 
   /**
@@ -151,7 +153,7 @@ export class Currency implements CurrencyArgs {
       bump: this.bump,
       project: this.project.toBase58(),
       mint: this.mint.toBase58(),
-      currencyType: 'CurrencyType.' + CurrencyType[this.currencyType],
+      kind: this.kind.__kind,
     }
   }
 }
@@ -160,7 +162,7 @@ export class Currency implements CurrencyArgs {
  * @category Accounts
  * @category generated
  */
-export const currencyBeet = new beet.BeetStruct<
+export const currencyBeet = new beet.FixableBeetStruct<
   Currency,
   CurrencyArgs & {
     accountDiscriminator: number[] /* size: 8 */
@@ -171,7 +173,7 @@ export const currencyBeet = new beet.BeetStruct<
     ['bump', beet.u8],
     ['project', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
-    ['currencyType', currencyTypeBeet],
+    ['kind', currencyKindBeet],
   ],
   Currency.fromArgs,
   'Currency'

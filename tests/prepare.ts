@@ -2,12 +2,7 @@ import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import * as web3 from "@solana/web3.js";
-import {
-  Honeycomb,
-  identityModule,
-  Service,
-  HoneycombProject,
-} from "@honeycomb-protocol/hive-control";
+import { Honeycomb, identityModule } from "@honeycomb-protocol/hive-control";
 
 dotenv.config();
 
@@ -26,19 +21,10 @@ export const prepare = async (airdropCount = 0) => {
   const honeycomb = new Honeycomb(connection);
   honeycomb.use(identityModule(signer));
 
-  honeycomb.use(
-    await HoneycombProject.fromAddress(
-      connection,
-      new web3.PublicKey(
-        process.env.PROJECT || "6XPSHSBTHZsPd6GXUPS1v5GF6y4H34n8gwsY5kbCcJcg"
-      )
-    )
-  );
-
   if (!found || airdropCount) {
     await airdrop(signer.publicKey, airdropCount || 1);
   }
-  return honeycomb;
+  return { honeycomb, signer };
 };
 
 function tryKeyOrGenerate(keyPath = "../key.json"): [web3.Keypair, boolean] {

@@ -13,6 +13,7 @@ import {
   burnCurrency,
   createCurrency,
   createHolderAccount,
+  fundAccount,
   mintCurrency,
   revokeDelegate,
   setHolderStatus,
@@ -41,8 +42,8 @@ export class HplCurrency extends Module {
     return this._currency.mint;
   }
 
-  public get currencyType() {
-    return this._currency.currencyType;
+  public get kind() {
+    return this._currency.kind;
   }
 
   public honeycomb() {
@@ -84,11 +85,14 @@ export class HplCurrency extends Module {
     return new HplCurrency(address, currency);
   }
 
-  static async new(honeycomb: Honeycomb, args: CreateCurrencyArgs) {
+  static async new(
+    honeycomb: Honeycomb,
+    args: CreateCurrencyArgs | { mint: web3.PublicKey }
+  ) {
     const { currency } = await createCurrency(honeycomb, {
-      programId: PROGRAM_ID,
-      project: honeycomb.project().address,
       args,
+      project: honeycomb.project().address,
+      programId: PROGRAM_ID,
     });
     return await HplCurrency.fromAddress(
       new web3.Connection(honeycomb.connection.rpcEndpoint, "processed"),
@@ -177,6 +181,14 @@ export class HplHolderAccount {
 
   public mint(amount: number) {
     return mintCurrency(this.currency().honeycomb(), {
+      amount,
+      holderAccount: this,
+      programId: PROGRAM_ID,
+    });
+  }
+
+  public fund(amount: number) {
+    return fundAccount(this.currency().honeycomb(), {
       amount,
       holderAccount: this,
       programId: PROGRAM_ID,

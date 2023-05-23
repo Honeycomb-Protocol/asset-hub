@@ -1,5 +1,5 @@
 pub use {
-    crate::state::{Currency, CurrencyType},
+    crate::state::{Currency, CurrencyKind, PermissionedCurrencyKind},
     anchor_lang::prelude::*,
 };
 
@@ -9,7 +9,11 @@ pub fn pre_actions<'info>(
     token_account: AccountInfo<'info>,
     mint: AccountInfo<'info>,
 ) -> Result<()> {
-    if currency.currency_type == CurrencyType::NonCustodial {
+    if currency.kind
+        == (CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::NonCustodial,
+        })
+    {
         let currency_seeds = &[
             b"currency".as_ref(),
             currency.mint.as_ref(),
@@ -36,7 +40,11 @@ pub fn post_actions<'info>(
     token_account: AccountInfo<'info>,
     mint: AccountInfo<'info>,
 ) -> Result<()> {
-    if currency.currency_type == CurrencyType::NonCustodial {
+    if currency.kind
+        == (CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::NonCustodial,
+        })
+    {
         let currency_seeds = &[
             b"currency".as_ref(),
             currency.mint.as_ref(),

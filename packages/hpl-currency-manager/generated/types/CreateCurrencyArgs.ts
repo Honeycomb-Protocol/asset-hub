@@ -6,13 +6,16 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-import { CurrencyType, currencyTypeBeet } from './CurrencyType'
+import {
+  PermissionedCurrencyKind,
+  permissionedCurrencyKindBeet,
+} from './PermissionedCurrencyKind'
 export type CreateCurrencyArgs = {
   name: string
   symbol: string
   uri: string
   decimals: number
-  currencyType: beet.COption<CurrencyType>
+  kind: beet.COption<PermissionedCurrencyKind>
 }
 
 /**
@@ -26,7 +29,7 @@ export const createCurrencyArgsBeet =
       ['symbol', beet.utf8String],
       ['uri', beet.utf8String],
       ['decimals', beet.u8],
-      ['currencyType', beet.coption(currencyTypeBeet)],
+      ['kind', beet.coption(permissionedCurrencyKindBeet)],
     ],
     'CreateCurrencyArgs'
   )

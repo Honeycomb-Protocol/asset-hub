@@ -7,7 +7,7 @@ import {
 } from "@honeycomb-protocol/hive-control";
 import {
   createCreateHolderAccountInstruction,
-  CurrencyType,
+  CurrencyKind,
   PROGRAM_ID,
 } from "../generated";
 import { holderAccountPdas, metadataPda } from "../utils";
@@ -15,7 +15,7 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
 
 type CreateCreateHolderAccountCtxArgs = {
-  currencyType: CurrencyType;
+  currencyKind: CurrencyKind;
   currency: web3.PublicKey;
   mint: web3.PublicKey;
   owner: web3.PublicKey;
@@ -30,7 +30,7 @@ export function createCreateHolderAccountCtx(
   const { holderAccount, tokenAccount } = holderAccountPdas(
     args.owner,
     args.mint,
-    args.currencyType,
+    args.currencyKind,
     TOKEN_PROGRAM_ID,
     programId
   );
@@ -68,7 +68,7 @@ export async function createHolderAccount(
   args: CreateHolderAccountArgs
 ): Promise<ConfirmedContext & { holderAccount: web3.PublicKey }> {
   const ctx = createCreateHolderAccountCtx({
-    currencyType: args.currency.currencyType,
+    currencyKind: args.currency.kind,
     currency: args.currency.address,
     mint: args.currency.mint,
     owner: args.owner || honeycomb.identity().publicKey,

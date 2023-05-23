@@ -1,11 +1,7 @@
 use {
-    crate::{
-        errors::ErrorCode,
-        state::*,
-        utils::{post_actions, pre_actions},
-    },
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
-    anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount},
+    anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount, Transfer},
     hpl_hive_control::{
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
@@ -41,7 +37,7 @@ pub struct CreateCurrency<'info> {
     pub mint: Account<'info, Mint>,
 
     /// Currency metadata
-    /// CHECK: This is not dangerous because we don't read or write from this account
+    /// CHECK: This is being checked inside the create_metadata instruction
     #[account(mut)]
     pub metadata: AccountInfo<'info>,
 
@@ -82,7 +78,7 @@ pub struct CreateCurrencyArgs {
     pub symbol: String,
     pub uri: String,
     pub decimals: u8,
-    pub currency_type: Option<CurrencyType>,
+    pub kind: Option<PermissionedCurrencyKind>,
 }
 
 /// Create a new currency
@@ -93,7 +89,9 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     currency.bump = ctx.bumps["currency"];
     currency.project = ctx.accounts.project.key();
     currency.mint = ctx.accounts.mint.key();
-    currency.currency_type = args.currency_type.unwrap_or(CurrencyType::NonCustodial);
+    currency.kind = CurrencyKind::Permissioned {
+        kind: args.kind.unwrap_or(PermissionedCurrencyKind::NonCustodial),
+    };
 
     let currency_seeds = &[
         b"currency".as_ref(),
@@ -118,7 +116,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
                 collection_details: None,
                 rule_set: None,
             },
-            decimals: None,
+            decimals: Some(args.decimals),
             print_supply: None,
         },
         false,
@@ -138,6 +136,74 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     Ok(())
 }
 
+/// Accounts used in create currency instruction
+#[derive(Accounts)]
+pub struct WrapCurrency<'info> {
+    /// Currency account
+    #[account(
+      init, payer = payer,
+      space = Currency::LEN,
+      seeds = [
+        b"currency".as_ref(),
+        mint.key().as_ref(),
+      ],
+      bump
+    )]
+    pub currency: Account<'info, Currency>,
+
+    /// Currency mint
+    #[account()]
+    pub mint: Account<'info, Mint>,
+
+    /// Currency metadata
+    /// CHECK: This is being checked inside the create_metadata instruction
+    #[account(mut)]
+    pub metadata: AccountInfo<'info>,
+
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Box<Account<'info, Project>>,
+
+    /// [Option] Delegate authority account containing permissions of the wallet for the project
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
+    /// The wallet that holds the authority over the project
+    pub authority: Signer<'info>,
+
+    /// The wallet that pays for the rent
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    /// CHECK: This account is only used to collect platform fee
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub sysvar_instructions: AccountInfo<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = mpl_token_metadata::ID)]
+    pub token_metadata_program: AccountInfo<'info>,
+    #[account(address = token::ID)]
+    pub token_program: Program<'info, Token>,
+    pub hive_control_program: Program<'info, HplHiveControl>,
+}
+
+/// Create a new currency
+pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
+    let currency = &mut ctx.accounts.currency;
+    currency.set_defaults();
+
+    currency.bump = ctx.bumps["currency"];
+    currency.project = ctx.accounts.project.key();
+    currency.mint = ctx.accounts.mint.key();
+    currency.kind = CurrencyKind::Wrapped;
+
+    Ok(())
+}
+
 /// Accounts used in mint currency instruction
 #[derive(Accounts)]
 pub struct MintCurrency<'info> {
@@ -146,7 +212,7 @@ pub struct MintCurrency<'info> {
     pub currency: Account<'info, Currency>,
 
     /// Holder account
-    #[account(has_one = currency, has_one = token_account, constraint = holder_account.owner == authority.key())]
+    #[account(has_one = currency, has_one = token_account)]
     pub holder_account: Account<'info, HolderAccount>,
 
     /// Currency mint
@@ -188,13 +254,6 @@ pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
         return Err(ErrorCode::InactiveHolder.into());
     }
 
-    pre_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-    )?;
-
     let currency_seeds = &[
         b"currency".as_ref(),
         ctx.accounts.currency.mint.as_ref(),
@@ -215,11 +274,56 @@ pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
         amount,
     )?;
 
-    post_actions(
-        &ctx.accounts.currency,
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.token_account.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
+    Ok(())
+}
+
+/// Accounts used in mint currency instruction
+#[derive(Accounts)]
+pub struct FundAccount<'info> {
+    /// Currency account
+    #[account(has_one = mint)]
+    pub currency: Account<'info, Currency>,
+
+    /// Currency mint
+    #[account(mut)]
+    pub mint: Account<'info, Mint>,
+
+    /// Holder account
+    #[account(has_one = currency, has_one = token_account)]
+    pub holder_account: Account<'info, HolderAccount>,
+
+    /// Token account holding the currency
+    #[account(mut, has_one = mint)]
+    pub token_account: Account<'info, TokenAccount>,
+
+    /// Token account holding the currency
+    #[account(mut, has_one = mint, constraint = source_token_account.owner == wallet.key())]
+    pub source_token_account: Account<'info, TokenAccount>,
+
+    #[account(address = token::ID)]
+    pub token_program: Program<'info, Token>,
+
+    /// The wallet that pays for any
+    #[account(mut)]
+    pub wallet: Signer<'info>,
+}
+
+/// mint currency
+pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
+    if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
+    token::transfer(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.source_token_account.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.wallet.to_account_info(),
+            },
+        ),
+        amount,
     )?;
 
     Ok(())

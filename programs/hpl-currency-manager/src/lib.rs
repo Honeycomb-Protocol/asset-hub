@@ -7,7 +7,12 @@ pub mod utils;
 
 declare_id!("3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7");
 
-use {instructions::*, state::HolderStatus};
+use {
+    errors::ErrorCode,
+    instructions::*,
+    state::HolderStatus,
+    utils::{post_actions, pre_actions},
+};
 
 #[program]
 pub mod hpl_currency_manager {
@@ -27,8 +32,29 @@ pub mod hpl_currency_manager {
         instructions::create_currency(ctx, args)
     }
 
+    pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.manage_delegate_authority,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &ctx.accounts.delegate_authority,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+        instructions::wrap_currency(ctx)
+    }
+
     pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
-        instructions::create_holder_account(ctx)
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        instructions::create_holder_account(ctx)?;
+
+        post_actions(currency, token_program, token_account, mint)
     }
 
     pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
@@ -43,23 +69,153 @@ pub mod hpl_currency_manager {
             ctx.accounts.system_program.to_account_info(),
         )?;
 
-        instructions::mint_currency(ctx, amount)
+        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+            return Err(ErrorCode::InactiveHolder.into());
+        }
+
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        instructions::mint_currency(ctx, amount)?;
+
+        post_actions(currency, token_program, token_account, mint)
+    }
+
+    pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
+        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+            return Err(ErrorCode::InactiveHolder.into());
+        }
+
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        instructions::fund_account(ctx, amount)?;
+
+        post_actions(currency, token_program, token_account, mint)
     }
 
     pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
-        instructions::burn_currency(ctx, amount)
+        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+            return Err(ErrorCode::InactiveHolder.into());
+        }
+
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        instructions::burn_currency(ctx, amount)?;
+
+        post_actions(currency, token_program, token_account, mint)
     }
 
     pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
-        instructions::transfer_currency(ctx, amount)
+        if ctx.accounts.sender_holder_account.status == HolderStatus::Inactive {
+            return Err(ErrorCode::InactiveHolder.into());
+        }
+
+        if ctx.accounts.receiver_holder_account.status == HolderStatus::Inactive {
+            return Err(ErrorCode::InactiveHolder.into());
+        }
+
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.sender_token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.receiver_token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let sender_token_account = ctx.accounts.sender_token_account.to_account_info();
+        let receiver_token_account = ctx.accounts.receiver_token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        instructions::transfer_currency(ctx, amount)?;
+
+        post_actions(
+            currency,
+            token_program.clone(),
+            sender_token_account,
+            mint.clone(),
+        )?;
+        post_actions(currency, token_program, receiver_token_account, mint)
     }
 
     pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()> {
-        instructions::approve_delegate(ctx, amount)
+        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+            return Err(ErrorCode::InactiveHolder.into());
+        }
+
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        instructions::approve_delegate(ctx, amount)?;
+
+        post_actions(currency, token_program, token_account, mint)
     }
 
     pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
-        instructions::revoke_delegate(ctx)
+        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+            return Err(ErrorCode::InactiveHolder.into());
+        }
+
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        instructions::revoke_delegate(ctx)?;
+
+        post_actions(currency, token_program, token_account, mint)
     }
 
     pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {

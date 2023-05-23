@@ -13,16 +13,18 @@ pub struct Currency {
     pub mint: Pubkey,
 
     /// The type of currency.
-    pub currency_type: CurrencyType,
+    pub kind: CurrencyKind,
 }
 impl Default for Currency {
-    const LEN: usize = 8 + 66;
+    const LEN: usize = 8 + 70;
 
     fn set_defaults(&mut self) {
         self.bump = 0;
         self.project = Pubkey::default();
         self.mint = Pubkey::default();
-        self.currency_type = CurrencyType::NonCustodial;
+        self.kind = CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::NonCustodial,
+        };
     }
 }
 
@@ -30,7 +32,13 @@ impl Default for Currency {
 /// Custodial currencies are held by the program for the user.
 /// NonCustodial currencies are transfered to holders wallet.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
-pub enum CurrencyType {
-    Custodial,
+pub enum CurrencyKind {
+    Permissioned { kind: PermissionedCurrencyKind },
+    Wrapped,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+pub enum PermissionedCurrencyKind {
     NonCustodial,
+    Custodial,
 }
