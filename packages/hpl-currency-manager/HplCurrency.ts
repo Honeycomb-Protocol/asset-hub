@@ -1,5 +1,9 @@
 import * as web3 from "@solana/web3.js";
-import { Honeycomb, Module } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  HoneycombProject,
+  Module,
+} from "@honeycomb-protocol/hive-control";
 import {
   CreateCurrencyArgs,
   Currency,
@@ -239,3 +243,30 @@ export class HplHolderAccount {
     });
   }
 }
+
+export const currencyModule = (
+  honeycomb: Honeycomb,
+  args: web3.PublicKey | (CreateCurrencyArgs | { mint: web3.PublicKey })
+) =>
+  args instanceof web3.PublicKey
+    ? HplCurrency.fromAddress(honeycomb.connection, args)
+    : HplCurrency.new(honeycomb, args);
+
+export const findProjectCurrencies = (project: HoneycombProject) =>
+  Currency.gpaBuilder()
+    .addFilter("project", project.address)
+    .run(project.honeycomb().connection)
+    .then((currencies) =>
+      currencies.map((c) => {
+        try {
+          project
+            .honeycomb()
+            .use(
+              new HplCurrency(c.pubkey, Currency.fromAccountInfo(c.account)[0])
+            );
+        } catch {
+          return null;
+        }
+      })
+    )
+    .then((_) => project.honeycomb());
