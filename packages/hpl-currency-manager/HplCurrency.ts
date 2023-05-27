@@ -1,4 +1,5 @@
 import * as web3 from "@solana/web3.js";
+import * as splToken from "@solana/spl-token";
 import {
   Honeycomb,
   HoneycombProject,
@@ -133,13 +134,19 @@ class HplCurrencyFetch {
       owner || this._currency.honeycomb().identity().publicKey,
       this._currency.mint
     );
+    const holderAccount = await HolderAccount.fromAccountAddress(
+      this._currency.honeycomb().connection,
+      address
+    );
+    const tokenAccounnt = await splToken.getAccount(
+      this._currency.honeycomb().connection,
+      holderAccount.tokenAccount
+    );
     return new HplHolderAccount(
       this._currency,
       address,
-      await HolderAccount.fromAccountAddress(
-        this._currency.honeycomb().connection,
-        address
-      )
+      holderAccount,
+      tokenAccounnt
     );
   }
 }
@@ -164,8 +171,21 @@ export class HplHolderAccount {
   constructor(
     private _currency: HplCurrency,
     readonly address: web3.PublicKey,
-    private _holderAccount: HolderAccount
+    private _holderAccount: HolderAccount,
+    private _tokenAccount: splToken.Account
   ) {}
+
+  public get amount() {
+    return this._tokenAccount.amount;
+  }
+
+  public get delegate() {
+    return this._tokenAccount.delegate;
+  }
+
+  public get delegatedAmount() {
+    return this._tokenAccount.delegatedAmount;
+  }
 
   public get owner() {
     return this._holderAccount.owner;
@@ -177,6 +197,10 @@ export class HplHolderAccount {
 
   public get status() {
     return this._holderAccount.status;
+  }
+
+  public get isActive() {
+    return this.status === HolderStatus.Active;
   }
 
   public currency() {

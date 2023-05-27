@@ -1,6 +1,6 @@
 {
   "name": "@honeycomb-protocol/asset-assembler",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": false,
   "dependencies": {
     "@metaplex-foundation/js": "^0.18.1"
