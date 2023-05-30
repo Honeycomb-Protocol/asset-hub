@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.7",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -907,7 +907,7 @@
     }
   ],
   "metadata": {
-    "address": "3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7",
+    "address": "4mGbMdQY7YgVp9rEqZnbkRg5m1H5o3ixZnneGgcT3Pvf",
     "origin": "anchor",
     "binaryVersion": "0.26.0",
     "libVersion": "0.26.0"

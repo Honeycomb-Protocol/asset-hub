@@ -74,7 +74,7 @@ export const approveDelegateInstructionDiscriminator = [
 export function createApproveDelegateInstruction(
   accounts: ApproveDelegateInstructionAccounts,
   args: ApproveDelegateInstructionArgs,
-  programId = new web3.PublicKey('3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7')
+  programId = new web3.PublicKey('4mGbMdQY7YgVp9rEqZnbkRg5m1H5o3ixZnneGgcT3Pvf')
 ) {
   const [data] = approveDelegateStruct.serialize({
     instructionDiscriminator: approveDelegateInstructionDiscriminator,

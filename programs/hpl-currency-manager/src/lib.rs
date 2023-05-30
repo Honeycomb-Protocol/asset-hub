@@ -5,7 +5,7 @@ pub mod instructions;
 pub mod state;
 pub mod utils;
 
-declare_id!("3F6KxyjUzun3zc9fpNSSz1S54AvFfPJbo1eLAx9Bxsz7");
+declare_id!("4mGbMdQY7YgVp9rEqZnbkRg5m1H5o3ixZnneGgcT3Pvf");
 
 use {
     errors::ErrorCode,
