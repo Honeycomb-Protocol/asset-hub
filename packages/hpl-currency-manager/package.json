@@ -1,6 +1,6 @@
 {
   "name": "@honeycomb-protocol/currency-manager",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "private": false,
   "peerDependencies": {
     "@solana/spl-token": "^0.3.7",

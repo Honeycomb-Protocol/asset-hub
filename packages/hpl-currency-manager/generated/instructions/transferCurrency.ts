@@ -37,7 +37,7 @@ export const transferCurrencyStruct = new beet.BeetArgsStruct<
  * Accounts required by the _transferCurrency_ instruction
  *
  * @property [] currency
- * @property [_writable_] mint
+ * @property [] mint
  * @property [] senderHolderAccount
  * @property [_writable_] senderTokenAccount
  * @property [] receiverHolderAccount
@@ -90,7 +90,7 @@ export function createTransferCurrencyInstruction(
     },
     {
       pubkey: accounts.mint,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {

@@ -157,7 +157,7 @@ pub struct TransferCurrency<'info> {
     pub currency: Account<'info, Currency>,
 
     /// Currency mint
-    #[account(mut)]
+    #[account()]
     pub mint: Account<'info, Mint>,
 
     /// Sender Holder account

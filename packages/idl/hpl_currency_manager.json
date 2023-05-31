@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7",
+  "version": "0.0.8",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -501,7 +501,7 @@
         },
         {
           "name": "mint",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false,
           "docs": [
             "Currency mint"
