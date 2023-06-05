@@ -1,4 +1,4 @@
-import { createCtx, Honeycomb, VAULT } from "@honeycomb-protocol/hive-control";
+import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 import * as web3 from "@solana/web3.js";
 import {
   PROGRAM_ID,
@@ -18,6 +18,7 @@ type CreateSetNftGeneratedCtxArgs = {
   programId?: web3.PublicKey;
 };
 export function createSetNftGeneratedCtx(
+  honeycomb: Honeycomb,
   args: CreateSetNftGeneratedCtxArgs,
   proofIndex: number
 ) {
@@ -51,7 +52,7 @@ export function createSetNftGeneratedCtx(
     ),
   ];
 
-  return createCtx(instructions);
+  return new Operation(honeycomb, instructions).context;
 }
 
 type SetNFTGeneratedArgs = {
@@ -65,13 +66,14 @@ export async function setNftGenerated(
   proofIndex: number
 ) {
   const ctx = await createSetNftGeneratedCtx(
+    honeycomb,
     {
       args: args.args,
       project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
       nftMint: args.nftMint,
-      authority: honeycomb.identity().publicKey,
-      payer: honeycomb.identity().publicKey,
+      authority: honeycomb.identity().address,
+      payer: honeycomb.identity().address,
       delegateAuthority: honeycomb.identity().delegateAuthority().address,
       programId: args.programId,
     },

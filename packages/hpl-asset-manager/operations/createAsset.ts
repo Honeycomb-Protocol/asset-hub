@@ -9,12 +9,7 @@ import {
   TransactionBuilder,
 } from "@metaplex-foundation/js";
 import { getAssetPda, getMetadataAccount_, METADATA_PROGRAM_ID } from "../pdas";
-import {
-  createCtx,
-  Honeycomb,
-  OperationCtx,
-  VAULT,
-} from "@honeycomb-protocol/hive-control";
+import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 
 type CreateCreateAssetCtx = {
   args: CreateAssetArgsChain;
@@ -26,9 +21,10 @@ type CreateCreateAssetCtx = {
   programId?: web3.PublicKey;
 };
 export function createCreateAssetCtx(
+  honeycomb: Honeycomb,
   args: CreateCreateAssetCtx,
   proofIndex: number
-): OperationCtx & { mint: web3.PublicKey; asset: web3.PublicKey } {
+) {
   const programId = args.programId || PROGRAM_ID;
   const mintKeypair = web3.Keypair.generate();
 
@@ -61,7 +57,7 @@ export function createCreateAssetCtx(
   ];
 
   return {
-    ...createCtx(instructions, [mintKeypair]),
+    ...new Operation(honeycomb, instructions, [mintKeypair]).context,
     mint: mintKeypair.publicKey,
     asset,
   };
@@ -77,12 +73,13 @@ export async function createAsset(
   args: CreataeAssetArgs
 ) {
   const ctx = createCreateAssetCtx(
+    honeycomb,
     {
       args: args.args,
       project: honeycomb.project().address,
       assetManager: honeycomb.assetManager().assetManagerAddress,
-      authority: honeycomb.identity().publicKey,
-      payer: honeycomb.identity().publicKey,
+      authority: honeycomb.identity().address,
+      payer: honeycomb.identity().address,
       delegateAuthority: honeycomb.identity().delegateAuthority().address,
       programId: args.programId,
     },

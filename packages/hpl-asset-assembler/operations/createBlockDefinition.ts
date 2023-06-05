@@ -1,9 +1,4 @@
-import {
-  createCtx,
-  Honeycomb,
-  OperationCtx,
-  VAULT,
-} from "@honeycomb-protocol/hive-control";
+import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 import { PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata";
 import * as web3 from "@solana/web3.js";
 import {
@@ -24,9 +19,10 @@ type CreateCreateBlockDefinitionCtxArgs = {
   programId?: web3.PublicKey;
 };
 export function createCreateBlockDefinitionCtx(
+  honeycomb: Honeycomb,
   args: CreateCreateBlockDefinitionCtxArgs,
   proofIndex: number
-): OperationCtx & { blockDefinition: web3.PublicKey } {
+) {
   const programId = args.programId || PROGRAM_ID;
   const [blockDefinition] = getBlockDefinitionPda(
     args.block,
@@ -53,7 +49,7 @@ export function createCreateBlockDefinitionCtx(
   ];
 
   return {
-    ...createCtx(instructions),
+    ...new Operation(honeycomb, instructions).context,
     blockDefinition,
   };
 }
@@ -71,14 +67,15 @@ export async function createBlockDefinition(
 ) {
   const wallet = honeycomb.identity();
   const ctx = createCreateBlockDefinitionCtx(
+    honeycomb,
     {
       args: args.args,
       project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
       block: args.block,
       blockDefinitionMint: args.blockDefinitionMint,
-      authority: wallet.publicKey,
-      payer: wallet.publicKey,
+      authority: wallet.address,
+      payer: wallet.address,
       delegateAuthority: wallet.delegateAuthority().address,
       programId: args.programId,
     },

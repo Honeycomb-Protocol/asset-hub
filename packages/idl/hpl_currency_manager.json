@@ -1,5 +1,5 @@
 {
-  "version": "0.0.8",
+  "version": "0.0.9",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -199,6 +199,14 @@
       "name": "createHolderAccount",
       "accounts": [
         {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
+        {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
@@ -253,6 +261,11 @@
           "docs": [
             "The wallet that pays for the rent"
           ]
+        },
+        {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -372,6 +385,14 @@
       "name": "fundAccount",
       "accounts": [
         {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
+        {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
@@ -412,17 +433,27 @@
           ]
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "wallet",
           "isMut": true,
           "isSigner": true,
           "docs": [
             "The wallet that pays for any"
           ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -435,6 +466,14 @@
     {
       "name": "burnCurrency",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
         {
           "name": "currency",
           "isMut": false,
@@ -476,6 +515,16 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -491,6 +540,14 @@
     {
       "name": "transferCurrency",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
         {
           "name": "currency",
           "isMut": false,
@@ -548,6 +605,16 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -563,6 +630,14 @@
     {
       "name": "approveDelegate",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
         {
           "name": "currency",
           "isMut": false,
@@ -612,6 +687,16 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -627,6 +712,14 @@
     {
       "name": "revokeDelegate",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
         {
           "name": "currency",
           "isMut": false,
@@ -668,6 +761,16 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -678,6 +781,22 @@
     {
       "name": "setHolderStatus",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
         {
           "name": "holderAccount",
           "isMut": true,
@@ -701,6 +820,16 @@
           "docs": [
             "The wallet that will own the token_account"
           ]
+        },
+        {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [

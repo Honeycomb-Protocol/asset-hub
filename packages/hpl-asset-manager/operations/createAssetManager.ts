@@ -2,10 +2,9 @@ import * as web3 from "@solana/web3.js";
 import { createCreateAssetManagerInstruction, PROGRAM_ID } from "../generated";
 import { getAssetManagerPda } from "../pdas";
 import {
-  createCtx,
   HIVECONTROL_PROGRAM_ID,
   Honeycomb,
-  OperationCtx,
+  Operation,
   VAULT,
 } from "@honeycomb-protocol/hive-control";
 
@@ -18,8 +17,9 @@ type CreateCreateAssetManagerCtx = {
   programId?: web3.PublicKey;
 };
 export function createCreateAssetManagerCtx(
+  honeycomb: Honeycomb,
   args: CreateCreateAssetManagerCtx
-): OperationCtx & { assetManager: web3.PublicKey } {
+) {
   const programId = args.programId || PROGRAM_ID;
 
   const [assetManager] = getAssetManagerPda(
@@ -45,7 +45,7 @@ export function createCreateAssetManagerCtx(
   ];
 
   return {
-    ...createCtx(instructions),
+    ...new Operation(honeycomb, instructions).context,
     assetManager,
   };
 }
@@ -57,11 +57,11 @@ export async function createAssetManager(
   honeycomb: Honeycomb,
   args: CreataeAssetManagerArgs
 ) {
-  const ctx = createCreateAssetManagerCtx({
+  const ctx = createCreateAssetManagerCtx(honeycomb, {
     project: honeycomb.project().address,
     serviceIndex: honeycomb.project().services.length,
-    authority: honeycomb.identity().publicKey,
-    payer: honeycomb.identity().publicKey,
+    authority: honeycomb.identity().address,
+    payer: honeycomb.identity().address,
     delegateAuthority: honeycomb.identity().delegateAuthority().address,
     programId: args.programId,
   });

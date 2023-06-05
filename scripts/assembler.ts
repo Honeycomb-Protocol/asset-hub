@@ -44,7 +44,7 @@ export default async function (
       ruleSet: null,
       defaultCreators: [
         {
-          address: honeycomb.identity().publicKey,
+          address: honeycomb.identity().address,
           share: 100,
         },
       ],
@@ -159,7 +159,7 @@ export default async function (
           await honeycomb
             .assembler()
             .fetch()
-            .nftsByWallet(honeycomb.identity().publicKey)
+            .nftsByWallet(honeycomb.identity().address)
         )[0];
 
         console.log("Burning NFT");

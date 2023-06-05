@@ -23,7 +23,7 @@ describe("Currency Manager", () => {
     honeycomb = temp.honeycomb;
     console.log(
       "address",
-      honeycomb.identity().publicKey.toString(),
+      honeycomb.identity().address.toString(),
       honeycomb.connection.rpcEndpoint
     );
 
@@ -33,7 +33,7 @@ describe("Currency Manager", () => {
 
     const balance = await honeycomb
       .rpc()
-      .getBalance(honeycomb.identity().publicKey);
+      .getBalance(honeycomb.identity().address);
     expect(balance).toBeGreaterThanOrEqual(web3.LAMPORTS_PER_SOL * 0.1);
   });
 
@@ -82,7 +82,7 @@ describe("Currency Manager", () => {
 
   it("Delegate and Revoke Delegate", async () => {
     const holderAccount = await honeycomb.currency().holderAccount();
-    await holderAccount.approveDelegate(10, honeycomb.identity().publicKey);
+    await holderAccount.approveDelegate(10, honeycomb.identity().address);
     await holderAccount.revokeDelegate();
   });
 

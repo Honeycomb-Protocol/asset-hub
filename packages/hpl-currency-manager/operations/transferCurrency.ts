@@ -1,71 +1,76 @@
 import * as web3 from "@solana/web3.js";
-import {
-  ConfirmedContext,
-  Honeycomb,
-  OperationCtx,
-  createCtx,
-} from "@honeycomb-protocol/hive-control";
+import * as splToken from "@solana/spl-token";
+import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 import { createTransferCurrencyInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
+import { holderAccountPdas } from "../utils";
+import { createCreateHolderAccountOperation } from "./createHolderAccount";
 
-type CreateTransferCurrencyCtxArgs = {
+type CreateTransferCurrencyOperationArgs = {
   amount: number;
-  currency: web3.PublicKey;
-  mint: web3.PublicKey;
-  senderHolderAccount: web3.PublicKey;
-  senderTokenAccount: web3.PublicKey;
-  receiverHolderAccount: web3.PublicKey;
-  receiverTokenAccount: web3.PublicKey;
-  owner: web3.PublicKey;
+  holderAccount: HplHolderAccount;
+  receiver: web3.PublicKey | HplHolderAccount;
   programId?: web3.PublicKey;
 };
-export function createTransferCurrencyCtx(
-  args: CreateTransferCurrencyCtxArgs
-): OperationCtx {
+export async function createTransferCurrencyOperation(
+  honeycomb: Honeycomb,
+  args: CreateTransferCurrencyOperationArgs
+) {
   const programId = args.programId || PROGRAM_ID;
 
-  const instructions = [
+  const instructions: web3.TransactionInstruction[] = [];
+
+  let receiverHolderAccount: web3.PublicKey,
+    receiverTokenAccount: web3.PublicKey;
+
+  if (args.receiver instanceof web3.PublicKey) {
+    const accounts = holderAccountPdas(
+      args.receiver,
+      args.holderAccount.currency().mint,
+      args.holderAccount.currency().kind,
+      splToken.TOKEN_PROGRAM_ID,
+      programId
+    );
+    receiverHolderAccount = accounts.holderAccount;
+    receiverTokenAccount = accounts.tokenAccount;
+
+    try {
+      await args.holderAccount.currency().holderAccount(args.receiver);
+    } catch {
+      instructions.unshift(
+        ...(await createCreateHolderAccountOperation(honeycomb, {
+          currency: args.holderAccount.currency(),
+          owner: args.receiver,
+          programId,
+        }).then(({ operation }) => operation.instructions))
+      );
+    }
+  } else {
+    receiverHolderAccount = args.receiver.address;
+    receiverTokenAccount = args.receiver.tokenAccount;
+  }
+
+  instructions.push(
     createTransferCurrencyInstruction(
       {
-        currency: args.currency,
-        mint: args.mint,
-        senderHolderAccount: args.senderHolderAccount,
-        senderTokenAccount: args.senderTokenAccount,
-        receiverHolderAccount: args.receiverHolderAccount,
-        receiverTokenAccount: args.receiverTokenAccount,
-        owner: args.owner,
+        project: args.holderAccount.currency().project().address,
+        currency: args.holderAccount.currency().address,
+        mint: args.holderAccount.currency().mint,
+        senderHolderAccount: args.holderAccount.address,
+        senderTokenAccount: args.holderAccount.tokenAccount,
+        receiverHolderAccount,
+        receiverTokenAccount,
+        owner: honeycomb.identity().address,
+        vault: VAULT,
       },
       {
         amount: args.amount,
       },
       programId
-    ),
-  ];
+    )
+  );
 
-  return createCtx(instructions);
-}
-
-type TransferCurrencyArgs = {
-  amount: number;
-  from: HplHolderAccount;
-  to: HplHolderAccount;
-  programId?: web3.PublicKey;
-};
-export async function transferCurrency(
-  honeycomb: Honeycomb,
-  args: TransferCurrencyArgs
-): Promise<ConfirmedContext> {
-  const ctx = createTransferCurrencyCtx({
-    amount: args.amount,
-    currency: args.from.currency().address,
-    mint: args.from.currency().mint,
-    senderHolderAccount: args.from.address,
-    senderTokenAccount: args.from.tokenAccount,
-    receiverHolderAccount: args.to.address,
-    receiverTokenAccount: args.to.tokenAccount,
-    owner: honeycomb.identity().publicKey,
-    programId: args.programId,
-  });
-
-  return honeycomb.rpc().sendAndConfirmTransaction(ctx);
+  return {
+    operation: new Operation(honeycomb, instructions),
+  };
 }

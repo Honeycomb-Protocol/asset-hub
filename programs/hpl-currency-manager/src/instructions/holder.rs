@@ -2,14 +2,19 @@ use {
     crate::{errors::ErrorCode, id, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
+    hpl_hive_control::state::Project,
     hpl_utils::traits::Default,
 };
 
 /// Accounts used in create create holder_account instruction
 #[derive(Accounts)]
 pub struct CreateHolderAccount<'info> {
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+
     /// Currency account
-    #[account(has_one = mint)]
+    #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
     /// Holder account
@@ -52,10 +57,11 @@ pub struct CreateHolderAccount<'info> {
     /// The wallet that will own the token_account
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub owner: AccountInfo<'info>,
-
     /// The wallet that pays for the rent
     #[account(mut)]
     pub payer: Signer<'info>,
+    /// CHECK: This is not dangerous because it only collects platform fee
+    pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
@@ -79,8 +85,12 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
 /// Accounts used in burn currency instruction
 #[derive(Accounts)]
 pub struct BurnCurrency<'info> {
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+
     /// Currency account
-    #[account(has_one = mint)]
+    #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
     /// Holder account
@@ -97,7 +107,9 @@ pub struct BurnCurrency<'info> {
 
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
-
+    /// CHECK: This is not dangerous because it only collects platform fee
+    pub vault: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
 }
 
@@ -152,8 +164,12 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
 /// Accounts used in transfer currency instruction
 #[derive(Accounts)]
 pub struct TransferCurrency<'info> {
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+
     /// Currency account
-    #[account(has_one = mint)]
+    #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
     /// Currency mint
@@ -178,7 +194,9 @@ pub struct TransferCurrency<'info> {
 
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
-
+    /// CHECK: This is not dangerous because it only collects platform fee
+    pub vault: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
 }
 
@@ -228,8 +246,12 @@ pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<
 /// Accounts used in approve currency instruction
 #[derive(Accounts)]
 pub struct ApproveDelegate<'info> {
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+
     /// Currency account
-    #[account(has_one = mint)]
+    #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
     /// Currency mint
@@ -250,7 +272,9 @@ pub struct ApproveDelegate<'info> {
 
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
-
+    /// CHECK: This is not dangerous because it only collects platform fee
+    pub vault: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
 }
 
@@ -305,8 +329,12 @@ pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()
 /// Accounts used in revoke delegate instruction
 #[derive(Accounts)]
 pub struct RevokeDelegate<'info> {
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+
     /// Currency account
-    #[account(has_one = mint)]
+    #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
     /// Currency mint
@@ -323,7 +351,9 @@ pub struct RevokeDelegate<'info> {
 
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
-
+    /// CHECK: This is not dangerous because it only collects platform fee
+    pub vault: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
 }
 
@@ -342,8 +372,16 @@ pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
 /// Accounts used in set holder status instruction
 #[derive(Accounts)]
 pub struct SetHolderStatus<'info> {
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+
+    /// Currency account
+    #[account(has_one = project)]
+    pub currency: Account<'info, Currency>,
+
     /// Holder account
-    #[account(mut, has_one = token_account)]
+    #[account(mut, has_one = token_account, has_one = currency)]
     pub holder_account: Account<'info, HolderAccount>,
 
     /// Holder account
@@ -352,6 +390,9 @@ pub struct SetHolderStatus<'info> {
 
     /// The wallet that will own the token_account
     pub authority: Signer<'info>,
+    /// CHECK: This is not dangerous because it only collects platform fee
+    pub vault: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 /// Set holder status

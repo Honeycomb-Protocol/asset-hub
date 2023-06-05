@@ -10,10 +10,9 @@ import {
   METADATA_PROGRAM_ID,
 } from "../pdas";
 import {
-  createCtx,
   HIVECONTROL_PROGRAM_ID,
   Honeycomb,
-  OperationCtx,
+  Operation,
   VAULT,
 } from "@honeycomb-protocol/hive-control";
 
@@ -26,8 +25,9 @@ type CreateCreateAssemblerCtxArgs = {
   programId?: web3.PublicKey;
 };
 export function createCreateAssemblerCtx(
+  honeycomb: Honeycomb,
   args: CreateCreateAssemblerCtxArgs
-): OperationCtx & { assembler: web3.PublicKey } {
+) {
   const programId = args.programId || PROGRAM_ID;
 
   const collectionMint = web3.Keypair.generate();
@@ -60,7 +60,7 @@ export function createCreateAssemblerCtx(
   ];
 
   return {
-    ...createCtx(instructions, [collectionMint]),
+    ...new Operation(honeycomb, instructions, [collectionMint]).context,
     assembler,
   };
 }
@@ -74,11 +74,11 @@ export async function createAssembler(
   args: CreateAssemblerArgs
 ) {
   const wallet = honeycomb.identity();
-  const ctx = createCreateAssemblerCtx({
+  const ctx = createCreateAssemblerCtx(honeycomb, {
     args: args.args,
     project: honeycomb.project().address,
-    authority: wallet.publicKey,
-    payer: wallet.publicKey,
+    authority: wallet.address,
+    payer: wallet.address,
     delegateAuthority: wallet.delegateAuthority().address,
     programId: args.programId,
   });

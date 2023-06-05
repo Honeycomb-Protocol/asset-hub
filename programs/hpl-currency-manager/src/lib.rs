@@ -20,7 +20,7 @@ pub mod hpl_currency_manager {
 
     pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_delegate_authority,
+            hpl_hive_control::constants::ACTIONS.manage_assets,
             None,
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
@@ -34,7 +34,7 @@ pub mod hpl_currency_manager {
 
     pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_delegate_authority,
+            hpl_hive_control::constants::ACTIONS.manage_assets,
             None,
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
@@ -47,6 +47,17 @@ pub mod hpl_currency_manager {
     }
 
     pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_low,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.payer.key(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
         let currency = &ctx.accounts.currency.clone();
         let token_program = ctx.accounts.token_program.to_account_info();
         let token_account = ctx.accounts.token_account.to_account_info();
@@ -59,7 +70,7 @@ pub mod hpl_currency_manager {
 
     pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_delegate_authority,
+            hpl_hive_control::constants::ACTIONS.manage_assets,
             None,
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
@@ -91,6 +102,17 @@ pub mod hpl_currency_manager {
     }
 
     pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_low,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.wallet.key(),
+            ctx.accounts.wallet.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
             return Err(ErrorCode::InactiveHolder.into());
         }
@@ -113,6 +135,17 @@ pub mod hpl_currency_manager {
     }
 
     pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.owner.key(),
+            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
             return Err(ErrorCode::InactiveHolder.into());
         }
@@ -135,6 +168,17 @@ pub mod hpl_currency_manager {
     }
 
     pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.owner.key(),
+            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
         if ctx.accounts.sender_holder_account.status == HolderStatus::Inactive {
             return Err(ErrorCode::InactiveHolder.into());
         }
@@ -175,6 +219,17 @@ pub mod hpl_currency_manager {
     }
 
     pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_low,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.owner.key(),
+            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
             return Err(ErrorCode::InactiveHolder.into());
         }
@@ -197,6 +252,17 @@ pub mod hpl_currency_manager {
     }
 
     pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_low,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
             return Err(ErrorCode::InactiveHolder.into());
         }
@@ -219,6 +285,17 @@ pub mod hpl_currency_manager {
     }
 
     pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_low,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
         instructions::set_holder_status(ctx, status)
     }
 }

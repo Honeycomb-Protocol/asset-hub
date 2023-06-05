@@ -280,8 +280,12 @@ pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
 /// Accounts used in mint currency instruction
 #[derive(Accounts)]
 pub struct FundAccount<'info> {
+    /// The project this currency is associated with.
+    #[account(mut)]
+    pub project: Box<Account<'info, Project>>,
+
     /// Currency account
-    #[account(has_one = mint)]
+    #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
     /// Currency mint
@@ -300,12 +304,16 @@ pub struct FundAccount<'info> {
     #[account(mut, has_one = mint, constraint = source_token_account.owner == wallet.key())]
     pub source_token_account: Account<'info, TokenAccount>,
 
-    #[account(address = token::ID)]
-    pub token_program: Program<'info, Token>,
-
     /// The wallet that pays for any
     #[account(mut)]
     pub wallet: Signer<'info>,
+
+    /// CHECK: This account is only used to collect platform fee
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+    #[account(address = token::ID)]
+    pub token_program: Program<'info, Token>,
 }
 
 /// mint currency

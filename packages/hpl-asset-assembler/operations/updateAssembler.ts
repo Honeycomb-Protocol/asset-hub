@@ -1,4 +1,4 @@
-import { createCtx, Honeycomb, VAULT } from "@honeycomb-protocol/hive-control";
+import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 import * as web3 from "@solana/web3.js";
 import {
   UpdateAssemblerArgs as UpdateAssemblerArgsChain,
@@ -16,6 +16,7 @@ type CreateUpdateAssemblerCtxArgs = {
   programId?: web3.PublicKey;
 };
 export function createUpdateAssemblerCtx(
+  honeycomb: Honeycomb,
   args: CreateUpdateAssemblerCtxArgs,
   proofIndex
 ) {
@@ -36,7 +37,7 @@ export function createUpdateAssemblerCtx(
     ),
   ];
 
-  return createCtx(instructions);
+  return new Operation(honeycomb, instructions).context;
 }
 
 type UpdateAssemblerArgs = {
@@ -50,12 +51,13 @@ export async function updateAssembler(
 ) {
   const wallet = honeycomb.identity();
   const ctx = createUpdateAssemblerCtx(
+    honeycomb,
     {
       args: args.args,
       project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
-      authority: wallet.publicKey,
-      payer: wallet.publicKey,
+      authority: wallet.address,
+      payer: wallet.address,
       delegateAuthority: wallet.delegateAuthority().address,
       programId: args.programId,
     },

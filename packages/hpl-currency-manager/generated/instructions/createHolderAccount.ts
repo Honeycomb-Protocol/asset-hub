@@ -23,6 +23,7 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _createHolderAccount_ instruction
  *
+ * @property [_writable_] project
  * @property [] currency
  * @property [_writable_] holderAccount
  * @property [] mint
@@ -30,12 +31,14 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] tokenAccount
  * @property [] owner
  * @property [_writable_, **signer**] payer
+ * @property [] vault
  * @property [] sysvarInstructions
  * @category Instructions
  * @category CreateHolderAccount
  * @category generated
  */
 export type CreateHolderAccountInstructionAccounts = {
+  project: web3.PublicKey
   currency: web3.PublicKey
   holderAccount: web3.PublicKey
   mint: web3.PublicKey
@@ -43,6 +46,7 @@ export type CreateHolderAccountInstructionAccounts = {
   tokenAccount: web3.PublicKey
   owner: web3.PublicKey
   payer: web3.PublicKey
+  vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   sysvarInstructions: web3.PublicKey
@@ -69,6 +73,11 @@ export function createCreateHolderAccountInstruction(
     instructionDiscriminator: createHolderAccountInstructionDiscriminator,
   })
   const keys: web3.AccountMeta[] = [
+    {
+      pubkey: accounts.project,
+      isWritable: true,
+      isSigner: false,
+    },
     {
       pubkey: accounts.currency,
       isWritable: false,
@@ -103,6 +112,11 @@ export function createCreateHolderAccountInstruction(
       pubkey: accounts.payer,
       isWritable: true,
       isSigner: true,
+    },
+    {
+      pubkey: accounts.vault,
+      isWritable: false,
+      isSigner: false,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,

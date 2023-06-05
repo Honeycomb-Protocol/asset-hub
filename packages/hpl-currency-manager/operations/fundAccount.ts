@@ -1,42 +1,31 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
-import {
-  ConfirmedContext,
-  Honeycomb,
-  OperationCtx,
-  createCtx,
-} from "@honeycomb-protocol/hive-control";
-import {
-  createFundAccountInstruction,
-  CurrencyKind,
-  PROGRAM_ID,
-} from "../generated";
-import { HplHolderAccount } from "../HplCurrency";
+import { createFundAccountInstruction, PROGRAM_ID } from "../generated";
 import { holderAccountPdas } from "../utils";
+import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
+import { HplCurrency } from "../HplCurrency";
+import { createCreateHolderAccountOperation } from "./createHolderAccount";
 
-type CreateFundAccountCtxArgs = {
+type CreateFundAccountOperationArgs = {
   amount: number;
-  project: web3.PublicKey;
-  currency: web3.PublicKey;
-  currencyKind: CurrencyKind;
-  mint: web3.PublicKey;
+  currency: HplCurrency;
   receiverWallet: web3.PublicKey;
-  wallet: web3.PublicKey;
   programId?: web3.PublicKey;
 };
-export function createFundAccountCtx(
-  args: CreateFundAccountCtxArgs
-): OperationCtx {
+export async function createFundAccountOperation(
+  honeycomb: Honeycomb,
+  args: CreateFundAccountOperationArgs
+) {
   const programId = args.programId || PROGRAM_ID;
 
   const sourceTokenAccount = splToken.getAssociatedTokenAddressSync(
-    args.mint,
-    args.wallet
+    args.currency.mint,
+    honeycomb.identity().address
   );
   const { holderAccount, tokenAccount } = holderAccountPdas(
     args.receiverWallet,
-    args.mint,
-    args.currencyKind,
+    args.currency.mint,
+    args.currency.kind,
     splToken.TOKEN_PROGRAM_ID,
     programId
   );
@@ -44,12 +33,14 @@ export function createFundAccountCtx(
   const instructions = [
     createFundAccountInstruction(
       {
-        currency: args.currency,
-        mint: args.mint,
+        project: args.currency.project().address,
+        currency: args.currency.address,
+        mint: args.currency.mint,
         holderAccount,
         tokenAccount,
         sourceTokenAccount,
-        wallet: args.wallet,
+        wallet: honeycomb.identity().address,
+        vault: VAULT,
       },
       {
         amount: args.amount,
@@ -58,28 +49,20 @@ export function createFundAccountCtx(
     ),
   ];
 
-  return createCtx(instructions);
-}
+  try {
+    await args.currency.holderAccount(args.receiverWallet);
+  } catch {
+    instructions.unshift(
+      ...(await createCreateHolderAccountOperation(honeycomb, {
+        currency: args.currency,
+        owner: args.receiverWallet,
+        programId,
+      }).then(({ operation }) => operation.instructions))
+    );
+  }
 
-type FundAccountArgs = {
-  amount: number;
-  holderAccount: HplHolderAccount;
-  programId?: web3.PublicKey;
-};
-export async function fundAccount(
-  honeycomb: Honeycomb,
-  args: FundAccountArgs
-): Promise<ConfirmedContext> {
-  const ctx = createFundAccountCtx({
-    amount: args.amount,
-    project: args.holderAccount.currency().project().address,
-    currency: args.holderAccount.currency().address,
-    currencyKind: args.holderAccount.currency().kind,
-    mint: args.holderAccount.currency().mint,
-    receiverWallet: args.holderAccount.owner,
-    wallet: honeycomb.identity().publicKey,
-    programId: args.programId,
-  });
-
-  return honeycomb.rpc().sendAndConfirmTransaction(ctx);
+  return {
+    operation: new Operation(honeycomb, instructions),
+    holderAccount,
+  };
 }

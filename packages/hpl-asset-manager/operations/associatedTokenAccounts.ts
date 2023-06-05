@@ -1,63 +1,49 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
-import { Honeycomb, OperationCtx } from "@honeycomb-protocol/hive-control";
+import { Honeycomb, Operation } from "@honeycomb-protocol/hive-control";
 
 export async function getAssociatedTokenAccountIntructions(
   honeycomb: Honeycomb,
   mints: web3.PublicKey[]
 ): Promise<{
-  preTxns: OperationCtx[];
-  postTxns: OperationCtx[];
+  preTxns: Operation[];
+  postTxns: Operation[];
 }> {
   let wallet = honeycomb.identity();
-  const preTxns: OperationCtx[] = [];
-  const postTxns: OperationCtx[] = [];
+  const preTxns: Operation[] = [];
+  const postTxns: Operation[] = [];
   for (let index = 0; index < mints.length; index++) {
     const mint = mints[index];
     const tokenAccountAddress = splToken.getAssociatedTokenAddressSync(
       mint,
-      wallet.publicKey
+      wallet.address
     );
     const tokenAccount: splToken.Account | null = await splToken
       .getAccount(honeycomb.connection, tokenAccountAddress)
       .catch((e) => null);
 
     if (!tokenAccount)
-      preTxns.push({
-        tx: new web3.Transaction().add(
+      preTxns.push(
+        new Operation(honeycomb, [
           splToken.createAssociatedTokenAccountInstruction(
-            wallet.publicKey,
+            wallet.address,
             tokenAccountAddress,
-            wallet.publicKey,
+            wallet.address,
             mint
-          )
-        ),
-        accounts: [
-          web3.SystemProgram.programId,
-          wallet.publicKey,
-          tokenAccountAddress,
-          mint,
-        ],
-        signers: [],
-      });
+          ),
+        ])
+      );
 
     if (!tokenAccount || !Number(tokenAccount.amount))
-      postTxns.push({
-        tx: new web3.Transaction().add(
+      postTxns.push(
+        new Operation(honeycomb, [
           splToken.createCloseAccountInstruction(
             tokenAccountAddress,
-            wallet.publicKey,
-            wallet.publicKey
-          )
-        ),
-        accounts: [
-          web3.SystemProgram.programId,
-          wallet.publicKey,
-          tokenAccountAddress,
-          mint,
-        ],
-        signers: [],
-      });
+            wallet.address,
+            wallet.address
+          ),
+        ])
+      );
   }
 
   return {

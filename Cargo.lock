@@ -960,33 +960,33 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.8"
+version = "0.0.10"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-hive-control",
+ "hpl-hive-control 0.0.99",
  "hpl-utils",
  "mpl-token-metadata",
 ]
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.8"
+version = "0.0.10"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-hive-control",
+ "hpl-hive-control 0.0.99",
  "hpl-utils",
  "mpl-token-metadata",
 ]
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-hive-control",
+ "hpl-hive-control 0.1.0",
  "hpl-utils",
  "mpl-token-metadata",
 ]
@@ -996,6 +996,18 @@ name = "hpl-hive-control"
 version = "0.0.99"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f5f120bb8e77e494dbbf1c8966d8154969b354330b5f5acd64985acca78ecadf"
+dependencies = [
+ "anchor-lang",
+ "hpl-utils",
+ "sol-did",
+ "spl-account-compression",
+]
+
+[[package]]
+name = "hpl-hive-control"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f45a821a23cf1d173f593866b701b7200b99e5170a648a329c553a9856536fc1"
 dependencies = [
  "anchor-lang",
  "hpl-utils",

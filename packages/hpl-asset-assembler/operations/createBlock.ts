@@ -1,9 +1,4 @@
-import {
-  createCtx,
-  Honeycomb,
-  OperationCtx,
-  VAULT,
-} from "@honeycomb-protocol/hive-control";
+import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 import * as web3 from "@solana/web3.js";
 import {
   createCreateBlockInstruction,
@@ -22,9 +17,10 @@ type CreateCreateBlockCtxArgs = {
   programId?: web3.PublicKey;
 };
 export function createCreateBlockCtx(
+  honeycomb: Honeycomb,
   args: CreateCreateBlockCtxArgs,
   proofIndex: number
-): OperationCtx & { block: web3.PublicKey } {
+) {
   const programId = args.programId || PROGRAM_ID;
 
   const [block] = getBlockPda(args.assembler, args.args.blockOrder, programId);
@@ -46,7 +42,7 @@ export function createCreateBlockCtx(
   ];
 
   return {
-    ...createCtx(instructions),
+    ...new Operation(honeycomb, instructions).context,
     block,
   };
 }
@@ -62,12 +58,13 @@ export async function createBlock(
 ) {
   const wallet = honeycomb.identity();
   const ctx = createCreateBlockCtx(
+    honeycomb,
     {
       args: args.args,
       project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
-      authority: wallet.publicKey,
-      payer: wallet.publicKey,
+      authority: wallet.address,
+      payer: wallet.address,
       delegateAuthority: wallet.delegateAuthority().address,
       programId: args.programId,
     },

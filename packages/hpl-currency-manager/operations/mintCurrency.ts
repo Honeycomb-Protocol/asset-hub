@@ -1,43 +1,36 @@
 import * as web3 from "@solana/web3.js";
 import {
-  ConfirmedContext,
   HIVECONTROL_PROGRAM_ID,
   Honeycomb,
-  OperationCtx,
+  Operation,
   VAULT,
-  createCtx,
 } from "@honeycomb-protocol/hive-control";
 import { createMintCurrencyInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
 
-type CreateMintCurrencyCtxArgs = {
+type CreateMintCurrencyOperationArgs = {
   amount: number;
-  project: web3.PublicKey;
-  currency: web3.PublicKey;
-  mint: web3.PublicKey;
-  holderAccount: web3.PublicKey;
-  tokenAccount: web3.PublicKey;
-  delegateAuthority?: web3.PublicKey;
-  authority: web3.PublicKey;
-  payer: web3.PublicKey;
+  holderAccount: HplHolderAccount;
   programId?: web3.PublicKey;
 };
-export function createMintCurrencyCtx(
-  args: CreateMintCurrencyCtxArgs
-): OperationCtx {
+export async function createMintCurrencyOperation(
+  honeycomb: Honeycomb,
+  args: CreateMintCurrencyOperationArgs
+) {
   const programId = args.programId || PROGRAM_ID;
 
   const instructions = [
     createMintCurrencyInstruction(
       {
-        currency: args.currency,
-        holderAccount: args.holderAccount,
-        mint: args.mint,
-        tokenAccount: args.tokenAccount,
-        project: args.project,
-        delegateAuthority: args.delegateAuthority || programId,
-        authority: args.authority,
-        payer: args.payer,
+        currency: args.holderAccount.currency().address,
+        holderAccount: args.holderAccount.address,
+        mint: args.holderAccount.currency().mint,
+        tokenAccount: args.holderAccount.tokenAccount,
+        project: args.holderAccount.currency().project().address,
+        delegateAuthority:
+          honeycomb.identity().delegateAuthority().address || programId,
+        authority: honeycomb.identity().address,
+        payer: honeycomb.identity().address,
         vault: VAULT,
         hiveControlProgram: HIVECONTROL_PROGRAM_ID,
       },
@@ -48,30 +41,7 @@ export function createMintCurrencyCtx(
     ),
   ];
 
-  return createCtx(instructions);
-}
-
-type MintCurrencyArgs = {
-  amount: number;
-  holderAccount: HplHolderAccount;
-  programId?: web3.PublicKey;
-};
-export async function mintCurrency(
-  honeycomb: Honeycomb,
-  args: MintCurrencyArgs
-): Promise<ConfirmedContext> {
-  const ctx = createMintCurrencyCtx({
-    amount: args.amount,
-    project: args.holderAccount.currency().project().address,
-    currency: args.holderAccount.currency().address,
-    mint: args.holderAccount.currency().mint,
-    holderAccount: args.holderAccount.address,
-    tokenAccount: args.holderAccount.tokenAccount,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
-    authority: honeycomb.identity().publicKey,
-    payer: honeycomb.identity().publicKey,
-    programId: args.programId,
-  });
-
-  return honeycomb.rpc().sendAndConfirmTransaction(ctx);
+  return {
+    operation: new Operation(honeycomb, instructions),
+  };
 }

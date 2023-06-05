@@ -36,24 +36,29 @@ export const fundAccountStruct = new beet.BeetArgsStruct<
 /**
  * Accounts required by the _fundAccount_ instruction
  *
+ * @property [_writable_] project
  * @property [] currency
  * @property [_writable_] mint
  * @property [] holderAccount
  * @property [_writable_] tokenAccount
  * @property [_writable_] sourceTokenAccount
  * @property [_writable_, **signer**] wallet
+ * @property [_writable_] vault
  * @category Instructions
  * @category FundAccount
  * @category generated
  */
 export type FundAccountInstructionAccounts = {
+  project: web3.PublicKey
   currency: web3.PublicKey
   mint: web3.PublicKey
   holderAccount: web3.PublicKey
   tokenAccount: web3.PublicKey
   sourceTokenAccount: web3.PublicKey
-  tokenProgram?: web3.PublicKey
   wallet: web3.PublicKey
+  vault: web3.PublicKey
+  systemProgram?: web3.PublicKey
+  tokenProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -82,6 +87,11 @@ export function createFundAccountInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.project,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.currency,
       isWritable: false,
       isSigner: false,
@@ -107,14 +117,24 @@ export function createFundAccountInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      pubkey: accounts.wallet,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.vault,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.wallet,
-      isWritable: true,
-      isSigner: true,
+      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
     },
   ]
 

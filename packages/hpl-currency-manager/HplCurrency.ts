@@ -4,6 +4,7 @@ import {
   Honeycomb,
   HoneycombProject,
   Module,
+  toBigNumber,
 } from "@honeycomb-protocol/hive-control";
 import {
   CreateCurrencyArgs,
@@ -14,15 +15,15 @@ import {
 } from "./generated";
 import { holderAccountPda } from "./utils";
 import {
-  approveDelegate,
-  burnCurrency,
-  createCurrency,
-  createHolderAccount,
-  fundAccount,
-  mintCurrency,
-  revokeDelegate,
-  setHolderStatus,
-  transferCurrency,
+  createApproveDelegateOperation,
+  createBurnCurrencyOperation,
+  createCreateCurrencyOperation,
+  createCreateHolderAccountOperation,
+  createFundAccountOperation,
+  createMintCurrencyOperation,
+  createRevokeDelegateOperation,
+  createSetHolderStatusOperation,
+  createTransferCurrencyOperation,
 } from "./operations";
 
 declare module "@honeycomb-protocol/hive-control" {
@@ -67,19 +68,12 @@ export class HplCurrency extends Module {
     return this._create;
   }
 
-  public holderAccount(owner?: web3.PublicKey) {
-    if (!owner) owner = this.honeycomb().identity().publicKey;
-
-    if (this._holders[owner.toString()]) {
-      return Promise.resolve(this._holders[owner.toString()]);
+  public async holderAccount(owner?: web3.PublicKey, reFetch = false) {
+    if (!owner) owner = this.honeycomb().identity().address;
+    if (!this._holders[owner.toString()] || reFetch) {
+      this._holders[owner.toString()] = await this.fetch().holderAccount(owner);
     }
-
-    return this.fetch()
-      .holderAccount(owner)
-      .then((x) => {
-        this._holders[owner.toString()] = x;
-        return x;
-      });
+    return this._holders[owner.toString()];
   }
 
   static async fromAddress(
@@ -92,13 +86,20 @@ export class HplCurrency extends Module {
 
   static async new(
     honeycomb: Honeycomb,
-    args: CreateCurrencyArgs | { mint: web3.PublicKey }
+    args: CreateCurrencyArgs | { mint: web3.PublicKey },
+    confirmOptions?: web3.ConfirmOptions
   ) {
-    const { currency } = await createCurrency(honeycomb, {
-      args,
-      project: honeycomb.project().address,
-      programId: PROGRAM_ID,
-    });
+    const { currency, operation } = await createCreateCurrencyOperation(
+      honeycomb,
+      {
+        args,
+        project: honeycomb.project(),
+        programId: PROGRAM_ID,
+      }
+    );
+
+    await operation.send(confirmOptions);
+
     return await HplCurrency.fromAddress(
       new web3.Connection(honeycomb.connection.rpcEndpoint, "processed"),
       currency
@@ -127,23 +128,27 @@ export class HplCurrency extends Module {
 }
 
 class HplCurrencyFetch {
-  constructor(private _currency: HplCurrency) {}
+  constructor(private currency: HplCurrency) {}
 
-  public async holderAccount(owner?: web3.PublicKey) {
-    const [address] = holderAccountPda(
-      owner || this._currency.honeycomb().identity().publicKey,
-      this._currency.mint
-    );
+  public async holderAccount(
+    owner: web3.PublicKey,
+    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
+  ) {
+    const [address] = holderAccountPda(owner, this.currency.mint);
     const holderAccount = await HolderAccount.fromAccountAddress(
-      this._currency.honeycomb().connection,
-      address
+      this.currency.honeycomb().connection,
+      address,
+      commitmentOrConfig
     );
     const tokenAccounnt = await splToken.getAccount(
-      this._currency.honeycomb().connection,
-      holderAccount.tokenAccount
+      this.currency.honeycomb().connection,
+      holderAccount.tokenAccount,
+      typeof commitmentOrConfig === "string"
+        ? commitmentOrConfig
+        : commitmentOrConfig.commitment
     );
     return new HplHolderAccount(
-      this._currency,
+      this.currency,
       address,
       holderAccount,
       tokenAccounnt
@@ -154,20 +159,26 @@ class HplCurrencyFetch {
 class HplCurrencyCreate {
   constructor(private _currency: HplCurrency) {}
 
-  public async holderAccount(owner?: web3.PublicKey) {
-    return createHolderAccount(this._currency.honeycomb(), {
-      currency: this._currency,
-      owner: owner || this._currency.honeycomb().identity().publicKey,
-      programId: PROGRAM_ID,
-    }).then((_) =>
-      this._currency.holderAccount(
-        owner || this._currency.honeycomb().identity().publicKey
-      )
+  public async holderAccount(
+    owner: web3.PublicKey,
+    confirmOptions?: web3.ConfirmOptions
+  ) {
+    const { operation } = await createCreateHolderAccountOperation(
+      this._currency.honeycomb(),
+      {
+        currency: this._currency,
+        owner: owner,
+        programId: PROGRAM_ID,
+      }
     );
+    await operation.send(confirmOptions);
+    return this._currency.holderAccount(owner);
   }
 }
 
 export class HplHolderAccount {
+  private _perceivedAmount: number = 0;
+
   constructor(
     private _currency: HplCurrency,
     readonly address: web3.PublicKey,
@@ -176,7 +187,9 @@ export class HplHolderAccount {
   ) {}
 
   public get amount() {
-    return this._tokenAccount.amount;
+    return toBigNumber(this._tokenAccount.amount.toString()).add(
+      toBigNumber(this._perceivedAmount)
+    );
   }
 
   public get delegate() {
@@ -207,64 +220,110 @@ export class HplHolderAccount {
     return this._currency;
   }
 
-  public mint(amount: number) {
-    return mintCurrency(this.currency().honeycomb(), {
-      amount,
-      holderAccount: this,
-      programId: PROGRAM_ID,
-    });
+  public async mint(amount: number, confirmOptions?: web3.ConfirmOptions) {
+    const { operation } = await createMintCurrencyOperation(
+      this.currency().honeycomb(),
+      {
+        amount,
+        holderAccount: this,
+        programId: PROGRAM_ID,
+      }
+    );
+    const context = await operation.send(confirmOptions);
+    this._perceivedAmount += amount;
+    return context;
   }
 
-  public fund(amount: number) {
-    return fundAccount(this.currency().honeycomb(), {
-      amount,
-      holderAccount: this,
-      programId: PROGRAM_ID,
-    });
+  public async fund(amount: number, confirmOptions?: web3.ConfirmOptions) {
+    const { operation } = await createFundAccountOperation(
+      this.currency().honeycomb(),
+      {
+        amount,
+        currency: this._currency,
+        receiverWallet: this.owner,
+        programId: PROGRAM_ID,
+      }
+    );
+    const context = await operation.send(confirmOptions);
+    this._perceivedAmount -= amount;
+    return context;
   }
 
-  public burn(amount: number) {
-    return burnCurrency(this.currency().honeycomb(), {
-      amount,
-      holderAccount: this,
-      programId: PROGRAM_ID,
-    });
+  public async burn(amount: number, confirmOptions?: web3.ConfirmOptions) {
+    const { operation } = await createBurnCurrencyOperation(
+      this.currency().honeycomb(),
+      {
+        amount,
+        holderAccount: this,
+        programId: PROGRAM_ID,
+      }
+    );
+    const context = await operation.send(confirmOptions);
+    this._perceivedAmount -= amount;
+    return context;
   }
 
-  public async transfer(amount: number, to: HplHolderAccount | web3.PublicKey) {
-    return transferCurrency(this.currency().honeycomb(), {
-      amount,
-      from: this,
-      to:
-        to instanceof HplHolderAccount
-          ? to
-          : await this.currency().holderAccount(to),
-      programId: PROGRAM_ID,
-    });
+  public async transfer(
+    amount: number,
+    to: HplHolderAccount | web3.PublicKey,
+    confirmOptions?: web3.ConfirmOptions
+  ) {
+    const { operation } = await createTransferCurrencyOperation(
+      this.currency().honeycomb(),
+      {
+        amount,
+        holderAccount: this,
+        receiver: to,
+        programId: PROGRAM_ID,
+      }
+    );
+    const context = await operation.send(confirmOptions);
+    if (!this.owner.equals(to instanceof web3.PublicKey ? to : to.owner))
+      this._perceivedAmount -= amount;
+    return context;
   }
 
-  public approveDelegate(amount: number, delegate: web3.PublicKey) {
-    return approveDelegate(this.currency().honeycomb(), {
-      amount,
-      delegate,
-      holderAccount: this,
-      programId: PROGRAM_ID,
-    });
+  public async approveDelegate(
+    amount: number,
+    delegate: web3.PublicKey,
+    confirmOptions?: web3.ConfirmOptions
+  ) {
+    const { operation } = await createApproveDelegateOperation(
+      this.currency().honeycomb(),
+      {
+        amount,
+        delegate,
+        holderAccount: this,
+        programId: PROGRAM_ID,
+      }
+    );
+    return operation.send(confirmOptions);
   }
 
-  public revokeDelegate() {
-    return revokeDelegate(this.currency().honeycomb(), {
-      holderAccount: this,
-      programId: PROGRAM_ID,
-    });
+  public async revokeDelegate(confirmOptions?: web3.ConfirmOptions) {
+    const { operation } = await createRevokeDelegateOperation(
+      this.currency().honeycomb(),
+      {
+        holderAccount: this,
+        programId: PROGRAM_ID,
+      }
+    );
+    return operation.send(confirmOptions);
   }
 
-  public setHolderStatus(status: HolderStatus) {
-    return setHolderStatus(this.currency().honeycomb(), {
-      status,
-      holderAccount: this,
-      programId: PROGRAM_ID,
-    });
+  public async setHolderStatus(
+    status: HolderStatus,
+    confirmOptions?: web3.ConfirmOptions
+  ) {
+    const { operation } = await createSetHolderStatusOperation(
+      this.currency().honeycomb(),
+      {
+        status,
+        holderAccount: this,
+        programId: PROGRAM_ID,
+      }
+    );
+    return operation.send(confirmOptions);
   }
 }
 

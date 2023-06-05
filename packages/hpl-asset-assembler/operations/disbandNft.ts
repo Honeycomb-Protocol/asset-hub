@@ -16,9 +16,9 @@ import {
   METADATA_PROGRAM_ID,
 } from "../pdas";
 import {
-  createCtx,
   Honeycomb,
-  OperationCtx,
+  Operation,
+  OperationContext,
   VAULT,
 } from "@honeycomb-protocol/hive-control";
 import {
@@ -36,7 +36,10 @@ type CreateBurnNFTCtxArgs = {
   delegateAuthority?: web3.PublicKey;
   programId?: web3.PublicKey;
 };
-export function createBurnNFTCtx(args: CreateBurnNFTCtxArgs) {
+export function createBurnNFTCtx(
+  honeycomb: Honeycomb,
+  args: CreateBurnNFTCtxArgs
+) {
   const programId = args.programId || PROGRAM_ID;
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
     args.nftMint,
@@ -70,7 +73,7 @@ export function createBurnNFTCtx(args: CreateBurnNFTCtxArgs) {
     ),
   ];
 
-  return createCtx(instructions);
+  return new Operation(honeycomb, instructions).context;
 }
 
 type CreateRemoveBlockCtxArgs = {
@@ -86,7 +89,10 @@ type CreateRemoveBlockCtxArgs = {
   assemblingAction?: AssemblingAction; // default: AssemblingAction.Freeze,
   programId?: web3.PublicKey;
 };
-export function createRemoveBlockCtx(args: CreateRemoveBlockCtxArgs) {
+export function createRemoveBlockCtx(
+  honeycomb: Honeycomb,
+  args: CreateRemoveBlockCtxArgs
+) {
   const programId = args.programId || PROGRAM_ID;
 
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
@@ -143,7 +149,7 @@ export function createRemoveBlockCtx(args: CreateRemoveBlockCtxArgs) {
     ),
   ];
 
-  return createCtx(instructions);
+  return new Operation(honeycomb, instructions).context;
 }
 
 type DisbandNftArgs = {
@@ -168,30 +174,30 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
       );
       const [blockDefinition] = getBlockDefinitionPda(block, attribute.mint);
 
-      return createRemoveBlockCtx({
+      return createRemoveBlockCtx(honeycomb, {
         project: honeycomb.project().address,
         assembler: honeycomb.assembler().assemblerAddress,
         nftMint: args.nft.mintAddress,
         block,
         blockDefinition,
         tokenMint: attribute.mint,
-        authority: honeycomb.identity().publicKey,
-        payer: honeycomb.identity().publicKey,
+        authority: honeycomb.identity().address,
+        payer: honeycomb.identity().address,
         assemblingAction: honeycomb.assembler().assemblingAction,
         delegateAuthority: honeycomb.identity().delegateAuthority().address,
         programId: args.programId,
       });
     })
-  ).then((x) => x.filter((x) => x !== null) as OperationCtx[]);
+  ).then((x) => x.filter((x) => x !== null) as OperationContext[]);
 
   ctxs.unshift(
-    createBurnNFTCtx({
+    createBurnNFTCtx(honeycomb, {
       project: honeycomb.project().address,
       assembler: honeycomb.assembler().assemblerAddress,
       nftMint: args.nft.mintAddress,
       uniqueConstraint,
-      authority: honeycomb.identity().publicKey,
-      payer: honeycomb.identity().publicKey,
+      authority: honeycomb.identity().address,
+      payer: honeycomb.identity().address,
       delegateAuthority: honeycomb.identity().delegateAuthority().address,
       programId: args.programId,
     })
@@ -221,12 +227,12 @@ export async function burnNft(honeycomb: Honeycomb, args: BurnNftArgs) {
     );
   }
 
-  const ctx = createBurnNFTCtx({
+  const ctx = createBurnNFTCtx(honeycomb, {
     project: honeycomb.project().address,
     assembler: honeycomb.assembler().assemblerAddress,
     nftMint: args.nft.mintAddress,
-    authority: honeycomb.identity().publicKey,
-    payer: honeycomb.identity().publicKey,
+    authority: honeycomb.identity().address,
+    payer: honeycomb.identity().address,
     uniqueConstraint,
     delegateAuthority: honeycomb.identity().delegateAuthority().address,
     programId: args.programId,
@@ -244,15 +250,15 @@ type RemoveBlockArgs = {
   programId?: web3.PublicKey;
 };
 export async function removeBlock(honeycomb: Honeycomb, args: RemoveBlockArgs) {
-  const ctx = createRemoveBlockCtx({
+  const ctx = createRemoveBlockCtx(honeycomb, {
     project: honeycomb.project().address,
     assembler: honeycomb.assembler().assemblerAddress,
     nftMint: args.nft.mintAddress,
     block: args.blockDefinition.block,
     blockDefinition: args.blockDefinition.address,
     tokenMint: args.blockDefinition.mint,
-    authority: honeycomb.identity().publicKey,
-    payer: honeycomb.identity().publicKey,
+    authority: honeycomb.identity().address,
+    payer: honeycomb.identity().address,
     delegateAuthority: honeycomb.identity().delegateAuthority().address,
     assemblingAction: honeycomb.assembler().assemblingAction,
     programId: args.programId,

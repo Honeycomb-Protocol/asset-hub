@@ -16,9 +16,9 @@ import {
   METADATA_PROGRAM_ID,
 } from "../pdas";
 import {
-  createCtx,
   Honeycomb,
-  OperationCtx,
+  Operation,
+  OperationContext,
   VAULT,
 } from "@honeycomb-protocol/hive-control";
 import {
@@ -40,11 +40,9 @@ type CreateCreateNftCtxArgs = {
   programId?: web3.PublicKey;
 };
 export function createCreateNftCtx(
+  honeycomb: Honeycomb,
   args: CreateCreateNftCtxArgs
-): OperationCtx & {
-  nft: web3.PublicKey;
-  nftMint: web3.PublicKey;
-} {
+) {
   const programId = args.programId || PROGRAM_ID;
 
   const nftMint = web3.Keypair.generate();
@@ -82,7 +80,7 @@ export function createCreateNftCtx(
   ];
 
   return {
-    ...createCtx(instructions, [nftMint]),
+    ...new Operation(honeycomb, instructions, [nftMint]).context,
     nft,
     nftMint: nftMint.publicKey,
   };
@@ -102,7 +100,10 @@ type CreateAddBlockCtx = {
   delegateAuthority?: web3.PublicKey;
   programId?: web3.PublicKey;
 };
-export function createAddBlockCtx(args: CreateAddBlockCtx) {
+export function createAddBlockCtx(
+  honeycomb: Honeycomb,
+  args: CreateAddBlockCtx
+) {
   const programId = args.programId || PROGRAM_ID;
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
     args.tokenMint,
@@ -164,7 +165,7 @@ export function createAddBlockCtx(args: CreateAddBlockCtx) {
     ),
   ];
 
-  return createCtx(instructions);
+  return new Operation(honeycomb, instructions).context;
 }
 
 type CreateMintNftCtxArgs = {
@@ -177,7 +178,10 @@ type CreateMintNftCtxArgs = {
   delegateAuthority?: web3.PublicKey;
   programId?: web3.PublicKey;
 };
-export function createMintNftCtx(args: CreateMintNftCtxArgs) {
+export function createMintNftCtx(
+  honeycomb: Honeycomb,
+  args: CreateMintNftCtxArgs
+) {
   const programId = args.programId || PROGRAM_ID;
   const tokenAccount = splToken.getAssociatedTokenAddressSync(
     args.nftMint,
@@ -225,7 +229,7 @@ export function createMintNftCtx(args: CreateMintNftCtxArgs) {
     ),
   ];
 
-  return createCtx(instructions);
+  return new Operation(honeycomb, instructions).context;
 }
 
 export type CreateCreateAndMintNftCtxsArgs = {
@@ -245,15 +249,16 @@ export type CreateCreateAndMintNftCtxsArgs = {
   programId?: web3.PublicKey;
 };
 export async function createCreateAndMintNftCtxs(
+  honeycomb: Honeycomb,
   args: CreateCreateAndMintNftCtxsArgs
 ): Promise<{
-  ctxs: OperationCtx[];
+  ctxs: OperationContext[];
   nft: web3.PublicKey;
   nftMint: web3.PublicKey;
 }> {
-  const ctxs: OperationCtx[] = [];
+  const ctxs: OperationContext[] = [];
 
-  const { nft, nftMint, ...nftCreateCtx } = createCreateNftCtx({
+  const { nft, nftMint, ...nftCreateCtx } = createCreateNftCtx(honeycomb, {
     project: args.project,
     assembler: args.assemblerAddress,
     collectionMint: args.assembler.collection,
@@ -266,7 +271,7 @@ export async function createCreateAndMintNftCtxs(
 
   args.blocks.forEach((block) => {
     ctxs.push(
-      createAddBlockCtx({
+      createAddBlockCtx(honeycomb, {
         project: args.project,
         assembler: args.assemblerAddress,
         nftMint,
@@ -292,7 +297,7 @@ export async function createCreateAndMintNftCtxs(
   }
 
   ctxs.push(
-    createMintNftCtx({
+    createMintNftCtx(honeycomb, {
       project: args.project,
       assembler: args.assemblerAddress,
       nftMint,
@@ -326,11 +331,11 @@ export async function createAndMintNft(
   honeycomb: Honeycomb,
   args: CreateCreateAndMintNftArgs
 ) {
-  const { ctxs, nftMint, nft } = await createCreateAndMintNftCtxs({
+  const { ctxs, nftMint, nft } = await createCreateAndMintNftCtxs(honeycomb, {
     project: honeycomb.project().address,
     assemblerAddress: honeycomb.assembler().assemblerAddress,
     assembler: honeycomb.assembler().assembler(),
-    wallet: honeycomb.identity().publicKey,
+    wallet: honeycomb.identity().address,
     blocks: args.blocks,
     delegateAuthority: honeycomb.identity().delegateAuthority().address,
     programId: args.programId,
@@ -357,12 +362,12 @@ export type CreateNftArgs = {
   programId?: web3.PublicKey;
 };
 export async function createNft(honeycomb: Honeycomb, args: CreateNftArgs) {
-  const ctx = createCreateNftCtx({
+  const ctx = createCreateNftCtx(honeycomb, {
     project: honeycomb.project().address,
     assembler: honeycomb.assembler().assemblerAddress,
     collectionMint: honeycomb.assembler().collection,
-    authority: honeycomb.identity().publicKey,
-    payer: honeycomb.identity().publicKey,
+    authority: honeycomb.identity().address,
+    payer: honeycomb.identity().address,
     delegateAuthority: honeycomb.identity().delegateAuthority().address,
     programId: args.programId,
   });
@@ -388,15 +393,15 @@ export async function addBlock(honeycomb: Honeycomb, args: AddBlockArgs) {
     metadata
   );
 
-  const ctx = createAddBlockCtx({
+  const ctx = createAddBlockCtx(honeycomb, {
     project: honeycomb.project().address,
     assembler: honeycomb.assembler().assemblerAddress,
     nftMint: args.nft.mintAddress,
     block: args.blockDefinition.block,
     blockDefinition: args.blockDefinition.address,
     tokenMint: args.blockDefinition.mint,
-    authority: honeycomb.identity().publicKey,
-    payer: honeycomb.identity().publicKey,
+    authority: honeycomb.identity().address,
+    payer: honeycomb.identity().address,
     assemblingAction: honeycomb.assembler().assemblingAction,
     tokenStandard: tokenStandard || undefined,
     delegateAuthority: honeycomb.identity().delegateAuthority().address,
@@ -425,13 +430,13 @@ export async function mintNft(honeycomb: Honeycomb, args: MintNftArgs) {
     );
   }
 
-  const ctx = createMintNftCtx({
+  const ctx = createMintNftCtx(honeycomb, {
     project: honeycomb.project().address,
     assembler: honeycomb.assembler().assemblerAddress,
     nftMint: args.nftMint,
     uniqueConstraint,
-    authority: honeycomb.identity().publicKey,
-    payer: honeycomb.identity().publicKey,
+    authority: honeycomb.identity().address,
+    payer: honeycomb.identity().address,
     delegateAuthority: honeycomb.identity().delegateAuthority().address,
     programId: args.programId,
   });
