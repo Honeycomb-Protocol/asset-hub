@@ -29,7 +29,12 @@ describe("Currency Manager", () => {
 
     metaplex = new Metaplex(honeycomb.connection);
     // metaplex.use(keypairIdentity(temp.signer));
-    metaplex.use(walletAdapterIdentity(honeycomb.identity()));
+    metaplex.use(
+      walletAdapterIdentity({
+        ...honeycomb.identity(),
+        publicKey: honeycomb.identity().address,
+      })
+    );
 
     const balance = await honeycomb
       .rpc()
@@ -60,7 +65,10 @@ describe("Currency Manager", () => {
   });
 
   it("Create holder account and mint", async () => {
-    const holderAccount = await honeycomb.currency().create().holderAccount();
+    const holderAccount = await honeycomb
+      .currency()
+      .create()
+      .holderAccount(honeycomb.identity().address);
     await holderAccount.mint(1000_000_000_000);
   });
 
@@ -77,7 +85,9 @@ describe("Currency Manager", () => {
       .holderAccount(randomKey.publicKey);
 
     const holderAccount = await honeycomb.currency().holderAccount();
-    await holderAccount.transfer(100_000_000_000, newHolderAccount);
+    await holderAccount.transfer(100_000_000_000, newHolderAccount, {
+      skipPreflight: true,
+    });
   });
 
   it("Delegate and Revoke Delegate", async () => {
@@ -112,7 +122,10 @@ describe("Currency Manager", () => {
       })
     );
 
-    const holderAccount = await honeycomb.currency().create().holderAccount();
+    const holderAccount = await honeycomb
+      .currency()
+      .create()
+      .holderAccount(honeycomb.identity().address);
     await holderAccount.fund(10_000_000_000);
   });
 });

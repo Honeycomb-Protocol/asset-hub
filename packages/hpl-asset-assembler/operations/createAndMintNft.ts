@@ -337,7 +337,7 @@ export async function createAndMintNft(
     assembler: honeycomb.assembler().assembler(),
     wallet: honeycomb.identity().address,
     blocks: args.blocks,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     programId: args.programId,
   });
 
@@ -368,7 +368,7 @@ export async function createNft(honeycomb: Honeycomb, args: CreateNftArgs) {
     collectionMint: honeycomb.assembler().collection,
     authority: honeycomb.identity().address,
     payer: honeycomb.identity().address,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     programId: args.programId,
   });
 
@@ -404,7 +404,7 @@ export async function addBlock(honeycomb: Honeycomb, args: AddBlockArgs) {
     payer: honeycomb.identity().address,
     assemblingAction: honeycomb.assembler().assemblingAction,
     tokenStandard: tokenStandard || undefined,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     programId: args.programId,
   });
 
@@ -437,7 +437,7 @@ export async function mintNft(honeycomb: Honeycomb, args: MintNftArgs) {
     uniqueConstraint,
     authority: honeycomb.identity().address,
     payer: honeycomb.identity().address,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     programId: args.programId,
   });
 

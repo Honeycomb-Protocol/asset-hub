@@ -74,7 +74,7 @@ export async function setNftGenerated(
       nftMint: args.nftMint,
       authority: honeycomb.identity().address,
       payer: honeycomb.identity().address,
-      delegateAuthority: honeycomb.identity().delegateAuthority().address,
+      delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
       programId: args.programId,
     },
     proofIndex

@@ -139,7 +139,7 @@ export async function mintAsset(honeycomb: Honeycomb, args: MintAssetArgs) {
     mint: args.asset.mintAddress,
     wallet: honeycomb.identity().address,
     walletSigner: honeycomb.identity().signer,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     candyGuard: args.asset.candyGuard,
     checkAssociatedTokenAccount: true,
     group: args.group,

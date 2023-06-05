@@ -184,7 +184,7 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
         authority: honeycomb.identity().address,
         payer: honeycomb.identity().address,
         assemblingAction: honeycomb.assembler().assemblingAction,
-        delegateAuthority: honeycomb.identity().delegateAuthority().address,
+        delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
         programId: args.programId,
       });
     })
@@ -198,7 +198,7 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
       uniqueConstraint,
       authority: honeycomb.identity().address,
       payer: honeycomb.identity().address,
-      delegateAuthority: honeycomb.identity().delegateAuthority().address,
+      delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
       programId: args.programId,
     })
   );
@@ -234,7 +234,7 @@ export async function burnNft(honeycomb: Honeycomb, args: BurnNftArgs) {
     authority: honeycomb.identity().address,
     payer: honeycomb.identity().address,
     uniqueConstraint,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     programId: args.programId,
   });
 
@@ -259,7 +259,7 @@ export async function removeBlock(honeycomb: Honeycomb, args: RemoveBlockArgs) {
     tokenMint: args.blockDefinition.mint,
     authority: honeycomb.identity().address,
     payer: honeycomb.identity().address,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     assemblingAction: honeycomb.assembler().assemblingAction,
     programId: args.programId,
   });

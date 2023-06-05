@@ -80,7 +80,7 @@ export async function createAsset(
       assetManager: honeycomb.assetManager().assetManagerAddress,
       authority: honeycomb.identity().address,
       payer: honeycomb.identity().address,
-      delegateAuthority: honeycomb.identity().delegateAuthority().address,
+      delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
       programId: args.programId,
     },
     honeycomb.assetManager().proofIndex()

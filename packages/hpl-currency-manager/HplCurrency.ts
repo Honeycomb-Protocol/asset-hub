@@ -145,7 +145,7 @@ class HplCurrencyFetch {
       holderAccount.tokenAccount,
       typeof commitmentOrConfig === "string"
         ? commitmentOrConfig
-        : commitmentOrConfig.commitment
+        : commitmentOrConfig?.commitment
     );
     return new HplHolderAccount(
       this.currency,

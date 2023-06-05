@@ -166,11 +166,11 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
 pub struct TransferCurrency<'info> {
     /// The project this currency is associated with.
     #[account(mut)]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
 
     /// Currency account
     #[account(has_one = mint, has_one = project)]
-    pub currency: Account<'info, Currency>,
+    pub currency: Box<Account<'info, Currency>>,
 
     /// Currency mint
     #[account()]

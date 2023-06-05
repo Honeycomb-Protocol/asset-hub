@@ -62,7 +62,7 @@ export async function createAssetManager(
     serviceIndex: honeycomb.project().services.length,
     authority: honeycomb.identity().address,
     payer: honeycomb.identity().address,
-    delegateAuthority: honeycomb.identity().delegateAuthority().address,
+    delegateAuthority: honeycomb.identity().delegateAuthority()?.address,
     programId: args.programId,
   });
 

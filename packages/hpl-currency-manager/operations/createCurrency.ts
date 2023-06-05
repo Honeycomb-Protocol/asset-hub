@@ -43,7 +43,7 @@ export async function createCreateCurrencyOperation(
             metadata,
             project: args.project.address,
             delegateAuthority:
-              honeycomb.identity().delegateAuthority().address || programId,
+              honeycomb.identity().delegateAuthority()?.address || programId,
             authority: honeycomb.identity().address,
             payer: honeycomb.identity().address,
             vault: VAULT,
@@ -60,7 +60,7 @@ export async function createCreateCurrencyOperation(
             metadata,
             project: args.project.address,
             delegateAuthority:
-              honeycomb.identity().delegateAuthority().address || programId,
+              honeycomb.identity().delegateAuthority()?.address || programId,
             authority: honeycomb.identity().address,
             payer: honeycomb.identity().address,
             vault: VAULT,
@@ -76,7 +76,11 @@ export async function createCreateCurrencyOperation(
   ];
 
   return {
-    operation: new Operation(honeycomb, instructions),
+    operation: new Operation(
+      honeycomb,
+      instructions,
+      !isArgsMint(args.args) ? [mint] : undefined
+    ),
     currency,
   };
 }

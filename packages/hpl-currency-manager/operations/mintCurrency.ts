@@ -28,7 +28,7 @@ export async function createMintCurrencyOperation(
         tokenAccount: args.holderAccount.tokenAccount,
         project: args.holderAccount.currency().project().address,
         delegateAuthority:
-          honeycomb.identity().delegateAuthority().address || programId,
+          honeycomb.identity().delegateAuthority()?.address || programId,
         authority: honeycomb.identity().address,
         payer: honeycomb.identity().address,
         vault: VAULT,
