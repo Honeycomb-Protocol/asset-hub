@@ -103,7 +103,7 @@ pub struct CreateNFT<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     // HIVE CONTROL
     #[account()]
@@ -188,7 +188,7 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
         ctx.accounts.payer.to_account_info(),
         assembler.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.instructions_sysvar.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
         Some(assembler_signer),
     )?;
@@ -293,7 +293,7 @@ pub struct AddBlock<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     /// SYSVAR RENT
     pub rent: Sysvar<'info, Rent>,
@@ -419,7 +419,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 ctx.accounts.authority.to_account_info(),
                 ctx.accounts.payer.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
-                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.instructions_sysvar.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
                 None,
                 None,
@@ -436,7 +436,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 ctx.accounts.token_record.clone(),
                 ctx.accounts.payer.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
-                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.instructions_sysvar.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
                 None,
                 None,
@@ -461,7 +461,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                     ctx.accounts.system_program.to_account_info(),
                     ctx.accounts.token_program.to_account_info(),
                     ctx.accounts.associated_token_program.to_account_info(),
-                    ctx.accounts.sysvar_instructions.to_account_info(),
+                    ctx.accounts.instructions_sysvar.to_account_info(),
                     None,
                     None,
                     None,
@@ -553,7 +553,7 @@ pub struct MintNFT<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -673,7 +673,7 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
         None, // delegate_record,
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.instructions_sysvar.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
         ctx.accounts.rent.to_account_info(),
         None,
@@ -739,7 +739,7 @@ pub struct BurnNFT<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     // HIVE CONTROL
     #[account()]
@@ -807,7 +807,7 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
         assembler.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.instructions_sysvar.to_account_info(),
         Some(assembler_signer),
     )?;
 
@@ -895,7 +895,7 @@ pub struct RemoveBlock<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     /// RENT PROGRAM
     pub rent: Sysvar<'info, Rent>,
@@ -982,7 +982,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 ctx.accounts.token_record.clone(),
                 ctx.accounts.payer.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
-                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.instructions_sysvar.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
                 None,
                 None,
@@ -1001,7 +1001,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 ctx.accounts.authority.to_account_info(),
                 ctx.accounts.payer.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
-                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.instructions_sysvar.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
                 None,
                 None,
@@ -1029,7 +1029,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 ctx.accounts.system_program.to_account_info(),
                 ctx.accounts.token_program.to_account_info(),
                 ctx.accounts.associated_token_program.to_account_info(),
-                ctx.accounts.sysvar_instructions.to_account_info(),
+                ctx.accounts.instructions_sysvar.to_account_info(),
                 None,
                 None,
                 Some(assembler_signer),
@@ -1117,7 +1117,7 @@ pub struct SetNFTGenerated<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     // HIVE CONTROL
     #[account()]
@@ -1179,7 +1179,7 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
             assembler.to_account_info(),
             ctx.accounts.authority.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.sysvar_instructions.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
             Some(assembler_signer),
         )?;
     }
@@ -1227,7 +1227,7 @@ pub struct UpdateMetadata<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     // HIVE CONTROL
     #[account()]
@@ -1288,7 +1288,7 @@ pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -
         ctx.accounts.assembler.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.instructions_sysvar.to_account_info(),
         Some(assembler_signer),
     )?;
 

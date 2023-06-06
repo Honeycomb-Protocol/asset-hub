@@ -60,8 +60,10 @@ export async function createTransferCurrencyOperation(
         senderTokenAccount: args.holderAccount.tokenAccount,
         receiverHolderAccount,
         receiverTokenAccount,
+        authority: honeycomb.identity().address,
         owner: honeycomb.identity().address,
         vault: VAULT,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       {
         amount: args.amount,

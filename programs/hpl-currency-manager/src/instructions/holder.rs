@@ -67,7 +67,7 @@ pub struct CreateHolderAccount<'info> {
     pub token_program: Program<'info, Token>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Create a holder account
@@ -106,11 +106,16 @@ pub struct BurnCurrency<'info> {
     pub token_account: Account<'info, TokenAccount>,
 
     /// The wallet that holds the authority over the project
+    pub authority: Signer<'info>,
+    /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Burn currency
@@ -193,11 +198,16 @@ pub struct TransferCurrency<'info> {
     pub receiver_token_account: Account<'info, TokenAccount>,
 
     /// The wallet that holds the authority over the project
+    pub authority: Signer<'info>,
+    /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Transger currency
@@ -271,11 +281,16 @@ pub struct ApproveDelegate<'info> {
     pub delegate: AccountInfo<'info>,
 
     /// The wallet that holds the authority over the project
+    pub authority: Signer<'info>,
+    /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Approve currency
@@ -355,6 +370,9 @@ pub struct RevokeDelegate<'info> {
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Approve currency
@@ -393,6 +411,9 @@ pub struct SetHolderStatus<'info> {
     /// CHECK: This is not dangerous because it only collects platform fee
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Set holder status

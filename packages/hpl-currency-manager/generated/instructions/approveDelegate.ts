@@ -42,8 +42,10 @@ export const approveDelegateStruct = new beet.BeetArgsStruct<
  * @property [] holderAccount
  * @property [_writable_] tokenAccount
  * @property [] delegate
+ * @property [**signer**] authority
  * @property [**signer**] owner
  * @property [] vault
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category ApproveDelegate
  * @category generated
@@ -55,10 +57,12 @@ export type ApproveDelegateInstructionAccounts = {
   holderAccount: web3.PublicKey
   tokenAccount: web3.PublicKey
   delegate: web3.PublicKey
+  authority: web3.PublicKey
   owner: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -117,6 +121,11 @@ export function createApproveDelegateInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.authority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
       pubkey: accounts.owner,
       isWritable: false,
       isSigner: true,
@@ -133,6 +142,11 @@ export function createApproveDelegateInstruction(
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
       isWritable: false,
       isSigner: false,
     },

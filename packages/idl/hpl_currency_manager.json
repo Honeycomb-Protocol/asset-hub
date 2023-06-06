@@ -1,5 +1,5 @@
 {
-  "version": "0.0.10",
+  "version": "0.0.11",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -73,11 +73,6 @@
           "isSigner": false
         },
         {
-          "name": "sysvarInstructions",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false
@@ -89,6 +84,11 @@
         },
         {
           "name": "hiveControlProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -173,11 +173,6 @@
           "isSigner": false
         },
         {
-          "name": "sysvarInstructions",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false
@@ -189,6 +184,11 @@
         },
         {
           "name": "hiveControlProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -278,7 +278,7 @@
           "isSigner": false
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -372,6 +372,11 @@
           "name": "hiveControlProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -437,7 +442,15 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for any"
+            "The wallet that owns the tokens"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that owns the tokens"
           ]
         },
         {
@@ -452,6 +465,11 @@
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -507,6 +525,14 @@
           ]
         },
         {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true,
@@ -526,6 +552,11 @@
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -597,6 +628,14 @@
           ]
         },
         {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true,
@@ -616,6 +655,11 @@
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -679,6 +723,14 @@
           ]
         },
         {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true,
@@ -698,6 +750,11 @@
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -774,6 +831,11 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": []
@@ -828,6 +890,11 @@
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false
         }

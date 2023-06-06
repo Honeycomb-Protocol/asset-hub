@@ -43,7 +43,9 @@ export const fundAccountStruct = new beet.BeetArgsStruct<
  * @property [_writable_] tokenAccount
  * @property [_writable_] sourceTokenAccount
  * @property [_writable_, **signer**] wallet
+ * @property [_writable_, **signer**] authority
  * @property [_writable_] vault
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category FundAccount
  * @category generated
@@ -56,9 +58,11 @@ export type FundAccountInstructionAccounts = {
   tokenAccount: web3.PublicKey
   sourceTokenAccount: web3.PublicKey
   wallet: web3.PublicKey
+  authority: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -122,6 +126,11 @@ export function createFundAccountInstruction(
       isSigner: true,
     },
     {
+      pubkey: accounts.authority,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
       pubkey: accounts.vault,
       isWritable: true,
       isSigner: false,
@@ -133,6 +142,11 @@ export function createFundAccountInstruction(
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
       isWritable: false,
       isSigner: false,
     },

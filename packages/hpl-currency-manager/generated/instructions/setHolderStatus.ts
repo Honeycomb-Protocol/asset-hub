@@ -42,6 +42,7 @@ export const setHolderStatusStruct = new beet.BeetArgsStruct<
  * @property [_writable_] tokenAccount
  * @property [**signer**] authority
  * @property [] vault
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category SetHolderStatus
  * @category generated
@@ -54,6 +55,7 @@ export type SetHolderStatusInstructionAccounts = {
   authority: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -113,6 +115,11 @@ export function createSetHolderStatusInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
       isWritable: false,
       isSigner: false,
     },

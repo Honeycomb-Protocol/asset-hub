@@ -22,8 +22,10 @@ export async function createBurnCurrencyOperation(
         holderAccount: args.holderAccount.address,
         mint: args.holderAccount.currency().mint,
         tokenAccount: args.holderAccount.tokenAccount,
+        authority: honeycomb.identity().address,
         owner: args.holderAccount.owner,
         vault: VAULT,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       {
         amount: args.amount,

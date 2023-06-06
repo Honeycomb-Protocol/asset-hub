@@ -853,12 +853,12 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.11"
+version = "0.0.12"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
- "hpl-hive-control 0.1.0",
+ "hpl-hive-control 0.1.3",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
@@ -880,14 +880,19 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.1.0"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f45a821a23cf1d173f593866b701b7200b99e5170a648a329c553a9856536fc1"
+checksum = "65d67cafbb60fb1f0a050c8121196588a095d7a57ea28873a3afacceae64242c"
 dependencies = [
  "anchor-lang",
+ "anchor-spl",
+ "getrandom 0.2.9",
  "hpl-utils",
  "sol-did",
+ "solana-program",
  "spl-account-compression",
+ "toml_datetime",
+ "winnow",
 ]
 
 [[package]]

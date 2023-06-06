@@ -27,6 +27,7 @@ export async function createSetHolderStatusOperation(
         tokenAccount: args.holderAccount.tokenAccount,
         authority: honeycomb.identity().address,
         vault: VAULT,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       {
         status: args.status,

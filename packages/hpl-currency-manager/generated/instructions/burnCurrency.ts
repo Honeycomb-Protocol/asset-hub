@@ -41,8 +41,10 @@ export const burnCurrencyStruct = new beet.BeetArgsStruct<
  * @property [] holderAccount
  * @property [_writable_] mint
  * @property [_writable_] tokenAccount
+ * @property [**signer**] authority
  * @property [**signer**] owner
  * @property [] vault
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category BurnCurrency
  * @category generated
@@ -53,10 +55,12 @@ export type BurnCurrencyInstructionAccounts = {
   holderAccount: web3.PublicKey
   mint: web3.PublicKey
   tokenAccount: web3.PublicKey
+  authority: web3.PublicKey
   owner: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -110,6 +114,11 @@ export function createBurnCurrencyInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.authority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
       pubkey: accounts.owner,
       isWritable: false,
       isSigner: true,
@@ -126,6 +135,11 @@ export function createBurnCurrencyInstruction(
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
       isWritable: false,
       isSigner: false,
     },

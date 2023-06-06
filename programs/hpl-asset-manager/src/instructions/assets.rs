@@ -118,7 +118,7 @@ pub struct CreateAsset<'info> {
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
+    pub instructions_sysvar: AccountInfo<'info>,
 
     // HIVE CONTROL
     #[account()]
@@ -188,7 +188,7 @@ pub fn create_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<
         ctx.accounts.payer.to_account_info(),
         asset.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.instructions_sysvar.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
         Some(asset_signer),
     )?;

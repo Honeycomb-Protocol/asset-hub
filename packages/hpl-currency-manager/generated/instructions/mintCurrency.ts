@@ -46,6 +46,7 @@ export const mintCurrencyStruct = new beet.BeetArgsStruct<
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] hiveControlProgram
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category MintCurrency
  * @category generated
@@ -63,6 +64,7 @@ export type MintCurrencyInstructionAccounts = {
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   hiveControlProgram: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -156,6 +158,11 @@ export function createMintCurrencyInstruction(
   })
   keys.push({
     pubkey: accounts.hiveControlProgram,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.instructionsSysvar,
     isWritable: false,
     isSigner: false,
   })

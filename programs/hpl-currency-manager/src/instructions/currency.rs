@@ -62,14 +62,14 @@ pub struct CreateCurrency<'info> {
 
     pub system_program: Program<'info, System>,
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
     pub hive_control_program: Program<'info, HplHiveControl>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
@@ -128,7 +128,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
         ctx.accounts.payer.to_account_info(),
         currency.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
-        ctx.accounts.sysvar_instructions.to_account_info(),
+        ctx.accounts.instructions_sysvar.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
         Some(currency_signer),
     )?;
@@ -181,14 +181,14 @@ pub struct WrapCurrency<'info> {
 
     pub system_program: Program<'info, System>,
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
-    pub sysvar_instructions: AccountInfo<'info>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
     pub hive_control_program: Program<'info, HplHiveControl>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Create a new currency
@@ -241,11 +241,13 @@ pub struct MintCurrency<'info> {
     /// CHECK: This account is only used to collect platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
-
     pub system_program: Program<'info, System>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
     pub hive_control_program: Program<'info, HplHiveControl>,
+    /// CHECK: This is only used to collect fee
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// mint currency
@@ -304,9 +306,13 @@ pub struct FundAccount<'info> {
     #[account(mut, has_one = mint, constraint = source_token_account.owner == wallet.key())]
     pub source_token_account: Account<'info, TokenAccount>,
 
-    /// The wallet that pays for any
+    /// The wallet that owns the tokens
     #[account(mut)]
     pub wallet: Signer<'info>,
+
+    /// The wallet that owns the tokens
+    #[account(mut)]
+    pub authority: Signer<'info>,
 
     /// CHECK: This account is only used to collect platform fee
     #[account(mut)]
@@ -314,6 +320,9 @@ pub struct FundAccount<'info> {
     pub system_program: Program<'info, System>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// mint currency

@@ -24,8 +24,10 @@ export async function createApproveDelegateOperation(
         holderAccount: args.holderAccount.address,
         tokenAccount: args.holderAccount.tokenAccount,
         delegate: args.delegate,
+        authority: honeycomb.identity().address,
         owner: args.holderAccount.owner,
         vault: VAULT,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       { amount: args.amount },
       programId

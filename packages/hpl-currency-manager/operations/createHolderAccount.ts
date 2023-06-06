@@ -37,7 +37,7 @@ export async function createCreateHolderAccountOperation(
         owner: args.owner,
         payer: honeycomb.identity().address,
         vault: VAULT,
-        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       programId
     ),

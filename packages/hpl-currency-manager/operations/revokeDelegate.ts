@@ -23,6 +23,7 @@ export async function createRevokeDelegateOperation(
         tokenAccount: args.holderAccount.tokenAccount,
         authority: honeycomb.identity().address,
         vault: VAULT,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       programId
     ),

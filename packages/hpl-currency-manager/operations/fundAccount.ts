@@ -39,8 +39,10 @@ export async function createFundAccountOperation(
         holderAccount,
         tokenAccount,
         sourceTokenAccount,
+        authority: honeycomb.identity().address,
         wallet: honeycomb.identity().address,
         vault: VAULT,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       {
         amount: args.amount,
