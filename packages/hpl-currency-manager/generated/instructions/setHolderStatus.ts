@@ -41,7 +41,7 @@ export const setHolderStatusStruct = new beet.BeetArgsStruct<
  * @property [_writable_] holderAccount
  * @property [_writable_] tokenAccount
  * @property [**signer**] authority
- * @property [] vault
+ * @property [_writable_] vault
  * @property [] instructionsSysvar
  * @category Instructions
  * @category SetHolderStatus
@@ -110,7 +110,7 @@ export function createSetHolderStatusInstruction(
     },
     {
       pubkey: accounts.vault,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {

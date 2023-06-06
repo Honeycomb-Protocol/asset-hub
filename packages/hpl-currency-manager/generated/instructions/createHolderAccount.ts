@@ -31,7 +31,7 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] tokenAccount
  * @property [] owner
  * @property [_writable_, **signer**] payer
- * @property [] vault
+ * @property [_writable_] vault
  * @property [] instructionsSysvar
  * @category Instructions
  * @category CreateHolderAccount
@@ -115,7 +115,7 @@ export function createCreateHolderAccountInstruction(
     },
     {
       pubkey: accounts.vault,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {

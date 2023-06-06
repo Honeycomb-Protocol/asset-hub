@@ -43,7 +43,7 @@ export const burnCurrencyStruct = new beet.BeetArgsStruct<
  * @property [_writable_] tokenAccount
  * @property [**signer**] authority
  * @property [**signer**] owner
- * @property [] vault
+ * @property [_writable_] vault
  * @property [] instructionsSysvar
  * @category Instructions
  * @category BurnCurrency
@@ -125,7 +125,7 @@ export function createBurnCurrencyInstruction(
     },
     {
       pubkey: accounts.vault,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
