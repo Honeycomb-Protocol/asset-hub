@@ -853,7 +853,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.12"
+version = "0.0.13"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

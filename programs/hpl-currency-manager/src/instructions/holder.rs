@@ -61,6 +61,7 @@ pub struct CreateHolderAccount<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
+    #[account(mut)]
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     #[account(address = token::ID)]
@@ -110,6 +111,7 @@ pub struct BurnCurrency<'info> {
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
+    #[account(mut)]
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -202,6 +204,7 @@ pub struct TransferCurrency<'info> {
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
+    #[account(mut)]
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -285,6 +288,7 @@ pub struct ApproveDelegate<'info> {
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
+    #[account(mut)]
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -367,6 +371,7 @@ pub struct RevokeDelegate<'info> {
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
+    #[account(mut)]
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -409,6 +414,7 @@ pub struct SetHolderStatus<'info> {
     /// The wallet that will own the token_account
     pub authority: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
+    #[account(mut)]
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     /// CHECK: This is not dangerous because we don't read or write from this account
