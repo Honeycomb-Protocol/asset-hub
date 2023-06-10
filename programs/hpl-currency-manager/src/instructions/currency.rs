@@ -155,11 +155,6 @@ pub struct WrapCurrency<'info> {
     #[account()]
     pub mint: Account<'info, Mint>,
 
-    /// Currency metadata
-    /// CHECK: This is being checked inside the create_metadata instruction
-    #[account(mut)]
-    pub metadata: AccountInfo<'info>,
-
     /// The project this currency is associated with.
     #[account(mut)]
     pub project: Box<Account<'info, Project>>,
@@ -180,9 +175,6 @@ pub struct WrapCurrency<'info> {
     pub vault: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = mpl_token_metadata::ID)]
-    pub token_metadata_program: AccountInfo<'info>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
     pub hive_control_program: Program<'info, HplHiveControl>,

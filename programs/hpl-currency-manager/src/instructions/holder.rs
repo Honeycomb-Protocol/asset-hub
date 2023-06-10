@@ -17,6 +17,10 @@ pub struct CreateHolderAccount<'info> {
     #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
+    /// Currency mint
+    #[account()]
+    pub mint: Account<'info, Mint>,
+
     /// Holder account
     #[account(
         init, payer = payer,
@@ -29,15 +33,6 @@ pub struct CreateHolderAccount<'info> {
         bump
     )]
     pub holder_account: Account<'info, HolderAccount>,
-
-    /// Currency mint
-    #[account()]
-    pub mint: Account<'info, Mint>,
-
-    /// Currency metadata
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub metadata: AccountInfo<'info>,
 
     /// token account holding the token
     #[account(

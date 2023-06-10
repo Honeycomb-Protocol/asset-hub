@@ -40,7 +40,6 @@ export async function createCreateCurrencyOperation(
           {
             currency,
             mint: mint.publicKey,
-            metadata,
             project: args.project.address,
             delegateAuthority:
               honeycomb.identity().delegateAuthority()?.address || programId,
@@ -48,7 +47,6 @@ export async function createCreateCurrencyOperation(
             payer: honeycomb.identity().address,
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-            tokenMetadataProgram: METADATA_PROGRAM_ID,
             hiveControlProgram: HIVECONTROL_PROGRAM_ID,
           },
           programId

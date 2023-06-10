@@ -25,9 +25,8 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
  *
  * @property [_writable_] project
  * @property [] currency
- * @property [_writable_] holderAccount
  * @property [] mint
- * @property [_writable_] metadata
+ * @property [_writable_] holderAccount
  * @property [_writable_] tokenAccount
  * @property [] owner
  * @property [_writable_, **signer**] payer
@@ -40,9 +39,8 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
 export type CreateHolderAccountInstructionAccounts = {
   project: web3.PublicKey
   currency: web3.PublicKey
-  holderAccount: web3.PublicKey
   mint: web3.PublicKey
-  metadata: web3.PublicKey
+  holderAccount: web3.PublicKey
   tokenAccount: web3.PublicKey
   owner: web3.PublicKey
   payer: web3.PublicKey
@@ -84,17 +82,12 @@ export function createCreateHolderAccountInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.holderAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.mint,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.metadata,
+      pubkey: accounts.holderAccount,
       isWritable: true,
       isSigner: false,
     },

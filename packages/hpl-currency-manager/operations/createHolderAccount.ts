@@ -33,7 +33,6 @@ export async function createCreateHolderAccountOperation(
         holderAccount,
         tokenAccount,
         mint: args.currency.mint,
-        metadata,
         owner: args.owner,
         payer: honeycomb.identity().address,
         vault: VAULT,
