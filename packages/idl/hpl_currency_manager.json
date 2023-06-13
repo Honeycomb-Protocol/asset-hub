@@ -1,5 +1,5 @@
 {
-  "version": "0.0.15",
+  "version": "0.0.16",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -432,11 +432,6 @@
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "hiveControlProgram",
           "isMut": false,
           "isSigner": false
         },

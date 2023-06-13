@@ -2,10 +2,7 @@ use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount, Transfer},
-    hpl_hive_control::{
-        program::HplHiveControl,
-        state::{DelegateAuthority, Project},
-    },
+    hpl_hive_control::state::{DelegateAuthority, Project},
     hpl_utils::traits::Default,
     mpl_token_metadata::{
         instruction::{
@@ -351,7 +348,6 @@ pub struct MintCurrency<'info> {
     pub system_program: Program<'info, System>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
-    pub hive_control_program: Program<'info, HplHiveControl>,
     /// CHECK: This is only used to collect fee
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
