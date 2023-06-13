@@ -5,79 +5,77 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  CreateCurrencyArgs,
-  createCurrencyArgsBeet,
-} from '../types/CreateCurrencyArgs'
+  UpdateCurrencyArgs,
+  updateCurrencyArgsBeet,
+} from '../types/UpdateCurrencyArgs'
 
 /**
  * @category Instructions
- * @category CreateCurrency
+ * @category UpdateCurrency
  * @category generated
  */
-export type CreateCurrencyInstructionArgs = {
-  args: CreateCurrencyArgs
+export type UpdateCurrencyInstructionArgs = {
+  args: UpdateCurrencyArgs
 }
 /**
  * @category Instructions
- * @category CreateCurrency
+ * @category UpdateCurrency
  * @category generated
  */
-export const createCurrencyStruct = new beet.FixableBeetArgsStruct<
-  CreateCurrencyInstructionArgs & {
+export const updateCurrencyStruct = new beet.FixableBeetArgsStruct<
+  UpdateCurrencyInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', createCurrencyArgsBeet],
+    ['args', updateCurrencyArgsBeet],
   ],
-  'CreateCurrencyInstructionArgs'
+  'UpdateCurrencyInstructionArgs'
 )
 /**
- * Accounts required by the _createCurrency_ instruction
+ * Accounts required by the _updateCurrency_ instruction
  *
  * @property [] project
- * @property [_writable_] currency
- * @property [_writable_, **signer**] mint
+ * @property [] currency
+ * @property [] mint
  * @property [_writable_] metadata
+ * @property [_writable_] edition
  * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] tokenMetadataProgram
- * @property [] hiveControlProgram
  * @property [] instructionsSysvar
  * @category Instructions
- * @category CreateCurrency
+ * @category UpdateCurrency
  * @category generated
  */
-export type CreateCurrencyInstructionAccounts = {
+export type UpdateCurrencyInstructionAccounts = {
   project: web3.PublicKey
   currency: web3.PublicKey
   mint: web3.PublicKey
   metadata: web3.PublicKey
+  edition: web3.PublicKey
   delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
-  tokenProgram?: web3.PublicKey
-  hiveControlProgram: web3.PublicKey
   instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const createCurrencyInstructionDiscriminator = [
-  148, 249, 90, 34, 172, 92, 48, 196,
+export const updateCurrencyInstructionDiscriminator = [
+  169, 2, 202, 88, 82, 103, 183, 47,
 ]
 
 /**
- * Creates a _CreateCurrency_ instruction.
+ * Creates a _UpdateCurrency_ instruction.
  *
  * Optional accounts that are not provided will be omitted from the accounts
  * array passed with the instruction.
@@ -88,16 +86,16 @@ export const createCurrencyInstructionDiscriminator = [
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CreateCurrency
+ * @category UpdateCurrency
  * @category generated
  */
-export function createCreateCurrencyInstruction(
-  accounts: CreateCurrencyInstructionAccounts,
-  args: CreateCurrencyInstructionArgs,
+export function createUpdateCurrencyInstruction(
+  accounts: UpdateCurrencyInstructionAccounts,
+  args: UpdateCurrencyInstructionArgs,
   programId = new web3.PublicKey('4mGbMdQY7YgVp9rEqZnbkRg5m1H5o3ixZnneGgcT3Pvf')
 ) {
-  const [data] = createCurrencyStruct.serialize({
-    instructionDiscriminator: createCurrencyInstructionDiscriminator,
+  const [data] = updateCurrencyStruct.serialize({
+    instructionDiscriminator: updateCurrencyInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -108,16 +106,21 @@ export function createCreateCurrencyInstruction(
     },
     {
       pubkey: accounts.currency,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.mint,
-      isWritable: true,
-      isSigner: true,
+      isWritable: false,
+      isSigner: false,
     },
     {
       pubkey: accounts.metadata,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.edition,
       isWritable: true,
       isSigner: false,
     },
@@ -152,16 +155,6 @@ export function createCreateCurrencyInstruction(
   })
   keys.push({
     pubkey: accounts.tokenMetadataProgram,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.hiveControlProgram,
     isWritable: false,
     isSigner: false,
   })

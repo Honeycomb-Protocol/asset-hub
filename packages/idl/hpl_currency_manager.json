@@ -1,10 +1,18 @@
 {
-  "version": "0.0.13",
+  "version": "0.0.14",
   "name": "hpl_currency_manager",
   "instructions": [
     {
       "name": "createCurrency",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
         {
           "name": "currency",
           "isMut": true,
@@ -27,14 +35,6 @@
           "isSigner": false,
           "docs": [
             "Currency metadata"
-          ]
-        },
-        {
-          "name": "project",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The project this currency is associated with."
           ]
         },
         {
@@ -98,6 +98,104 @@
           "name": "args",
           "type": {
             "defined": "CreateCurrencyArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateCurrency",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with."
+          ]
+        },
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Currency mint"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency metadata"
+          ]
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Currency edition"
+          ]
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "[Option] Delegate authority account containing permissions of the wallet for the project"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the rent"
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateCurrencyArgs"
           }
         }
       ]
@@ -1004,6 +1102,26 @@
                 "defined": "PermissionedCurrencyKind"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateCurrencyArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
           }
         ]
       }

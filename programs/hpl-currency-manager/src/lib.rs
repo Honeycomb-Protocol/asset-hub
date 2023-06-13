@@ -32,6 +32,20 @@ pub mod hpl_currency_manager {
         instructions::create_currency(ctx, args)
     }
 
+    pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -> Result<()> {
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.manage_assets,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &ctx.accounts.delegate_authority,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+        instructions::update_currency(ctx, args)
+    }
+
     pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assets,

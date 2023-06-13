@@ -7,13 +7,23 @@ use {
         state::{DelegateAuthority, Project},
     },
     hpl_utils::traits::Default,
-    mpl_token_metadata::{instruction::CreateArgs, state::AssetData},
+    mpl_token_metadata::{
+        instruction::{
+            CollectionDetailsToggle, CollectionToggle, CreateArgs, RuleSetToggle, UpdateArgs,
+            UsesToggle,
+        },
+        state::{AssetData, Data},
+    },
 };
 
 /// Accounts used in create currency instruction
 #[derive(Accounts)]
 #[instruction(args: CreateCurrencyArgs)]
 pub struct CreateCurrency<'info> {
+    /// The project this currency is associated with.
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Currency account
     #[account(
       init, payer = payer,
@@ -40,10 +50,6 @@ pub struct CreateCurrency<'info> {
     /// CHECK: This is being checked inside the create_metadata instruction
     #[account(mut)]
     pub metadata: AccountInfo<'info>,
-
-    /// The project this currency is associated with.
-    #[account(mut)]
-    pub project: Box<Account<'info, Project>>,
 
     /// [Option] Delegate authority account containing permissions of the wallet for the project
     #[account(has_one = authority)]
@@ -130,6 +136,104 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.instructions_sysvar.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
+        Some(currency_signer),
+    )?;
+
+    Ok(())
+}
+
+/// Accounts used in update currency instruction
+#[derive(Accounts)]
+pub struct UpdateCurrency<'info> {
+    /// The project this currency is associated with.
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
+    /// Currency account
+    #[account(has_one = project, has_one = mint)]
+    pub currency: Account<'info, Currency>,
+
+    /// Currency mint
+    #[account()]
+    pub mint: Account<'info, Mint>,
+
+    /// Currency metadata
+    /// CHECK: This is being checked inside the update_metadata instruction
+    #[account(mut)]
+    pub metadata: AccountInfo<'info>,
+
+    /// Currency edition
+    /// CHECK: This is being checked inside the update_metadata instruction
+    #[account(mut)]
+    pub edition: AccountInfo<'info>,
+
+    /// [Option] Delegate authority account containing permissions of the wallet for the project
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
+    /// The wallet that holds the authority over the project
+    pub authority: Signer<'info>,
+
+    /// The wallet that pays for the rent
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    /// CHECK: This account is only used to collect platform fee
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = mpl_token_metadata::ID)]
+    pub token_metadata_program: AccountInfo<'info>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+pub struct UpdateCurrencyArgs {
+    pub name: String,
+    pub symbol: String,
+    pub uri: String,
+}
+
+/// Update currency
+pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -> Result<()> {
+    let currency_seeds = &[
+        b"currency".as_ref(),
+        ctx.accounts.currency.mint.as_ref(),
+        &[ctx.accounts.currency.bump],
+    ];
+    let currency_signer = &[&currency_seeds[..]];
+
+    hpl_utils::metadata::update(
+        UpdateArgs::V1 {
+            new_update_authority: None,
+            data: Some(Data {
+                name: args.name,
+                symbol: args.symbol,
+                uri: args.uri,
+                seller_fee_basis_points: 0,
+                creators: None,
+            }),
+            primary_sale_happened: None,
+            is_mutable: None,
+            collection: CollectionToggle::None,
+            collection_details: CollectionDetailsToggle::None,
+            uses: UsesToggle::None,
+            rule_set: RuleSetToggle::None,
+            authorization_data: None,
+        },
+        None,
+        None,
+        ctx.accounts.mint.to_account_info(),
+        ctx.accounts.metadata.to_account_info(),
+        ctx.accounts.edition.to_account_info(),
+        ctx.accounts.currency.to_account_info(),
+        ctx.accounts.payer.to_account_info(),
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.instructions_sysvar.to_account_info(),
         Some(currency_signer),
     )?;
 
