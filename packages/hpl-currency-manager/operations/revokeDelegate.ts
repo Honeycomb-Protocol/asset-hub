@@ -18,7 +18,7 @@ export async function createRevokeDelegateOperation(
       {
         project: args.holderAccount.currency().project().address,
         currency: args.holderAccount.currency().address,
-        mint: args.holderAccount.currency().mint,
+        mint: args.holderAccount.currency().mint.address,
         holderAccount: args.holderAccount.address,
         tokenAccount: args.holderAccount.tokenAccount,
         authority: honeycomb.identity().address,

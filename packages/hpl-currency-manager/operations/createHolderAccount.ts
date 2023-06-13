@@ -18,12 +18,12 @@ export async function createCreateHolderAccountOperation(
 
   const { holderAccount, tokenAccount } = holderAccountPdas(
     args.owner,
-    args.currency.mint,
+    args.currency.mint.address,
     args.currency.kind,
     TOKEN_PROGRAM_ID,
     programId
   );
-  const [metadata] = metadataPda(args.currency.mint);
+  const [metadata] = metadataPda(args.currency.mint.address);
 
   const instructions = [
     createCreateHolderAccountInstruction(
@@ -32,7 +32,7 @@ export async function createCreateHolderAccountOperation(
         currency: args.currency.address,
         holderAccount,
         tokenAccount,
-        mint: args.currency.mint,
+        mint: args.currency.mint.address,
         owner: args.owner,
         payer: honeycomb.identity().address,
         vault: VAULT,

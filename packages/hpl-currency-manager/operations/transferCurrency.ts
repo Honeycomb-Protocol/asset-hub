@@ -26,7 +26,7 @@ export async function createTransferCurrencyOperation(
   if (args.receiver instanceof web3.PublicKey) {
     const accounts = holderAccountPdas(
       args.receiver,
-      args.holderAccount.currency().mint,
+      args.holderAccount.currency().mint.address,
       args.holderAccount.currency().kind,
       splToken.TOKEN_PROGRAM_ID,
       programId
@@ -55,7 +55,7 @@ export async function createTransferCurrencyOperation(
       {
         project: args.holderAccount.currency().project().address,
         currency: args.holderAccount.currency().address,
-        mint: args.holderAccount.currency().mint,
+        mint: args.holderAccount.currency().mint.address,
         senderHolderAccount: args.holderAccount.address,
         senderTokenAccount: args.holderAccount.tokenAccount,
         receiverHolderAccount,

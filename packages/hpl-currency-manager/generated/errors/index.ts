@@ -52,13 +52,36 @@ createErrorFromCodeLookup.set(0x1771, () => new UnauthorizedError())
 createErrorFromNameLookup.set('Unauthorized', () => new UnauthorizedError())
 
 /**
+ * InvalidMetadata: 'Metadata is invalid for the nft'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class InvalidMetadataError extends Error {
+  readonly code: number = 0x1772
+  readonly name: string = 'InvalidMetadata'
+  constructor() {
+    super('Metadata is invalid for the nft')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, InvalidMetadataError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1772, () => new InvalidMetadataError())
+createErrorFromNameLookup.set(
+  'InvalidMetadata',
+  () => new InvalidMetadataError()
+)
+
+/**
  * InactiveHolder: 'The holder account is currrently Inactive'
  *
  * @category Errors
  * @category generated
  */
 export class InactiveHolderError extends Error {
-  readonly code: number = 0x1772
+  readonly code: number = 0x1773
   readonly name: string = 'InactiveHolder'
   constructor() {
     super('The holder account is currrently Inactive')
@@ -68,7 +91,7 @@ export class InactiveHolderError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1772, () => new InactiveHolderError())
+createErrorFromCodeLookup.set(0x1773, () => new InactiveHolderError())
 createErrorFromNameLookup.set('InactiveHolder', () => new InactiveHolderError())
 
 /**

@@ -24,7 +24,7 @@ export async function createMintCurrencyOperation(
       {
         currency: args.holderAccount.currency().address,
         holderAccount: args.holderAccount.address,
-        mint: args.holderAccount.currency().mint,
+        mint: args.holderAccount.currency().mint.address,
         tokenAccount: args.holderAccount.tokenAccount,
         project: args.holderAccount.currency().project().address,
         delegateAuthority:

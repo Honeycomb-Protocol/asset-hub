@@ -20,7 +20,7 @@ export async function createApproveDelegateOperation(
       {
         project: args.holderAccount.currency().project().address,
         currency: args.holderAccount.currency().address,
-        mint: args.holderAccount.currency().mint,
+        mint: args.holderAccount.currency().mint.address,
         holderAccount: args.holderAccount.address,
         tokenAccount: args.holderAccount.tokenAccount,
         delegate: args.delegate,

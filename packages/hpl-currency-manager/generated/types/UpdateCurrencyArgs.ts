@@ -7,9 +7,9 @@
 
 import * as beet from '@metaplex-foundation/beet'
 export type UpdateCurrencyArgs = {
-  name: string
-  symbol: string
-  uri: string
+  name: beet.COption<string>
+  symbol: beet.COption<string>
+  uri: beet.COption<string>
 }
 
 /**
@@ -19,9 +19,9 @@ export type UpdateCurrencyArgs = {
 export const updateCurrencyArgsBeet =
   new beet.FixableBeetArgsStruct<UpdateCurrencyArgs>(
     [
-      ['name', beet.utf8String],
-      ['symbol', beet.utf8String],
-      ['uri', beet.utf8String],
+      ['name', beet.coption(beet.utf8String)],
+      ['symbol', beet.coption(beet.utf8String)],
+      ['uri', beet.coption(beet.utf8String)],
     ],
     'UpdateCurrencyArgs'
   )

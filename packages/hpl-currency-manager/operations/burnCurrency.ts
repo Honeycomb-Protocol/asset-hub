@@ -20,7 +20,7 @@ export async function createBurnCurrencyOperation(
         project: args.holderAccount.currency().project().address,
         currency: args.holderAccount.currency().address,
         holderAccount: args.holderAccount.address,
-        mint: args.holderAccount.currency().mint,
+        mint: args.holderAccount.currency().mint.address,
         tokenAccount: args.holderAccount.tokenAccount,
         authority: honeycomb.identity().address,
         owner: args.holderAccount.owner,

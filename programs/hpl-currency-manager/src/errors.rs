@@ -8,6 +8,9 @@ pub enum ErrorCode {
     #[msg("You are not authorized to perform this action")]
     Unauthorized,
 
+    #[msg("Metadata is invalid for the nft")]
+    InvalidMetadata,
+
     #[msg("The holder account is currrently Inactive")]
     InactiveHolder,
 }

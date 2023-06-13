@@ -19,12 +19,12 @@ export async function createFundAccountOperation(
   const programId = args.programId || PROGRAM_ID;
 
   const sourceTokenAccount = splToken.getAssociatedTokenAddressSync(
-    args.currency.mint,
+    args.currency.mint.address,
     honeycomb.identity().address
   );
   const { holderAccount, tokenAccount } = holderAccountPdas(
     args.receiverWallet,
-    args.currency.mint,
+    args.currency.mint.address,
     args.currency.kind,
     splToken.TOKEN_PROGRAM_ID,
     programId
@@ -35,7 +35,7 @@ export async function createFundAccountOperation(
       {
         project: args.currency.project().address,
         currency: args.currency.address,
-        mint: args.currency.mint,
+        mint: args.currency.mint.address,
         holderAccount,
         tokenAccount,
         sourceTokenAccount,

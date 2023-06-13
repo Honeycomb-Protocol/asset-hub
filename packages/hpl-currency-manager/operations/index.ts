@@ -7,3 +7,4 @@ export * from "./approveDelegate";
 export * from "./revokeDelegate";
 export * from "./setHolderStatus";
 export * from "./fundAccount";
+export * from "./updateCurrency";

@@ -47,7 +47,6 @@ export async function createCreateCurrencyOperation(
             payer: honeycomb.identity().address,
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-            hiveControlProgram: HIVECONTROL_PROGRAM_ID,
           },
           programId
         )
@@ -64,7 +63,6 @@ export async function createCreateCurrencyOperation(
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             tokenMetadataProgram: METADATA_PROGRAM_ID,
-            hiveControlProgram: HIVECONTROL_PROGRAM_ID,
           },
           {
             args: args.args,

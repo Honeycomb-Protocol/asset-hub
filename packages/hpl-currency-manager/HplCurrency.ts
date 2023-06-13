@@ -12,8 +12,9 @@ import {
   HolderAccount,
   HolderStatus,
   PROGRAM_ID,
+  UpdateCurrencyArgs,
 } from "./generated";
-import { holderAccountPda } from "./utils";
+import { holderAccountPda, metadataPda } from "./utils";
 import {
   createApproveDelegateOperation,
   createBurnCurrencyOperation,
@@ -24,7 +25,9 @@ import {
   createRevokeDelegateOperation,
   createSetHolderStatusOperation,
   createTransferCurrencyOperation,
+  createUpdateCurrencyOperation,
 } from "./operations";
+import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 
 declare module "@honeycomb-protocol/hive-control" {
   interface Honeycomb {
@@ -38,14 +41,31 @@ export class HplCurrency extends Module {
 
   private _holders: { [key: string]: HplHolderAccount } = {};
 
-  constructor(readonly address: web3.PublicKey, private _currency: Currency) {
+  constructor(
+    readonly address: web3.PublicKey,
+    private _currency: Currency,
+    private _mint: splToken.Mint,
+    private _metadata: Metadata
+  ) {
     super();
     this._fetch = new HplCurrencyFetch(this);
     this._create = new HplCurrencyCreate(this);
   }
 
+  public get name() {
+    return this._metadata.data.name;
+  }
+
+  public get symbol() {
+    return this._metadata.data.symbol;
+  }
+
+  public get uri() {
+    return this._metadata.data.uri;
+  }
+
   public get mint() {
-    return this._currency.mint;
+    return this._mint;
   }
 
   public get kind() {
@@ -81,7 +101,12 @@ export class HplCurrency extends Module {
     address: web3.PublicKey
   ) {
     const currency = await Currency.fromAccountAddress(connection, address);
-    return new HplCurrency(address, currency);
+    const mint = await splToken.getMint(connection, currency.mint);
+    const metadata = await Metadata.fromAccountAddress(
+      connection,
+      metadataPda(mint.address)[0]
+    );
+    return new HplCurrency(address, currency, mint, metadata);
   }
 
   static async new(
@@ -104,6 +129,21 @@ export class HplCurrency extends Module {
       new web3.Connection(honeycomb.connection.rpcEndpoint, "processed"),
       currency
     );
+  }
+
+  public async update(
+    args: UpdateCurrencyArgs,
+    confirmOptions?: web3.ConfirmOptions
+  ) {
+    const { operation } = await createUpdateCurrencyOperation(
+      this.honeycomb(),
+      {
+        args,
+        currency: this,
+        programId: PROGRAM_ID,
+      }
+    );
+    return operation.send(confirmOptions);
   }
 
   public install(honeycomb: Honeycomb): Honeycomb {
@@ -340,16 +380,25 @@ export const findProjectCurrencies = (project: HoneycombProject) =>
     .addFilter("project", project.address)
     .run(project.honeycomb().connection)
     .then((currencies) =>
-      currencies.map((c) => {
-        try {
-          project
-            .honeycomb()
-            .use(
-              new HplCurrency(c.pubkey, Currency.fromAccountInfo(c.account)[0])
+      Promise.all(
+        currencies.map(async (c) => {
+          try {
+            const currency = Currency.fromAccountInfo(c.account)[0];
+            const mint = await splToken.getMint(
+              project.honeycomb().connection,
+              currency.mint
             );
-        } catch {
-          return null;
-        }
-      })
+            const metadata = await Metadata.fromAccountAddress(
+              project.honeycomb().connection,
+              metadataPda(mint.address)[0]
+            );
+            project
+              .honeycomb()
+              .use(new HplCurrency(c.pubkey, currency, mint, metadata));
+          } catch {
+            return null;
+          }
+        })
+      )
     )
     .then((_) => project.honeycomb());

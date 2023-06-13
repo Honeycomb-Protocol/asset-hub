@@ -1,5 +1,5 @@
 {
-  "version": "0.0.14",
+  "version": "0.0.15",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -79,11 +79,6 @@
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "hiveControlProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -264,11 +259,6 @@
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "hiveControlProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1113,15 +1103,21 @@
         "fields": [
           {
             "name": "name",
-            "type": "string"
+            "type": {
+              "option": "string"
+            }
           },
           {
             "name": "symbol",
-            "type": "string"
+            "type": {
+              "option": "string"
+            }
           },
           {
             "name": "uri",
-            "type": "string"
+            "type": {
+              "option": "string"
+            }
           }
         ]
       }
@@ -1195,6 +1191,11 @@
     },
     {
       "code": 6002,
+      "name": "InvalidMetadata",
+      "msg": "Metadata is invalid for the nft"
+    },
+    {
+      "code": 6003,
       "name": "InactiveHolder",
       "msg": "The holder account is currrently Inactive"
     }

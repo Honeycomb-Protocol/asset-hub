@@ -12,7 +12,7 @@ use {
             CollectionDetailsToggle, CollectionToggle, CreateArgs, RuleSetToggle, UpdateArgs,
             UsesToggle,
         },
-        state::{AssetData, Data},
+        state::{AssetData, Data, Metadata, TokenMetadataAccount},
     },
 };
 
@@ -72,7 +72,6 @@ pub struct CreateCurrency<'info> {
     pub token_metadata_program: AccountInfo<'info>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
-    pub hive_control_program: Program<'info, HplHiveControl>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
@@ -193,13 +192,26 @@ pub struct UpdateCurrency<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub struct UpdateCurrencyArgs {
-    pub name: String,
-    pub symbol: String,
-    pub uri: String,
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub uri: Option<String>,
 }
 
 /// Update currency
 pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -> Result<()> {
+    let metadata_account_info = &ctx.accounts.metadata;
+
+    if metadata_account_info.data_is_empty() {
+        msg!("Metadata account is empty");
+        return Err(ErrorCode::InvalidMetadata.into());
+    }
+
+    let metadata: Metadata = Metadata::from_account_info(metadata_account_info)?;
+    if metadata.mint != ctx.accounts.mint.key() {
+        msg!("Metadata mint does not match NFT mint");
+        return Err(ErrorCode::InvalidMetadata.into());
+    }
+
     let currency_seeds = &[
         b"currency".as_ref(),
         ctx.accounts.currency.mint.as_ref(),
@@ -211,9 +223,9 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         UpdateArgs::V1 {
             new_update_authority: None,
             data: Some(Data {
-                name: args.name,
-                symbol: args.symbol,
-                uri: args.uri,
+                name: args.name.unwrap_or(metadata.data.name),
+                symbol: args.symbol.unwrap_or(metadata.data.symbol),
+                uri: args.uri.unwrap_or(metadata.data.uri),
                 seller_fee_basis_points: 0,
                 creators: None,
             }),
@@ -281,7 +293,6 @@ pub struct WrapCurrency<'info> {
     pub system_program: Program<'info, System>,
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
-    pub hive_control_program: Program<'info, HplHiveControl>,
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
