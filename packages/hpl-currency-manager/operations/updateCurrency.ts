@@ -20,9 +20,6 @@ export async function createUpdateCurrencyOperation(
   const programId = args.programId || PROGRAM_ID;
 
   const [metadata] = metadataPda(args.currency.mint.address);
-  const [edition] = metadataPda(args.currency.mint.address, {
-    __kind: "edition",
-  });
 
   const instructions = [
     createUpdateCurrencyInstruction(
@@ -30,7 +27,6 @@ export async function createUpdateCurrencyOperation(
         currency: args.currency.address,
         mint: args.currency.mint.address,
         metadata,
-        edition,
         project: args.currency.project().address,
         delegateAuthority:
           honeycomb.identity().delegateAuthority()?.address || programId,
