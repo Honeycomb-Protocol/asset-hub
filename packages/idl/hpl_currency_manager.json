@@ -1,5 +1,5 @@
 {
-  "version": "0.0.17",
+  "version": "0.0.18",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -130,15 +130,6 @@
           "isSigner": false,
           "docs": [
             "Currency metadata"
-          ]
-        },
-        {
-          "name": "edition",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true,
-          "docs": [
-            "Currency edition"
           ]
         },
         {

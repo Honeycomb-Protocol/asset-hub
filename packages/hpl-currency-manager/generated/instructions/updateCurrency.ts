@@ -43,7 +43,6 @@ export const updateCurrencyStruct = new beet.FixableBeetArgsStruct<
  * @property [] currency
  * @property [] mint
  * @property [_writable_] metadata
- * @property [_writable_] edition (optional)
  * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
@@ -59,7 +58,6 @@ export type UpdateCurrencyInstructionAccounts = {
   currency: web3.PublicKey
   mint: web3.PublicKey
   metadata: web3.PublicKey
-  edition?: web3.PublicKey
   delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
@@ -121,19 +119,7 @@ export function createUpdateCurrencyInstruction(
     },
   ]
 
-  if (accounts.edition != null) {
-    keys.push({
-      pubkey: accounts.edition,
-      isWritable: true,
-      isSigner: false,
-    })
-  }
   if (accounts.delegateAuthority != null) {
-    if (accounts.edition == null) {
-      throw new Error(
-        "When providing 'delegateAuthority' then 'accounts.edition' need(s) to be provided as well."
-      )
-    }
     keys.push({
       pubkey: accounts.delegateAuthority,
       isWritable: false,
