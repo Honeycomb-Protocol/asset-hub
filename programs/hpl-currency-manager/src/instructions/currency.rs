@@ -161,7 +161,7 @@ pub struct UpdateCurrency<'info> {
     /// Currency edition
     /// CHECK: This is being checked inside the update_metadata instruction
     #[account(mut)]
-    pub edition: AccountInfo<'info>,
+    pub edition: Option<AccountInfo<'info>>,
 
     /// [Option] Delegate authority account containing permissions of the wallet for the project
     #[account(has_one = authority)]
@@ -238,11 +238,13 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         None,
         ctx.accounts.mint.to_account_info(),
         ctx.accounts.metadata.to_account_info(),
-        ctx.accounts.edition.to_account_info(),
+        ctx.accounts.edition.clone(),
         ctx.accounts.currency.to_account_info(),
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.instructions_sysvar.to_account_info(),
+        None,
+        None,
         Some(currency_signer),
     )?;
 

@@ -803,11 +803,13 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
         None,
         ctx.accounts.nft_mint.to_account_info(),
         ctx.accounts.nft_metadata.to_account_info(),
-        ctx.accounts.nft_master_edition.to_account_info(),
+        Some(ctx.accounts.nft_master_edition.to_account_info()),
         assembler.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.instructions_sysvar.to_account_info(),
+        None,
+        None,
         Some(assembler_signer),
     )?;
 
@@ -1175,11 +1177,13 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
             None,
             ctx.accounts.nft_mint.to_account_info(),
             ctx.accounts.nft_metadata.to_account_info(),
-            ctx.accounts.nft_master_edition.to_account_info(),
+            Some(ctx.accounts.nft_master_edition.to_account_info()),
             assembler.to_account_info(),
             ctx.accounts.authority.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
             ctx.accounts.instructions_sysvar.to_account_info(),
+            None,
+            None,
             Some(assembler_signer),
         )?;
     }
@@ -1284,11 +1288,13 @@ pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -
         None,
         ctx.accounts.nft_mint.to_account_info(),
         ctx.accounts.nft_metadata.to_account_info(),
-        ctx.accounts.nft_master_edition.to_account_info(),
+        Some(ctx.accounts.nft_master_edition.to_account_info()),
         ctx.accounts.assembler.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.instructions_sysvar.to_account_info(),
+        None,
+        None,
         Some(assembler_signer),
     )?;
 

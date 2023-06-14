@@ -823,7 +823,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.17"
+version = "0.0.18"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -838,7 +838,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.17"
+version = "0.0.18"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -853,7 +853,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.17"
+version = "0.0.18"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -897,12 +897,17 @@ dependencies = [
 
 [[package]]
 name = "hpl-utils"
-version = "0.1.6"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cc714945459b42d67b04fd32637fef97a89fac277445001fe91b5221a37397e"
+checksum = "7850c0719f9ca4640ebaf7a8cc6fac5361f93b2de78c5a7ea43bfca60f8cfe7c"
 dependencies = [
  "anchor-lang",
+ "anchor-spl",
+ "getrandom 0.2.9",
  "mpl-token-metadata",
+ "solana-program",
+ "toml_datetime",
+ "winnow",
 ]
 
 [[package]]
@@ -1122,9 +1127,9 @@ dependencies = [
 
 [[package]]
 name = "mpl-token-metadata"
-version = "1.11.1"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe6527274dc245c7516244eec69ba28e0fef4b754c26238cf8a570038ab1ca73"
+checksum = "f661ff8c1d64c48cf207c0d259783d411a4249058c1b861fabd8bb6ce30ae4d8"
 dependencies = [
  "arrayref",
  "borsh",
