@@ -174,7 +174,7 @@ class HplCurrencyFetch {
     owner: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
   ) {
-    const [address] = holderAccountPda(owner, this.currency.mint);
+    const [address] = holderAccountPda(owner, this.currency.mint.address);
     const holderAccount = await HolderAccount.fromAccountAddress(
       this.currency.honeycomb().connection,
       address,
