@@ -179,7 +179,7 @@ pub struct TransferCurrency<'info> {
     pub mint: Account<'info, Mint>,
 
     /// Sender Holder account
-    #[account(has_one = currency, has_one = owner, constraint = sender_holder_account.token_account == sender_token_account.key())]
+    #[account(mut, has_one = currency, has_one = owner, constraint = sender_holder_account.token_account == sender_token_account.key())]
     pub sender_holder_account: Account<'info, HolderAccount>,
 
     /// Sender Token account holding the currency
@@ -197,6 +197,7 @@ pub struct TransferCurrency<'info> {
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
     /// The wallet that holds the authority over the project
+    #[account(mut)]
     pub owner: Signer<'info>,
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]

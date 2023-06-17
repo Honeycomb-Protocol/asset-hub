@@ -1,5 +1,5 @@
 {
-  "version": "0.0.19",
+  "version": "0.0.20",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -651,7 +651,7 @@
         },
         {
           "name": "senderHolderAccount",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "Sender Holder account"
@@ -691,7 +691,7 @@
         },
         {
           "name": "owner",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true,
           "docs": [
             "The wallet that holds the authority over the project"
