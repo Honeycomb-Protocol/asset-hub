@@ -211,11 +211,13 @@ pub struct TransferCurrency<'info> {
 
 /// Transger currency
 pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
+    msg!("TRANSFER");
     if ctx.accounts.currency.kind
         == (CurrencyKind::Permissioned {
             kind: PermissionedCurrencyKind::Custodial,
         })
     {
+        msg!("PERMISSIONED");
         let holder_seeds = &[
             b"holder_account",
             ctx.accounts.sender_holder_account.owner.as_ref(),
@@ -237,6 +239,7 @@ pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<
             amount,
         )?;
     } else {
+        msg!("NOMAL");
         token::transfer(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),

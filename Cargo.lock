@@ -823,12 +823,12 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.21"
+version = "0.0.22"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
- "hpl-hive-control 0.0.99",
+ "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
@@ -843,7 +843,7 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
- "hpl-hive-control 0.0.99",
+ "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
@@ -858,7 +858,7 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
- "hpl-hive-control 0.1.6",
+ "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
@@ -868,21 +868,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.0.99"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5f120bb8e77e494dbbf1c8966d8154969b354330b5f5acd64985acca78ecadf"
-dependencies = [
- "anchor-lang",
- "hpl-utils",
- "sol-did",
- "spl-account-compression",
-]
-
-[[package]]
-name = "hpl-hive-control"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad2b7d23df292e159b2452ca2c1ea28792c7b8f2c9dc9b5fcb77fa2fa2a363c8"
+checksum = "85cc4223c859b929f940095ebeff2f6dd98ca9a0b5a324530579dc699a888ea8"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

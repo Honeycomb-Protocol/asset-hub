@@ -116,40 +116,62 @@ pub mod hpl_currency_manager {
     }
 
     pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
-        if ctx.accounts.project.allowed_programs.len() > 0 {
-            let ix_program_key =
-                anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                    0,
-                    &ctx.accounts.instructions_sysvar,
-                )
-                .unwrap()
-                .program_id;
+        let allowed_programs: Vec<Pubkey> = vec![
+            ctx.accounts.project.allowed_programs.clone(),
+            hpl_hive_control::constants::known_programs(),
+        ]
+        .concat();
 
-            if ix_program_key.eq(&ID) {
-                hpl_hive_control::instructions::platform_gate_fn(
-                    hpl_hive_control::constants::ACTIONS.driver_action,
-                    Some((0, Pubkey::default())),
-                    &ctx.accounts.project,
-                    ctx.accounts.authority.key(),
-                    ctx.accounts.wallet.to_account_info(),
-                    ctx.accounts.vault.to_account_info(),
-                    &None,
-                    ctx.accounts.system_program.to_account_info(),
-                )?;
-            } else {
-                let found = ctx
-                    .accounts
-                    .project
-                    .allowed_programs
-                    .iter()
-                    .find(|p| (*p).eq(&ix_program_key));
-                if found.is_none() {
-                    return Err(errors::ErrorCode::Unauthorized.into());
-                }
-            }
-        } else {
+        // if allowed_programs.len() > 0 {
+        //     let ix_program_key =
+        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+        //             0,
+        //             &ctx.accounts.instructions_sysvar,
+        //         )
+        //         .unwrap()
+        //         .program_id;
+
+        //     if ix_program_key.eq(&ID) {
+        //         hpl_hive_control::instructions::platform_gate_fn(
+        //             hpl_hive_control::constants::ACTIONS.driver_action,
+        //             Some((0, Pubkey::default())),
+        //             &ctx.accounts.project,
+        //             ctx.accounts.authority.key(),
+        //             ctx.accounts.wallet.to_account_info(),
+        //             ctx.accounts.vault.to_account_info(),
+        //             &None,
+        //             ctx.accounts.system_program.to_account_info(),
+        //         )?;
+        //     } else {
+        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+        //         if found.is_none() {
+        //             return Err(errors::ErrorCode::Unauthorized.into());
+        //         }
+        //     }
+        // } else {
+        //     hpl_hive_control::instructions::platform_gate_fn(
+        //         hpl_hive_control::constants::ACTIONS.public_high,
+        //         None,
+        //         &ctx.accounts.project,
+        //         ctx.accounts.authority.key(),
+        //         ctx.accounts.wallet.to_account_info(),
+        //         ctx.accounts.vault.to_account_info(),
+        //         &None,
+        //         ctx.accounts.system_program.to_account_info(),
+        //     )?;
+        // }
+
+        let ix_program_key =
+            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+                0,
+                &ctx.accounts.instructions_sysvar,
+            )
+            .unwrap()
+            .program_id;
+
+        if ix_program_key.eq(&ID) {
             hpl_hive_control::instructions::platform_gate_fn(
-                hpl_hive_control::constants::ACTIONS.public_low,
+                hpl_hive_control::constants::ACTIONS.public_high,
                 None,
                 &ctx.accounts.project,
                 ctx.accounts.authority.key(),
@@ -158,6 +180,11 @@ pub mod hpl_currency_manager {
                 &None,
                 ctx.accounts.system_program.to_account_info(),
             )?;
+        } else {
+            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+            if found.is_none() {
+                return Err(errors::ErrorCode::Unauthorized.into());
+            }
         }
 
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
@@ -182,38 +209,60 @@ pub mod hpl_currency_manager {
     }
 
     pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
-        if ctx.accounts.project.allowed_programs.len() > 0 {
-            let ix_program_key =
-                anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                    0,
-                    &ctx.accounts.instructions_sysvar,
-                )
-                .unwrap()
-                .program_id;
+        let allowed_programs: Vec<Pubkey> = vec![
+            ctx.accounts.project.allowed_programs.clone(),
+            hpl_hive_control::constants::known_programs(),
+        ]
+        .concat();
 
-            if ix_program_key.eq(&ID) {
-                hpl_hive_control::instructions::platform_gate_fn(
-                    hpl_hive_control::constants::ACTIONS.driver_action,
-                    Some((0, Pubkey::default())),
-                    &ctx.accounts.project,
-                    ctx.accounts.authority.key(),
-                    ctx.accounts.owner.to_account_info(),
-                    ctx.accounts.vault.to_account_info(),
-                    &None,
-                    ctx.accounts.system_program.to_account_info(),
-                )?;
-            } else {
-                let found = ctx
-                    .accounts
-                    .project
-                    .allowed_programs
-                    .iter()
-                    .find(|p| (*p).eq(&ix_program_key));
-                if found.is_none() {
-                    return Err(errors::ErrorCode::Unauthorized.into());
-                }
-            }
-        } else {
+        // if allowed_programs.len() > 0 {
+        //     let ix_program_key =
+        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+        //             0,
+        //             &ctx.accounts.instructions_sysvar,
+        //         )
+        //         .unwrap()
+        //         .program_id;
+
+        //     if ix_program_key.eq(&ID) {
+        //         hpl_hive_control::instructions::platform_gate_fn(
+        //             hpl_hive_control::constants::ACTIONS.driver_action,
+        //             Some((0, Pubkey::default())),
+        //             &ctx.accounts.project,
+        //             ctx.accounts.authority.key(),
+        //             ctx.accounts.owner.to_account_info(),
+        //             ctx.accounts.vault.to_account_info(),
+        //             &None,
+        //             ctx.accounts.system_program.to_account_info(),
+        //         )?;
+        //     } else {
+        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+        //         if found.is_none() {
+        //             return Err(errors::ErrorCode::Unauthorized.into());
+        //         }
+        //     }
+        // } else {
+        //     hpl_hive_control::instructions::platform_gate_fn(
+        //         hpl_hive_control::constants::ACTIONS.public_high,
+        //         None,
+        //         &ctx.accounts.project,
+        //         ctx.accounts.authority.key(),
+        //         ctx.accounts.owner.to_account_info(),
+        //         ctx.accounts.vault.to_account_info(),
+        //         &None,
+        //         ctx.accounts.system_program.to_account_info(),
+        //     )?;
+        // }
+
+        let ix_program_key =
+            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+                0,
+                &ctx.accounts.instructions_sysvar,
+            )
+            .unwrap()
+            .program_id;
+
+        if ix_program_key.eq(&ID) {
             hpl_hive_control::instructions::platform_gate_fn(
                 hpl_hive_control::constants::ACTIONS.public_high,
                 None,
@@ -224,6 +273,11 @@ pub mod hpl_currency_manager {
                 &None,
                 ctx.accounts.system_program.to_account_info(),
             )?;
+        } else {
+            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+            if found.is_none() {
+                return Err(errors::ErrorCode::Unauthorized.into());
+            }
         }
 
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
@@ -248,38 +302,60 @@ pub mod hpl_currency_manager {
     }
 
     pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
-        if ctx.accounts.project.allowed_programs.len() > 0 {
-            let ix_program_key =
-                anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                    0,
-                    &ctx.accounts.instructions_sysvar,
-                )
-                .unwrap()
-                .program_id;
+        let allowed_programs: Vec<Pubkey> = vec![
+            ctx.accounts.project.allowed_programs.clone(),
+            hpl_hive_control::constants::known_programs(),
+        ]
+        .concat();
 
-            if ix_program_key.eq(&ID) {
-                hpl_hive_control::instructions::platform_gate_fn(
-                    hpl_hive_control::constants::ACTIONS.driver_action,
-                    Some((0, Pubkey::default())),
-                    &ctx.accounts.project,
-                    ctx.accounts.authority.key(),
-                    ctx.accounts.owner.to_account_info(),
-                    ctx.accounts.vault.to_account_info(),
-                    &None,
-                    ctx.accounts.system_program.to_account_info(),
-                )?;
-            } else {
-                let found = ctx
-                    .accounts
-                    .project
-                    .allowed_programs
-                    .iter()
-                    .find(|p| (*p).eq(&ix_program_key));
-                if found.is_none() {
-                    return Err(errors::ErrorCode::Unauthorized.into());
-                }
-            }
-        } else {
+        // if allowed_programs.len() > 0 {
+        //     let ix_program_key =
+        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+        //             0,
+        //             &ctx.accounts.instructions_sysvar,
+        //         )
+        //         .unwrap()
+        //         .program_id;
+
+        //     if ix_program_key.eq(&ID) {
+        //         hpl_hive_control::instructions::platform_gate_fn(
+        //             hpl_hive_control::constants::ACTIONS.driver_action,
+        //             Some((0, Pubkey::default())),
+        //             &ctx.accounts.project,
+        //             ctx.accounts.authority.key(),
+        //             ctx.accounts.owner.to_account_info(),
+        //             ctx.accounts.vault.to_account_info(),
+        //             &None,
+        //             ctx.accounts.system_program.to_account_info(),
+        //         )?;
+        //     } else {
+        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+        //         if found.is_none() {
+        //             return Err(errors::ErrorCode::Unauthorized.into());
+        //         }
+        //     }
+        // } else {
+        //     hpl_hive_control::instructions::platform_gate_fn(
+        //         hpl_hive_control::constants::ACTIONS.public_high,
+        //         None,
+        //         &ctx.accounts.project,
+        //         ctx.accounts.authority.key(),
+        //         ctx.accounts.owner.to_account_info(),
+        //         ctx.accounts.vault.to_account_info(),
+        //         &None,
+        //         ctx.accounts.system_program.to_account_info(),
+        //     )?;
+        // }
+
+        let ix_program_key =
+            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+                0,
+                &ctx.accounts.instructions_sysvar,
+            )
+            .unwrap()
+            .program_id;
+
+        if ix_program_key.eq(&ID) {
             hpl_hive_control::instructions::platform_gate_fn(
                 hpl_hive_control::constants::ACTIONS.public_high,
                 None,
@@ -290,6 +366,11 @@ pub mod hpl_currency_manager {
                 &None,
                 ctx.accounts.system_program.to_account_info(),
             )?;
+        } else {
+            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+            if found.is_none() {
+                return Err(errors::ErrorCode::Unauthorized.into());
+            }
         }
 
         if ctx.accounts.sender_holder_account.status == HolderStatus::Inactive {
@@ -332,38 +413,60 @@ pub mod hpl_currency_manager {
     }
 
     pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()> {
-        if ctx.accounts.project.allowed_programs.len() > 0 {
-            let ix_program_key =
-                anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                    0,
-                    &ctx.accounts.instructions_sysvar,
-                )
-                .unwrap()
-                .program_id;
+        let allowed_programs: Vec<Pubkey> = vec![
+            ctx.accounts.project.allowed_programs.clone(),
+            hpl_hive_control::constants::known_programs(),
+        ]
+        .concat();
 
-            if ix_program_key.eq(&ID) {
-                hpl_hive_control::instructions::platform_gate_fn(
-                    hpl_hive_control::constants::ACTIONS.driver_action,
-                    Some((0, Pubkey::default())),
-                    &ctx.accounts.project,
-                    ctx.accounts.authority.key(),
-                    ctx.accounts.owner.to_account_info(),
-                    ctx.accounts.vault.to_account_info(),
-                    &None,
-                    ctx.accounts.system_program.to_account_info(),
-                )?;
-            } else {
-                let found = ctx
-                    .accounts
-                    .project
-                    .allowed_programs
-                    .iter()
-                    .find(|p| (*p).eq(&ix_program_key));
-                if found.is_none() {
-                    return Err(errors::ErrorCode::Unauthorized.into());
-                }
-            }
-        } else {
+        // if allowed_programs.len() > 0 {
+        //     let ix_program_key =
+        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+        //             0,
+        //             &ctx.accounts.instructions_sysvar,
+        //         )
+        //         .unwrap()
+        //         .program_id;
+
+        //     if ix_program_key.eq(&ID) {
+        //         hpl_hive_control::instructions::platform_gate_fn(
+        //             hpl_hive_control::constants::ACTIONS.driver_action,
+        //             Some((0, Pubkey::default())),
+        //             &ctx.accounts.project,
+        //             ctx.accounts.authority.key(),
+        //             ctx.accounts.owner.to_account_info(),
+        //             ctx.accounts.vault.to_account_info(),
+        //             &None,
+        //             ctx.accounts.system_program.to_account_info(),
+        //         )?;
+        //     } else {
+        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+        //         if found.is_none() {
+        //             return Err(errors::ErrorCode::Unauthorized.into());
+        //         }
+        //     }
+        // } else {
+        //     hpl_hive_control::instructions::platform_gate_fn(
+        //         hpl_hive_control::constants::ACTIONS.public_high,
+        //         None,
+        //         &ctx.accounts.project,
+        //         ctx.accounts.authority.key(),
+        //         ctx.accounts.owner.to_account_info(),
+        //         ctx.accounts.vault.to_account_info(),
+        //         &None,
+        //         ctx.accounts.system_program.to_account_info(),
+        //     )?;
+        // }
+
+        let ix_program_key =
+            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+                0,
+                &ctx.accounts.instructions_sysvar,
+            )
+            .unwrap()
+            .program_id;
+
+        if ix_program_key.eq(&ID) {
             hpl_hive_control::instructions::platform_gate_fn(
                 hpl_hive_control::constants::ACTIONS.public_high,
                 None,
@@ -374,6 +477,11 @@ pub mod hpl_currency_manager {
                 &None,
                 ctx.accounts.system_program.to_account_info(),
             )?;
+        } else {
+            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+            if found.is_none() {
+                return Err(errors::ErrorCode::Unauthorized.into());
+            }
         }
 
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
@@ -398,38 +506,60 @@ pub mod hpl_currency_manager {
     }
 
     pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
-        if ctx.accounts.project.allowed_programs.len() > 0 {
-            let ix_program_key =
-                anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                    0,
-                    &ctx.accounts.instructions_sysvar,
-                )
-                .unwrap()
-                .program_id;
+        let allowed_programs: Vec<Pubkey> = vec![
+            ctx.accounts.project.allowed_programs.clone(),
+            hpl_hive_control::constants::known_programs(),
+        ]
+        .concat();
 
-            if ix_program_key.eq(&ID) {
-                hpl_hive_control::instructions::platform_gate_fn(
-                    hpl_hive_control::constants::ACTIONS.driver_action,
-                    Some((0, Pubkey::default())),
-                    &ctx.accounts.project,
-                    ctx.accounts.authority.key(),
-                    ctx.accounts.authority.to_account_info(),
-                    ctx.accounts.vault.to_account_info(),
-                    &None,
-                    ctx.accounts.system_program.to_account_info(),
-                )?;
-            } else {
-                let found = ctx
-                    .accounts
-                    .project
-                    .allowed_programs
-                    .iter()
-                    .find(|p| (*p).eq(&ix_program_key));
-                if found.is_none() {
-                    return Err(errors::ErrorCode::Unauthorized.into());
-                }
-            }
-        } else {
+        // if allowed_programs.len() > 0 {
+        //     let ix_program_key =
+        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+        //             0,
+        //             &ctx.accounts.instructions_sysvar,
+        //         )
+        //         .unwrap()
+        //         .program_id;
+
+        //     if ix_program_key.eq(&ID) {
+        //         hpl_hive_control::instructions::platform_gate_fn(
+        //             hpl_hive_control::constants::ACTIONS.driver_action,
+        //             Some((0, Pubkey::default())),
+        //             &ctx.accounts.project,
+        //             ctx.accounts.authority.key(),
+        //             ctx.accounts.authority.to_account_info(),
+        //             ctx.accounts.vault.to_account_info(),
+        //             &None,
+        //             ctx.accounts.system_program.to_account_info(),
+        //         )?;
+        //     } else {
+        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+        //         if found.is_none() {
+        //             return Err(errors::ErrorCode::Unauthorized.into());
+        //         }
+        //     }
+        // } else {
+        //     hpl_hive_control::instructions::platform_gate_fn(
+        //         hpl_hive_control::constants::ACTIONS.public_high,
+        //         None,
+        //         &ctx.accounts.project,
+        //         ctx.accounts.authority.key(),
+        //         ctx.accounts.authority.to_account_info(),
+        //         ctx.accounts.vault.to_account_info(),
+        //         &None,
+        //         ctx.accounts.system_program.to_account_info(),
+        //     )?;
+        // }
+
+        let ix_program_key =
+            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+                0,
+                &ctx.accounts.instructions_sysvar,
+            )
+            .unwrap()
+            .program_id;
+
+        if ix_program_key.eq(&ID) {
             hpl_hive_control::instructions::platform_gate_fn(
                 hpl_hive_control::constants::ACTIONS.public_high,
                 None,
@@ -440,6 +570,11 @@ pub mod hpl_currency_manager {
                 &None,
                 ctx.accounts.system_program.to_account_info(),
             )?;
+        } else {
+            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+            if found.is_none() {
+                return Err(errors::ErrorCode::Unauthorized.into());
+            }
         }
 
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
@@ -464,38 +599,60 @@ pub mod hpl_currency_manager {
     }
 
     pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
-        if ctx.accounts.project.allowed_programs.len() > 0 {
-            let ix_program_key =
-                anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                    0,
-                    &ctx.accounts.instructions_sysvar,
-                )
-                .unwrap()
-                .program_id;
+        let allowed_programs: Vec<Pubkey> = vec![
+            ctx.accounts.project.allowed_programs.clone(),
+            hpl_hive_control::constants::known_programs(),
+        ]
+        .concat();
 
-            if ix_program_key.eq(&ID) {
-                hpl_hive_control::instructions::platform_gate_fn(
-                    hpl_hive_control::constants::ACTIONS.driver_action,
-                    Some((0, Pubkey::default())),
-                    &ctx.accounts.project,
-                    ctx.accounts.authority.key(),
-                    ctx.accounts.authority.to_account_info(),
-                    ctx.accounts.vault.to_account_info(),
-                    &None,
-                    ctx.accounts.system_program.to_account_info(),
-                )?;
-            } else {
-                let found = ctx
-                    .accounts
-                    .project
-                    .allowed_programs
-                    .iter()
-                    .find(|p| (*p).eq(&ix_program_key));
-                if found.is_none() {
-                    return Err(errors::ErrorCode::Unauthorized.into());
-                }
-            }
-        } else {
+        // if allowed_programs.len() > 0 {
+        //     let ix_program_key =
+        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+        //             0,
+        //             &ctx.accounts.instructions_sysvar,
+        //         )
+        //         .unwrap()
+        //         .program_id;
+
+        //     if ix_program_key.eq(&ID) {
+        //         hpl_hive_control::instructions::platform_gate_fn(
+        //             hpl_hive_control::constants::ACTIONS.driver_action,
+        //             Some((0, Pubkey::default())),
+        //             &ctx.accounts.project,
+        //             ctx.accounts.authority.key(),
+        //             ctx.accounts.authority.to_account_info(),
+        //             ctx.accounts.vault.to_account_info(),
+        //             &None,
+        //             ctx.accounts.system_program.to_account_info(),
+        //         )?;
+        //     } else {
+        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+        //         if found.is_none() {
+        //             return Err(errors::ErrorCode::Unauthorized.into());
+        //         }
+        //     }
+        // } else {
+        //     hpl_hive_control::instructions::platform_gate_fn(
+        //         hpl_hive_control::constants::ACTIONS.public_high,
+        //         None,
+        //         &ctx.accounts.project,
+        //         ctx.accounts.authority.key(),
+        //         ctx.accounts.authority.to_account_info(),
+        //         ctx.accounts.vault.to_account_info(),
+        //         &None,
+        //         ctx.accounts.system_program.to_account_info(),
+        //     )?;
+        // }
+
+        let ix_program_key =
+            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
+                0,
+                &ctx.accounts.instructions_sysvar,
+            )
+            .unwrap()
+            .program_id;
+
+        if ix_program_key.eq(&ID) {
             hpl_hive_control::instructions::platform_gate_fn(
                 hpl_hive_control::constants::ACTIONS.public_high,
                 None,
@@ -506,6 +663,11 @@ pub mod hpl_currency_manager {
                 &None,
                 ctx.accounts.system_program.to_account_info(),
             )?;
+        } else {
+            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+            if found.is_none() {
+                return Err(errors::ErrorCode::Unauthorized.into());
+            }
         }
 
         instructions::set_holder_status(ctx, status)
