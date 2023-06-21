@@ -15,9 +15,6 @@ import {
 import { METADATA_PROGRAM_ID, currencyPda, metadataPda } from "../utils";
 
 type CreateCurrencyArgsPack = CreateCurrencyArgs | { mint: web3.PublicKey };
-const isArgsMint = (
-  args: CreateCurrencyArgsPack
-): args is { mint: web3.PublicKey } => "mint" in args;
 
 type CreateCreateCurrencyOperationArgs = {
   args: CreateCurrencyArgsPack;
@@ -31,11 +28,15 @@ export async function createCreateCurrencyOperation(
   const programId = args.programId || PROGRAM_ID;
 
   const mint = web3.Keypair.generate();
-  const [currency] = currencyPda(mint.publicKey);
-  const [metadata] = metadataPda(mint.publicKey);
+  const [currency] = currencyPda(
+    "mint" in args.args ? args.args.mint : mint.publicKey
+  );
+  const [metadata] = metadataPda(
+    "mint" in args.args ? args.args.mint : mint.publicKey
+  );
 
   const instructions = [
-    isArgsMint(args.args)
+    "mint" in args.args
       ? createWrapCurrencyInstruction(
           {
             currency,
@@ -75,7 +76,7 @@ export async function createCreateCurrencyOperation(
     operation: new Operation(
       honeycomb,
       instructions,
-      !isArgsMint(args.args) ? [mint] : undefined
+      !("mint" in args.args) ? [mint] : undefined
     ),
     currency,
   };
