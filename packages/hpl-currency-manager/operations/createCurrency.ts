@@ -39,7 +39,7 @@ export async function createCreateCurrencyOperation(
       ? createWrapCurrencyInstruction(
           {
             currency,
-            mint: mint.publicKey,
+            mint: args.args.mint,
             project: args.project.address,
             delegateAuthority:
               honeycomb.identity().delegateAuthority()?.address || programId,

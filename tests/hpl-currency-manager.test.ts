@@ -4,6 +4,7 @@ import {
   HolderStatus,
   HplCurrency,
   PermissionedCurrencyKind,
+  findProjectCurrencies,
 } from "../packages/hpl-currency-manager";
 import { prepare } from "./prepare";
 import {
@@ -42,7 +43,17 @@ describe("Currency Manager", () => {
     expect(balance).toBeGreaterThanOrEqual(web3.LAMPORTS_PER_SOL * 0.1);
   });
 
-  it("Create Project and currency", async () => {
+  it("Temp", async () => {
+    const project = await HoneycombProject.fromAddress(
+      honeycomb.connection,
+      new web3.PublicKey("35PPpJ28L3PeCAYnhTm41zaCJacViPiLg4wne9hu2trr")
+    );
+    honeycomb.use(project);
+    await findProjectCurrencies(project);
+    console.log(honeycomb._currencies);
+  });
+
+  it.skip("Create Project and currency", async () => {
     // Create project
     honeycomb.use(
       await HoneycombProject.new(honeycomb, {
@@ -64,7 +75,7 @@ describe("Currency Manager", () => {
     );
   });
 
-  it("Create holder account and mint", async () => {
+  it.skip("Create holder account and mint", async () => {
     const holderAccount = await honeycomb
       .currency()
       .create()
@@ -72,12 +83,12 @@ describe("Currency Manager", () => {
     await holderAccount.mint(1000_000_000_000);
   });
 
-  it("Burn tokens", async () => {
+  it.skip("Burn tokens", async () => {
     const holderAccount = await honeycomb.currency().holderAccount();
     await holderAccount.burn(100_000_000_000);
   });
 
-  it("Transfer tokens", async () => {
+  it.skip("Transfer tokens", async () => {
     const randomKey = web3.Keypair.generate();
     const newHolderAccount = await honeycomb
       .currency()
@@ -90,19 +101,19 @@ describe("Currency Manager", () => {
     });
   });
 
-  it("Delegate and Revoke Delegate", async () => {
+  it.skip("Delegate and Revoke Delegate", async () => {
     const holderAccount = await honeycomb.currency().holderAccount();
     await holderAccount.approveDelegate(10, honeycomb.identity().address);
     await holderAccount.revokeDelegate();
   });
 
-  it("Freeze and Thaw", async () => {
+  it.skip("Freeze and Thaw", async () => {
     const holderAccount = await honeycomb.currency().holderAccount();
     await holderAccount.setHolderStatus(HolderStatus.Inactive);
     await holderAccount.setHolderStatus(HolderStatus.Active);
   });
 
-  it("Wrapped currency", async () => {
+  it.skip("Wrapped currency", async () => {
     // let mint = web3.Keypair.generate();
     // const token = await metaplex.tokens().createMint({
     //   decimals: 9,

@@ -40,6 +40,7 @@ export class HplCurrency extends Module {
   private _create: HplCurrencyCreate;
 
   private _holders: { [key: string]: HplHolderAccount } = {};
+  private _uriData: any = undefined;
 
   constructor(
     readonly address: web3.PublicKey,
@@ -53,7 +54,16 @@ export class HplCurrency extends Module {
   }
 
   public get name() {
-    return this._metadata.data.name;
+    return this._metadata.data.name.slice(
+      0,
+      this._metadata.data.name.lastIndexOf(
+        (
+          [
+            ...this._metadata.data.name.matchAll(/[a-zA-Z0-9]/g),
+          ] as unknown as string[]
+        ).slice(-1)[0]
+      ) + 1
+    );
   }
 
   public get symbol() {
@@ -70,6 +80,16 @@ export class HplCurrency extends Module {
 
   public get kind() {
     return this._currency.kind;
+  }
+
+  public async uriData(reFetch = false) {
+    if (!this._uriData || reFetch) {
+      this._uriData = await fetch(this.uri, {
+        method: "GET",
+        redirect: "follow",
+      }).then((e) => e.json());
+    }
+    return;
   }
 
   public honeycomb() {
