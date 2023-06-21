@@ -46,7 +46,7 @@ describe("Currency Manager", () => {
   it("Temp", async () => {
     const project = await HoneycombProject.fromAddress(
       honeycomb.connection,
-      new web3.PublicKey("35PPpJ28L3PeCAYnhTm41zaCJacViPiLg4wne9hu2trr")
+      new web3.PublicKey("7CKTHsJ3EZqChNf3XGt9ytdZXvSzDFWmrQJL3BCe4Ppw")
     );
     honeycomb.use(project);
     await findProjectCurrencies(project);

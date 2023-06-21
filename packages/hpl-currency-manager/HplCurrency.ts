@@ -397,7 +397,7 @@ export const currencyModule = (
 
 export const findProjectCurrencies = (project: HoneycombProject) =>
   Currency.gpaBuilder()
-    .addFilter("project", project.address)
+    // .addFilter("project", project.address)
     .run(project.honeycomb().connection)
     .then((currencies) =>
       Promise.all(
@@ -411,7 +411,7 @@ export const findProjectCurrencies = (project: HoneycombProject) =>
             const metadata = await Metadata.fromAccountAddress(
               project.honeycomb().connection,
               metadataPda(mint.address)[0]
-            );
+            ).catch((x) => ({} as Metadata));
             project
               .honeycomb()
               .use(new HplCurrency(c.pubkey, currency, mint, metadata));
