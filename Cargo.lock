@@ -823,7 +823,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.28"
+version = "0.0.29"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -838,7 +838,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.28"
+version = "0.0.29"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -853,7 +853,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.28"
+version = "0.0.29"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -868,14 +868,15 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85cc4223c859b929f940095ebeff2f6dd98ca9a0b5a324530579dc699a888ea8"
+checksum = "237bcbe204f52741c63a86247c6745a9034997179e64a2329204110a0335748a"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
  "hpl-utils",
+ "mpl-token-metadata",
  "sol-did",
  "solana-program",
  "spl-account-compression",
