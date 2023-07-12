@@ -32,6 +32,7 @@ export const createHolderAccountStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] instructionsSysvar
+ * @property [] clockSysvar
  * @category Instructions
  * @category CreateHolderAccount
  * @category generated
@@ -48,6 +49,7 @@ export type CreateHolderAccountInstructionAccounts = {
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   instructionsSysvar: web3.PublicKey
+  clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -123,6 +125,11 @@ export function createCreateHolderAccountInstruction(
     },
     {
       pubkey: accounts.instructionsSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clockSysvar,
       isWritable: false,
       isSigner: false,
     },

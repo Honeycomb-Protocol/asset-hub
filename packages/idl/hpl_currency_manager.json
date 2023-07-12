@@ -1,5 +1,5 @@
 {
-  "version": "0.0.28",
+  "version": "0.0.29",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -84,6 +84,11 @@
         },
         {
           "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -338,6 +343,11 @@
         },
         {
           "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clockSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -999,6 +1009,13 @@
             "type": {
               "defined": "CurrencyKind"
             }
+          },
+          {
+            "name": "createdAt",
+            "docs": [
+              "When this currency was created"
+            ],
+            "type": "i64"
           }
         ]
       }
@@ -1045,6 +1062,13 @@
             "type": {
               "defined": "HolderStatus"
             }
+          },
+          {
+            "name": "createdAt",
+            "docs": [
+              "When this holder account was created"
+            ],
+            "type": "i64"
           }
         ]
       }

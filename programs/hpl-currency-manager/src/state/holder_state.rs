@@ -14,6 +14,8 @@ pub struct HolderAccount {
     pub token_account: Pubkey,
     /// Holder status
     pub status: HolderStatus,
+    /// When this holder account was created
+    pub created_at: i64,
 }
 impl Default for HolderAccount {
     const LEN: usize = 8 + 131;
@@ -24,6 +26,7 @@ impl Default for HolderAccount {
         self.owner = Pubkey::default();
         self.token_account = Pubkey::default();
         self.status = HolderStatus::Active;
+        self.created_at = 0;
     }
 }
 

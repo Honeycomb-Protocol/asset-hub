@@ -72,6 +72,7 @@ pub struct CreateCurrency<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
+    pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
@@ -94,6 +95,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     currency.kind = CurrencyKind::Permissioned {
         kind: args.kind.unwrap_or(PermissionedCurrencyKind::NonCustodial),
     };
+    currency.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
 
     let currency_seeds = &[
         b"currency".as_ref(),

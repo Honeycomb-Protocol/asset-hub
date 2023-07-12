@@ -21,6 +21,7 @@ export type HolderAccountArgs = {
   owner: web3.PublicKey
   tokenAccount: web3.PublicKey
   status: HolderStatus
+  createdAt: beet.bignum
 }
 
 export const holderAccountDiscriminator = [164, 95, 70, 248, 145, 238, 169, 176]
@@ -37,7 +38,8 @@ export class HolderAccount implements HolderAccountArgs {
     readonly currency: web3.PublicKey,
     readonly owner: web3.PublicKey,
     readonly tokenAccount: web3.PublicKey,
-    readonly status: HolderStatus
+    readonly status: HolderStatus,
+    readonly createdAt: beet.bignum
   ) {}
 
   /**
@@ -49,7 +51,8 @@ export class HolderAccount implements HolderAccountArgs {
       args.currency,
       args.owner,
       args.tokenAccount,
-      args.status
+      args.status,
+      args.createdAt
     )
   }
 
@@ -161,6 +164,17 @@ export class HolderAccount implements HolderAccountArgs {
       owner: this.owner.toBase58(),
       tokenAccount: this.tokenAccount.toBase58(),
       status: 'HolderStatus.' + HolderStatus[this.status],
+      createdAt: (() => {
+        const x = <{ toNumber: () => number }>this.createdAt
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
     }
   }
 }
@@ -182,6 +196,7 @@ export const holderAccountBeet = new beet.BeetStruct<
     ['owner', beetSolana.publicKey],
     ['tokenAccount', beetSolana.publicKey],
     ['status', holderStatusBeet],
+    ['createdAt', beet.i64],
   ],
   HolderAccount.fromArgs,
   'HolderAccount'

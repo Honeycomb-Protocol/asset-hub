@@ -64,6 +64,7 @@ export async function createCreateCurrencyOperation(
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             tokenMetadataProgram: METADATA_PROGRAM_ID,
+            clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           },
           {
             args: args.args,

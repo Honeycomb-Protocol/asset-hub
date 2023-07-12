@@ -355,6 +355,8 @@ pub mod hpl_currency_manager {
             .unwrap()
             .program_id;
 
+        msg!("CPI? {:?}", ix_program_key);
+
         if ix_program_key.eq(&ID) {
             hpl_hive_control::instructions::platform_gate_fn(
                 hpl_hive_control::constants::ACTIONS.public_high,
@@ -368,6 +370,7 @@ pub mod hpl_currency_manager {
             )?;
         } else {
             let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
+            msg!("Allowed CPI {}", found.is_some());
             if found.is_none() {
                 return Err(errors::ErrorCode::Unauthorized.into());
             }

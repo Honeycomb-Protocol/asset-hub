@@ -11,7 +11,7 @@ use {
 pub struct CreateHolderAccount<'info> {
     /// The project this currency is associated with.
     #[account(mut)]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
 
     /// Currency account
     #[account(has_one = mint, has_one = project)]
@@ -64,6 +64,7 @@ pub struct CreateHolderAccount<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
+    pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
 /// Create a holder account
@@ -74,6 +75,7 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     holder_account.currency = ctx.accounts.currency.key();
     holder_account.owner = ctx.accounts.owner.key();
     holder_account.token_account = ctx.accounts.token_account.key();
+    holder_account.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
 
     Ok(())
 }
@@ -260,7 +262,7 @@ pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<
 pub struct ApproveDelegate<'info> {
     /// The project this currency is associated with.
     #[account(mut)]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
 
     /// Currency account
     #[account(has_one = mint, has_one = project)]
@@ -396,7 +398,7 @@ pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
 pub struct SetHolderStatus<'info> {
     /// The project this currency is associated with.
     #[account(mut)]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
 
     /// Currency account
     #[account(has_one = project)]

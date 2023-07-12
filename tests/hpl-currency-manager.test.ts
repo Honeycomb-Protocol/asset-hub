@@ -1,6 +1,8 @@
 import * as web3 from "@solana/web3.js";
 import { Honeycomb, HoneycombProject } from "@honeycomb-protocol/hive-control";
 import {
+  Currency,
+  HolderAccount,
   HolderStatus,
   HplCurrency,
   PermissionedCurrencyKind,
@@ -44,13 +46,42 @@ describe("Currency Manager", () => {
   });
 
   it("Temp", async () => {
-    const project = await HoneycombProject.fromAddress(
-      honeycomb.connection,
-      new web3.PublicKey("7CKTHsJ3EZqChNf3XGt9ytdZXvSzDFWmrQJL3BCe4Ppw")
-    );
-    honeycomb.use(project);
-    await findProjectCurrencies(project);
-    console.log(honeycomb._currencies);
+    // const project = await HoneycombProject.fromAddress(
+    //   honeycomb.connection,
+    //   new web3.PublicKey("7CKTHsJ3EZqChNf3XGt9ytdZXvSzDFWmrQJL3BCe4Ppw")
+    // );
+    // honeycomb.use(project);
+    // await findProjectCurrencies(project);
+    // console.log(honeycomb._currencies);
+
+    await Currency.gpaBuilder()
+      .run(honeycomb.connection)
+      .then((x) =>
+        x
+          .map((y) => {
+            try {
+              return Currency.fromAccountInfo(y.account);
+            } catch {
+              return null;
+            }
+          })
+          .filter((x) => !!x)
+      )
+      .then((x) => console.log("Currencies", x.length));
+    await HolderAccount.gpaBuilder()
+      .run(honeycomb.connection)
+      .then((x) =>
+        x
+          .map((y) => {
+            try {
+              return HolderAccount.fromAccountInfo(y.account);
+            } catch {
+              return null;
+            }
+          })
+          .filter((x) => !!x)
+      )
+      .then((x) => console.log("Holder Accounts", x.length));
   });
 
   it.skip("Create Project and currency", async () => {

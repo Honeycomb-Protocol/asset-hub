@@ -14,9 +14,12 @@ pub struct Currency {
 
     /// The type of currency.
     pub kind: CurrencyKind,
+
+    /// When this currency was created
+    pub created_at: i64,
 }
 impl Default for Currency {
-    const LEN: usize = 8 + 70;
+    const LEN: usize = 8 + 80;
 
     fn set_defaults(&mut self) {
         self.bump = 0;
@@ -25,6 +28,7 @@ impl Default for Currency {
         self.kind = CurrencyKind::Permissioned {
             kind: PermissionedCurrencyKind::NonCustodial,
         };
+        self.created_at = 0;
     }
 }
 
