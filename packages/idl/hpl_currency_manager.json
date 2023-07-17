@@ -1,5 +1,5 @@
 {
-  "version": "0.0.29",
+  "version": "0.0.30",
   "name": "hpl_currency_manager",
   "instructions": [
     {
@@ -1009,13 +1009,6 @@
             "type": {
               "defined": "CurrencyKind"
             }
-          },
-          {
-            "name": "createdAt",
-            "docs": [
-              "When this currency was created"
-            ],
-            "type": "i64"
           }
         ]
       }
@@ -1109,6 +1102,9 @@
     },
     {
       "name": "UpdateCurrencyArgs",
+      "docs": [
+        "Accounts used in update currency instruction"
+      ],
       "type": {
         "kind": "struct",
         "fields": [

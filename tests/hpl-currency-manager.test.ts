@@ -1,5 +1,9 @@
 import * as web3 from "@solana/web3.js";
-import { Honeycomb, HoneycombProject } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  HoneycombProject,
+  Operation,
+} from "@honeycomb-protocol/hive-control";
 import {
   Currency,
   HolderAccount,
@@ -54,34 +58,54 @@ describe("Currency Manager", () => {
     // await findProjectCurrencies(project);
     // console.log(honeycomb._currencies);
 
-    await Currency.gpaBuilder()
+    const currencies = (await Currency.gpaBuilder()
       .run(honeycomb.connection)
       .then((x) =>
         x
           .map((y) => {
             try {
-              return Currency.fromAccountInfo(y.account);
+              return [y.pubkey, Currency.fromAccountInfo(y.account)[0]] as [
+                web3.PublicKey,
+                Currency
+              ];
             } catch {
               return null;
             }
           })
           .filter((x) => !!x)
-      )
-      .then((x) => console.log("Currencies", x.length));
-    await HolderAccount.gpaBuilder()
-      .run(honeycomb.connection)
-      .then((x) =>
-        x
-          .map((y) => {
-            try {
-              return HolderAccount.fromAccountInfo(y.account);
-            } catch {
-              return null;
-            }
-          })
-          .filter((x) => !!x)
-      )
-      .then((x) => console.log("Holder Accounts", x.length));
+      )) as [web3.PublicKey, Currency][];
+    console.log("Currencies", currencies.length);
+
+    // for (let currency of currencies) {
+    //   await new Operation(honeycomb, [
+    //     createUpgradeCurrencyInstruction({
+    //       project: currency[1].project,
+    //       currency: currency[0],
+    //       authority: honeycomb.identity().address,
+    //       payer: honeycomb.identity().address,
+    //       rentSysvar: web3.SYSVAR_RENT_PUBKEY,
+    //     }),
+    //   ]).send({ skipPreflight: true });
+    //   console.log("Currency", currency[0].toString());
+    //   break;
+    // }
+
+    console.log("Doe");
+
+    // await HolderAccount.gpaBuilder()
+    //   .run(honeycomb.connection)
+    //   .then((x) =>
+    //     x
+    //       .map((y) => {
+    //         try {
+    //           return HolderAccount.fromAccountInfo(y.account);
+    //         } catch {
+    //           return null;
+    //         }
+    //       })
+    //       .filter((x) => !!x)
+    //   )
+    //   .then((x) => console.log("Holder Accounts", x.length));
   });
 
   it.skip("Create Project and currency", async () => {

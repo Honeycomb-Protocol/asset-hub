@@ -20,7 +20,6 @@ export type CurrencyArgs = {
   project: web3.PublicKey
   mint: web3.PublicKey
   kind: CurrencyKind
-  createdAt: beet.bignum
 }
 
 export const currencyDiscriminator = [191, 62, 116, 219, 163, 67, 229, 200]
@@ -36,21 +35,14 @@ export class Currency implements CurrencyArgs {
     readonly bump: number,
     readonly project: web3.PublicKey,
     readonly mint: web3.PublicKey,
-    readonly kind: CurrencyKind,
-    readonly createdAt: beet.bignum
+    readonly kind: CurrencyKind
   ) {}
 
   /**
    * Creates a {@link Currency} instance from the provided args.
    */
   static fromArgs(args: CurrencyArgs) {
-    return new Currency(
-      args.bump,
-      args.project,
-      args.mint,
-      args.kind,
-      args.createdAt
-    )
+    return new Currency(args.bump, args.project, args.mint, args.kind)
   }
 
   /**
@@ -162,17 +154,6 @@ export class Currency implements CurrencyArgs {
       project: this.project.toBase58(),
       mint: this.mint.toBase58(),
       kind: this.kind.__kind,
-      createdAt: (() => {
-        const x = <{ toNumber: () => number }>this.createdAt
-        if (typeof x.toNumber === 'function') {
-          try {
-            return x.toNumber()
-          } catch (_) {
-            return x
-          }
-        }
-        return x
-      })(),
     }
   }
 }
@@ -193,7 +174,6 @@ export const currencyBeet = new beet.FixableBeetStruct<
     ['project', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
     ['kind', currencyKindBeet],
-    ['createdAt', beet.i64],
   ],
   Currency.fromArgs,
   'Currency'

@@ -95,7 +95,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     currency.kind = CurrencyKind::Permissioned {
         kind: args.kind.unwrap_or(PermissionedCurrencyKind::NonCustodial),
     };
-    currency.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
+    // currency.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
 
     let currency_seeds = &[
         b"currency".as_ref(),
@@ -184,6 +184,7 @@ pub struct UpdateCurrency<'info> {
     pub instructions_sysvar: AccountInfo<'info>,
 }
 
+/// Accounts used in update currency instruction
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub struct UpdateCurrencyArgs {
     pub name: Option<String>,
