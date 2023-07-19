@@ -89,7 +89,7 @@ export class HplCurrency extends Module {
         redirect: "follow",
       }).then((e) => e.json());
     }
-    return;
+    return this._uriData;
   }
 
   public honeycomb() {
