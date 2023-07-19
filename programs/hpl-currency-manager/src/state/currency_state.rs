@@ -3,6 +3,7 @@ use {anchor_lang::prelude::*, hpl_utils::Default};
 /// A currency is a project associated spl token.
 /// It is used as in-game utility currency.
 #[account]
+#[derive(Debug)]
 pub struct Currency {
     pub bump: u8,
 

@@ -137,6 +137,8 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
         Some(currency_signer),
     )?;
 
+    msg!("Currency JSON: {:?}", ctx.accounts.currency);
+
     Ok(())
 }
 
@@ -246,6 +248,7 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         Some(currency_signer),
     )?;
 
+    msg!("Currency JSON: {:?}", ctx.accounts.currency);
     Ok(())
 }
 
