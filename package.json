@@ -10,7 +10,7 @@
   "scripts": {
     "prepare": "husky install",
     "postinstall": "node scripts/postinstall.js",
-    "copyPackages": "copyfiles -u 1 packages/**/package.json dist/",
+    "copyPackages": "copyfiles -u 1 packages/**/package.json dist/ && copyfiles -u 1 packages/**/typedoc.json dist/",
     "precommit": "node ./scripts/precommit.js && git add programs/**/Cargo.toml && git add Cargo.lock",
     "prepush": "echo LFG",
     "publishall": "node ./scripts/publishall.js",
