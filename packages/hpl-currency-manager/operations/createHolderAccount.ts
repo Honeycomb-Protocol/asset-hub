@@ -5,17 +5,44 @@ import { holderAccountPdas, metadataPda } from "../utils";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
 
+/**
+ * Represents the arguments for creating a "Create Holder Account" operation.
+ * @category Types
+ */
 type CreateCreateHolderAccountOperationArgs = {
   currency: HplCurrency;
   owner: web3.PublicKey;
   programId?: web3.PublicKey;
 };
+
+/**
+ * Creates a "Create Holder Account" operation for the given owner and currency,
+ * creating a new holder account and token account for the specified currency.
+ * @category Operation Builders
+ * @param honeycomb The Honeycomb instance.
+ * @param args The arguments for creating the "Create Holder Account" operation.
+ * @returns An object containing the "Create Holder Account" operation and the holder account address.
+ * @example
+ * const honeycomb = new Honeycomb(...); // Initialize Honeycomb instance
+ * const currency = ...; // HplCurrency instance
+ * const ownerPublicKey = ...; // Owner's public key
+ *
+ * // Create a "Create Holder Account" operation for the owner and currency
+ * const operationArgs: CreateCreateHolderAccountOperationArgs = {
+ *   currency,
+ *   owner: ownerPublicKey,
+ * };
+ * const { operation } = await createCreateHolderAccountOperation(honeycomb, operationArgs);
+ * operation.send();
+ */
 export async function createCreateHolderAccountOperation(
   honeycomb: Honeycomb,
   args: CreateCreateHolderAccountOperationArgs
 ) {
+  // If programId is not provided, use the default PROGRAM_ID.
   const programId = args.programId || PROGRAM_ID;
 
+  // Get the holder account and token account PDAs for the specified owner and currency.
   const { holderAccount, tokenAccount } = holderAccountPdas(
     args.owner,
     args.currency.mint.address,
@@ -23,8 +50,11 @@ export async function createCreateHolderAccountOperation(
     TOKEN_PROGRAM_ID,
     programId
   );
+
+  // Get the metadata PDA for the currency's mint.
   const [metadata] = metadataPda(args.currency.mint.address);
 
+  // Create the instruction for the "Create Holder Account" operation.
   const instructions = [
     createCreateHolderAccountInstruction(
       {
@@ -43,6 +73,7 @@ export async function createCreateHolderAccountOperation(
     ),
   ];
 
+  // Return the "Create Holder Account" operation wrapped in an object, along with the holder account address.
   return {
     operation: new Operation(honeycomb, instructions),
     holderAccount,

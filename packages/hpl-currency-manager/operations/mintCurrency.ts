@@ -8,17 +8,44 @@ import {
 import { createMintCurrencyInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
 
+/**
+ * Represents the arguments for creating a "Mint Currency" operation.
+ * @category Types
+ */
 type CreateMintCurrencyOperationArgs = {
   amount: number;
   holderAccount: HplHolderAccount;
   programId?: web3.PublicKey;
 };
+
+/**
+ * Creates a "Mint Currency" operation to mint new currency tokens and add them to the specified holder account.
+ * @category Operation Builders
+ * @param honeycomb The Honeycomb instance.
+ * @param args The arguments for creating the "Mint Currency" operation.
+ * @returns An object containing the "Mint Currency" operation.
+ * @example
+ * const honeycomb = new Honeycomb(...); // Initialize Honeycomb instance
+ * const currency = ...; // HplCurrency instance
+ * const holderAccount = ...; // HplHolderAccount instance
+ * const amount = 100; // Amount to mint
+ *
+ * // Create a "Mint Currency" operation for the holder account and amount
+ * const operationArgs: CreateMintCurrencyOperationArgs = {
+ *   holderAccount,
+ *   amount,
+ * };
+ * const { operation } = await createMintCurrencyOperation(honeycomb, operationArgs);
+ * operation.send();
+ */
 export async function createMintCurrencyOperation(
   honeycomb: Honeycomb,
   args: CreateMintCurrencyOperationArgs
 ) {
+  // If programId is not provided, use the default PROGRAM_ID.
   const programId = args.programId || PROGRAM_ID;
 
+  // Create the instruction for the "Mint Currency" operation.
   const instructions = [
     createMintCurrencyInstruction(
       {
@@ -41,6 +68,7 @@ export async function createMintCurrencyOperation(
     ),
   ];
 
+  // Return the "Mint Currency" operation wrapped in an object.
   return {
     operation: new Operation(honeycomb, instructions),
   };
