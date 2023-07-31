@@ -40,10 +40,10 @@ export const mintAssetStruct = new beet.BeetArgsStruct<
  * @property [] asset
  * @property [_writable_] mint
  * @property [_writable_] tokenAccount
- * @property [] candyGuard
+ * @property [] candyGuard (optional)
  * @property [_writable_, **signer**] wallet
  * @property [] project
- * @property [] delegateAuthority
+ * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
  * @category Instructions
  * @category MintAsset
@@ -54,12 +54,12 @@ export type MintAssetInstructionAccounts = {
   asset: web3.PublicKey
   mint: web3.PublicKey
   tokenAccount: web3.PublicKey
-  candyGuard: web3.PublicKey
+  candyGuard?: web3.PublicKey
   wallet: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   project: web3.PublicKey
-  delegateAuthority: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -70,6 +70,11 @@ export const mintAssetInstructionDiscriminator = [
 
 /**
  * Creates a _MintAsset_ instruction.
+ *
+ * Optional accounts that are not provided will be omitted from the accounts
+ * array passed with the instruction.
+ * An optional account that is set cannot follow an optional account that is unset.
+ * Otherwise an Error is raised.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
@@ -108,42 +113,52 @@ export function createMintAssetInstruction(
       isWritable: true,
       isSigner: false,
     },
-    {
+  ]
+
+  if (accounts.candyGuard != null) {
+    keys.push({
       pubkey: accounts.candyGuard,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.wallet,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
+    })
+  }
+  keys.push({
+    pubkey: accounts.wallet,
+    isWritable: true,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.project,
+    isWritable: false,
+    isSigner: false,
+  })
+  if (accounts.delegateAuthority != null) {
+    if (accounts.candyGuard == null) {
+      throw new Error(
+        "When providing 'delegateAuthority' then 'accounts.candyGuard' need(s) to be provided as well."
+      )
+    }
+    keys.push({
       pubkey: accounts.delegateAuthority,
       isWritable: false,
       isSigner: false,
-    },
-    {
-      pubkey: accounts.vault,
-      isWritable: true,
-      isSigner: false,
-    },
-  ]
+    })
+  }
+  keys.push({
+    pubkey: accounts.vault,
+    isWritable: true,
+    isSigner: false,
+  })
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

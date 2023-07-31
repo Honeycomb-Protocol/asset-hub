@@ -38,7 +38,7 @@ export const removeBlockStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] payer
  * @property [] associatedTokenProgram
  * @property [] tokenMetadataProgram
- * @property [] sysvarInstructions
+ * @property [] instructionsSysvar
  * @property [] project
  * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
@@ -64,7 +64,7 @@ export type RemoveBlockInstructionAccounts = {
   tokenProgram?: web3.PublicKey
   associatedTokenProgram: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
-  sysvarInstructions: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   rent?: web3.PublicKey
   project: web3.PublicKey
   delegateAuthority?: web3.PublicKey
@@ -212,7 +212,7 @@ export function createRemoveBlockInstruction(
     isSigner: false,
   })
   keys.push({
-    pubkey: accounts.sysvarInstructions,
+    pubkey: accounts.instructionsSysvar,
     isWritable: false,
     isSigner: false,
   })

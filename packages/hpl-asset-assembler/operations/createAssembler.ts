@@ -47,7 +47,7 @@ export function createCreateAssemblerCtx(
         assembler,
         authority: args.authority,
         payer: args.payer,
-        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
         project: args.project,
         delegateAuthority: args.delegateAuthority || programId,

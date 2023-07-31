@@ -33,7 +33,7 @@ export const burnNftStruct = new beet.BeetArgsStruct<{
  * @property [**signer**] authority
  * @property [**signer**] payer
  * @property [] tokenMetadataProgram
- * @property [] sysvarInstructions
+ * @property [] instructionsSysvar
  * @property [] project
  * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
@@ -54,7 +54,7 @@ export type BurnNftInstructionAccounts = {
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
-  sysvarInstructions: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   project: web3.PublicKey
   delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
@@ -151,7 +151,7 @@ export function createBurnNftInstruction(
     isSigner: false,
   })
   keys.push({
-    pubkey: accounts.sysvarInstructions,
+    pubkey: accounts.instructionsSysvar,
     isWritable: false,
     isSigner: false,
   })

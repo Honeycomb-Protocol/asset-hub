@@ -47,7 +47,7 @@ export const createAssemblerStruct = new beet.FixableBeetArgsStruct<
  * @property [] authority
  * @property [_writable_, **signer**] payer
  * @property [] tokenMetadataProgram
- * @property [] sysvarInstructions
+ * @property [] instructionsSysvar
  * @property [_writable_] project
  * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
@@ -67,7 +67,7 @@ export type CreateAssemblerInstructionAccounts = {
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
   rent?: web3.PublicKey
-  sysvarInstructions: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   project: web3.PublicKey
   delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
@@ -155,7 +155,7 @@ export function createCreateAssemblerInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.sysvarInstructions,
+      pubkey: accounts.instructionsSysvar,
       isWritable: false,
       isSigner: false,
     },

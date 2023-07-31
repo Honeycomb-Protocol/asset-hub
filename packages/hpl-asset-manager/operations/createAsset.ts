@@ -48,7 +48,7 @@ export function createCreateAssetCtx(
         delegateAuthority: args.delegateAuthority || programId,
         vault: VAULT,
         rentSysvar: web3.SYSVAR_RENT_PUBKEY,
-        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
       },
       { args: args.args, proofIndex },

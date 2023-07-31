@@ -41,7 +41,7 @@ export function createSetNftGeneratedCtx(
         authority: args.authority,
         payer: args.payer,
         delegateAuthority: args.delegateAuthority || programId,
-        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         vault: VAULT,
       },
       {

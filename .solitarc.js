@@ -1,7 +1,6 @@
 const path = require("path");
 
 const createConfig = (name, programId) => {
-
   const packageName = "hpl-" + name;
   const programName = "hpl_" + name.replaceAll(/-/g, "_");
 
@@ -9,7 +8,7 @@ const createConfig = (name, programId) => {
     idlGenerator: "anchor",
     programName,
     programId: programId,
-    idlDir: path.join(__dirname, "packages", "idl"),
+    idlDir: path.join(__dirname, "packages", packageName),
     sdkDir: path.join(__dirname, "packages", packageName, "generated"),
     binaryInstallDir: path.join(__dirname, ".crates"),
     programDir: path.join(__dirname, "programs", packageName),
@@ -18,29 +17,41 @@ const createConfig = (name, programId) => {
       idl.types = idl.types.filter(
         (type) => type.name !== "ActionType" && type.name !== "PlatformGateArgs"
       );
-    
-      idl.accounts = idl.accounts.map(account => {
-        
-        account.type.fields = account.type.fields.map(field => {
-          if(field.type.defined?.includes("HashMap")) {
-            field.type = { hashMap: [ 'string', { defined: field.type.defined.split(",")[1].slice(0, -1) }] }
+
+      idl.accounts = idl.accounts.map((account) => {
+        account.type.fields = account.type.fields.map((field) => {
+          if (field.type.defined?.includes("HashMap")) {
+            field.type = {
+              hashMap: [
+                "string",
+                { defined: field.type.defined.split(",")[1].slice(0, -1) },
+              ],
+            };
           }
-    
-          return field
-        })
-    
+
+          return field;
+        });
+
         return account;
-      })
+      });
       return idl;
     },
-  }
-
-} 
+  };
+};
 
 const configs = {
-  "asset-assembler": createConfig("asset-assembler", "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz"),
-  "asset-manager": createConfig("asset-manager", "7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd"),
-  "currency-manager": createConfig("currency-manager", "CrNcYmnu2nvH5fp4pspk2rLQ9h6N3XrJvZMzEhnpbJux"),
+  "asset-assembler": createConfig(
+    "asset-assembler",
+    "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz"
+  ),
+  "asset-manager": createConfig(
+    "asset-manager",
+    "7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd"
+  ),
+  "currency-manager": createConfig(
+    "currency-manager",
+    "CrNcYmnu2nvH5fp4pspk2rLQ9h6N3XrJvZMzEhnpbJux"
+  ),
 };
 
 const defaultProgram = "currency-manager" || Object.keys(configs)[0];

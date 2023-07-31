@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.37",
   "name": "hpl_asset_assembler",
   "instructions": [
     {
@@ -86,7 +86,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -470,7 +470,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -640,7 +640,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -784,7 +784,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -927,7 +927,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -1097,7 +1097,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -1207,7 +1207,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -1320,7 +1320,7 @@
           ]
         },
         {
-          "name": "sysvarInstructions",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [

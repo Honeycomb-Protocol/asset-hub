@@ -49,7 +49,7 @@ export const updateMetadataStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_] nftMasterEdition
  * @property [**signer**] authority
  * @property [**signer**] payer
- * @property [] sysvarInstructions
+ * @property [] instructionsSysvar
  * @property [] project
  * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
@@ -67,7 +67,7 @@ export type UpdateMetadataInstructionAccounts = {
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  sysvarInstructions: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   project: web3.PublicKey
   delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
@@ -149,7 +149,7 @@ export function createUpdateMetadataInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.sysvarInstructions,
+      pubkey: accounts.instructionsSysvar,
       isWritable: false,
       isSigner: false,
     },

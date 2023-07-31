@@ -66,7 +66,7 @@ export function createBurnNFTCtx(
         payer: args.payer,
         delegateAuthority: args.delegateAuthority || programId,
         vault: VAULT,
-        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
       },
       programId
@@ -143,7 +143,7 @@ export function createRemoveBlockCtx(
         vault: VAULT,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
         associatedTokenProgram: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-        sysvarInstructions: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       programId
     ),
