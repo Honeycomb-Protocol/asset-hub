@@ -16,9 +16,13 @@ pub struct Currency {
     /// The type of currency.
     pub kind: CurrencyKind,
 }
+
+/// Default implementation for `Currency`.
 impl Default for Currency {
+    /// The size of the serialized `Currency` account.
     const LEN: usize = 8 + 80;
 
+    /// Sets default values for `Currency`.
     fn set_defaults(&mut self) {
         self.bump = 0;
         self.project = Pubkey::default();
@@ -34,12 +38,17 @@ impl Default for Currency {
 /// NonCustodial currencies are transfered to holders wallet.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum CurrencyKind {
+    /// Represents a permissioned currency, further specified by `PermissionedCurrencyKind`.
     Permissioned { kind: PermissionedCurrencyKind },
+    /// Represents a wrapped currency.
     Wrapped,
 }
 
+/// The sub-type of permissioned currency.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum PermissionedCurrencyKind {
+    /// Represents a non-custodial permissioned currency.
     NonCustodial,
+    /// Represents a custodial permissioned currency.
     Custodial,
 }

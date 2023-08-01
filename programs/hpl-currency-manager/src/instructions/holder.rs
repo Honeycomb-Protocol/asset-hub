@@ -34,7 +34,7 @@ pub struct CreateHolderAccount<'info> {
     )]
     pub holder_account: Account<'info, HolderAccount>,
 
-    /// token account holding the token
+    /// Token account holding the token
     #[account(
       init, payer = payer,
       seeds = [
@@ -52,18 +52,29 @@ pub struct CreateHolderAccount<'info> {
     /// The wallet that will own the token_account
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub owner: AccountInfo<'info>,
+
     /// The wallet that pays for the rent
     #[account(mut)]
     pub payer: Signer<'info>,
+
+    /// this account collects the protocol fee
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// SPL Token program
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
+
+    /// NATIVE CLOCK SYSVAR
     pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
@@ -71,10 +82,13 @@ pub struct CreateHolderAccount<'info> {
 pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
 
+    // Set the bump value for the holder account.
     holder_account.bump = ctx.bumps["holder_account"];
     holder_account.currency = ctx.accounts.currency.key();
     holder_account.owner = ctx.accounts.owner.key();
     holder_account.token_account = ctx.accounts.token_account.key();
+
+    // Set the creation timestamp for the holder account.
     holder_account.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
 
     Ok(())
@@ -83,35 +97,44 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
 /// Accounts used in burn currency instruction
 #[derive(Accounts)]
 pub struct BurnCurrency<'info> {
-    /// The project this currency is associated with.
+    /// The project account associated with the currency.
     #[account(mut)]
     pub project: Account<'info, Project>,
 
-    /// Currency account
+    /// The currency account to be burned.
     #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
-    /// Holder account
+    /// The holder account associated with the currency, which holds the token.
     #[account(has_one = currency, has_one = token_account, has_one = owner)]
     pub holder_account: Account<'info, HolderAccount>,
 
-    /// Currency mint
+    /// The mint account of the currency.
     #[account(mut)]
     pub mint: Account<'info, Mint>,
 
-    /// Token account holding the currency
+    /// The token account that will be burned.
     #[account(mut)]
     pub token_account: Account<'info, TokenAccount>,
 
-    /// The wallet that holds the authority over the project
+    /// The authority who initiates the burning process.
     pub authority: Signer<'info>,
-    /// The wallet that holds the authority over the project
+
+    /// The owner of the token account.
     pub owner: Signer<'info>,
+
+    /// The account used to collect platform fees for the burning process.
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// SPL Token program
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
@@ -119,15 +142,18 @@ pub struct BurnCurrency<'info> {
 
 /// Burn currency
 pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
+    // Check if the holder account is inactive
     if ctx.accounts.holder_account.status == HolderStatus::Inactive {
         return Err(ErrorCode::InactiveHolder.into());
     }
 
+    // Check the currency kind to determine the authority for burning
     if ctx.accounts.currency.kind
         == (CurrencyKind::Permissioned {
             kind: PermissionedCurrencyKind::Custodial,
         })
     {
+        // For custodial permissioned currency, use the holder account as the authority
         let holder_seeds = &[
             b"holder_account",
             ctx.accounts.holder_account.owner.as_ref(),
@@ -149,6 +175,7 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
             amount,
         )?;
     } else {
+        // For non-custodial permissioned or other kinds of currency, use the owner as the authority
         token::burn(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -180,32 +207,44 @@ pub struct TransferCurrency<'info> {
     #[account()]
     pub mint: Account<'info, Mint>,
 
-    /// Sender Holder account
+    /// Sender holder account
+    /// Must have one currency and one owner.
+    /// The sender's token account must match the sender token account in the constraint.
     #[account(mut, has_one = currency, has_one = owner, constraint = sender_holder_account.token_account == sender_token_account.key())]
     pub sender_holder_account: Account<'info, HolderAccount>,
 
-    /// Sender Token account holding the currency
+    /// Sender token account
     #[account(mut)]
     pub sender_token_account: Account<'info, TokenAccount>,
 
-    /// Reciever Holder account
+    /// Receiver holder account.
+    /// Must have one currency.
+    /// The receiver's token account must match the receiver token account in the constraint.
     #[account(has_one = currency, constraint = receiver_holder_account.token_account == receiver_token_account.key())]
     pub receiver_holder_account: Account<'info, HolderAccount>,
 
-    /// Receiver Token account holding the currency
+    /// Receiver token account
     #[account(mut)]
     pub receiver_token_account: Account<'info, TokenAccount>,
 
-    /// The wallet that holds the authority over the project
+    /// The authority signer for the transaction.
     pub authority: Signer<'info>,
-    /// The wallet that holds the authority over the project
+
+    ///  The authority signer for the transaction.
     #[account(mut)]
     pub owner: Signer<'info>,
+    /// This account is used to collect the platform fee
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// SPL Token program
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
@@ -288,11 +327,19 @@ pub struct ApproveDelegate<'info> {
     pub authority: Signer<'info>,
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
+
+    /// This account is used to collect the platform fee.
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// SPL Token program
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
@@ -371,11 +418,19 @@ pub struct RevokeDelegate<'info> {
 
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
+
+    /// This account is used to collect the platform fee.
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// SPL Token program
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
@@ -414,10 +469,16 @@ pub struct SetHolderStatus<'info> {
 
     /// The wallet that will own the token_account
     pub authority: Signer<'info>,
+
+    /// This account is used to collect the platform fee.
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// SPL Token program
     pub system_program: Program<'info, System>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,

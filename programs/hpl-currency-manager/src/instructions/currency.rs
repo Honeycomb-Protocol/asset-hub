@@ -59,44 +59,97 @@ pub struct CreateCurrency<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// this account collects the protocol fee
     /// CHECK: This account is only used to collect platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
 
+    /// The Solana System Program.
     pub system_program: Program<'info, System>,
+
+    /// The Token Metadata Program ID.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
+
+    /// The Token Program ID.
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
+
+    /// The Clock System Variable Account.
     pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub struct CreateCurrencyArgs {
+    /// The name of the currency.
     pub name: String,
+    /// The symbol of the currency.
     pub symbol: String,
+    /// The URI (Uniform Resource Identifier) associated with the currency.
     pub uri: String,
+    /// The number of decimal places for the currency. Used to represent fractional values.
     pub decimals: u8,
+    /// [Optional] The kind of permissioned currency. It is an enumeration of different permissioned currency kinds.
     pub kind: Option<PermissionedCurrencyKind>,
 }
 
-/// Create a new currency
+/// Create a new currency.
+///
+/// This function is used to create a new currency within a specific project.
+///
+/// # Parameters
+///
+/// - `ctx`: The program context that contains the accounts involved in the transaction.
+/// - `args`: The arguments required to create the new currency. It includes the currency name,
+/// symbol, URI, decimals, and an optional kind specifying the permissioned currency kind.
+///
+/// # Errors
+///
+/// This function can return errors if:
+/// - There is an issue setting the default values for the currency account.
+/// - The provided currency kind is not valid.
+/// - There is an error while creating the associated metadata for the currency.
+/// - The metadata creation process fails for any reason.
+///
+/// # Example
+///
+/// ```no_run
+/// # use my_program::*;
+/// # fn main() -> ProgramResult {
+/// # let ctx: Context<CreateCurrency> = unimplemented!();
+/// # let args: CreateCurrencyArgs = unimplemented!();
+/// create_currency(ctx, args)?;
+/// # Ok(())
+/// # }
+/// ```
 pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -> Result<()> {
+    // Create a mutable reference to the currency account.
     let currency = &mut ctx.accounts.currency;
+
+    // Set default values for the currency account.
     currency.set_defaults();
 
+    // Set the currency bump using the provided context.
     currency.bump = ctx.bumps["currency"];
+
+    // Set the project key and mint key for the currency account.
     currency.project = ctx.accounts.project.key();
+
     currency.mint = ctx.accounts.mint.key();
+
+    // Set the currency kind, defaulting to non-custodial if not provided.
     currency.kind = CurrencyKind::Permissioned {
         kind: args.kind.unwrap_or(PermissionedCurrencyKind::NonCustodial),
     };
     // currency.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
 
+    // Generate currency seeds and signer to create the associated metadata.
     let currency_seeds = &[
         b"currency".as_ref(),
         currency.mint.as_ref(),
@@ -104,6 +157,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     ];
     let currency_signer = &[&currency_seeds[..]];
 
+    // Create the currency metadata using hpl_utils::metadata::create function.
     hpl_utils::metadata::create(
         CreateArgs::V1 {
             asset_data: AssetData {
@@ -137,6 +191,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
         Some(currency_signer),
     )?;
 
+    // Log the created currency JSON for debugging purposes.
     msg!("Currency JSON: {:?}", ctx.accounts.currency);
 
     Ok(())
@@ -173,29 +228,52 @@ pub struct UpdateCurrency<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// this account collects the protocol fee
     /// CHECK: This account is only used to collect platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
 
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// The token metadata program account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
 }
 
-/// Accounts used in update currency instruction
+/// Arguments for updating a currency.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub struct UpdateCurrencyArgs {
+    /// [Option] The updated name of the currency. If `Some`, the name will be updated.
     pub name: Option<String>,
+
+    /// [Option] The updated symbol of the currency. If `Some`, the symbol will be updated.
     pub symbol: Option<String>,
+
+    /// [Option] The updated URI of the currency. If `Some`, the URI will be updated.
     pub uri: Option<String>,
 }
 
-/// Update currency
+/// Update the details of a currency.
+///
+/// This function allows updating the name, symbol, and URI of a currency. The `UpdateCurrencyArgs`
+/// struct contains optional fields for each of these attributes, allowing for partial updates.
+///
+/// # Errors
+/// This function may return an error if the provided metadata account is empty or if the metadata's
+/// mint does not match the currency's mint.
+///
+/// # Arguments
+/// - `ctx`: The context for the instruction, containing accounts and other data.
+/// - `args`: The arguments specifying the updates to be applied to the currency.
 pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -> Result<()> {
+    // Check if the metadata account is empty
     let metadata_account_info = &ctx.accounts.metadata;
 
     if metadata_account_info.data_is_empty() {
@@ -203,12 +281,14 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         return Err(ErrorCode::InvalidMetadata.into());
     }
 
+    // Validate that the metadata's mint matches the currency's mint
     let metadata: Metadata = Metadata::from_account_info(metadata_account_info)?;
     if metadata.mint != ctx.accounts.mint.key() {
         msg!("Metadata mint does not match NFT mint");
         return Err(ErrorCode::InvalidMetadata.into());
     }
 
+    // Prepare the currency signer for updating metadata
     let currency_seeds = &[
         b"currency".as_ref(),
         ctx.accounts.currency.mint.as_ref(),
@@ -216,6 +296,7 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
     ];
     let currency_signer = &[&currency_seeds[..]];
 
+    // Update the metadata based on the provided arguments
     hpl_utils::metadata::update(
         UpdateArgs::V1 {
             new_update_authority: None,
@@ -252,10 +333,14 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
     Ok(())
 }
 
-/// Accounts used in create currency instruction
+/// Accounts used in the instruction to wrap a currency into an associated NFT (non-fungible token).
+///
+/// This struct represents the accounts required to execute the operation of wrapping a currency into
+/// an NFT. The currency will be associated with a specific project, and it will be represented as
+/// an NFT by minting a new NFT token with its own metadata.
 #[derive(Accounts)]
 pub struct WrapCurrency<'info> {
-    /// Currency account
+    /// The account representing the currency to be wrapped into an NFT.
     #[account(
       init, payer = payer,
       space = Currency::LEN,
@@ -265,68 +350,125 @@ pub struct WrapCurrency<'info> {
       ],
       bump
     )]
+
+    /// The account representing the mint of the currency.
     pub currency: Account<'info, Currency>,
 
-    /// Currency mint
+    /// The account representing the project to which the currency is associated.
     #[account()]
     pub mint: Account<'info, Mint>,
 
-    /// The project this currency is associated with.
+    /// The account representing the project to which the currency is associated.
     #[account(mut)]
     pub project: Box<Account<'info, Project>>,
 
-    /// [Option] Delegate authority account containing permissions of the wallet for the project
+    /// [Option] The account representing the delegate authority containing permissions of the wallet for the project.
     #[account(has_one = authority)]
     pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
 
-    /// The wallet that holds the authority over the project
+    /// The wallet that holds the authority over the project.
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent.
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// this account collects the protocol fee
     /// CHECK: This account is only used to collect platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
 
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// Token Program
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
+
+    /// NATIVE INSTRUCTIONS SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account.
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
 }
 
-/// Create a new currency
+/// Wrap a currency into an associated NFT (non-fungible token).
+///
+/// This function wraps the given currency into an NFT by updating the `Currency` account's fields
+/// accordingly. The currency's `bump`, `project`, `mint`, and `kind` fields are set to the appropriate
+/// values to represent that the currency is now associated with an NFT.
+///
+/// # Errors
+///
+/// This function will return an error if there are any issues during the wrapping process.
+/// - An error may occur if the `Currency` account is not properly initialized or does not have enough space.
+///
+/// # Panics
+///
+/// This function should not panic under normal circumstances.
 pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
+    // Get a mutable reference to the currency account and set its defaults.
     let currency = &mut ctx.accounts.currency;
     currency.set_defaults();
 
+    // Set the currency bump value based on the provided bumps.
     currency.bump = ctx.bumps["currency"];
+
+    // Set the project and mint associated with the currency account.
     currency.project = ctx.accounts.project.key();
     currency.mint = ctx.accounts.mint.key();
+
+    // Set the currency kind to indicate that it is wrapped.
     currency.kind = CurrencyKind::Wrapped;
 
+    // Return Ok to indicate the successful completion of the wrapping process.
     Ok(())
 }
 
-/// Accounts used in mint currency instruction
+/// Mint currency to a holder account.
+///
+/// This function is used to mint currency to a holder account. It updates the `HolderAccount`
+/// by increasing the balance of the token account associated with the holder. It also updates the
+/// `Currency` account's supply field to reflect the newly minted tokens.
+///
+/// # Inputs
+///
+/// - `currency`: The `Currency` account representing the currency being minted.
+/// - `holder_account`: The `HolderAccount` account representing the holder to receive the minted tokens.
+/// - `mint`: The `Mint` account associated with the currency.
+/// - `token_account`: The `TokenAccount` account associated with the holder to receive the minted tokens.
+/// - `project`: The `Project` account associated with the currency.
+/// - `delegate_authority`: [Optional] The `DelegateAuthority` account containing permissions for the project.
+/// - `authority`: The wallet that holds the authority over the project.
+/// - `payer`: The wallet that pays for the minting transaction fees.
+/// - `vault`: The account used to collect platform fees.
+/// - `system_program`: The system program required for the transaction.
+/// - `token_program`: The token program required for the token-related instructions.
+/// - `instructions_sysvar`: The sysvar account required for instructions.
+///
+/// # Errors
+///
+/// This function will return an error if there are any issues during the minting process.
+/// - An error may occur if the `HolderAccount` is not properly initialized or does not have enough space.
+/// - An error may occur if the `Currency` or `Mint` accounts are not properly initialized or have incorrect data.
+///
+/// # Panics
+///
+/// This function should not panic under normal circumstances.
 #[derive(Accounts)]
 pub struct MintCurrency<'info> {
-    /// Currency account
+    /// The currency account representing the specific currency being minted.
     #[account(has_one = project, has_one = mint)]
     pub currency: Account<'info, Currency>,
 
-    /// Holder account
+    /// The holder account that will receive the newly minted tokens.
     #[account(has_one = currency, has_one = token_account)]
     pub holder_account: Account<'info, HolderAccount>,
 
-    /// Currency mint
+    /// The mint account associated with the currency's token mint.
     #[account(mut)]
     pub mint: Account<'info, Mint>,
 
-    /// Token account holding the currency
+    /// The token account where the newly minted tokens will be added.
     #[account(mut)]
     pub token_account: Account<'info, TokenAccount>,
 
@@ -334,34 +476,44 @@ pub struct MintCurrency<'info> {
     #[account(mut)]
     pub project: Box<Account<'info, Project>>,
 
-    /// [Option] Delegate authority account containing permissions of the wallet for the project
+    /// [Option] Delegate authority account containing permissions of the wallet for the project.
     #[account(has_one = authority)]
     pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
 
-    /// The wallet that holds the authority over the project
+    /// The wallet that holds the authority over the project.
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent.
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// this account collects the protocol fee
     /// CHECK: This account is only used to collect platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// System Program.
     pub system_program: Program<'info, System>,
+
+    /// SPL Token Program.
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR.
     /// CHECK: This is only used to collect fee
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
 }
 
-/// mint currency
+/// Mint new currency tokens and add them to the specified token account.
 pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
+    // Check if the holder account is inactive, and if so, return an error.
     if ctx.accounts.holder_account.status == HolderStatus::Inactive {
         return Err(ErrorCode::InactiveHolder.into());
     }
 
+    // Define the seeds for the currency account. This is used for signature verification
+    // when minting new tokens.
     let currency_seeds = &[
         b"currency".as_ref(),
         ctx.accounts.currency.mint.as_ref(),
@@ -369,6 +521,7 @@ pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
     ];
     let currency_signer = &[&currency_seeds[..]];
 
+    // Mint new currency tokens and add them to the specified token account.
     token::mint_to(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -382,61 +535,72 @@ pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
         amount,
     )?;
 
+    // Return Ok to indicate the successful completion of the minting operation.
     Ok(())
 }
 
-/// Accounts used in mint currency instruction
+/// Accounts used in the `fund_account` instruction.
 #[derive(Accounts)]
 pub struct FundAccount<'info> {
-    /// The project this currency is associated with.
+    /// The project account to which the currency is associated with.
     #[account(mut)]
     pub project: Box<Account<'info, Project>>,
 
-    /// Currency account
+    /// The currency account representing the specific currency being funded.
     #[account(has_one = mint, has_one = project)]
     pub currency: Account<'info, Currency>,
 
-    /// Currency mint
+    /// The mint account associated with the currency's token mint.
     #[account(mut)]
     pub mint: Account<'info, Mint>,
 
-    /// Holder account
+    /// The holder account that will receive the newly funded tokens.
     #[account(has_one = currency, has_one = token_account)]
     pub holder_account: Account<'info, HolderAccount>,
 
-    /// Token account holding the currency
+    /// The token account where the newly funded tokens will be added.
     #[account(mut, has_one = mint)]
     pub token_account: Account<'info, TokenAccount>,
 
-    /// Token account holding the currency
+    /// The source token account from which funds will be transferred.
     #[account(mut, has_one = mint, constraint = source_token_account.owner == wallet.key())]
     pub source_token_account: Account<'info, TokenAccount>,
 
-    /// The wallet that owns the tokens
+    /// The wallet account that holds the authority over the funds.
     #[account(mut)]
     pub wallet: Signer<'info>,
 
-    /// The wallet that owns the tokens
+    /// The authority signer that approves the fund transfer.
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    /// this account collects the protocol fee
     /// CHECK: This account is only used to collect platform fee
     #[account(mut)]
     pub vault: AccountInfo<'info>,
+
+    /// System Program
     pub system_program: Program<'info, System>,
+
+    /// SPL Token Program
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
 }
 
-/// mint currency
+/// Fund the holder account with a specified amount of tokens.
 pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
+    // Check if the holder account is inactive, and if so, return an error.
     if ctx.accounts.holder_account.status == HolderStatus::Inactive {
         return Err(ErrorCode::InactiveHolder.into());
     }
 
+    // Transfer the specified amount of tokens from the source token account to the token account
+    // associated with the holder account.
     token::transfer(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -449,5 +613,6 @@ pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
         amount,
     )?;
 
+    // Return Ok to indicate the successful completion of the funding operation.
     Ok(())
 }

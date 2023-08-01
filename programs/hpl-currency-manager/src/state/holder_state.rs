@@ -17,9 +17,13 @@ pub struct HolderAccount {
     /// When this holder account was created
     pub created_at: i64,
 }
+
+/// Default implementation for `HolderAccount`.
 impl Default for HolderAccount {
+    /// The size of the serialized `HolderAccount` account.
     const LEN: usize = 8 + 131;
 
+    /// Sets default values for `HolderAccount`.
     fn set_defaults(&mut self) {
         self.bump = 0;
         self.currency = Pubkey::default();
@@ -30,6 +34,7 @@ impl Default for HolderAccount {
     }
 }
 
+/// The status of a holder account.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum HolderStatus {
     /// The holder is active and can be used to send and receive currency.
