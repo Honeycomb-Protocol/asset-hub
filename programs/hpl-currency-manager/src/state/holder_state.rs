@@ -3,6 +3,8 @@ use hpl_utils::Default;
 
 /// A holder is a middle man account between wallet and currency.
 /// It contains detail about the token account that holds the currency
+/// PDA: ['holder', owner, mint]
+/// Category: holder_state
 #[account]
 pub struct HolderAccount {
     pub bump: u8,
