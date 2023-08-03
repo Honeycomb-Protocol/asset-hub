@@ -1,9 +1,30 @@
 {
-  "version": "0.0.37",
+  "version": "0.0.39",
   "name": "hpl_currency_manager",
+  "docs": [
+    "The entry point for the HPL currency manager program."
+  ],
   "instructions": [
     {
       "name": "createCurrency",
+      "docs": [
+        "Create a new currency in the HPL Hive Control program.",
+        "",
+        "This function serves as a platform gate to manage assets for a project. It calls the",
+        "`platform_gate_fn` from the `hpl_hive_control` instructions module to check permissions",
+        "and then calls `create_currency` from the `hpl_hive_control::instructions` module to",
+        "perform the actual currency creation.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context with accounts and instructions provided by the runtime.",
+        "- `args`: The arguments required to create a new currency.",
+        "",
+        "# Errors",
+        "",
+        "This function can return an error if the platform gate fails or if the currency creation",
+        "encounters any issues."
+      ],
       "accounts": [
         {
           "name": "project",
@@ -65,32 +86,50 @@
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The Solana System Program."
+          ]
         },
         {
           "name": "tokenMetadataProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The Token Metadata Program ID."
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The Token Program ID."
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The Instructions System Variable Account."
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The Clock System Variable Account."
+          ]
         }
       ],
       "args": [
@@ -104,6 +143,24 @@
     },
     {
       "name": "updateCurrency",
+      "docs": [
+        "Update an existing currency in the HPL Hive Control program.",
+        "",
+        "This function serves as a platform gate to manage assets for a project. It calls the",
+        "`platform_gate_fn` from the `hpl_hive_control` instructions module to check permissions",
+        "and then calls `update_currency` from the `hpl_hive_control::instructions` module to",
+        "perform the actual currency update.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context with accounts and instructions provided by the runtime.",
+        "- `args`: The arguments required to update an existing currency.",
+        "",
+        "# Errors",
+        "",
+        "This function can return an error if the platform gate fails or if the currency update",
+        "encounters any issues."
+      ],
       "accounts": [
         {
           "name": "project",
@@ -165,22 +222,34 @@
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenMetadataProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The token metadata program account."
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -194,13 +263,30 @@
     },
     {
       "name": "wrapCurrency",
+      "docs": [
+        "Wrap a currency in the HPL Hive Control program.",
+        "",
+        "This function serves as a platform gate to manage assets for a project. It checks",
+        "permissions using the `platform_gate_fn` from the `hpl_hive_control` instructions",
+        "module. If the platform gate is successful, it proceeds to wrap the currency.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails or if the currency wrapping",
+        "encounters any issues."
+      ],
       "accounts": [
         {
           "name": "currency",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Currency account"
+            "The account representing the currency to be wrapped into an NFT.",
+            "The account representing the mint of the currency."
           ]
         },
         {
@@ -208,7 +294,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Currency mint"
+            "The account representing the project to which the currency is associated."
           ]
         },
         {
@@ -216,7 +302,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The project this currency is associated with."
+            "The account representing the project to which the currency is associated."
           ]
         },
         {
@@ -225,7 +311,7 @@
           "isSigner": false,
           "isOptional": true,
           "docs": [
-            "[Option] Delegate authority account containing permissions of the wallet for the project"
+            "[Option] The account representing the delegate authority containing permissions of the wallet for the project."
           ]
         },
         {
@@ -233,7 +319,7 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that holds the authority over the project"
+            "The wallet that holds the authority over the project."
           ]
         },
         {
@@ -241,34 +327,62 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent."
           ]
         },
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Token Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": []
     },
     {
       "name": "createHolderAccount",
+      "docs": [
+        "Create a holder account in the HPL Hive Control program.",
+        "",
+        "This function serves as a platform gate to manage public low-level actions for a project.",
+        "It checks permissions using the `platform_gate_fn` from the `hpl_hive_control` instructions",
+        "module. If the platform gate is successful, it proceeds to create the holder account.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails or if any issues occur during the",
+        "holder account creation process."
+      ],
       "accounts": [
         {
           "name": "project",
@@ -307,7 +421,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "token account holding the token"
+            "Token account holding the token"
           ]
         },
         {
@@ -329,40 +443,73 @@
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE CLOCK SYSVAR"
+          ]
         }
       ],
       "args": []
     },
     {
       "name": "mintCurrency",
+      "docs": [
+        "Mint new currency in the HPL Hive Control program.",
+        "",
+        "This function serves as a platform gate to manage assets for a project. It checks",
+        "permissions using the `platform_gate_fn` from the `hpl_hive_control` instructions",
+        "module. If the platform gate is successful and the holder account status is active,",
+        "it proceeds to mint the new currency. Otherwise, it returns an error.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "- `amount`: The amount of currency to be minted.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails, the holder account is inactive,",
+        "or if any issues occur during the currency minting process."
+      ],
       "accounts": [
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Currency account"
+            "The currency account representing the specific currency being minted."
           ]
         },
         {
@@ -370,7 +517,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Holder account"
+            "The holder account that will receive the newly minted tokens."
           ]
         },
         {
@@ -378,7 +525,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Currency mint"
+            "The mint account associated with the currency's token mint."
           ]
         },
         {
@@ -386,7 +533,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Token account holding the currency"
+            "The token account where the newly minted tokens will be added."
           ]
         },
         {
@@ -403,7 +550,7 @@
           "isSigner": false,
           "isOptional": true,
           "docs": [
-            "[Option] Delegate authority account containing permissions of the wallet for the project"
+            "[Option] Delegate authority account containing permissions of the wallet for the project."
           ]
         },
         {
@@ -411,7 +558,7 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that holds the authority over the project"
+            "The wallet that holds the authority over the project."
           ]
         },
         {
@@ -419,28 +566,40 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent."
           ]
         },
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program."
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token Program."
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR."
+          ]
         }
       ],
       "args": [
@@ -452,13 +611,37 @@
     },
     {
       "name": "fundAccount",
+      "docs": [
+        "Fund an account in the HPL Hive Control program.",
+        "",
+        "This function performs a platform gate to determine the action based on the caller's",
+        "program ID. If the caller's program ID matches the HPL Hive Control program ID, it",
+        "checks permissions using the `platform_gate_fn` for driver actions. Otherwise, it",
+        "checks if the caller's program ID is allowed based on the list of allowed programs.",
+        "If the caller's program ID is neither the HPL Hive Control program ID nor in the list",
+        "of allowed programs, it returns an unauthorized error.",
+        "",
+        "If the holder account status is inactive, it returns an error. Otherwise, it performs",
+        "pre-actions before funding the account, calls the `fund_account` instruction to perform",
+        "the funding, and then performs post-actions.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "- `amount`: The amount to fund the account with.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails, the holder account is inactive,",
+        "the caller's program ID is not authorized, or if any issues occur during the funding process."
+      ],
       "accounts": [
         {
           "name": "project",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The project this currency is associated with."
+            "The project account to which the currency is associated with."
           ]
         },
         {
@@ -466,7 +649,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Currency account"
+            "The currency account representing the specific currency being funded."
           ]
         },
         {
@@ -474,7 +657,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Currency mint"
+            "The mint account associated with the currency's token mint."
           ]
         },
         {
@@ -482,7 +665,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Holder account"
+            "The holder account that will receive the newly funded tokens."
           ]
         },
         {
@@ -490,7 +673,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Token account holding the currency"
+            "The token account where the newly funded tokens will be added."
           ]
         },
         {
@@ -498,7 +681,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Token account holding the currency"
+            "The source token account from which funds will be transferred."
           ]
         },
         {
@@ -506,7 +689,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that owns the tokens"
+            "The wallet account that holds the authority over the funds."
           ]
         },
         {
@@ -514,28 +697,40 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that owns the tokens"
+            "The authority signer that approves the fund transfer."
           ]
         },
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR."
+          ]
         }
       ],
       "args": [
@@ -547,13 +742,37 @@
     },
     {
       "name": "burnCurrency",
+      "docs": [
+        "Burn currency in the HPL Hive Control program.",
+        "",
+        "This function performs a platform gate to determine the action based on the caller's",
+        "program ID. If the caller's program ID matches the HPL Hive Control program ID, it",
+        "checks permissions using the `platform_gate_fn` for driver actions. Otherwise, it",
+        "checks if the caller's program ID is allowed based on the list of allowed programs.",
+        "If the caller's program ID is neither the HPL Hive Control program ID nor in the list",
+        "of allowed programs, it returns an unauthorized error.",
+        "",
+        "If the holder account status is inactive, it returns an error. Otherwise, it performs",
+        "pre-actions before burning the currency, calls the `burn_currency` instruction to perform",
+        "the burning, and then performs post-actions.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "- `amount`: The amount of currency to be burned.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails, the holder account is inactive,",
+        "the caller's program ID is not authorized, or if any issues occur during the burning process."
+      ],
       "accounts": [
         {
           "name": "project",
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "The project this currency is associated with."
+            "The project account associated with the currency."
           ]
         },
         {
@@ -561,7 +780,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Currency account"
+            "The currency account to be burned."
           ]
         },
         {
@@ -569,7 +788,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Holder account"
+            "The holder account associated with the currency, which holds the token."
           ]
         },
         {
@@ -577,7 +796,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Currency mint"
+            "The mint account of the currency."
           ]
         },
         {
@@ -585,7 +804,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Token account holding the currency"
+            "The token account that will be burned."
           ]
         },
         {
@@ -593,7 +812,7 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that holds the authority over the project"
+            "The authority who initiates the burning process."
           ]
         },
         {
@@ -601,28 +820,40 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that holds the authority over the project"
+            "The owner of the token account."
           ]
         },
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The account used to collect platform fees for the burning process."
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -634,6 +865,32 @@
     },
     {
       "name": "transferCurrency",
+      "docs": [
+        "Transfer currency in the HPL Hive Control program from one holder account to another.",
+        "",
+        "This function performs a platform gate to determine the action based on the caller's",
+        "program ID. If the caller's program ID matches the HPL Hive Control program ID, it",
+        "checks permissions using the `platform_gate_fn` for driver actions. Otherwise, it",
+        "checks if the caller's program ID is allowed based on the list of allowed programs.",
+        "If the caller's program ID is neither the HPL Hive Control program ID nor in the list",
+        "of allowed programs, it returns an unauthorized error.",
+        "",
+        "If either the sender's or receiver's holder account status is inactive, it returns an error.",
+        "Otherwise, it performs pre-actions before transferring the currency, calls the `transfer_currency`",
+        "instruction to perform the transfer, and then performs post-actions for both the sender's and",
+        "receiver's token accounts.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "- `amount`: The amount of currency to be transferred.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails, either the sender's or receiver's",
+        "holder account is inactive, the caller's program ID is not authorized, or if any issues occur",
+        "during the transfer process."
+      ],
       "accounts": [
         {
           "name": "project",
@@ -664,7 +921,9 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Sender Holder account"
+            "Sender holder account",
+            "Must have one currency and one owner.",
+            "The sender's token account must match the sender token account in the constraint."
           ]
         },
         {
@@ -672,7 +931,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Sender Token account holding the currency"
+            "Sender token account"
           ]
         },
         {
@@ -680,7 +939,9 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "Reciever Holder account"
+            "Receiver holder account.",
+            "Must have one currency.",
+            "The receiver's token account must match the receiver token account in the constraint."
           ]
         },
         {
@@ -688,7 +949,7 @@
           "isMut": true,
           "isSigner": false,
           "docs": [
-            "Receiver Token account holding the currency"
+            "Receiver token account"
           ]
         },
         {
@@ -696,7 +957,7 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that holds the authority over the project"
+            "The authority signer for the transaction."
           ]
         },
         {
@@ -704,28 +965,40 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that holds the authority over the project"
+            "The authority signer for the transaction."
           ]
         },
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "This account is used to collect the platform fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -737,6 +1010,29 @@
     },
     {
       "name": "approveDelegate",
+      "docs": [
+        "",
+        "This function performs a platform gate to determine the action based on the caller's",
+        "program ID. If the caller's program ID matches the HPL Hive Control program ID, it",
+        "checks permissions using the `platform_gate_fn` for driver actions. Otherwise, it",
+        "checks if the caller's program ID is allowed based on the list of allowed programs.",
+        "If the caller's program ID is neither the HPL Hive Control program ID nor in the list",
+        "of allowed programs, it returns an unauthorized error.",
+        "",
+        "If the holder account status is inactive, it returns an error. Otherwise, it performs",
+        "pre-actions before approving the delegate, calls the `approve_delegate` instruction to",
+        "approve the delegate, and then performs post-actions.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "- `amount`: The amount of currency to be approved for delegation.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails, the holder account is inactive,",
+        "the caller's program ID is not authorized, or if any issues occur during the approval process."
+      ],
       "accounts": [
         {
           "name": "project",
@@ -805,22 +1101,34 @@
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "This account is used to collect the platform fee."
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -832,6 +1140,29 @@
     },
     {
       "name": "revokeDelegate",
+      "docs": [
+        "Revoke a delegate's permission to manage currency in the HPL Hive Control program.",
+        "",
+        "This function performs a platform gate to determine the action based on the caller's",
+        "program ID. If the caller's program ID matches the HPL Hive Control program ID, it",
+        "checks permissions using the `platform_gate_fn` for driver actions. Otherwise, it",
+        "checks if the caller's program ID is allowed based on the list of allowed programs.",
+        "If the caller's program ID is neither the HPL Hive Control program ID nor in the list",
+        "of allowed programs, it returns an unauthorized error.",
+        "",
+        "If the holder account status is inactive, it returns an error. Otherwise, it performs",
+        "pre-actions before revoking the delegate, calls the `revoke_delegate` instruction to",
+        "revoke the delegate, and then performs post-actions.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails, the holder account is inactive,",
+        "the caller's program ID is not authorized, or if any issues occur during the revoking process."
+      ],
       "accounts": [
         {
           "name": "project",
@@ -884,28 +1215,62 @@
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "This account is used to collect the platform fee."
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": []
     },
     {
       "name": "setHolderStatus",
+      "docs": [
+        "Set the status of a holder account in the HPL Hive Control program.",
+        "",
+        "This function performs a platform gate to determine the action based on the caller's",
+        "program ID. If the caller's program ID matches the HPL Hive Control program ID, it",
+        "checks permissions using the `platform_gate_fn` for driver actions. Otherwise, it",
+        "checks if the caller's program ID is allowed based on the list of allowed programs.",
+        "If the caller's program ID is neither the HPL Hive Control program ID nor in the list",
+        "of allowed programs, it returns an unauthorized error.",
+        "",
+        "The function then calls the `set_holder_status` instruction to set the holder account's status.",
+        "",
+        "# Parameters",
+        "",
+        "- `ctx`: The program context containing accounts and instructions provided by the runtime.",
+        "- `status`: The status to be set for the holder account.",
+        "",
+        "# Errors",
+        "",
+        "This function returns an error if the platform gate fails, the caller's program ID is not authorized,",
+        "or if any issues occur during the process of setting the holder account's status."
+      ],
       "accounts": [
         {
           "name": "project",
@@ -950,17 +1315,26 @@
         {
           "name": "vault",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "This account is used to collect the platform fee."
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -978,7 +1352,9 @@
       "name": "Currency",
       "docs": [
         "A currency is a project associated spl token.",
-        "It is used as in-game utility currency."
+        "It is used as in-game utility currency.",
+        "PDA: ['currency', mint]",
+        "Category: currency_state"
       ],
       "type": {
         "kind": "struct",
@@ -1017,7 +1393,9 @@
       "name": "HolderAccount",
       "docs": [
         "A holder is a middle man account between wallet and currency.",
-        "It contains detail about the token account that holds the currency"
+        "It contains detail about the token account that holds the currency",
+        "PDA: ['holder', owner, mint]",
+        "Category: holder_state"
       ],
       "type": {
         "kind": "struct",
@@ -1075,22 +1453,37 @@
         "fields": [
           {
             "name": "name",
+            "docs": [
+              "The name of the currency."
+            ],
             "type": "string"
           },
           {
             "name": "symbol",
+            "docs": [
+              "The symbol of the currency."
+            ],
             "type": "string"
           },
           {
             "name": "uri",
+            "docs": [
+              "The URI (Uniform Resource Identifier) associated with the currency."
+            ],
             "type": "string"
           },
           {
             "name": "decimals",
+            "docs": [
+              "The number of decimal places for the currency. Used to represent fractional values."
+            ],
             "type": "u8"
           },
           {
             "name": "kind",
+            "docs": [
+              "[Optional] The kind of permissioned currency. It is an enumeration of different permissioned currency kinds."
+            ],
             "type": {
               "option": {
                 "defined": "PermissionedCurrencyKind"
@@ -1103,25 +1496,34 @@
     {
       "name": "UpdateCurrencyArgs",
       "docs": [
-        "Accounts used in update currency instruction"
+        "Arguments for updating a currency."
       ],
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "name",
+            "docs": [
+              "[Option] The updated name of the currency. If `Some`, the name will be updated."
+            ],
             "type": {
               "option": "string"
             }
           },
           {
             "name": "symbol",
+            "docs": [
+              "[Option] The updated symbol of the currency. If `Some`, the symbol will be updated."
+            ],
             "type": {
               "option": "string"
             }
           },
           {
             "name": "uri",
+            "docs": [
+              "[Option] The updated URI of the currency. If `Some`, the URI will be updated."
+            ],
             "type": {
               "option": "string"
             }
@@ -1158,6 +1560,9 @@
     },
     {
       "name": "PermissionedCurrencyKind",
+      "docs": [
+        "The sub-type of permissioned currency."
+      ],
       "type": {
         "kind": "enum",
         "variants": [
@@ -1172,6 +1577,9 @@
     },
     {
       "name": "HolderStatus",
+      "docs": [
+        "The status of a holder account."
+      ],
       "type": {
         "kind": "enum",
         "variants": [
