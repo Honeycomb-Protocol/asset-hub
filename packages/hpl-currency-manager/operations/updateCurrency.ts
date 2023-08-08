@@ -7,6 +7,7 @@ import {
 } from "../generated";
 import { METADATA_PROGRAM_ID, metadataPda } from "../utils";
 import { HplCurrency } from "../HplCurrency";
+import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
 
 /**
  * Represents the arguments for creating an "Update Currency" operation.
@@ -65,6 +66,8 @@ export async function createUpdateCurrencyOperation(
         vault: VAULT,
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         tokenMetadataProgram: METADATA_PROGRAM_ID,
+        logWrapper: SPL_NOOP_PROGRAM_ID,
+        clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
       },
       {
         args: args.args,

@@ -6,6 +6,7 @@ import {
   PROGRAM_ID,
 } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
+import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
 
 /**
  * Represents the arguments for creating a "Set Holder Status" operation.
@@ -53,6 +54,8 @@ export async function createSetHolderStatusOperation(
         authority: honeycomb.identity().address,
         vault: VAULT,
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        logWrapper: SPL_NOOP_PROGRAM_ID,
+        clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
       },
       {
         status: args.status,

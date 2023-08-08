@@ -13,6 +13,7 @@ import {
   PROGRAM_ID,
 } from "../generated";
 import { METADATA_PROGRAM_ID, currencyPda, metadataPda } from "../utils";
+import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
 
 /**
  * Represents the arguments for creating a "Create Currency" operation.
@@ -94,6 +95,8 @@ export async function createCreateCurrencyOperation(
             payer: honeycomb.identity().address,
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            logWrapper: SPL_NOOP_PROGRAM_ID,
+            clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           },
           programId
         )
@@ -110,6 +113,7 @@ export async function createCreateCurrencyOperation(
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             tokenMetadataProgram: METADATA_PROGRAM_ID,
+            logWrapper: SPL_NOOP_PROGRAM_ID,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           },
           {

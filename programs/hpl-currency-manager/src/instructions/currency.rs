@@ -11,6 +11,7 @@ use {
         },
         state::{AssetData, Data, Metadata, TokenMetadataAccount},
     },
+    spl_account_compression::Noop,
 };
 
 /// Accounts used in create currency instruction
@@ -75,6 +76,9 @@ pub struct CreateCurrency<'info> {
     /// The Token Program ID.
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// SPL NOOP PROGRAM
+    pub log_wrapper: Program<'info, Noop>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -191,8 +195,8 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
         Some(currency_signer),
     )?;
 
-    // Log the created currency JSON for debugging purposes.
-    msg!("Currency JSON: {:?}", ctx.accounts.currency);
+    Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
+        .wrap(ctx.accounts.log_wrapper.to_account_info())?;
 
     Ok(())
 }
@@ -241,10 +245,16 @@ pub struct UpdateCurrency<'info> {
     #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
 
-    /// NATIVE INSTRUCTIONS SYSVAR
+    /// SPL NOOP PROGRAM
+    pub log_wrapper: Program<'info, Noop>,
+
+    /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
+
+    /// The Clock System Variable Account.
+    pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
 /// Arguments for updating a currency.
@@ -329,7 +339,12 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         Some(currency_signer),
     )?;
 
-    msg!("Currency JSON: {:?}", ctx.accounts.currency);
+    Event::update_currency(
+        ctx.accounts.currency.key(),
+        &ctx.accounts.currency,
+        &ctx.accounts.clock_sysvar,
+    )
+    .wrap(ctx.accounts.log_wrapper.to_account_info())?;
     Ok(())
 }
 
@@ -385,10 +400,16 @@ pub struct WrapCurrency<'info> {
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
 
-    /// NATIVE INSTRUCTIONS SYSVAR
-    /// CHECK: This is not dangerous because we don't read or write from this account.
+    /// SPL NOOP PROGRAM
+    pub log_wrapper: Program<'info, Noop>,
+
+    /// The Instructions System Variable Account.
+    /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
+
+    /// The Clock System Variable Account.
+    pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
 /// Wrap a currency into an associated NFT (non-fungible token).
@@ -419,6 +440,9 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
 
     // Set the currency kind to indicate that it is wrapped.
     currency.kind = CurrencyKind::Wrapped;
+
+    Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
+        .wrap(ctx.accounts.log_wrapper.to_account_info())?;
 
     // Return Ok to indicate the successful completion of the wrapping process.
     Ok(())

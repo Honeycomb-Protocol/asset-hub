@@ -4,6 +4,7 @@ use {
     anchor_spl::token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
     hpl_hive_control::state::Project,
     hpl_utils::traits::Default,
+    spl_account_compression::Noop,
 };
 
 /// Accounts used in create create holder_account instruction
@@ -69,12 +70,15 @@ pub struct CreateHolderAccount<'info> {
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
 
-    /// NATIVE INSTRUCTIONS SYSVAR
+    /// SPL NOOP PROGRAM
+    pub log_wrapper: Program<'info, Noop>,
+
+    /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
 
-    /// NATIVE CLOCK SYSVAR
+    /// The Clock System Variable Account.
     pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
@@ -90,6 +94,13 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
 
     // Set the creation timestamp for the holder account.
     holder_account.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
+
+    Event::new_holder_account(
+        holder_account.key(),
+        &holder_account,
+        &ctx.accounts.clock_sysvar,
+    )
+    .wrap(ctx.accounts.log_wrapper.to_account_info())?;
 
     Ok(())
 }
@@ -389,7 +400,6 @@ pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()
             amount,
         )?;
     }
-
     Ok(())
 }
 
@@ -478,10 +488,16 @@ pub struct SetHolderStatus<'info> {
     /// SPL Token program
     pub system_program: Program<'info, System>,
 
-    /// NATIVE INSTRUCTIONS SYSVAR
+    /// SPL NOOP PROGRAM
+    pub log_wrapper: Program<'info, Noop>,
+
+    /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
+
+    /// The Clock System Variable Account.
+    pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
 /// Set holder status
@@ -497,5 +513,13 @@ pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) ->
     }
 
     holder_account.status = status;
+
+    Event::update_holder_account(
+        holder_account.key(),
+        &holder_account,
+        &ctx.accounts.clock_sysvar,
+    )
+    .wrap(ctx.accounts.log_wrapper.to_account_info())?;
+
     Ok(())
 }

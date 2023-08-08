@@ -116,6 +116,14 @@
           ]
         },
         {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL NOOP PROGRAM"
+          ]
+        },
+        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
@@ -244,11 +252,27 @@
           ]
         },
         {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL NOOP PROGRAM"
+          ]
+        },
+        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "NATIVE INSTRUCTIONS SYSVAR"
+            "The Instructions System Variable Account."
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The Clock System Variable Account."
           ]
         }
       ],
@@ -355,11 +379,27 @@
           ]
         },
         {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL NOOP PROGRAM"
+          ]
+        },
+        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "NATIVE INSTRUCTIONS SYSVAR"
+            "The Instructions System Variable Account."
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The Clock System Variable Account."
           ]
         }
       ],
@@ -465,11 +505,19 @@
           ]
         },
         {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL NOOP PROGRAM"
+          ]
+        },
+        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "NATIVE INSTRUCTIONS SYSVAR"
+            "The Instructions System Variable Account."
           ]
         },
         {
@@ -477,7 +525,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "NATIVE CLOCK SYSVAR"
+            "The Clock System Variable Account."
           ]
         }
       ],
@@ -1329,11 +1377,27 @@
           ]
         },
         {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL NOOP PROGRAM"
+          ]
+        },
+        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "NATIVE INSTRUCTIONS SYSVAR"
+            "The Instructions System Variable Account."
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The Clock System Variable Account."
           ]
         }
       ],
@@ -1571,6 +1635,82 @@
           },
           {
             "name": "Custodial"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Event",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NewCurrency",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "info",
+                "type": "bytes"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "UpdateCurrency",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "info",
+                "type": "bytes"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "NewHolderAccount",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "info",
+                "type": "bytes"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "UpdateHolderAccount",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "info",
+                "type": "bytes"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
           }
         ]
       }
