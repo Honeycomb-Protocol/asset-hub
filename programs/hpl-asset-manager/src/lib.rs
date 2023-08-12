@@ -29,6 +29,8 @@ pub mod hpl_asset_manager {
                     payer: ctx.accounts.payer.to_account_info(),
                     rent_sysvar: ctx.accounts.rent_sysvar.to_account_info(),
                     system_program: ctx.accounts.system_program.to_account_info(),
+                    log_wrapper: ctx.accounts.log_wrapper.to_account_info(),
+                    clock: ctx.accounts.clock_sysvar.to_account_info(),
                     vault: ctx.accounts.vault.to_account_info(),
                 },
             ),

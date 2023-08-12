@@ -7,6 +7,7 @@ use hpl_hive_control::{
 };
 use hpl_utils::create;
 use mpl_token_metadata::{instruction::CreateArgs, state::AssetData};
+use spl_account_compression::Noop;
 
 /// Accounts used in create asset manager
 #[derive(Accounts)]
@@ -49,6 +50,12 @@ pub struct CreateAssetManager<'info> {
 
     /// HIVE CONTROL PROGRAM
     pub hive_control: Program<'info, HplHiveControl>,
+
+        /// SPL NOOP PROGRAM
+        pub log_wrapper: Program<'info, Noop>,
+    
+        /// The Clock System Variable Account.
+        pub clock_sysvar: Sysvar<'info, Clock>,
 }
 pub fn create_asset_manager(ctx: Context<CreateAssetManager>) -> Result<()> {
     let asset_manager = &mut ctx.accounts.asset_manager;

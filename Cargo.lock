@@ -194,7 +194,7 @@ dependencies = [
  "arrayref",
  "base64 0.13.1",
  "bincode",
- "borsh 0.9.3",
+ "borsh",
  "bytemuck",
  "solana-program",
  "thiserror",
@@ -353,18 +353,8 @@ version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "15bf3650200d8bffa99015595e10f1fbd17de07abbc25bb067da79e769939bfa"
 dependencies = [
- "borsh-derive 0.9.3",
+ "borsh-derive",
  "hashbrown 0.11.2",
-]
-
-[[package]]
-name = "borsh"
-version = "0.10.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4114279215a005bc675e386011e594e1d9b800918cea18fcadadcce864a2046b"
-dependencies = [
- "borsh-derive 0.10.3",
- "hashbrown 0.12.3",
 ]
 
 [[package]]
@@ -373,21 +363,8 @@ version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6441c552f230375d18e3cc377677914d2ca2b0d36e52129fe15450a2dce46775"
 dependencies = [
- "borsh-derive-internal 0.9.3",
- "borsh-schema-derive-internal 0.9.3",
- "proc-macro-crate 0.1.5",
- "proc-macro2",
- "syn 1.0.107",
-]
-
-[[package]]
-name = "borsh-derive"
-version = "0.10.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0754613691538d51f329cce9af41d7b7ca150bc973056f1156611489475f54f7"
-dependencies = [
- "borsh-derive-internal 0.10.3",
- "borsh-schema-derive-internal 0.10.3",
+ "borsh-derive-internal",
+ "borsh-schema-derive-internal",
  "proc-macro-crate 0.1.5",
  "proc-macro2",
  "syn 1.0.107",
@@ -405,32 +382,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "borsh-derive-internal"
-version = "0.10.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "afb438156919598d2c7bad7e1c0adf3d26ed3840dbc010db1a882a65583ca2fb"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.107",
-]
-
-[[package]]
 name = "borsh-schema-derive-internal"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdbd5696d8bfa21d53d9fe39a714a18538bad11492a42d066dbbc395fb1951c0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.107",
-]
-
-[[package]]
-name = "borsh-schema-derive-internal"
-version = "0.10.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "634205cc43f74a1b9046ef87c4540ebda95696ec0f315024860cad7c5b0f5ccd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -868,7 +823,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.39"
+version = "0.0.41"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -877,13 +832,14 @@ dependencies = [
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
+ "spl-account-compression",
  "toml_datetime",
  "winnow",
 ]
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.39"
+version = "0.0.41"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -892,6 +848,7 @@ dependencies = [
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
+ "spl-account-compression",
  "toml_datetime",
  "winnow",
 ]
@@ -909,11 +866,11 @@ dependencies = [
 
 [[package]]
 name = "hpl-compression"
-version = "0.1.3"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29a1923f3046b5514554ccc4a24f543fdf90df33bdf1fb7f4735b4fc970fcbfa"
+checksum = "d98820de260e0143d8e4dd5197c02e77266e5377ad919bf211038f2c62fc5bb8"
 dependencies = [
- "borsh 0.10.3",
+ "borsh",
  "hpl-attribute-event",
  "solana-program",
  "spl-noop",
@@ -921,7 +878,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.40"
+version = "0.0.41"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -938,13 +895,14 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.1.21"
+version = "0.1.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e399997cbcd3d0f45ffd4b0a90f9d3365aeb42a5f1657b1a818c2fcb5d08bde6"
+checksum = "19cd49e53594692ee1c58228f7326deca33bac788b723624b9583fd31ed83b2f"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
+ "hpl-compression",
  "hpl-utils",
  "mpl-token-metadata",
  "sol-did",
@@ -1172,7 +1130,7 @@ version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24dcb2b0ec0e9246f6f035e0336ba3359c21f6928dfd90281999e2c8e8ab53eb"
 dependencies = [
- "borsh 0.9.3",
+ "borsh",
  "mpl-token-metadata-context-derive",
  "num-derive",
  "num-traits",
@@ -1191,7 +1149,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f661ff8c1d64c48cf207c0d259783d411a4249058c1b861fabd8bb6ce30ae4d8"
 dependencies = [
  "arrayref",
- "borsh 0.9.3",
+ "borsh",
  "mpl-token-auth-rules",
  "mpl-token-metadata-context-derive",
  "mpl-utils",
@@ -1221,7 +1179,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "822133b6cba8f9a43e5e0e189813be63dd795858f54155c729833be472ffdb51"
 dependencies = [
  "arrayref",
- "borsh 0.9.3",
+ "borsh",
  "solana-program",
  "spl-token",
 ]
@@ -1748,7 +1706,7 @@ checksum = "8e7c254bd5b2c38f0f7baa009ad7825fb43b1807e64a8ac7b08784b216c5b03c"
 dependencies = [
  "anchor-lang",
  "bitflags",
- "borsh 0.9.3",
+ "borsh",
  "itertools",
  "num-derive",
  "num-traits",
@@ -1823,8 +1781,8 @@ dependencies = [
  "bincode",
  "bitflags",
  "blake3",
- "borsh 0.9.3",
- "borsh-derive 0.9.3",
+ "borsh",
+ "borsh-derive",
  "bs58 0.4.0",
  "bv",
  "bytemuck",
@@ -1872,7 +1830,7 @@ dependencies = [
  "base64 0.13.1",
  "bincode",
  "bitflags",
- "borsh 0.9.3",
+ "borsh",
  "bs58 0.4.0",
  "bytemuck",
  "byteorder",
@@ -1982,7 +1940,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbc000f0fdf1f12f99d77d398137c1751345b18c88258ce0f99b7872cf6c9bd6"
 dependencies = [
  "assert_matches",
- "borsh 0.9.3",
+ "borsh",
  "num-derive",
  "num-traits",
  "solana-program",

@@ -1,7 +1,7 @@
 use {
-    crate::{errors::ErrorCode, id, state::*},
+    crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
-    anchor_spl::token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
+    anchor_spl::{token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer}, associated_token::{AssociatedToken}},
     hpl_hive_control::state::Project,
     hpl_utils::traits::Default,
     spl_account_compression::Noop,
@@ -38,15 +38,15 @@ pub struct CreateHolderAccount<'info> {
     /// Token account holding the token
     #[account(
       init, payer = payer,
-      seeds = [
-        if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } )  { holder_account.to_account_info() } else { owner.to_account_info() }.key().as_ref(),
-        mint.key().as_ref(),
-        id().as_ref(),
-        token_program.key().as_ref(),
-      ],
-      bump,
-      token::mint = mint,
-      token::authority = if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } ) { holder_account.to_account_info() } else { owner.to_account_info() }
+    //   seeds = [
+    //     if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } )  { holder_account.to_account_info() } else { owner.to_account_info() }.key().as_ref(),
+    //     mint.key().as_ref(),
+    //     id().as_ref(),
+    //     token_program.key().as_ref(),
+    //   ],
+    //   bump,
+      associated_token::mint = mint,
+      associated_token::authority = if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } ) { holder_account.to_account_info() } else { owner.to_account_info() }
     )]
     pub token_account: Account<'info, TokenAccount>,
 
@@ -67,8 +67,10 @@ pub struct CreateHolderAccount<'info> {
     pub system_program: Program<'info, System>,
 
     /// SPL Token program
-    #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// SPL Associated Token program
+    pub associated_token_program: Program<'info, AssociatedToken>,
 
     /// SPL NOOP PROGRAM
     pub log_wrapper: Program<'info, Noop>,

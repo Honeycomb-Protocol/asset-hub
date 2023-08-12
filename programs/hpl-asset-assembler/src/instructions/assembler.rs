@@ -8,6 +8,7 @@ use {
     },
     hpl_utils::create_nft,
     mpl_token_metadata::state::AssetData,
+    spl_account_compression::Noop
 };
 
 /// Accounts used in the create assembler instruction
@@ -85,6 +86,13 @@ pub struct CreateAssembler<'info> {
 
     /// HIVE CONTROL PROGRAM
     pub hive_control: Program<'info, HplHiveControl>,
+
+    /// HIVE CONTROL PROGRAM
+    pub log_wrapper: Program<'info, Noop>,
+
+    /// SYSVAR CLOCK
+    pub clock_sysvar: Sysvar<'info, Clock>,
+
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]

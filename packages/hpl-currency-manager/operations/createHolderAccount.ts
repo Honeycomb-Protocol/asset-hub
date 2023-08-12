@@ -2,7 +2,10 @@ import * as web3 from "@solana/web3.js";
 import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 import { createCreateHolderAccountInstruction, PROGRAM_ID } from "../generated";
 import { holderAccountPdas, metadataPda } from "../utils";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
 import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
 
@@ -70,6 +73,7 @@ export async function createCreateHolderAccountOperation(
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         logWrapper: SPL_NOOP_PROGRAM_ID,
         clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
       },
       programId
     ),
