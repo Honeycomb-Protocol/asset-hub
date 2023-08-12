@@ -10,8 +10,8 @@ pub fn pre_actions<'info>(
     mint: AccountInfo<'info>,
 ) -> Result<()> {
     if currency.kind
-        == (CurrencyKind::Permissioned {
-            kind: PermissionedCurrencyKind::NonCustodial,
+        != (CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::Custodial,
         })
     {
         let currency_seeds = &[
@@ -41,8 +41,8 @@ pub fn post_actions<'info>(
     mint: AccountInfo<'info>,
 ) -> Result<()> {
     if currency.kind
-        == (CurrencyKind::Permissioned {
-            kind: PermissionedCurrencyKind::NonCustodial,
+        != (CurrencyKind::Permissioned {
+            kind: PermissionedCurrencyKind::Custodial,
         })
     {
         let currency_seeds = &[

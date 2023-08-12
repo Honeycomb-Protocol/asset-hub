@@ -184,7 +184,13 @@ export class HplCurrency extends Module {
    */
   static async new(
     honeycomb: Honeycomb,
-    args: CreateCurrencyArgs | { mint: web3.PublicKey },
+    args:
+      | CreateCurrencyArgs
+      | {
+          mint: web3.PublicKey;
+          mintAuthority: web3.PublicKey;
+          freezeAuthority: web3.PublicKey;
+        },
     confirmOptions?: web3.ConfirmOptions
   ) {
     const { currency, operation } = await createCreateCurrencyOperation(
@@ -539,7 +545,16 @@ export class HplHolderAccount {
  */
 export const currencyModule = (
   honeycomb: Honeycomb,
-  args: web3.PublicKey | (CreateCurrencyArgs | { mint: web3.PublicKey })
+  args:
+    | web3.PublicKey
+    | (
+        | CreateCurrencyArgs
+        | {
+            mint: web3.PublicKey;
+            mintAuthority: web3.PublicKey;
+            freezeAuthority: web3.PublicKey;
+          }
+      )
 ) =>
   args instanceof web3.PublicKey
     ? HplCurrency.fromAddress(honeycomb.connection, args)

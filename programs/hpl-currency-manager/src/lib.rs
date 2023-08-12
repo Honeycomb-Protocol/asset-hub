@@ -153,6 +153,95 @@ pub mod hpl_currency_manager {
         post_actions(currency, token_program, token_account, mint)
     }
 
+    /// Wrap a holder account in the HPL Hive Control program.
+    ///
+    /// This function serves as a platform gate to manage public low-level actions for a project.
+    /// It checks permissions using the `platform_gate_fn` from the `hpl_hive_control` instructions
+    /// module. If the platform gate is successful, it proceeds to wrap the holder account.
+    ///
+    /// # Parameters
+    ///
+    /// - `ctx`: The program context containing accounts and instructions provided by the runtime.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the platform gate fails or if any issues occur during the
+    /// holder account creation process.
+    pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
+        // Perform platform gate to manage public low-level actions for the project
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_low,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.payer.key(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+        // Clone the currency reference for later usage
+        let currency = &ctx.accounts.currency.clone();
+        // Get references to the token program, token account, and mint
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        // Create the holder account
+        instructions::wrap_holder_account(ctx)?;
+
+        // Perform post-actions after creating the holder account
+        post_actions(currency, token_program, token_account, mint)
+    }
+
+    /// Fix a holder account in the HPL Hive Control program.
+    ///
+    /// This function serves as a platform gate to manage public low-level actions for a project.
+    /// It checks permissions using the `platform_gate_fn` from the `hpl_hive_control` instructions
+    /// module. If the platform gate is successful, it proceeds to fix the holder account.
+    ///
+    /// # Parameters
+    ///
+    /// - `ctx`: The program context containing accounts and instructions provided by the runtime.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the platform gate fails or if any issues occur during the
+    /// holder account creation process.
+    pub fn fix_holder_account(ctx: Context<FixHolderAccount>) -> Result<()> {
+        // Perform platform gate to manage public low-level actions for the project
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_low,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.payer.key(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+        )?;
+
+        // Perform pre-actions before fixing the account
+        pre_actions(
+            &ctx.accounts.currency,
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.token_account.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+        )?;
+
+        // Clone the currency reference for later usage
+        let currency = &ctx.accounts.currency.clone();
+        // Get references to the token program, token account, and mint
+        let token_program = ctx.accounts.token_program.to_account_info();
+        let token_account = ctx.accounts.new_token_account.to_account_info();
+        let mint = ctx.accounts.mint.to_account_info();
+
+        // Create the holder account
+        instructions::fix_holder_account(ctx)?;
+
+        // Perform post-actions after creating the holder account
+        post_actions(currency, token_program, token_account, mint)
+    }
+
     /// Mint new currency in the HPL Hive Control program.
     ///
     /// This function serves as a platform gate to manage assets for a project. It checks

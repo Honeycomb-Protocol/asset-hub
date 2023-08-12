@@ -1,7 +1,7 @@
 use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
-    anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount, Transfer},
+    anchor_spl::token::{self, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
     hpl_hive_control::state::{DelegateAuthority, Project},
     hpl_utils::traits::Default,
     mpl_token_metadata::{
@@ -355,6 +355,10 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
 /// an NFT by minting a new NFT token with its own metadata.
 #[derive(Accounts)]
 pub struct WrapCurrency<'info> {
+    /// The account representing the project to which the currency is associated.
+    #[account(mut)]
+    pub project: Box<Account<'info, Project>>,
+
     /// The account representing the currency to be wrapped into an NFT.
     #[account(
       init, payer = payer,
@@ -365,17 +369,11 @@ pub struct WrapCurrency<'info> {
       ],
       bump
     )]
-
-    /// The account representing the mint of the currency.
     pub currency: Account<'info, Currency>,
 
     /// The account representing the project to which the currency is associated.
     #[account()]
     pub mint: Account<'info, Mint>,
-
-    /// The account representing the project to which the currency is associated.
-    #[account(mut)]
-    pub project: Box<Account<'info, Project>>,
 
     /// [Option] The account representing the delegate authority containing permissions of the wallet for the project.
     #[account(has_one = authority)]
@@ -383,6 +381,12 @@ pub struct WrapCurrency<'info> {
 
     /// The wallet that holds the authority over the project.
     pub authority: Signer<'info>,
+
+    /// The wallet that has the authority to mint tokens.
+    pub mint_authority: Signer<'info>,
+
+    /// The wallet that has the authority to freeze token accounts.
+    pub freeze_authority: Signer<'info>,
 
     /// The wallet that pays for the rent.
     #[account(mut)]
@@ -431,15 +435,34 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
     let currency = &mut ctx.accounts.currency;
     currency.set_defaults();
 
-    // Set the currency bump value based on the provided bumps.
     currency.bump = ctx.bumps["currency"];
-
-    // Set the project and mint associated with the currency account.
     currency.project = ctx.accounts.project.key();
     currency.mint = ctx.accounts.mint.key();
-
-    // Set the currency kind to indicate that it is wrapped.
     currency.kind = CurrencyKind::Wrapped;
+
+    token::set_authority(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            SetAuthority {
+                account_or_mint: ctx.accounts.mint.to_account_info(),
+                current_authority: ctx.accounts.mint_authority.to_account_info(),
+            },
+        ),
+        token::spl_token::instruction::AuthorityType::MintTokens,
+        Some(currency.key()),
+    )?;
+
+    token::set_authority(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            SetAuthority {
+                account_or_mint: ctx.accounts.mint.to_account_info(),
+                current_authority: ctx.accounts.freeze_authority.to_account_info(),
+            },
+        ),
+        token::spl_token::instruction::AuthorityType::FreezeAccount,
+        Some(currency.key()),
+    )?;
 
     Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
         .wrap(ctx.accounts.log_wrapper.to_account_info())?;

@@ -1,10 +1,15 @@
 import * as web3 from "@solana/web3.js";
 import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
-import { createCreateHolderAccountInstruction, PROGRAM_ID } from "../generated";
+import {
+  createCreateHolderAccountInstruction,
+  createWrapHolderAccountInstruction,
+  PROGRAM_ID,
+} from "../generated";
 import { holderAccountPdas, metadataPda } from "../utils";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
+  getAccount as getTokenAccount,
 } from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
 import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
@@ -22,6 +27,9 @@ type CreateCreateHolderAccountOperationArgs = {
 /**
  * Creates a "Create Holder Account" operation for the given owner and currency,
  * creating a new holder account and token account for the specified currency.
+ *
+ * If the token account `already exists` (In case of wrapped currency) then "Wrap Holder Account" instruction will be created.
+ *
  * @category Operation Builders
  * @param honeycomb The Honeycomb instance.
  * @param args The arguments for creating the "Create Holder Account" operation.
@@ -55,28 +63,52 @@ export async function createCreateHolderAccountOperation(
     programId
   );
 
-  // Get the metadata PDA for the currency's mint.
-  const [metadata] = metadataPda(args.currency.mint.address);
+  let wrap = false;
+
+  if (args.currency.kind.__kind === "Wrapped") {
+    try {
+      await getTokenAccount(honeycomb.connection, tokenAccount);
+      wrap = true;
+    } catch {}
+  }
 
   // Create the instruction for the "Create Holder Account" operation.
   const instructions = [
-    createCreateHolderAccountInstruction(
-      {
-        project: args.currency.project().address,
-        currency: args.currency.address,
-        holderAccount,
-        tokenAccount,
-        mint: args.currency.mint.address,
-        owner: args.owner,
-        payer: honeycomb.identity().address,
-        vault: VAULT,
-        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-        logWrapper: SPL_NOOP_PROGRAM_ID,
-        clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-      },
-      programId
-    ),
+    wrap
+      ? createWrapHolderAccountInstruction(
+          {
+            project: args.currency.project().address,
+            currency: args.currency.address,
+            holderAccount,
+            tokenAccount,
+            mint: args.currency.mint.address,
+            owner: args.owner,
+            payer: honeycomb.identity().address,
+            vault: VAULT,
+            instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            logWrapper: SPL_NOOP_PROGRAM_ID,
+            clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          },
+          programId
+        )
+      : createCreateHolderAccountInstruction(
+          {
+            project: args.currency.project().address,
+            currency: args.currency.address,
+            holderAccount,
+            tokenAccount,
+            mint: args.currency.mint.address,
+            owner: args.owner,
+            payer: honeycomb.identity().address,
+            vault: VAULT,
+            instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            logWrapper: SPL_NOOP_PROGRAM_ID,
+            clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          },
+          programId
+        ),
   ];
 
   // Return the "Create Holder Account" operation wrapped in an object, along with the holder account address.

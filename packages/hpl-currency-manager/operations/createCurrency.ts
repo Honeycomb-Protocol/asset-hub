@@ -19,7 +19,13 @@ import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
  * Represents the arguments for creating a "Create Currency" operation.
  * @category Types
  */
-type CreateCurrencyArgsPack = CreateCurrencyArgs | { mint: web3.PublicKey };
+type CreateCurrencyArgsPack =
+  | CreateCurrencyArgs
+  | {
+      mint: web3.PublicKey;
+      mintAuthority: web3.Keypair | web3.PublicKey;
+      freezeAuthority: web3.Keypair | web3.PublicKey;
+    };
 
 /**
  * Represents the arguments for creating a "Create Currency" operation.
@@ -92,6 +98,14 @@ export async function createCreateCurrencyOperation(
             delegateAuthority:
               honeycomb.identity().delegateAuthority()?.address || programId,
             authority: honeycomb.identity().address,
+            mintAuthority:
+              args.args.mintAuthority instanceof web3.Keypair
+                ? args.args.mintAuthority.publicKey
+                : args.args.mintAuthority,
+            freezeAuthority:
+              args.args.freezeAuthority instanceof web3.Keypair
+                ? args.args.freezeAuthority.publicKey
+                : args.args.freezeAuthority,
             payer: honeycomb.identity().address,
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
@@ -123,13 +137,22 @@ export async function createCreateCurrencyOperation(
         ),
   ];
 
+  let signers = [];
+
+  if ("mint" in args.args) {
+    if (args.args.mintAuthority instanceof web3.Keypair) {
+      signers.push(args.args.mintAuthority);
+    }
+    if (args.args.freezeAuthority instanceof web3.Keypair) {
+      signers.push(args.args.freezeAuthority);
+    }
+  } else {
+    signers.push(mint);
+  }
+
   // Return the "Create Currency" operation wrapped in an object, along with the currency address.
   return {
-    operation: new Operation(
-      honeycomb,
-      instructions,
-      !("mint" in args.args) ? [mint] : undefined
-    ),
+    operation: new Operation(honeycomb, instructions, signers),
     currency,
   };
 }

@@ -23,11 +23,13 @@ export const wrapCurrencyStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _wrapCurrency_ instruction
  *
+ * @property [_writable_] project
  * @property [_writable_] currency
  * @property [] mint
- * @property [_writable_] project
  * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
+ * @property [**signer**] mintAuthority
+ * @property [**signer**] freezeAuthority
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] logWrapper
@@ -38,11 +40,13 @@ export const wrapCurrencyStruct = new beet.BeetArgsStruct<{
  * @category generated
  */
 export type WrapCurrencyInstructionAccounts = {
+  project: web3.PublicKey
   currency: web3.PublicKey
   mint: web3.PublicKey
-  project: web3.PublicKey
   delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
+  mintAuthority: web3.PublicKey
+  freezeAuthority: web3.PublicKey
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -79,6 +83,11 @@ export function createWrapCurrencyInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.project,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.currency,
       isWritable: true,
       isSigner: false,
@@ -86,11 +95,6 @@ export function createWrapCurrencyInstruction(
     {
       pubkey: accounts.mint,
       isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: true,
       isSigner: false,
     },
   ]
@@ -104,6 +108,16 @@ export function createWrapCurrencyInstruction(
   }
   keys.push({
     pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.mintAuthority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.freezeAuthority,
     isWritable: false,
     isSigner: true,
   })
