@@ -1,5 +1,5 @@
 {
-  "version": "0.0.43",
+  "version": "0.0.44",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -1935,10 +1935,6 @@
                 "type": "publicKey"
               },
               {
-                "name": "info",
-                "type": "bytes"
-              },
-              {
                 "name": "timestamp",
                 "type": "i64"
               }
@@ -1950,10 +1946,6 @@
               {
                 "name": "address",
                 "type": "publicKey"
-              },
-              {
-                "name": "info",
-                "type": "bytes"
               },
               {
                 "name": "timestamp",
@@ -1969,10 +1961,6 @@
                 "type": "publicKey"
               },
               {
-                "name": "info",
-                "type": "bytes"
-              },
-              {
                 "name": "timestamp",
                 "type": "i64"
               }
@@ -1984,10 +1972,6 @@
               {
                 "name": "address",
                 "type": "publicKey"
-              },
-              {
-                "name": "info",
-                "type": "bytes"
               },
               {
                 "name": "timestamp",

@@ -5,10 +5,9 @@ import {
   createWrapHolderAccountInstruction,
   PROGRAM_ID,
 } from "../generated";
-import { holderAccountPdas, metadataPda } from "../utils";
+import { holderAccountPdas } from "../utils";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
   getAccount as getTokenAccount,
 } from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
@@ -59,7 +58,6 @@ export async function createCreateHolderAccountOperation(
     args.owner,
     args.currency.mint.address,
     args.currency.kind,
-    TOKEN_PROGRAM_ID,
     programId
   );
 

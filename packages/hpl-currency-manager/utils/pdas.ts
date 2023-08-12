@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
   CurrencyKind,
@@ -105,7 +105,7 @@ export const tokenAccountPda = (
   owner: PublicKey,
   mint: PublicKey,
   tokenProgram = TOKEN_PROGRAM_ID,
-  programId = PROGRAM_ID
+  programId = ASSOCIATED_TOKEN_PROGRAM_ID
 ) =>
   PublicKey.findProgramAddressSync(
     [
@@ -132,28 +132,25 @@ export const holderAccountPdas = (
   owner: PublicKey,
   mint: PublicKey,
   currencyKind: CurrencyKind,
-  tokenProgram = TOKEN_PROGRAM_ID,
   programId = PROGRAM_ID
 ): { holderAccount: PublicKey; tokenAccount: PublicKey } => {
-  const [holderAccount] = holderAccountPda(owner, mint);
+  const [holderAccount] = holderAccountPda(owner, mint, programId);
 
-  const tokenAccount = getAssociatedTokenAddressSync(
-    mint,
-    currencyKind.__kind === "Permissioned" &&
-      currencyKind.kind === PermissionedCurrencyKind.Custodial
-      ? holderAccount
-      : owner
-  );
-
-  // const [tokenAccount] = tokenAccountPda(
+  // const tokenAccount = getAssociatedTokenAddressSync(
+  //   mint,
   //   currencyKind.__kind === "Permissioned" &&
   //     currencyKind.kind === PermissionedCurrencyKind.Custodial
   //     ? holderAccount
-  //     : owner,
-  //   mint,
-  //   tokenProgram,
-  //   programId
+  //     : owner
   // );
+
+  const [tokenAccount] = tokenAccountPda(
+    currencyKind.__kind === "Permissioned" &&
+      currencyKind.kind === PermissionedCurrencyKind.Custodial
+      ? holderAccount
+      : owner,
+    mint
+  );
 
   return { holderAccount, tokenAccount };
 };

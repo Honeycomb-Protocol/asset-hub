@@ -58,7 +58,6 @@ export async function createTransferCurrencyOperation(
       args.receiver,
       args.holderAccount.currency().mint.address,
       args.holderAccount.currency().kind,
-      splToken.TOKEN_PROGRAM_ID,
       programId
     );
     receiverHolderAccount = accounts.holderAccount;

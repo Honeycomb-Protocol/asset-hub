@@ -57,7 +57,6 @@ export async function createFundAccountOperation(
     args.receiverWallet,
     args.currency.mint.address,
     args.currency.kind,
-    splToken.TOKEN_PROGRAM_ID,
     programId
   );
 
