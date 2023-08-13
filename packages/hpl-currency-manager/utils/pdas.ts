@@ -2,6 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import {
   CurrencyKind,
@@ -136,21 +137,22 @@ export const holderAccountPdas = (
 ): { holderAccount: PublicKey; tokenAccount: PublicKey } => {
   const [holderAccount] = holderAccountPda(owner, mint, programId);
 
-  // const tokenAccount = getAssociatedTokenAddressSync(
-  //   mint,
-  //   currencyKind.__kind === "Permissioned" &&
-  //     currencyKind.kind === PermissionedCurrencyKind.Custodial
-  //     ? holderAccount
-  //     : owner
-  // );
-
-  const [tokenAccount] = tokenAccountPda(
+  const tokenAccount = getAssociatedTokenAddressSync(
+    mint,
     currencyKind.__kind === "Permissioned" &&
       currencyKind.kind === PermissionedCurrencyKind.Custodial
       ? holderAccount
       : owner,
-    mint
+    true
   );
+
+  // const [tokenAccount] = tokenAccountPda(
+  //   currencyKind.__kind === "Permissioned" &&
+  //     currencyKind.kind === PermissionedCurrencyKind.Custodial
+  //     ? holderAccount
+  //     : owner,
+  //   mint
+  // );
 
   return { holderAccount, tokenAccount };
 };

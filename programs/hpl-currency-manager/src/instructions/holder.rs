@@ -204,15 +204,15 @@ pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
 pub struct FixHolderAccount<'info> {
     /// The project account associated with the currency.
     #[account(mut)]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
 
     /// The currency account to be burned.
     #[account(has_one = mint, has_one = project)]
-    pub currency: Account<'info, Currency>,
+    pub currency: Box<Account<'info, Currency>>,
 
     /// The holder account associated with the currency, which holds the token.
     #[account(mut, has_one = currency, has_one = token_account, has_one = owner)]
-    pub holder_account: Account<'info, HolderAccount>,
+    pub holder_account: Box<Account<'info, HolderAccount>>,
 
     /// The mint account of the currency.
     #[account(mut)]
