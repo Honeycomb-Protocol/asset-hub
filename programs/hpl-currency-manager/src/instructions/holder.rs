@@ -462,13 +462,21 @@ pub struct TransferCurrency<'info> {
 
 /// Transger currency
 pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
-    msg!("TRANSFER");
+    // Check if the sender's holder account status is active, if not, return an error
+    if ctx.accounts.sender_holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
+    // Check if the receiver's holder account status is active, if not, return an error
+    if ctx.accounts.receiver_holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
     if ctx.accounts.currency.kind
         == (CurrencyKind::Permissioned {
             kind: PermissionedCurrencyKind::Custodial,
         })
     {
-        msg!("PERMISSIONED");
         let holder_seeds = &[
             b"holder_account",
             ctx.accounts.sender_holder_account.owner.as_ref(),
@@ -490,7 +498,6 @@ pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<
             amount,
         )?;
     } else {
-        msg!("NOMAL");
         token::transfer(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -647,6 +654,10 @@ pub struct RevokeDelegate<'info> {
 
 /// Approve currency
 pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
+    if ctx.accounts.holder_account.status == HolderStatus::Inactive {
+        return Err(ErrorCode::InactiveHolder.into());
+    }
+
     token::revoke(CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Revoke {

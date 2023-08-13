@@ -3,14 +3,21 @@ import {
   Honeycomb,
   HoneycombProject,
   Operation,
+  VAULT,
 } from "@honeycomb-protocol/hive-control";
 import {
+  CURRENCY_MANAGER_ID,
   Currency,
   HolderAccount,
   HolderStatus,
   HplCurrency,
   PermissionedCurrencyKind,
+  createFixHolderAccountInstruction,
+  currencyPda,
   findProjectCurrencies,
+  holderAccountPda,
+  holderAccountPdas,
+  tokenAccountPda,
 } from "../packages/hpl-currency-manager";
 import { prepare } from "./prepare";
 import {
@@ -19,6 +26,12 @@ import {
   keypairIdentity,
   token as tokenAmount,
 } from "@metaplex-foundation/js";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  AuthorityType,
+  getMint,
+  setAuthority,
+} from "@solana/spl-token";
 jest.setTimeout(200000);
 
 describe("Currency Manager", () => {
@@ -46,10 +59,10 @@ describe("Currency Manager", () => {
     const balance = await honeycomb
       .rpc()
       .getBalance(honeycomb.identity().address);
-    expect(balance).toBeGreaterThanOrEqual(web3.LAMPORTS_PER_SOL * 0.1);
+    expect(balance).toBeGreaterThanOrEqual(web3.LAMPORTS_PER_SOL * 0.01);
   });
 
-  it("Temp", async () => {
+  it.skip("Temp", async () => {
     // const project = await HoneycombProject.fromAddress(
     //   honeycomb.connection,
     //   new web3.PublicKey("7CKTHsJ3EZqChNf3XGt9ytdZXvSzDFWmrQJL3BCe4Ppw")
@@ -76,36 +89,62 @@ describe("Currency Manager", () => {
       )) as [web3.PublicKey, Currency][];
     console.log("Currencies", currencies.length);
 
-    // for (let currency of currencies) {
-    //   await new Operation(honeycomb, [
-    //     createUpgradeCurrencyInstruction({
-    //       project: currency[1].project,
-    //       currency: currency[0],
-    //       authority: honeycomb.identity().address,
-    //       payer: honeycomb.identity().address,
-    //       rentSysvar: web3.SYSVAR_RENT_PUBKEY,
-    //     }),
-    //   ]).send({ skipPreflight: true });
-    //   console.log("Currency", currency[0].toString());
-    //   break;
-    // }
+    const holderAccounts = await HolderAccount.gpaBuilder()
+      .run(honeycomb.connection)
+      .then(
+        (x) =>
+          x
+            .map((y) => {
+              try {
+                return HolderAccount.fromAccountInfo(y.account)[0];
+              } catch {
+                return null;
+              }
+            })
+            .filter((x) => !!x) as HolderAccount[]
+      );
 
-    console.log("Doe");
+    for (let holderAccount of holderAccounts) {
+      const currency = currencies.find((c) =>
+        c[0].equals(holderAccount.currency)
+      );
+      if (!currency) continue;
 
-    // await HolderAccount.gpaBuilder()
-    //   .run(honeycomb.connection)
-    //   .then((x) =>
-    //     x
-    //       .map((y) => {
-    //         try {
-    //           return HolderAccount.fromAccountInfo(y.account);
-    //         } catch {
-    //           return null;
-    //         }
-    //       })
-    //       .filter((x) => !!x)
-    //   )
-    //   .then((x) => console.log("Holder Accounts", x.length));
+      const {
+        holderAccount: holderAccountAddress,
+        tokenAccount: newTokenAccount,
+      } = holderAccountPdas(
+        holderAccount.owner,
+        currency[1].mint,
+        currency[1].kind
+      );
+      const [tokenAccount] = tokenAccountPda(
+        holderAccount.owner,
+        currency[1].mint,
+        undefined,
+        CURRENCY_MANAGER_ID
+      );
+
+      if (newTokenAccount.equals(holderAccount.tokenAccount)) continue;
+
+      const ctx = await new Operation(honeycomb, [
+        createFixHolderAccountInstruction({
+          project: currency[1].project,
+          currency: currency[0],
+          mint: currency[1].mint,
+          holderAccount: holderAccountAddress,
+          tokenAccount,
+          newTokenAccount,
+          owner: holderAccount.owner,
+          payer: honeycomb.identity().address,
+          vault: VAULT,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+        }),
+      ]).send();
+      console.log("Signature", ctx.signature);
+      break;
+    }
   });
 
   it.skip("Create Project and currency", async () => {
@@ -185,6 +224,8 @@ describe("Currency Manager", () => {
         mint: new web3.PublicKey(
           "GsRHzw9G6at1hjiq7YEGKiZmm3opMvp1iguqkq4TsXcE"
         ),
+        mintAuthority: web3.Keypair.generate(),
+        freezeAuthority: web3.Keypair.generate(),
       })
     );
 

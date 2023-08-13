@@ -35,6 +35,7 @@ pub mod hpl_asset_assembler {
                     system_program: ctx.accounts.system_program.to_account_info(),
                     log_wrapper: ctx.accounts.log_wrapper.to_account_info(),
                     clock: ctx.accounts.clock_sysvar.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
                     vault: ctx.accounts.vault.to_account_info(),
                 },
             ),
@@ -63,6 +64,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::update_assembler(ctx, args)
@@ -82,6 +84,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::create_block(ctx, args)
@@ -101,6 +104,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::create_block_definition(ctx, args)
@@ -116,6 +120,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::create_nft(ctx)
@@ -131,6 +136,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::add_block(ctx)
@@ -146,6 +152,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::mint_nft(ctx)
@@ -161,6 +168,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::burn_nft(ctx)
@@ -176,6 +184,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::remove_block(ctx)
@@ -195,6 +204,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::set_nft_generated(ctx, args)
@@ -214,6 +224,7 @@ pub mod hpl_asset_assembler {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         instructions::update_metadata(ctx, args)

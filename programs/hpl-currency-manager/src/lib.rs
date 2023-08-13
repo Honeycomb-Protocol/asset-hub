@@ -36,7 +36,6 @@ pub mod hpl_currency_manager {
     /// This function can return an error if the platform gate fails or if the currency creation
     /// encounters any issues.
     pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -> Result<()> {
-        // Perform platform gate to manage assets for the project
         hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assets,
             None,
@@ -46,8 +45,9 @@ pub mod hpl_currency_manager {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
-        // Create the new currency using the provided arguments
+
         instructions::create_currency(ctx, args)
     }
 
@@ -68,7 +68,6 @@ pub mod hpl_currency_manager {
     /// This function can return an error if the platform gate fails or if the currency update
     /// encounters any issues.
     pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -> Result<()> {
-        // Perform platform gate to manage assets for the project
         hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assets,
             None,
@@ -78,8 +77,9 @@ pub mod hpl_currency_manager {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
-        // Update the existing currency using the provided arguments
+
         instructions::update_currency(ctx, args)
     }
 
@@ -98,7 +98,6 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails or if the currency wrapping
     /// encounters any issues.
     pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
-        // Perform platform gate to manage assets for the project
         hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assets,
             None,
@@ -108,8 +107,9 @@ pub mod hpl_currency_manager {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
-        // Wrap the currency
+
         instructions::wrap_currency(ctx)
     }
 
@@ -128,7 +128,6 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails or if any issues occur during the
     /// holder account creation process.
     pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
-        // Perform platform gate to manage public low-level actions for the project
         hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.public_low,
             None,
@@ -138,19 +137,17 @@ pub mod hpl_currency_manager {
             ctx.accounts.vault.to_account_info(),
             &None,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
-        // Clone the currency reference for later usage
-        let currency = &ctx.accounts.currency.clone();
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
 
-        // Create the holder account
+        let currency = &ctx.accounts.currency.clone();
+        let mint = &ctx.accounts.mint.clone();
+        let token_account = &ctx.accounts.token_account.clone();
+        let token_program = &ctx.accounts.token_program.clone();
+
         instructions::create_holder_account(ctx)?;
 
-        // Perform post-actions after creating the holder account
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Wrap a holder account in the HPL Hive Control program.
@@ -178,19 +175,18 @@ pub mod hpl_currency_manager {
             ctx.accounts.vault.to_account_info(),
             &None,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
-        // Clone the currency reference for later usage
+
         let currency = &ctx.accounts.currency.clone();
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let token_program = &ctx.accounts.token_program.clone();
+        let token_account = &ctx.accounts.token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Create the holder account
         instructions::wrap_holder_account(ctx)?;
 
-        // Perform post-actions after creating the holder account
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Fix a holder account in the HPL Hive Control program.
@@ -218,28 +214,26 @@ pub mod hpl_currency_manager {
             ctx.accounts.vault.to_account_info(),
             &None,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
-        // Perform pre-actions before fixing the account
+        // Perform pre-actions before instructionn
         pre_actions(
             &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+            &ctx.accounts.mint,
+            &ctx.accounts.token_account,
+            &ctx.accounts.token_program,
         )?;
 
-        // Clone the currency reference for later usage
         let currency = &ctx.accounts.currency.clone();
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.new_token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let token_program = &ctx.accounts.token_program.clone();
+        let token_account = &ctx.accounts.new_token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Create the holder account
         instructions::fix_holder_account(ctx)?;
 
-        // Perform post-actions after creating the holder account
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Mint new currency in the HPL Hive Control program.
@@ -269,6 +263,7 @@ pub mod hpl_currency_manager {
             ctx.accounts.vault.to_account_info(),
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
         // Check if the holder account status is active, if not, return an error
@@ -276,27 +271,23 @@ pub mod hpl_currency_manager {
             return Err(ErrorCode::InactiveHolder.into());
         }
 
-        // Perform pre-actions before minting the currency
+        // Perform pre-actions before instructionn
         pre_actions(
             &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+            &ctx.accounts.mint,
+            &ctx.accounts.token_account,
+            &ctx.accounts.token_program,
         )?;
 
-        // Clone the currency reference for later usage
         let currency = &ctx.accounts.currency.clone();
-
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let token_program = &ctx.accounts.token_program.clone();
+        let token_account = &ctx.accounts.token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Mint the specified amount of currency
         instructions::mint_currency(ctx, amount)?;
 
-        // Perform post-actions after minting the currency
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Fund an account in the HPL Hive Control program.
@@ -322,105 +313,35 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the funding process.
     pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
-        let allowed_programs: Vec<Pubkey> = vec![
-            ctx.accounts.project.allowed_programs.clone(),
-            hpl_hive_control::constants::known_programs(),
-        ]
-        .concat();
-
-        // if allowed_programs.len() > 0 {
-        //     let ix_program_key =
-        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-        //             0,
-        //             &ctx.accounts.instructions_sysvar,
-        //         )
-        //         .unwrap()
-        //         .program_id;
-
-        //     if ix_program_key.eq(&ID) {
-        //         hpl_hive_control::instructions::platform_gate_fn(
-        //             hpl_hive_control::constants::ACTIONS.driver_action,
-        //             Some((0, Pubkey::default())),
-        //             &ctx.accounts.project,
-        //             ctx.accounts.authority.key(),
-        //             ctx.accounts.wallet.to_account_info(),
-        //             ctx.accounts.vault.to_account_info(),
-        //             &None,
-        //             ctx.accounts.system_program.to_account_info(),
-        //         )?;
-        //     } else {
-        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-        //         if found.is_none() {
-        //             return Err(errors::ErrorCode::Unauthorized.into());
-        //         }
-        //     }
-        // } else {
-        //     hpl_hive_control::instructions::platform_gate_fn(
-        //         hpl_hive_control::constants::ACTIONS.public_high,
-        //         None,
-        //         &ctx.accounts.project,
-        //         ctx.accounts.authority.key(),
-        //         ctx.accounts.wallet.to_account_info(),
-        //         ctx.accounts.vault.to_account_info(),
-        //         &None,
-        //         ctx.accounts.system_program.to_account_info(),
-        //     )?;
-        // }
-
-        let ix_program_key =
-            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                0,
-                &ctx.accounts.instructions_sysvar,
-            )
-            .unwrap()
-            .program_id;
-
-        // Perform the platform gate based on the caller's program ID
-        if ix_program_key.eq(&ID) {
-            // If caller's program ID is the HPL Hive Control program ID, perform driver action platform gate
-            hpl_hive_control::instructions::platform_gate_fn(
-                hpl_hive_control::constants::ACTIONS.public_high,
-                None,
-                &ctx.accounts.project,
-                ctx.accounts.authority.key(),
-                ctx.accounts.wallet.to_account_info(),
-                ctx.accounts.vault.to_account_info(),
-                &None,
-                ctx.accounts.system_program.to_account_info(),
-            )?;
-        } else {
-            // If caller's program ID is not the HPL Hive Control program ID, check if it's in the allowed programs list
-            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-            if found.is_none() {
-                return Err(errors::ErrorCode::Unauthorized.into());
-            }
-        }
-        // Check if the holder account status is active, if not, return an error
-        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
-            return Err(ErrorCode::InactiveHolder.into());
-        }
-
-        // Perform pre-actions before funding the account
-        pre_actions(
-            &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.wallet.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
-        // Clone the currency reference for later usage
-        let currency = &ctx.accounts.currency.clone();
+        // Perform pre-actions before instructionn
+        pre_actions(
+            &ctx.accounts.currency,
+            &ctx.accounts.mint,
+            &ctx.accounts.token_account,
+            &ctx.accounts.token_program,
+        )?;
 
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = &ctx.accounts.token_program.clone();
+        let token_account = &ctx.accounts.token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Fund the account with the specified amount
         instructions::fund_account(ctx, amount)?;
 
-        // Perform post-actions after funding the account
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Burn currency in the HPL Hive Control program.
@@ -446,105 +367,35 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the burning process.
     pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
-        let allowed_programs: Vec<Pubkey> = vec![
-            ctx.accounts.project.allowed_programs.clone(),
-            hpl_hive_control::constants::known_programs(),
-        ]
-        .concat();
-
-        // if allowed_programs.len() > 0 {
-        //     let ix_program_key =
-        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-        //             0,
-        //             &ctx.accounts.instructions_sysvar,
-        //         )
-        //         .unwrap()
-        //         .program_id;
-
-        //     if ix_program_key.eq(&ID) {
-        //         hpl_hive_control::instructions::platform_gate_fn(
-        //             hpl_hive_control::constants::ACTIONS.driver_action,
-        //             Some((0, Pubkey::default())),
-        //             &ctx.accounts.project,
-        //             ctx.accounts.authority.key(),
-        //             ctx.accounts.owner.to_account_info(),
-        //             ctx.accounts.vault.to_account_info(),
-        //             &None,
-        //             ctx.accounts.system_program.to_account_info(),
-        //         )?;
-        //     } else {
-        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-        //         if found.is_none() {
-        //             return Err(errors::ErrorCode::Unauthorized.into());
-        //         }
-        //     }
-        // } else {
-        //     hpl_hive_control::instructions::platform_gate_fn(
-        //         hpl_hive_control::constants::ACTIONS.public_high,
-        //         None,
-        //         &ctx.accounts.project,
-        //         ctx.accounts.authority.key(),
-        //         ctx.accounts.owner.to_account_info(),
-        //         ctx.accounts.vault.to_account_info(),
-        //         &None,
-        //         ctx.accounts.system_program.to_account_info(),
-        //     )?;
-        // }
-
-        let ix_program_key =
-            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                0,
-                &ctx.accounts.instructions_sysvar,
-            )
-            .unwrap()
-            .program_id;
-
-        // Perform the platform gate based on the caller's program ID
-        if ix_program_key.eq(&ID) {
-            // If caller's program ID is the HPL Hive Control program ID, perform driver action platform gate
-            hpl_hive_control::instructions::platform_gate_fn(
-                hpl_hive_control::constants::ACTIONS.public_high,
-                None,
-                &ctx.accounts.project,
-                ctx.accounts.authority.key(),
-                ctx.accounts.owner.to_account_info(),
-                ctx.accounts.vault.to_account_info(),
-                &None,
-                ctx.accounts.system_program.to_account_info(),
-            )?;
-        } else {
-            // If caller's program ID is not the HPL Hive Control program ID, check if it's in the allowed programs list
-            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-            if found.is_none() {
-                return Err(errors::ErrorCode::Unauthorized.into());
-            }
-        }
-        // Check if the holder account status is active, if not, return an error
-        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
-            return Err(ErrorCode::InactiveHolder.into());
-        }
-
-        // Perform pre-actions before burning the currency
-        pre_actions(
-            &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
-        // Clone the currency reference for later usage
-        let currency = &ctx.accounts.currency.clone();
+        // Perform pre-actions before instructionn
+        pre_actions(
+            &ctx.accounts.currency,
+            &ctx.accounts.mint,
+            &ctx.accounts.token_account,
+            &ctx.accounts.token_program,
+        )?;
 
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = &ctx.accounts.token_program.clone();
+        let token_account = &ctx.accounts.token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Burn the specified amount of currency
         instructions::burn_currency(ctx, amount)?;
 
-        // Perform post-actions after burning the currency
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Transfer currency in the HPL Hive Control program from one holder account to another.
@@ -572,131 +423,45 @@ pub mod hpl_currency_manager {
     /// holder account is inactive, the caller's program ID is not authorized, or if any issues occur
     /// during the transfer process.
     pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
-        let allowed_programs: Vec<Pubkey> = vec![
-            ctx.accounts.project.allowed_programs.clone(),
-            hpl_hive_control::constants::known_programs(),
-        ]
-        .concat();
-
-        // if allowed_programs.len() > 0 {
-        //     let ix_program_key =
-        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-        //             0,
-        //             &ctx.accounts.instructions_sysvar,
-        //         )
-        //         .unwrap()
-        //         .program_id;
-
-        //     if ix_program_key.eq(&ID) {
-        //         hpl_hive_control::instructions::platform_gate_fn(
-        //             hpl_hive_control::constants::ACTIONS.driver_action,
-        //             Some((0, Pubkey::default())),
-        //             &ctx.accounts.project,
-        //             ctx.accounts.authority.key(),
-        //             ctx.accounts.owner.to_account_info(),
-        //             ctx.accounts.vault.to_account_info(),
-        //             &None,
-        //             ctx.accounts.system_program.to_account_info(),
-        //         )?;
-        //     } else {
-        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-        //         if found.is_none() {
-        //             return Err(errors::ErrorCode::Unauthorized.into());
-        //         }
-        //     }
-        // } else {
-        //     hpl_hive_control::instructions::platform_gate_fn(
-        //         hpl_hive_control::constants::ACTIONS.public_high,
-        //         None,
-        //         &ctx.accounts.project,
-        //         ctx.accounts.authority.key(),
-        //         ctx.accounts.owner.to_account_info(),
-        //         ctx.accounts.vault.to_account_info(),
-        //         &None,
-        //         ctx.accounts.system_program.to_account_info(),
-        //     )?;
-        // }
-
-        let ix_program_key =
-            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                0,
-                &ctx.accounts.instructions_sysvar,
-            )
-            .unwrap()
-            .program_id;
-
-        msg!("CPI? {:?}", ix_program_key);
-
-        // Perform the platform gate based on the caller's program ID
-        if ix_program_key.eq(&ID) {
-            // If caller's program ID is the HPL Hive Control program ID, perform driver action platform gate
-            hpl_hive_control::instructions::platform_gate_fn(
-                hpl_hive_control::constants::ACTIONS.public_high,
-                None,
-                &ctx.accounts.project,
-                ctx.accounts.authority.key(),
-                ctx.accounts.owner.to_account_info(),
-                ctx.accounts.vault.to_account_info(),
-                &None,
-                ctx.accounts.system_program.to_account_info(),
-            )?;
-        } else {
-            // If caller's program ID is not the HPL Hive Control program ID, check if it's in the allowed programs list
-            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-            msg!("Allowed CPI {}", found.is_some());
-            if found.is_none() {
-                return Err(errors::ErrorCode::Unauthorized.into());
-            }
-        }
-
-        // Check if the sender's holder account status is active, if not, return an error
-        if ctx.accounts.sender_holder_account.status == HolderStatus::Inactive {
-            return Err(ErrorCode::InactiveHolder.into());
-        }
-
-        // Check if the receiver's holder account status is active, if not, return an error
-        if ctx.accounts.receiver_holder_account.status == HolderStatus::Inactive {
-            return Err(ErrorCode::InactiveHolder.into());
-        }
-
-        // Perform pre-actions before transferring the currency for the sender's token account
-        pre_actions(
-            &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.sender_token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
-        // Perform pre-actions before transferring the currency for the sender's token account
+        // Perform pre-actions before instructionn
         pre_actions(
             &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.receiver_token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+            &ctx.accounts.mint,
+            &ctx.accounts.sender_token_account,
+            &ctx.accounts.token_program,
         )?;
 
-        // Clone the currency reference for later usage
+        pre_actions(
+            &ctx.accounts.currency,
+            &ctx.accounts.mint,
+            &ctx.accounts.receiver_token_account,
+            &ctx.accounts.token_program,
+        )?;
+
         let currency = &ctx.accounts.currency.clone();
-
-        // Get references to the token program, sender's and receiver's token accounts, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let sender_token_account = ctx.accounts.sender_token_account.to_account_info();
-        let receiver_token_account = ctx.accounts.receiver_token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let token_program = &ctx.accounts.token_program.clone();
+        let sender_token_account = &ctx.accounts.sender_token_account.clone();
+        let receiver_token_account = &ctx.accounts.receiver_token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Transfer the specified amount of currency
         instructions::transfer_currency(ctx, amount)?;
 
-        // Perform post-actions after transferring the currency for the sender's token account
-        post_actions(
-            currency,
-            token_program.clone(),
-            sender_token_account,
-            mint.clone(),
-        )?;
+        post_actions(currency, mint, sender_token_account, token_program)?;
 
-        // Perform post-actions after transferring the currency for the sender's token account
-        post_actions(currency, token_program, receiver_token_account, mint)
+        post_actions(currency, mint, receiver_token_account, token_program)
     }
 
     ///
@@ -721,106 +486,35 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the approval process.
     pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()> {
-        let allowed_programs: Vec<Pubkey> = vec![
-            ctx.accounts.project.allowed_programs.clone(),
-            hpl_hive_control::constants::known_programs(),
-        ]
-        .concat();
-
-        // if allowed_programs.len() > 0 {
-        //     let ix_program_key =
-        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-        //             0,
-        //             &ctx.accounts.instructions_sysvar,
-        //         )
-        //         .unwrap()
-        //         .program_id;
-
-        //     if ix_program_key.eq(&ID) {
-        //         hpl_hive_control::instructions::platform_gate_fn(
-        //             hpl_hive_control::constants::ACTIONS.driver_action,
-        //             Some((0, Pubkey::default())),
-        //             &ctx.accounts.project,
-        //             ctx.accounts.authority.key(),
-        //             ctx.accounts.owner.to_account_info(),
-        //             ctx.accounts.vault.to_account_info(),
-        //             &None,
-        //             ctx.accounts.system_program.to_account_info(),
-        //         )?;
-        //     } else {
-        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-        //         if found.is_none() {
-        //             return Err(errors::ErrorCode::Unauthorized.into());
-        //         }
-        //     }
-        // } else {
-        //     hpl_hive_control::instructions::platform_gate_fn(
-        //         hpl_hive_control::constants::ACTIONS.public_high,
-        //         None,
-        //         &ctx.accounts.project,
-        //         ctx.accounts.authority.key(),
-        //         ctx.accounts.owner.to_account_info(),
-        //         ctx.accounts.vault.to_account_info(),
-        //         &None,
-        //         ctx.accounts.system_program.to_account_info(),
-        //     )?;
-        // }
-
-        let ix_program_key =
-            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                0,
-                &ctx.accounts.instructions_sysvar,
-            )
-            .unwrap()
-            .program_id;
-
-        // Perform the platform gate based on the caller's program ID
-        if ix_program_key.eq(&ID) {
-            // If caller's program ID is the HPL Hive Control program ID, perform driver action platform gate
-            hpl_hive_control::instructions::platform_gate_fn(
-                hpl_hive_control::constants::ACTIONS.public_high,
-                None,
-                &ctx.accounts.project,
-                ctx.accounts.authority.key(),
-                ctx.accounts.owner.to_account_info(),
-                ctx.accounts.vault.to_account_info(),
-                &None,
-                ctx.accounts.system_program.to_account_info(),
-            )?;
-        } else {
-            // If caller's program ID is not the HPL Hive Control program ID, check if it's in the allowed programs list
-            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-            if found.is_none() {
-                return Err(errors::ErrorCode::Unauthorized.into());
-            }
-        }
-
-        // Check if the holder account status is active, if not, return an error
-        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
-            return Err(ErrorCode::InactiveHolder.into());
-        }
-
-        // Perform pre-actions before approving the delegate
-        pre_actions(
-            &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
-        // Clone the currency reference for later usage
-        let currency = &ctx.accounts.currency.clone();
+        // Perform pre-actions before instructionn
+        pre_actions(
+            &ctx.accounts.currency,
+            &ctx.accounts.mint,
+            &ctx.accounts.token_account,
+            &ctx.accounts.token_program,
+        )?;
 
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = &ctx.accounts.token_program.clone();
+        let token_account = &ctx.accounts.token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Approve the delegate to manage the specified amount of currency
         instructions::approve_delegate(ctx, amount)?;
 
-        // Perform post-actions after approving the delegate
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Revoke a delegate's permission to manage currency in the HPL Hive Control program.
@@ -845,107 +539,35 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the revoking process.
     pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
-        let allowed_programs: Vec<Pubkey> = vec![
-            ctx.accounts.project.allowed_programs.clone(),
-            hpl_hive_control::constants::known_programs(),
-        ]
-        .concat();
-
-        // if allowed_programs.len() > 0 {
-        //     let ix_program_key =
-        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-        //             0,
-        //             &ctx.accounts.instructions_sysvar,
-        //         )
-        //         .unwrap()
-        //         .program_id;
-
-        //     if ix_program_key.eq(&ID) {
-        //         hpl_hive_control::instructions::platform_gate_fn(
-        //             hpl_hive_control::constants::ACTIONS.driver_action,
-        //             Some((0, Pubkey::default())),
-        //             &ctx.accounts.project,
-        //             ctx.accounts.authority.key(),
-        //             ctx.accounts.authority.to_account_info(),
-        //             ctx.accounts.vault.to_account_info(),
-        //             &None,
-        //             ctx.accounts.system_program.to_account_info(),
-        //         )?;
-        //     } else {
-        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-        //         if found.is_none() {
-        //             return Err(errors::ErrorCode::Unauthorized.into());
-        //         }
-        //     }
-        // } else {
-        //     hpl_hive_control::instructions::platform_gate_fn(
-        //         hpl_hive_control::constants::ACTIONS.public_high,
-        //         None,
-        //         &ctx.accounts.project,
-        //         ctx.accounts.authority.key(),
-        //         ctx.accounts.authority.to_account_info(),
-        //         ctx.accounts.vault.to_account_info(),
-        //         &None,
-        //         ctx.accounts.system_program.to_account_info(),
-        //     )?;
-        // }
-
-        // Perform the platform gate based on the caller's program ID
-        let ix_program_key =
-            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                0,
-                &ctx.accounts.instructions_sysvar,
-            )
-            .unwrap()
-            .program_id;
-
-        // Perform the platform gate based on the caller's program ID
-        if ix_program_key.eq(&ID) {
-            // If caller's program ID is the HPL Hive Control program ID, perform driver action platform gate
-            hpl_hive_control::instructions::platform_gate_fn(
-                hpl_hive_control::constants::ACTIONS.public_high,
-                None,
-                &ctx.accounts.project,
-                ctx.accounts.authority.key(),
-                ctx.accounts.authority.to_account_info(),
-                ctx.accounts.vault.to_account_info(),
-                &None,
-                ctx.accounts.system_program.to_account_info(),
-            )?;
-        } else {
-            // If caller's program ID is not the HPL Hive Control program ID, check if it's in the allowed programs list
-            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-            if found.is_none() {
-                return Err(errors::ErrorCode::Unauthorized.into());
-            }
-        }
-
-        // Check if the holder account status is active, if not, return an error
-        if ctx.accounts.holder_account.status == HolderStatus::Inactive {
-            return Err(ErrorCode::InactiveHolder.into());
-        }
-
-        // Perform pre-actions before revoking the delegate
-        pre_actions(
-            &ctx.accounts.currency,
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.token_account.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
         )?;
 
-        // Clone the currency reference for later usage
-        let currency = &ctx.accounts.currency.clone();
+        // Perform pre-actions before instructionn
+        pre_actions(
+            &ctx.accounts.currency,
+            &ctx.accounts.mint,
+            &ctx.accounts.token_account,
+            &ctx.accounts.token_program,
+        )?;
 
-        // Get references to the token program, token account, and mint
-        let token_program = ctx.accounts.token_program.to_account_info();
-        let token_account = ctx.accounts.token_account.to_account_info();
-        let mint = ctx.accounts.mint.to_account_info();
+        let currency = &ctx.accounts.currency.clone();
+        let token_program = &ctx.accounts.token_program.clone();
+        let token_account = &ctx.accounts.token_account.clone();
+        let mint = &ctx.accounts.mint.clone();
 
         // Revoke the delegate's permission to manage currency
         instructions::revoke_delegate(ctx)?;
 
-        // Perform post-actions after revoking the delegate
-        post_actions(currency, token_program, token_account, mint)
+        post_actions(currency, mint, token_account, token_program)
     }
 
     /// Set the status of a holder account in the HPL Hive Control program.
@@ -969,79 +591,17 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the caller's program ID is not authorized,
     /// or if any issues occur during the process of setting the holder account's status.
     pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
-        let allowed_programs: Vec<Pubkey> = vec![
-            ctx.accounts.project.allowed_programs.clone(),
-            hpl_hive_control::constants::known_programs(),
-        ]
-        .concat();
-
-        // if allowed_programs.len() > 0 {
-        //     let ix_program_key =
-        //         anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-        //             0,
-        //             &ctx.accounts.instructions_sysvar,
-        //         )
-        //         .unwrap()
-        //         .program_id;
-
-        //     if ix_program_key.eq(&ID) {
-        //         hpl_hive_control::instructions::platform_gate_fn(
-        //             hpl_hive_control::constants::ACTIONS.driver_action,
-        //             Some((0, Pubkey::default())),
-        //             &ctx.accounts.project,
-        //             ctx.accounts.authority.key(),
-        //             ctx.accounts.authority.to_account_info(),
-        //             ctx.accounts.vault.to_account_info(),
-        //             &None,
-        //             ctx.accounts.system_program.to_account_info(),
-        //         )?;
-        //     } else {
-        //         let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-        //         if found.is_none() {
-        //             return Err(errors::ErrorCode::Unauthorized.into());
-        //         }
-        //     }
-        // } else {
-        //     hpl_hive_control::instructions::platform_gate_fn(
-        //         hpl_hive_control::constants::ACTIONS.public_high,
-        //         None,
-        //         &ctx.accounts.project,
-        //         ctx.accounts.authority.key(),
-        //         ctx.accounts.authority.to_account_info(),
-        //         ctx.accounts.vault.to_account_info(),
-        //         &None,
-        //         ctx.accounts.system_program.to_account_info(),
-        //     )?;
-        // }
-
-        let ix_program_key =
-            anchor_lang::solana_program::sysvar::instructions::get_instruction_relative(
-                0,
-                &ctx.accounts.instructions_sysvar,
-            )
-            .unwrap()
-            .program_id;
-
-        // Perform the platform gate based on the caller's program ID
-        if ix_program_key.eq(&ID) {
-            // If caller's program ID is the HPL Hive Control program ID, perform driver action platform gate
-            hpl_hive_control::instructions::platform_gate_fn(
-                hpl_hive_control::constants::ACTIONS.public_high,
-                None,
-                &ctx.accounts.project,
-                ctx.accounts.authority.key(),
-                ctx.accounts.authority.to_account_info(),
-                ctx.accounts.vault.to_account_info(),
-                &None,
-                ctx.accounts.system_program.to_account_info(),
-            )?;
-        } else {
-            // If caller's program ID is not the HPL Hive Control program ID, check if it's in the allowed programs list
-            let found = allowed_programs.iter().find(|p| (*p).eq(&ix_program_key));
-            if found.is_none() {
-                return Err(errors::ErrorCode::Unauthorized.into());
-            }
-        }
+        hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.public_high,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &None,
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
+        )?;
 
         // Call the `set_holder_status` instruction to set the holder account's status
         instructions::set_holder_status(ctx, status)

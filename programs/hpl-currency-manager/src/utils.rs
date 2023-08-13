@@ -1,18 +1,22 @@
 pub use {
     crate::state::{Currency, CurrencyKind, PermissionedCurrencyKind},
     anchor_lang::prelude::*,
+    anchor_spl::token::{Mint, Token, TokenAccount},
 };
 
 pub fn pre_actions<'info>(
     currency: &Account<'info, Currency>,
-    token_program: AccountInfo<'info>,
-    token_account: AccountInfo<'info>,
-    mint: AccountInfo<'info>,
+    mint: &Account<'info, Mint>,
+    token_account: &Account<'info, TokenAccount>,
+    token_program: &Program<'info, Token>,
 ) -> Result<()> {
-    if currency.kind
-        != (CurrencyKind::Permissioned {
-            kind: PermissionedCurrencyKind::Custodial,
-        })
+    if token_account.is_frozen()
+        && mint.freeze_authority.is_some()
+        && mint.freeze_authority.unwrap().eq(&currency.key())
+        && currency.kind
+            != (CurrencyKind::Permissioned {
+                kind: PermissionedCurrencyKind::Custodial,
+            })
     {
         let currency_seeds = &[
             b"currency".as_ref(),
@@ -36,14 +40,17 @@ pub fn pre_actions<'info>(
 
 pub fn post_actions<'info>(
     currency: &Account<'info, Currency>,
-    token_program: AccountInfo<'info>,
-    token_account: AccountInfo<'info>,
-    mint: AccountInfo<'info>,
+    mint: &Account<'info, Mint>,
+    token_account: &Account<'info, TokenAccount>,
+    token_program: &Program<'info, Token>,
 ) -> Result<()> {
-    if currency.kind
-        != (CurrencyKind::Permissioned {
-            kind: PermissionedCurrencyKind::Custodial,
-        })
+    if !token_account.is_frozen()
+        && mint.freeze_authority.is_some()
+        && mint.freeze_authority.unwrap().eq(&currency.key())
+        && currency.kind
+            != (CurrencyKind::Permissioned {
+                kind: PermissionedCurrencyKind::Custodial,
+            })
     {
         let currency_seeds = &[
             b"currency".as_ref(),

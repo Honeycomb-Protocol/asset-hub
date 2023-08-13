@@ -188,8 +188,8 @@ export class HplCurrency extends Module {
       | CreateCurrencyArgs
       | {
           mint: web3.PublicKey;
-          mintAuthority: web3.PublicKey;
-          freezeAuthority: web3.PublicKey;
+          mintAuthority: web3.PublicKey | web3.Keypair;
+          freezeAuthority: web3.PublicKey | web3.Keypair;
         },
     confirmOptions?: web3.ConfirmOptions
   ) {
@@ -551,8 +551,8 @@ export const currencyModule = (
         | CreateCurrencyArgs
         | {
             mint: web3.PublicKey;
-            mintAuthority: web3.PublicKey;
-            freezeAuthority: web3.PublicKey;
+            mintAuthority: web3.PublicKey | web3.Keypair;
+            freezeAuthority: web3.PublicKey | web3.Keypair;
           }
       )
 ) =>

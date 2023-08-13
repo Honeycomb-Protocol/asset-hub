@@ -51,11 +51,16 @@ pub struct CreateAssetManager<'info> {
     /// HIVE CONTROL PROGRAM
     pub hive_control: Program<'info, HplHiveControl>,
 
-        /// SPL NOOP PROGRAM
-        pub log_wrapper: Program<'info, Noop>,
-    
-        /// The Clock System Variable Account.
-        pub clock_sysvar: Sysvar<'info, Clock>,
+    /// SPL NOOP PROGRAM
+    pub log_wrapper: Program<'info, Noop>,
+
+    /// The Clock System Variable Account.
+    pub clock_sysvar: Sysvar<'info, Clock>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 }
 pub fn create_asset_manager(ctx: Context<CreateAssetManager>) -> Result<()> {
     let asset_manager = &mut ctx.accounts.asset_manager;
@@ -235,6 +240,11 @@ pub struct MintAsset<'info> {
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 
     // HIVE CONTROL
     #[account()]

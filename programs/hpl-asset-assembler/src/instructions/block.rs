@@ -39,6 +39,11 @@ pub struct CreateBlock<'info> {
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
 
+    /// NATIVE INSTRUCTIONS SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
+
     // HIVE CONTROL
     #[account()]
     pub project: Box<Account<'info, Project>>,
@@ -108,6 +113,11 @@ pub struct CreateBlockDefinition<'info> {
 
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// NATIVE INSTRUCTIONS SYSVAR
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
+    pub instructions_sysvar: AccountInfo<'info>,
 
     // HIVE CONTROL
     #[account()]
