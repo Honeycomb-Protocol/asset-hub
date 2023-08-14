@@ -327,11 +327,11 @@ pub struct BurnCurrency<'info> {
     #[account(mut)]
     pub token_account: Account<'info, TokenAccount>,
 
-    /// The authority who initiates the burning process.
-    pub authority: Signer<'info>,
-
     /// The owner of the token account.
     pub owner: Signer<'info>,
+
+    /// The wallet that pays for the fees.
+    pub payer: Signer<'info>,
 
     /// The account used to collect platform fees for the burning process.
     /// CHECK: This is not dangerous because it only collects platform fee
@@ -437,12 +437,13 @@ pub struct TransferCurrency<'info> {
     #[account(mut)]
     pub receiver_token_account: Account<'info, TokenAccount>,
 
-    /// The authority signer for the transaction.
-    pub authority: Signer<'info>,
-
-    ///  The authority signer for the transaction.
+    /// The owner of the source holder account
     #[account(mut)]
     pub owner: Signer<'info>,
+
+    /// The wallet that pays for the fees.
+    pub payer: Signer<'info>,
+
     /// This account is used to collect the platform fee
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
@@ -541,9 +542,10 @@ pub struct ApproveDelegate<'info> {
     pub delegate: AccountInfo<'info>,
 
     /// The wallet that holds the authority over the project
-    pub authority: Signer<'info>,
-    /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
+
+    /// The wallet that pays for the fees.
+    pub payer: Signer<'info>,
 
     /// This account is used to collect the platform fee.
     /// CHECK: This is not dangerous because it only collects platform fee
@@ -635,6 +637,9 @@ pub struct RevokeDelegate<'info> {
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
 
+    /// The wallet that pays for the fees.
+    pub payer: Signer<'info>,
+
     /// This account is used to collect the platform fee.
     /// CHECK: This is not dangerous because it only collects platform fee
     #[account(mut)]
@@ -672,7 +677,7 @@ pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
 #[derive(Accounts)]
 pub struct SetHolderStatus<'info> {
     /// The project this currency is associated with.
-    #[account(mut)]
+    #[account(mut, has_one = authority)]
     pub project: Box<Account<'info, Project>>,
 
     /// Currency account
@@ -687,8 +692,11 @@ pub struct SetHolderStatus<'info> {
     #[account(mut)]
     pub token_account: Account<'info, TokenAccount>,
 
-    /// The wallet that will own the token_account
+    /// The authority of the project
     pub authority: Signer<'info>,
+
+    /// The wallet that pays for the fees.
+    pub payer: Signer<'info>,
 
     /// This account is used to collect the platform fee.
     /// CHECK: This is not dangerous because it only collects platform fee

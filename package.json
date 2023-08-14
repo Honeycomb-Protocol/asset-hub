@@ -22,14 +22,14 @@
     "build-deploy": "yarn build && yarn deploy"
   },
   "dependencies": {
-    "@honeycomb-protocol/hive-control": "^0.1.9",
+    "@honeycomb-protocol/hive-control": "^0.1.26",
     "@metaplex-foundation/js": "^0.18.1",
     "@metaplex-foundation/mpl-candy-guard": "https://gitpkg.now.sh/Solana-Studio/mpl-candy-guard/js?main",
     "@metaplex-foundation/mpl-token-metadata": "^2.8.3",
     "@project-serum/anchor": "^0.26.0",
     "@solana/spl-account-compression": "^0.1.10",
     "@solana/spl-token": "^0.3.8",
-    "@solana/web3.js": "^1.78.0",
+    "@solana/web3.js": "^1.78.4",
     "yargs": "^17.6.2"
   },
   "devDependencies": {

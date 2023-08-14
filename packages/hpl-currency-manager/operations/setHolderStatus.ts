@@ -52,6 +52,7 @@ export async function createSetHolderStatusOperation(
         holderAccount: args.holderAccount.address,
         tokenAccount: args.holderAccount.tokenAccount,
         authority: honeycomb.identity().address,
+        payer: honeycomb.identity().address,
         vault: VAULT,
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         logWrapper: SPL_NOOP_PROGRAM_ID,

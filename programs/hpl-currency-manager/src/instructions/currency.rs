@@ -610,16 +610,16 @@ pub struct FundAccount<'info> {
     pub token_account: Account<'info, TokenAccount>,
 
     /// The source token account from which funds will be transferred.
-    #[account(mut, has_one = mint, constraint = source_token_account.owner == wallet.key())]
+    #[account(mut, has_one = mint, has_one = owner)]
     pub source_token_account: Account<'info, TokenAccount>,
 
-    /// The wallet account that holds the authority over the funds.
+    /// The owner of the source token account.
     #[account(mut)]
-    pub wallet: Signer<'info>,
+    pub owner: Signer<'info>,
 
-    /// The authority signer that approves the fund transfer.
+    /// The wallet that pays for the fees.
     #[account(mut)]
-    pub authority: Signer<'info>,
+    pub payer: Signer<'info>,
 
     /// this account collects the protocol fee
     /// CHECK: This account is only used to collect platform fee
@@ -654,7 +654,7 @@ pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
             Transfer {
                 from: ctx.accounts.source_token_account.to_account_info(),
                 to: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.wallet.to_account_info(),
+                authority: ctx.accounts.owner.to_account_info(),
             },
         ),
         amount,

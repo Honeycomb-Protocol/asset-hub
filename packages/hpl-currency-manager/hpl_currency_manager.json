@@ -1,5 +1,5 @@
 {
-  "version": "0.0.47",
+  "version": "0.0.48",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -1016,19 +1016,19 @@
           ]
         },
         {
-          "name": "wallet",
+          "name": "owner",
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet account that holds the authority over the funds."
+            "The owner of the source token account."
           ]
         },
         {
-          "name": "authority",
+          "name": "payer",
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The authority signer that approves the fund transfer."
+            "The wallet that pays for the fees."
           ]
         },
         {
@@ -1139,19 +1139,19 @@
           ]
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "The authority who initiates the burning process."
-          ]
-        },
-        {
           "name": "owner",
           "isMut": false,
           "isSigner": true,
           "docs": [
             "The owner of the token account."
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the fees."
           ]
         },
         {
@@ -1284,19 +1284,19 @@
           ]
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "The authority signer for the transaction."
-          ]
-        },
-        {
           "name": "owner",
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The authority signer for the transaction."
+            "The owner of the source holder account"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the fees."
           ]
         },
         {
@@ -1414,7 +1414,7 @@
           ]
         },
         {
-          "name": "authority",
+          "name": "owner",
           "isMut": false,
           "isSigner": true,
           "docs": [
@@ -1422,11 +1422,11 @@
           ]
         },
         {
-          "name": "owner",
+          "name": "payer",
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that holds the authority over the project"
+            "The wallet that pays for the fees."
           ]
         },
         {
@@ -1544,6 +1544,14 @@
           ]
         },
         {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the fees."
+          ]
+        },
+        {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
@@ -1640,7 +1648,15 @@
           "isMut": false,
           "isSigner": true,
           "docs": [
-            "The wallet that will own the token_account"
+            "The authority of the project"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that pays for the fees."
           ]
         },
         {
@@ -1935,6 +1951,10 @@
                 "type": "publicKey"
               },
               {
+                "name": "info",
+                "type": "bytes"
+              },
+              {
                 "name": "timestamp",
                 "type": "i64"
               }
@@ -1946,6 +1966,10 @@
               {
                 "name": "address",
                 "type": "publicKey"
+              },
+              {
+                "name": "info",
+                "type": "bytes"
               },
               {
                 "name": "timestamp",
@@ -1961,6 +1985,10 @@
                 "type": "publicKey"
               },
               {
+                "name": "info",
+                "type": "bytes"
+              },
+              {
                 "name": "timestamp",
                 "type": "i64"
               }
@@ -1972,6 +2000,10 @@
               {
                 "name": "address",
                 "type": "publicKey"
+              },
+              {
+                "name": "info",
+                "type": "bytes"
               },
               {
                 "name": "timestamp",

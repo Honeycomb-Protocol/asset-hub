@@ -18,10 +18,26 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
  * @private
  */
 export type EventRecord = {
-  NewCurrency: { address: web3.PublicKey; timestamp: beet.bignum }
-  UpdateCurrency: { address: web3.PublicKey; timestamp: beet.bignum }
-  NewHolderAccount: { address: web3.PublicKey; timestamp: beet.bignum }
-  UpdateHolderAccount: { address: web3.PublicKey; timestamp: beet.bignum }
+  NewCurrency: {
+    address: web3.PublicKey
+    info: Uint8Array
+    timestamp: beet.bignum
+  }
+  UpdateCurrency: {
+    address: web3.PublicKey
+    info: Uint8Array
+    timestamp: beet.bignum
+  }
+  NewHolderAccount: {
+    address: web3.PublicKey
+    info: Uint8Array
+    timestamp: beet.bignum
+  }
+  UpdateHolderAccount: {
+    address: web3.PublicKey
+    info: Uint8Array
+    timestamp: beet.bignum
+  }
 }
 
 /**
@@ -59,9 +75,10 @@ export const isEventUpdateHolderAccount = (
 export const eventBeet = beet.dataEnum<EventRecord>([
   [
     'NewCurrency',
-    new beet.BeetArgsStruct<EventRecord['NewCurrency']>(
+    new beet.FixableBeetArgsStruct<EventRecord['NewCurrency']>(
       [
         ['address', beetSolana.publicKey],
+        ['info', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["NewCurrency"]'
@@ -70,9 +87,10 @@ export const eventBeet = beet.dataEnum<EventRecord>([
 
   [
     'UpdateCurrency',
-    new beet.BeetArgsStruct<EventRecord['UpdateCurrency']>(
+    new beet.FixableBeetArgsStruct<EventRecord['UpdateCurrency']>(
       [
         ['address', beetSolana.publicKey],
+        ['info', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["UpdateCurrency"]'
@@ -81,9 +99,10 @@ export const eventBeet = beet.dataEnum<EventRecord>([
 
   [
     'NewHolderAccount',
-    new beet.BeetArgsStruct<EventRecord['NewHolderAccount']>(
+    new beet.FixableBeetArgsStruct<EventRecord['NewHolderAccount']>(
       [
         ['address', beetSolana.publicKey],
+        ['info', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["NewHolderAccount"]'
@@ -92,9 +111,10 @@ export const eventBeet = beet.dataEnum<EventRecord>([
 
   [
     'UpdateHolderAccount',
-    new beet.BeetArgsStruct<EventRecord['UpdateHolderAccount']>(
+    new beet.FixableBeetArgsStruct<EventRecord['UpdateHolderAccount']>(
       [
         ['address', beetSolana.publicKey],
+        ['info', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["UpdateHolderAccount"]'
