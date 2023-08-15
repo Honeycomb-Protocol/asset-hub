@@ -44,7 +44,7 @@ export const transferCurrencyStruct = new beet.BeetArgsStruct<
  * @property [] receiverHolderAccount
  * @property [_writable_] receiverTokenAccount
  * @property [_writable_, **signer**] owner
- * @property [**signer**] payer
+ * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] instructionsSysvar
  * @category Instructions
@@ -134,7 +134,7 @@ export function createTransferCurrencyInstruction(
     },
     {
       pubkey: accounts.payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

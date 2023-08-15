@@ -29,7 +29,7 @@ export const revokeDelegateStruct = new beet.BeetArgsStruct<{
  * @property [] holderAccount
  * @property [_writable_] tokenAccount
  * @property [**signer**] authority
- * @property [**signer**] payer
+ * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] instructionsSysvar
  * @category Instructions
@@ -103,7 +103,7 @@ export function createRevokeDelegateInstruction(
     },
     {
       pubkey: accounts.payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

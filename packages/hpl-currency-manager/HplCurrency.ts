@@ -567,6 +567,7 @@ export const currencyModule = (
  */
 export const findProjectCurrencies = (project: HoneycombProject) =>
   Currency.gpaBuilder()
+    .addFilter("project", project.address)
     .run(project.honeycomb().connection)
     .then((currencies) =>
       Promise.all(

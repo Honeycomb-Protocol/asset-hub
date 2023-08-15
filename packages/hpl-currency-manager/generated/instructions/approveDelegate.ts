@@ -43,7 +43,7 @@ export const approveDelegateStruct = new beet.BeetArgsStruct<
  * @property [_writable_] tokenAccount
  * @property [] delegate
  * @property [**signer**] owner
- * @property [**signer**] payer
+ * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] instructionsSysvar
  * @category Instructions
@@ -127,7 +127,7 @@ export function createApproveDelegateInstruction(
     },
     {
       pubkey: accounts.payer,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

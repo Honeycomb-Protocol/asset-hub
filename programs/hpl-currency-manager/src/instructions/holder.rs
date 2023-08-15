@@ -57,7 +57,7 @@ pub struct CreateHolderAccount<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub owner: AccountInfo<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent and fees
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -146,7 +146,7 @@ pub struct WrapHolderAccount<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub owner: AccountInfo<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent and fees
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -234,7 +234,7 @@ pub struct FixHolderAccount<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
 
-    /// The owner of the token account.
+    /// The wallet that pays for the rent and fees
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -330,7 +330,8 @@ pub struct BurnCurrency<'info> {
     /// The owner of the token account.
     pub owner: Signer<'info>,
 
-    /// The wallet that pays for the fees.
+    /// The wallet that pays for the rent and fees
+    #[account(mut)]
     pub payer: Signer<'info>,
 
     /// The account used to collect platform fees for the burning process.
@@ -441,7 +442,8 @@ pub struct TransferCurrency<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
 
-    /// The wallet that pays for the fees.
+    /// The wallet that pays for the rent and fees
+    #[account(mut)]
     pub payer: Signer<'info>,
 
     /// This account is used to collect the platform fee
@@ -544,7 +546,8 @@ pub struct ApproveDelegate<'info> {
     /// The wallet that holds the authority over the project
     pub owner: Signer<'info>,
 
-    /// The wallet that pays for the fees.
+    /// The wallet that pays for the rent and fees
+    #[account(mut)]
     pub payer: Signer<'info>,
 
     /// This account is used to collect the platform fee.
@@ -637,7 +640,8 @@ pub struct RevokeDelegate<'info> {
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the fees.
+    /// The wallet that pays for the rent and fees
+    #[account(mut)]
     pub payer: Signer<'info>,
 
     /// This account is used to collect the platform fee.
@@ -695,7 +699,8 @@ pub struct SetHolderStatus<'info> {
     /// The authority of the project
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the fees.
+    /// The wallet that pays for the rent and fees
+    #[account(mut)]
     pub payer: Signer<'info>,
 
     /// This account is used to collect the platform fee.

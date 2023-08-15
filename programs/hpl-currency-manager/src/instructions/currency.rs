@@ -56,7 +56,7 @@ pub struct CreateCurrency<'info> {
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent and fees
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -228,7 +228,7 @@ pub struct UpdateCurrency<'info> {
     /// The wallet that holds the authority over the project
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent and fees
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -617,7 +617,7 @@ pub struct FundAccount<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
 
-    /// The wallet that pays for the fees.
+    /// The wallet that pays for the rent and fees
     #[account(mut)]
     pub payer: Signer<'info>,
 

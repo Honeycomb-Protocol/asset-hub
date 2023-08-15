@@ -1,5 +1,5 @@
 {
-  "version": "0.0.48",
+  "version": "0.0.49",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -80,7 +80,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -224,7 +224,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -492,7 +492,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -626,7 +626,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -768,7 +768,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The owner of the token account."
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -1028,7 +1028,7 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the fees."
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -1148,10 +1148,10 @@
         },
         {
           "name": "payer",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the fees."
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -1293,10 +1293,10 @@
         },
         {
           "name": "payer",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the fees."
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -1423,10 +1423,10 @@
         },
         {
           "name": "payer",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the fees."
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -1545,10 +1545,10 @@
         },
         {
           "name": "payer",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the fees."
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
@@ -1653,10 +1653,10 @@
         },
         {
           "name": "payer",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the fees."
+            "The wallet that pays for the rent and fees"
           ]
         },
         {
