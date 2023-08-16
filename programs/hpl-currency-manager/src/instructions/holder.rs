@@ -224,7 +224,7 @@ pub struct FixHolderAccount<'info> {
 
     /// Token account holding the token
     #[account(
-        init, payer = owner,
+        init_if_needed, payer = payer,
         associated_token::mint = mint,
         associated_token::authority = if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } ) { holder_account.to_account_info() } else { owner.to_account_info() }
     )]
