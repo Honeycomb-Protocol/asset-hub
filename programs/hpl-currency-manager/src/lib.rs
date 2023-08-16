@@ -314,7 +314,7 @@ pub mod hpl_currency_manager {
     /// the caller's program ID is not authorized, or if any issues occur during the funding process.
     pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
+            hpl_hive_control::constants::ACTIONS.fee_exempt,
             None,
             &ctx.accounts.project,
             ctx.accounts.owner.key(),
@@ -368,7 +368,7 @@ pub mod hpl_currency_manager {
     /// the caller's program ID is not authorized, or if any issues occur during the burning process.
     pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
+            hpl_hive_control::constants::ACTIONS.fee_exempt,
             None,
             &ctx.accounts.project,
             ctx.accounts.owner.key(),
@@ -424,7 +424,7 @@ pub mod hpl_currency_manager {
     /// during the transfer process.
     pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
+            hpl_hive_control::constants::ACTIONS.fee_exempt,
             None,
             &ctx.accounts.project,
             ctx.accounts.owner.key(),
@@ -487,7 +487,7 @@ pub mod hpl_currency_manager {
     /// the caller's program ID is not authorized, or if any issues occur during the approval process.
     pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
+            hpl_hive_control::constants::ACTIONS.public_high,
             None,
             &ctx.accounts.project,
             ctx.accounts.owner.key(),
@@ -540,7 +540,7 @@ pub mod hpl_currency_manager {
     /// the caller's program ID is not authorized, or if any issues occur during the revoking process.
     pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
+            hpl_hive_control::constants::ACTIONS.public_high,
             None,
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
@@ -592,7 +592,7 @@ pub mod hpl_currency_manager {
     /// or if any issues occur during the process of setting the holder account's status.
     pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
+            hpl_hive_control::constants::ACTIONS.public_high,
             None,
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
