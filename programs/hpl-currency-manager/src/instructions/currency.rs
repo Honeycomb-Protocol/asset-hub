@@ -196,7 +196,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     )?;
 
     Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
-        .wrap(ctx.accounts.log_wrapper.to_account_info())?;
+        .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
 
     Ok(())
 }
@@ -344,7 +344,7 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         &ctx.accounts.currency,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info())?;
+    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
     Ok(())
 }
 
@@ -465,7 +465,7 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
     )?;
 
     Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
-        .wrap(ctx.accounts.log_wrapper.to_account_info())?;
+        .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
 
     // Return Ok to indicate the successful completion of the wrapping process.
     Ok(())

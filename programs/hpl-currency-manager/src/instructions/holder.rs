@@ -105,7 +105,7 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
         &holder_account,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info())?;
+    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
 
     Ok(())
 }
@@ -194,7 +194,7 @@ pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
         &holder_account,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info())?;
+    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
 
     Ok(())
 }
@@ -742,7 +742,7 @@ pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) ->
         &holder_account,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info())?;
+    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
 
     Ok(())
 }
