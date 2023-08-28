@@ -20,22 +20,22 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
 export type EventRecord = {
   NewCurrency: {
     address: web3.PublicKey
-    info: Uint8Array
+    state: Uint8Array
     timestamp: beet.bignum
   }
   UpdateCurrency: {
     address: web3.PublicKey
-    info: Uint8Array
+    state: Uint8Array
     timestamp: beet.bignum
   }
   NewHolderAccount: {
     address: web3.PublicKey
-    info: Uint8Array
+    state: Uint8Array
     timestamp: beet.bignum
   }
   UpdateHolderAccount: {
     address: web3.PublicKey
-    info: Uint8Array
+    state: Uint8Array
     timestamp: beet.bignum
   }
 }
@@ -78,7 +78,7 @@ export const eventBeet = beet.dataEnum<EventRecord>([
     new beet.FixableBeetArgsStruct<EventRecord['NewCurrency']>(
       [
         ['address', beetSolana.publicKey],
-        ['info', beet.bytes],
+        ['state', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["NewCurrency"]'
@@ -90,7 +90,7 @@ export const eventBeet = beet.dataEnum<EventRecord>([
     new beet.FixableBeetArgsStruct<EventRecord['UpdateCurrency']>(
       [
         ['address', beetSolana.publicKey],
-        ['info', beet.bytes],
+        ['state', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["UpdateCurrency"]'
@@ -102,7 +102,7 @@ export const eventBeet = beet.dataEnum<EventRecord>([
     new beet.FixableBeetArgsStruct<EventRecord['NewHolderAccount']>(
       [
         ['address', beetSolana.publicKey],
-        ['info', beet.bytes],
+        ['state', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["NewHolderAccount"]'
@@ -114,7 +114,7 @@ export const eventBeet = beet.dataEnum<EventRecord>([
     new beet.FixableBeetArgsStruct<EventRecord['UpdateHolderAccount']>(
       [
         ['address', beetSolana.publicKey],
-        ['info', beet.bytes],
+        ['state', beet.bytes],
         ['timestamp', beet.i64],
       ],
       'EventRecord["UpdateHolderAccount"]'
