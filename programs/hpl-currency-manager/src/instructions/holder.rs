@@ -41,13 +41,6 @@ pub struct CreateHolderAccount<'info> {
     /// Token account holding the token
     #[account(
       init, payer = payer,
-    //   seeds = [
-    //     if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } )  { holder_account.to_account_info() } else { owner.to_account_info() }.key().as_ref(),
-    //     mint.key().as_ref(),
-    //     id().as_ref(),
-    //     token_program.key().as_ref(),
-    //   ],
-    //   bump,
       associated_token::mint = mint,
       associated_token::authority = if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } ) { holder_account.to_account_info() } else { owner.to_account_info() }
     )]

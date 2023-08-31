@@ -113,5 +113,6 @@ export async function createCreateHolderAccountOperation(
   return {
     operation: new Operation(honeycomb, instructions),
     holderAccount,
+    tokenAccount,
   };
 }

@@ -205,13 +205,11 @@ export async function disbandNft(honeycomb: Honeycomb, args: DisbandNftArgs) {
 
   const preparedCtxs = await honeycomb.rpc().prepareTransactions(ctxs);
 
-  return await honeycomb
-    .rpc()
-    .sendAndConfirmTransactionsInBatches(preparedCtxs, {
-      commitment: "processed",
-      skipPreflight: true,
-      batchSize: 1,
-    });
+  return await honeycomb.rpc().sendAndConfirmTransactions(preparedCtxs, {
+    commitment: "processed",
+    skipPreflight: true,
+    batchSize: 1,
+  });
 }
 
 type BurnNftArgs = {

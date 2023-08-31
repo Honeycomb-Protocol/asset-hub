@@ -345,7 +345,7 @@ export async function createAndMintNft(
 
   const responses = await honeycomb
     .rpc()
-    .sendAndConfirmTransactionsInBatches(preparedCtxs, {
+    .sendAndConfirmTransactions(preparedCtxs, {
       commitment: "processed",
       skipPreflight: true,
       batchSize: 1,

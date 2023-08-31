@@ -255,6 +255,17 @@ pub mod hpl_currency_manager {
     pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
         // Perform platform gate to manage assets for the project
         hpl_hive_control::instructions::platform_gate_fn(
+            hpl_hive_control::constants::ACTIONS.currency_manager,
+            None,
+            &ctx.accounts.project,
+            ctx.accounts.authority.key(),
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.vault.to_account_info(),
+            &ctx.accounts.delegate_authority,
+            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.instructions_sysvar.to_account_info(),
+        )
+        .or(hpl_hive_control::instructions::platform_gate_fn(
             hpl_hive_control::constants::ACTIONS.manage_assets,
             None,
             &ctx.accounts.project,
@@ -264,7 +275,7 @@ pub mod hpl_currency_manager {
             &ctx.accounts.delegate_authority,
             ctx.accounts.system_program.to_account_info(),
             ctx.accounts.instructions_sysvar.to_account_info(),
-        )?;
+        ))?;
 
         // Check if the holder account status is active, if not, return an error
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
@@ -592,7 +603,7 @@ pub mod hpl_currency_manager {
     /// or if any issues occur during the process of setting the holder account's status.
     pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
         hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
+            hpl_hive_control::constants::ACTIONS.currency_manager,
             None,
             &ctx.accounts.project,
             ctx.accounts.authority.key(),
