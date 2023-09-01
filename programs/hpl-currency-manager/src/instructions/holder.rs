@@ -302,7 +302,7 @@ pub fn fix_holder_account(ctx: Context<FixHolderAccount>) -> Result<()> {
 pub struct BurnCurrency<'info> {
     /// The project account associated with the currency.
     #[account(mut)]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
 
     /// The currency account to be burned.
     #[account(has_one = mint, has_one = project)]
@@ -612,7 +612,7 @@ pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()
 pub struct RevokeDelegate<'info> {
     /// The project this currency is associated with.
     #[account(mut)]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
 
     /// Currency account
     #[account(has_one = mint, has_one = project)]
