@@ -1,5 +1,4 @@
 import * as web3 from "@solana/web3.js";
-import * as splToken from "@solana/spl-token";
 import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
 import { createTransferCurrencyInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
@@ -63,18 +62,14 @@ export async function createTransferCurrencyOperation(
     receiverHolderAccount = accounts.holderAccount;
     receiverTokenAccount = accounts.tokenAccount;
 
-    try {
-      // Check if the receiver already has a holder account, and create one if it doesn't exist.
-      await args.holderAccount.currency().holderAccount(args.receiver);
-    } catch {
-      instructions.unshift(
-        ...(await createCreateHolderAccountOperation(honeycomb, {
-          currency: args.holderAccount.currency(),
-          owner: args.receiver,
-          programId,
-        }).then(({ operation }) => operation.instructions))
-      );
-    }
+    // If needed, create a new holder account for the receiver and add the corresponding instructions.
+    instructions.unshift(
+      ...(await createCreateHolderAccountOperation(honeycomb, {
+        currency: args.holderAccount.currency(),
+        owner: args.receiver,
+        programId,
+      }).then(({ operation }) => operation?.instructions || []))
+    );
   } else {
     receiverHolderAccount = args.receiver.address;
     receiverTokenAccount = args.receiver.tokenAccount;

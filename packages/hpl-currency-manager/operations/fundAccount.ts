@@ -81,20 +81,14 @@ export async function createFundAccountOperation(
       programId
     ),
   ];
-
-  try {
-    // Check if the receiver wallet already has a holder account for the currency.
-    await args.currency.holderAccount(args.receiverWallet);
-  } catch {
-    // If not, create a new holder account for the receiver and add the corresponding instructions.
-    instructions.unshift(
-      ...(await createCreateHolderAccountOperation(honeycomb, {
-        currency: args.currency,
-        owner: args.receiverWallet,
-        programId,
-      }).then(({ operation }) => operation.instructions))
-    );
-  }
+  // If needed, create a new holder account for the receiver and add the corresponding instructions.
+  instructions.unshift(
+    ...(await createCreateHolderAccountOperation(honeycomb, {
+      currency: args.currency,
+      owner: args.receiverWallet,
+      programId,
+    }).then(({ operation }) => operation?.instructions || []))
+  );
 
   // Return the "Fund Account" operation wrapped in an object, along with the holder account address.
   return {

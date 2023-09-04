@@ -317,7 +317,7 @@ export class HplCurrencyCreate {
         programId: PROGRAM_ID,
       }
     );
-    await operation.send(confirmOptions);
+    if (operation) await operation.send(confirmOptions);
     return this._currency.holderAccount(owner);
   }
 }

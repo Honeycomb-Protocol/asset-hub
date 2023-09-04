@@ -6,10 +6,7 @@ import {
   PROGRAM_ID,
 } from "../generated";
 import { holderAccountPdas } from "../utils";
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  getAccount as getTokenAccount,
-} from "@solana/spl-token";
+import { ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
 import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
 
@@ -61,19 +58,17 @@ export async function createCreateHolderAccountOperation(
     programId
   );
 
-  let wrap = false;
+  const wrap = args.currency.kind.__kind === "Wrapped";
+  const needed = {
+    tokenAccount: !(await honeycomb.rpc().getBalance(tokenAccount)),
+    holderAccount: !(await honeycomb.rpc().getBalance(holderAccount)),
+  };
 
-  if (args.currency.kind.__kind === "Wrapped") {
-    try {
-      await getTokenAccount(honeycomb.connection, tokenAccount);
-      wrap = true;
-    } catch {}
-  }
-
-  // Create the instruction for the "Create Holder Account" operation.
-  const instructions = [
-    wrap
-      ? createWrapHolderAccountInstruction(
+  const instructions: web3.TransactionInstruction[] = [];
+  if (wrap) {
+    if (needed.holderAccount) {
+      instructions.push(
+        createWrapHolderAccountInstruction(
           {
             project: args.currency.project().address,
             currency: args.currency.address,
@@ -90,7 +85,12 @@ export async function createCreateHolderAccountOperation(
           },
           programId
         )
-      : createCreateHolderAccountInstruction(
+      );
+    }
+  } else {
+    if (needed.holderAccount || needed.tokenAccount) {
+      instructions.push(
+        createCreateHolderAccountInstruction(
           {
             project: args.currency.project().address,
             currency: args.currency.address,
@@ -106,12 +106,15 @@ export async function createCreateHolderAccountOperation(
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           },
           programId
-        ),
-  ];
-
+        )
+      );
+    }
+  }
   // Return the "Create Holder Account" operation wrapped in an object, along with the holder account address.
   return {
-    operation: new Operation(honeycomb, instructions),
+    operation: instructions.length
+      ? new Operation(honeycomb, instructions)
+      : null,
     holderAccount,
     tokenAccount,
   };

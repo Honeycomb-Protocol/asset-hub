@@ -27,7 +27,7 @@ pub struct CreateHolderAccount<'info> {
 
     /// Holder account
     #[account(
-        init, payer = payer,
+        init_if_needed, payer = payer,
         space = HolderAccount::LEN,
         seeds = [
             b"holder_account",
@@ -40,7 +40,7 @@ pub struct CreateHolderAccount<'info> {
 
     /// Token account holding the token
     #[account(
-      init, payer = payer,
+      init_if_needed, payer = payer,
       associated_token::mint = mint,
       associated_token::authority = if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } ) { holder_account.to_account_info() } else { owner.to_account_info() }
     )]
@@ -120,7 +120,7 @@ pub struct WrapHolderAccount<'info> {
 
     /// Holder account
     #[account(
-        init, payer = payer,
+        init_if_needed, payer = payer,
         space = HolderAccount::LEN,
         seeds = [
             b"holder_account",
