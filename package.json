@@ -22,7 +22,7 @@
     "build-deploy": "yarn build && yarn deploy"
   },
   "dependencies": {
-    "@honeycomb-protocol/hive-control": "^0.1.58",
+    "@honeycomb-protocol/hive-control": "^0.1.62",
     "@metaplex-foundation/js": "^0.18.1",
     "@metaplex-foundation/mpl-candy-guard": "https://gitpkg.now.sh/Solana-Studio/mpl-candy-guard/js?main",
     "@metaplex-foundation/mpl-token-metadata": "^2.8.3",

@@ -2,7 +2,7 @@
 name = "hpl-asset-manager"
 description = "Honeycomb protocol library asset manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.55"
+version = "0.0.56"
 edition = "2021"
 license = "MIT"
 
@@ -25,6 +25,6 @@ solana-program = "=1.14.17"
 winnow = "=0.4.1"
 toml_datetime = "=0.6.1"
 hpl-utils = "0.1.4"
-hpl-hive-control = { version="0.1.58", features = ["cpi"] }
+hpl-hive-control = { version="0.1.62", features = ["cpi"] }
 mpl-token-metadata = { version="1.9.0", features = [ "no-entrypoint" ] }
 spl-account-compression = { version="0.1.8", features=["cpi"] }
