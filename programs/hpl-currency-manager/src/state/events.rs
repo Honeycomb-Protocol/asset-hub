@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
-use borsh::{BorshDeserialize, BorshSerialize};
-use hpl_compression::{event, invoke, spl_noop, ProgramResult};
+use hpl_events::{event, invoke, Instruction, ProgramResult};
 
 use super::{Currency, HolderAccount};
 

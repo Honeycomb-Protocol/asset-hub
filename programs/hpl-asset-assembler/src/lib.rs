@@ -33,7 +33,7 @@ pub mod hpl_asset_assembler {
                     payer: ctx.accounts.payer.to_account_info(),
                     rent_sysvar: ctx.accounts.rent.to_account_info(),
                     system_program: ctx.accounts.system_program.to_account_info(),
-                    log_wrapper: ctx.accounts.log_wrapper.to_account_info(),
+                    hpl_events: ctx.accounts.hpl_events.to_account_info(),
                     clock: ctx.accounts.clock_sysvar.to_account_info(),
                     instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
                     vault: ctx.accounts.vault.to_account_info(),

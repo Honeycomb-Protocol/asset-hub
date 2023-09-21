@@ -2,7 +2,7 @@
 name = "hpl-currency-manager"
 description = "Honeycomb protocol library currency manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.57"
+version = "0.0.58"
 edition = "2021"
 license = "MIT"
 
@@ -18,14 +18,13 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = { version="0.26.0", features = ["init-if-needed"] }
+anchor-lang = { version = "0.26.0", features = ["init-if-needed"] }
 anchor-spl = "0.26.0"
 getrandom = { version = "0.2.9", features = ["custom"] }
 solana-program = "=1.14.17"
 winnow = "=0.4.1"
 toml_datetime = "=0.6.1"
 hpl-utils = "0.1.4"
-hpl-compression = "0.1.6"
-hpl-hive-control = { version="0.1.67", features = ["cpi"] }
-mpl-token-metadata = { version="1.9.0", features = [ "no-entrypoint" ] }
-spl-account-compression = { version="0.1.8", features=["cpi"] }
+hpl-events = { version = "0.1.13", features = ["no-entrypoint"] }
+hpl-hive-control = { version = "0.1.68", features = ["cpi"] }
+mpl-token-metadata = { version = "1.9.0", features = ["no-entrypoint"] }

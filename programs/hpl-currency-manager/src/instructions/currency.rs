@@ -2,6 +2,7 @@ use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
+    hpl_events::program::HplEvents,
     hpl_hive_control::state::{DelegateAuthority, Project},
     hpl_utils::traits::Default,
     mpl_token_metadata::{
@@ -11,7 +12,6 @@ use {
         },
         state::{AssetData, Data, Metadata, TokenMetadataAccount},
     },
-    spl_account_compression::Noop,
 };
 
 /// Accounts used in create currency instruction
@@ -77,8 +77,8 @@ pub struct CreateCurrency<'info> {
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
 
-    /// SPL NOOP PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    /// HPL Events Program
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -196,7 +196,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     )?;
 
     Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
-        .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
+        .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
 
     Ok(())
 }
@@ -245,8 +245,8 @@ pub struct UpdateCurrency<'info> {
     #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
 
-    /// SPL NOOP PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    /// HPL Events Program
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -344,7 +344,7 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         &ctx.accounts.currency,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
+    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
     Ok(())
 }
 
@@ -404,8 +404,8 @@ pub struct WrapCurrency<'info> {
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
 
-    /// SPL NOOP PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    /// HPL Events Program
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -465,7 +465,7 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
     )?;
 
     Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
-        .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
+        .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
 
     // Return Ok to indicate the successful completion of the wrapping process.
     Ok(())

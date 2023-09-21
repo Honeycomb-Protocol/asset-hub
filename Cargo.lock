@@ -823,41 +823,41 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.57"
+version = "0.0.58"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
+ "hpl-events",
  "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
- "spl-account-compression",
  "toml_datetime",
  "winnow",
 ]
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.57"
+version = "0.0.58"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
+ "hpl-events",
  "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
- "spl-account-compression",
  "toml_datetime",
  "winnow",
 ]
 
 [[package]]
 name = "hpl-attribute-event"
-version = "0.1.6"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "666cac4426e10d923fdd1c9defaad782b04d8103dd34fed6a3b875cf79d74870"
+checksum = "a5d22d1203c358ee3c318e81542369434a776d30377337a9e785f780c6affa98"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -865,44 +865,42 @@ dependencies = [
 ]
 
 [[package]]
-name = "hpl-compression"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f29fabb12a787a7473929e923f1da5ec229a6ad51ac22370d0acb31ae8c58303"
-dependencies = [
- "borsh",
- "hpl-attribute-event",
- "solana-program",
- "spl-noop",
-]
-
-[[package]]
 name = "hpl-currency-manager"
-version = "0.0.57"
+version = "0.0.58"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
- "hpl-compression",
+ "hpl-events",
  "hpl-hive-control",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
- "spl-account-compression",
  "toml_datetime",
  "winnow",
 ]
 
 [[package]]
-name = "hpl-hive-control"
-version = "0.1.67"
+name = "hpl-events"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f870b8a1232fa774653458298405231a62f8a46f6763d356a4e032774b22d763"
+checksum = "d511f296f73cac8127da764ccbaf6db8a84eac069cfb90fe38a333c2bef7d69c"
+dependencies = [
+ "anchor-lang",
+ "borsh",
+ "hpl-attribute-event",
+]
+
+[[package]]
+name = "hpl-hive-control"
+version = "0.1.68"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e780a9e6ece1edbb34f6459c7738b53490fd5e37b79f20f48f6a2c5eee76e05"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
- "hpl-compression",
+ "hpl-events",
  "hpl-utils",
  "mpl-token-metadata",
  "sol-did",

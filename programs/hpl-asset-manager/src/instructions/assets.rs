@@ -1,13 +1,13 @@
 use crate::{errors::ErrorCode, states::*};
 use anchor_lang::{prelude::*, solana_program};
 use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
+use hpl_events::program::HplEvents;
 use hpl_hive_control::{
     program::HplHiveControl,
     state::{DelegateAuthority, Project},
 };
 use hpl_utils::create;
 use mpl_token_metadata::{instruction::CreateArgs, state::AssetData};
-use spl_account_compression::Noop;
 
 /// Accounts used in create asset manager
 #[derive(Accounts)]
@@ -51,8 +51,8 @@ pub struct CreateAssetManager<'info> {
     /// HIVE CONTROL PROGRAM
     pub hive_control: Program<'info, HplHiveControl>,
 
-    /// SPL NOOP PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    /// HPL Events Program
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Clock System Variable Account.
     pub clock_sysvar: Sysvar<'info, Clock>,

@@ -2,13 +2,13 @@ use {
     crate::state::{Assembler, AssemblingAction, Creator, TokenStandard},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, Token},
+    hpl_events::program::HplEvents,
     hpl_hive_control::{
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
     },
     hpl_utils::create_nft,
     mpl_token_metadata::state::AssetData,
-    spl_account_compression::Noop,
 };
 
 /// Accounts used in the create assembler instruction
@@ -26,7 +26,7 @@ pub struct CreateAssembler<'info> {
       mint::authority = assembler,
       mint::freeze_authority = assembler,
     )]
-    pub collection_mint: Account<'info, Mint>,
+    pub collection_mint: Box<Account<'info, Mint>>,
 
     /// Metadata account of the collection
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -76,7 +76,7 @@ pub struct CreateAssembler<'info> {
     pub token_metadata_program: AccountInfo<'info>,
 
     /// HIVE CONTROL PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// SYSVAR CLOCK
     pub clock_sysvar: Sysvar<'info, Clock>,

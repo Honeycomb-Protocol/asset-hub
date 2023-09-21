@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import {
-  HIVECONTROL_PROGRAM_ID,
+  HPL_HIVE_CONTROL_PROGRAM,
   Honeycomb,
   Operation,
   VAULT,

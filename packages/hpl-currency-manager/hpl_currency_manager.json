@@ -1,5 +1,5 @@
 {
-  "version": "0.0.56",
+  "version": "0.0.58",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -116,11 +116,11 @@
           ]
         },
         {
-          "name": "logWrapper",
+          "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "SPL NOOP PROGRAM"
+            "HPL Events Program"
           ]
         },
         {
@@ -252,11 +252,11 @@
           ]
         },
         {
-          "name": "logWrapper",
+          "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "SPL NOOP PROGRAM"
+            "HPL Events Program"
           ]
         },
         {
@@ -394,11 +394,11 @@
           ]
         },
         {
-          "name": "logWrapper",
+          "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "SPL NOOP PROGRAM"
+            "HPL Events Program"
           ]
         },
         {
@@ -528,11 +528,11 @@
           ]
         },
         {
-          "name": "logWrapper",
+          "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "SPL NOOP PROGRAM"
+            "HPL Events Program"
           ]
         },
         {
@@ -662,11 +662,11 @@
           ]
         },
         {
-          "name": "logWrapper",
+          "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "SPL NOOP PROGRAM"
+            "HPL Events Program"
           ]
         },
         {
@@ -1676,11 +1676,11 @@
           ]
         },
         {
-          "name": "logWrapper",
+          "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "SPL NOOP PROGRAM"
+            "HPL Events Program"
           ]
         },
         {

@@ -2,7 +2,7 @@ import * as web3 from "@solana/web3.js";
 import { createCreateAssetManagerInstruction, PROGRAM_ID } from "../generated";
 import { getAssetManagerPda } from "../pdas";
 import {
-  HIVECONTROL_PROGRAM_ID,
+  HPL_HIVE_CONTROL_PROGRAM,
   Honeycomb,
   Operation,
   VAULT,
@@ -37,7 +37,7 @@ export function createCreateAssetManagerCtx(
         project: args.project,
         delegateAuthority: args.delegateAuthority || programId,
         vault: VAULT,
-        hiveControl: HIVECONTROL_PROGRAM_ID,
+        hiveControl: HPL_HIVE_CONTROL_PROGRAM,
         rentSysvar: web3.SYSVAR_RENT_PUBKEY,
       },
       programId

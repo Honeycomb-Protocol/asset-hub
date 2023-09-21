@@ -10,7 +10,7 @@ import {
   METADATA_PROGRAM_ID,
 } from "../pdas";
 import {
-  HIVECONTROL_PROGRAM_ID,
+  HPL_HIVE_CONTROL_PROGRAM,
   Honeycomb,
   Operation,
   VAULT,
@@ -52,7 +52,7 @@ export function createCreateAssemblerCtx(
         project: args.project,
         delegateAuthority: args.delegateAuthority || programId,
         vault: VAULT,
-        hiveControl: HIVECONTROL_PROGRAM_ID,
+        hiveControl: HPL_HIVE_CONTROL_PROGRAM,
       },
       { args: args.args },
       programId

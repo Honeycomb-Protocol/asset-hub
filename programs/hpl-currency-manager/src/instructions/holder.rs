@@ -5,9 +5,9 @@ use {
         associated_token::AssociatedToken,
         token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
     },
+    hpl_events::program::HplEvents,
     hpl_hive_control::state::Project,
     hpl_utils::traits::Default,
-    spl_account_compression::Noop,
 };
 
 /// Accounts used in create create holder_account instruction
@@ -68,8 +68,8 @@ pub struct CreateHolderAccount<'info> {
     /// SPL Associated Token program
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// SPL NOOP PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    /// HPL Events Program
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -98,7 +98,7 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
         &holder_account,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
+    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
 
     Ok(())
 }
@@ -157,8 +157,8 @@ pub struct WrapHolderAccount<'info> {
     /// SPL Associated Token program
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// SPL NOOP PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    /// HPL Events Program
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -187,7 +187,7 @@ pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
         &holder_account,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
+    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
 
     Ok(())
 }
@@ -704,8 +704,8 @@ pub struct SetHolderStatus<'info> {
     /// SPL Token program
     pub system_program: Program<'info, System>,
 
-    /// SPL NOOP PROGRAM
-    pub log_wrapper: Program<'info, Noop>,
+    /// HPL Events Program
+    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -735,7 +735,7 @@ pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) ->
         &holder_account,
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.log_wrapper.to_account_info(), crate::id())?;
+    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
 
     Ok(())
 }

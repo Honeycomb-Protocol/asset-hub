@@ -1,6 +1,5 @@
 import * as web3 from "@solana/web3.js";
 import {
-  HIVECONTROL_PROGRAM_ID,
   Honeycomb,
   HoneycombProject,
   Operation,
@@ -13,7 +12,7 @@ import {
   PROGRAM_ID,
 } from "../generated";
 import { METADATA_PROGRAM_ID, currencyPda, metadataPda } from "../utils";
-import { SPL_NOOP_PROGRAM_ID } from "@solana/spl-account-compression";
+import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**
  * Represents the arguments for creating a "Create Currency" operation.
@@ -109,7 +108,7 @@ export async function createCreateCurrencyOperation(
             payer: honeycomb.identity().address,
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-            logWrapper: SPL_NOOP_PROGRAM_ID,
+            hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           },
           programId
@@ -127,7 +126,7 @@ export async function createCreateCurrencyOperation(
             vault: VAULT,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             tokenMetadataProgram: METADATA_PROGRAM_ID,
-            logWrapper: SPL_NOOP_PROGRAM_ID,
+            hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           },
           {

@@ -16,13 +16,14 @@
     "compile": "tsc",
     "build:program": "anchor build",
     "build:sdk": "yarn solita && yarn compile",
-    "build": "yarn build:program & yarn build:sdk",
+    "build": "yarn build:program && yarn build:sdk",
     "deploy": "anchor deploy",
     "test": "jest --verbose",
     "build-deploy": "yarn build && yarn deploy"
   },
   "dependencies": {
-    "@honeycomb-protocol/hive-control": "^0.1.67",
+    "@honeycomb-protocol/events": "^0.1.13",
+    "@honeycomb-protocol/hive-control": "^0.1.68",
     "@metaplex-foundation/js": "^0.18.1",
     "@metaplex-foundation/mpl-candy-guard": "https://gitpkg.now.sh/Solana-Studio/mpl-candy-guard/js?main",
     "@metaplex-foundation/mpl-token-metadata": "^2.8.3",

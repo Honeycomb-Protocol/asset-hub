@@ -32,7 +32,7 @@ export const wrapCurrencyStruct = new beet.BeetArgsStruct<{
  * @property [**signer**] freezeAuthority
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
- * @property [] logWrapper
+ * @property [] hplEvents
  * @property [] instructionsSysvar
  * @property [] clockSysvar
  * @category Instructions
@@ -51,7 +51,7 @@ export type WrapCurrencyInstructionAccounts = {
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  logWrapper: web3.PublicKey
+  hplEvents: web3.PublicKey
   instructionsSysvar: web3.PublicKey
   clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -142,7 +142,7 @@ export function createWrapCurrencyInstruction(
     isSigner: false,
   })
   keys.push({
-    pubkey: accounts.logWrapper,
+    pubkey: accounts.hplEvents,
     isWritable: false,
     isSigner: false,
   })
