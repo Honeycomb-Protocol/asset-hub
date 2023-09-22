@@ -50,7 +50,7 @@ const configs = {
   ),
   "currency-manager": createConfig(
     "currency-manager",
-    "CrNcYmnu2nvH5fp4pspk2rLQ9h6N3XrJvZMzEhnpbJux"
+    "CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4"
   ),
 };
 

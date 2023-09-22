@@ -823,7 +823,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.60"
+version = "0.0.61"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -839,7 +839,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.60"
+version = "0.0.61"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -866,7 +866,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.60"
+version = "0.0.61"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
