@@ -6,8 +6,8 @@
  */
 
 import * as web3 from '@solana/web3.js'
-import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
+import * as beet from '@metaplex-foundation/beet'
 /**
  * This type is used to derive the {@link Event} type as well as the de/serializer.
  * However don't refer to it in your code but use the {@link Event} type instead.
@@ -18,26 +18,10 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
  * @private
  */
 export type EventRecord = {
-  NewCurrency: {
-    address: web3.PublicKey
-    state: Uint8Array
-    timestamp: beet.bignum
-  }
-  UpdateCurrency: {
-    address: web3.PublicKey
-    state: Uint8Array
-    timestamp: beet.bignum
-  }
-  NewHolderAccount: {
-    address: web3.PublicKey
-    state: Uint8Array
-    timestamp: beet.bignum
-  }
-  UpdateHolderAccount: {
-    address: web3.PublicKey
-    state: Uint8Array
-    timestamp: beet.bignum
-  }
+  NewCurrency: { address: web3.PublicKey; state: Uint8Array }
+  UpdateCurrency: { address: web3.PublicKey; state: Uint8Array }
+  NewHolderAccount: { address: web3.PublicKey; state: Uint8Array }
+  UpdateHolderAccount: { address: web3.PublicKey; state: Uint8Array }
 }
 
 /**
@@ -79,7 +63,6 @@ export const eventBeet = beet.dataEnum<EventRecord>([
       [
         ['address', beetSolana.publicKey],
         ['state', beet.bytes],
-        ['timestamp', beet.i64],
       ],
       'EventRecord["NewCurrency"]'
     ),
@@ -91,7 +74,6 @@ export const eventBeet = beet.dataEnum<EventRecord>([
       [
         ['address', beetSolana.publicKey],
         ['state', beet.bytes],
-        ['timestamp', beet.i64],
       ],
       'EventRecord["UpdateCurrency"]'
     ),
@@ -103,7 +85,6 @@ export const eventBeet = beet.dataEnum<EventRecord>([
       [
         ['address', beetSolana.publicKey],
         ['state', beet.bytes],
-        ['timestamp', beet.i64],
       ],
       'EventRecord["NewHolderAccount"]'
     ),
@@ -115,7 +96,6 @@ export const eventBeet = beet.dataEnum<EventRecord>([
       [
         ['address', beetSolana.publicKey],
         ['state', beet.bytes],
-        ['timestamp', beet.i64],
       ],
       'EventRecord["UpdateHolderAccount"]'
     ),

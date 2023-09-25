@@ -1,7 +1,7 @@
 use crate::{errors::ErrorCode, states::*};
 use anchor_lang::{prelude::*, solana_program};
 use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
-use hpl_events::program::HplEvents;
+use hpl_events::HplEvents;
 use hpl_hive_control::{
     program::HplHiveControl,
     state::{DelegateAuthority, Project},

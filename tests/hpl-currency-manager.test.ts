@@ -6,73 +6,56 @@ import {
   VAULT,
 } from "@honeycomb-protocol/hive-control";
 import {
-  CURRENCY_MANAGER_ID,
   Currency,
+  HPL_CURRENCY_MANAGER_PROGRAM,
   HolderAccount,
   HolderStatus,
   HplCurrency,
   PermissionedCurrencyKind,
   createFixHolderAccountInstruction,
-  currencyPda,
-  findProjectCurrencies,
-  holderAccountPda,
   holderAccountPdas,
   tokenAccountPda,
 } from "../packages/hpl-currency-manager";
-import { prepare } from "./prepare";
-import {
-  Metaplex,
-  walletAdapterIdentity,
-  keypairIdentity,
-  token as tokenAmount,
-} from "@metaplex-foundation/js";
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  AuthorityType,
-  getMint,
-  setAuthority,
-} from "@solana/spl-token";
+import { getHoneycomb } from "./prepare";
+import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
+import { ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 jest.setTimeout(200000);
 
 describe("Currency Manager", () => {
-  let honeycomb: Honeycomb;
+  let adminHC: Honeycomb;
+  let userHC: Honeycomb;
   let metaplex: Metaplex;
 
   it("Prepare", async () => {
-    const temp = await prepare();
-    honeycomb = temp.honeycomb;
-    console.log(
-      "address",
-      honeycomb.identity().address.toString(),
-      honeycomb.connection.rpcEndpoint
-    );
+    const temp = await getHoneycomb();
+    adminHC = temp.adminHC;
+    userHC = temp.userHC;
+    console.log("Admin", adminHC.identity().address.toString());
 
-    metaplex = new Metaplex(honeycomb.connection);
+    metaplex = new Metaplex(adminHC.connection);
     // metaplex.use(keypairIdentity(temp.signer));
     metaplex.use(
       walletAdapterIdentity({
-        ...honeycomb.identity(),
-        publicKey: honeycomb.identity().address,
+        ...adminHC.identity(),
+        publicKey: adminHC.identity().address,
       })
     );
 
-    const balance = await honeycomb
-      .rpc()
-      .getBalance(honeycomb.identity().address);
+    const balance = await adminHC.rpc().getBalance(adminHC.identity().address);
     expect(balance).toBeGreaterThanOrEqual(web3.LAMPORTS_PER_SOL * 0.01);
   });
 
   it.skip("Temp", async () => {
     // const project = await HoneycombProject.fromAddress(
-    //   honeycomb.connection,
+    //   adminHC.connection,
     //   new web3.PublicKey("7CKTHsJ3EZqChNf3XGt9ytdZXvSzDFWmrQJL3BCe4Ppw")
     // );
-    // honeycomb.use(project);
+    // adminHC.use(project);
     // await findProjectCurrencies(project);
-    // console.log(honeycomb._currencies);
+    // console.log(adminHC._currencies);
 
     const currencies = (await Currency.gpaBuilder()
-      .run(honeycomb.connection)
+      .run(adminHC.connection)
       .then((x) =>
         x
           .map((y) => {
@@ -90,7 +73,7 @@ describe("Currency Manager", () => {
     console.log("Currencies", currencies.length);
 
     const holderAccounts = await HolderAccount.gpaBuilder()
-      .run(honeycomb.connection)
+      .run(adminHC.connection)
       .then(
         (x) =>
           x
@@ -122,12 +105,12 @@ describe("Currency Manager", () => {
         holderAccount.owner,
         currency[1].mint,
         undefined,
-        CURRENCY_MANAGER_ID
+        HPL_CURRENCY_MANAGER_PROGRAM
       );
 
       if (newTokenAccount.equals(holderAccount.tokenAccount)) continue;
 
-      const ctx = await new Operation(honeycomb, [
+      const [ctx] = await new Operation(adminHC, [
         createFixHolderAccountInstruction({
           project: currency[1].project,
           currency: currency[0],
@@ -136,7 +119,7 @@ describe("Currency Manager", () => {
           tokenAccount,
           newTokenAccount,
           owner: holderAccount.owner,
-          payer: honeycomb.identity().address,
+          payer: adminHC.identity().address,
           vault: VAULT,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
@@ -147,20 +130,20 @@ describe("Currency Manager", () => {
     }
   });
 
-  it.skip("Create Project and currency", async () => {
+  it("Create Project and currency", async () => {
     // Create project
-    honeycomb.use(
-      await HoneycombProject.new(honeycomb, {
+    adminHC.use(
+      await HoneycombProject.new(adminHC, {
         name: "TestProject",
         expectedMintAddresses: 1,
         profileDataConfigs: [],
       })
     );
-    expect(honeycomb.project().name).toBe("TestProject");
+    expect(adminHC.project().name).toBe("TestProject");
 
-    honeycomb.use(
-      await HplCurrency.new(honeycomb, {
-        kind: PermissionedCurrencyKind.Custodial,
+    adminHC.use(
+      await HplCurrency.new(adminHC, {
+        kind: PermissionedCurrencyKind.NonCustodial,
         decimals: 9,
         name: "TestCoin",
         symbol: "TSC",
@@ -169,58 +152,47 @@ describe("Currency Manager", () => {
     );
   });
 
-  it.skip("Create holder account and mint", async () => {
-    const holderAccount = await honeycomb
+  it("Create holder account and mint", async () => {
+    const holderAccount = await adminHC
       .currency()
       .create()
-      .holderAccount(honeycomb.identity().address);
+      .holderAccount(adminHC.identity().address);
     await holderAccount.mint(1000_000_000_000);
   });
 
-  it.skip("Burn tokens", async () => {
-    const holderAccount = await honeycomb.currency().holderAccount();
+  it("Burn tokens", async () => {
+    const holderAccount = await adminHC.currency().holderAccount();
     await holderAccount.burn(100_000_000_000);
   });
 
-  it.skip("Transfer tokens", async () => {
-    const randomKey = web3.Keypair.generate();
-    const newHolderAccount = await honeycomb
+  it("Transfer tokens", async () => {
+    const newHolderAccount = await adminHC
       .currency()
       .create()
-      .holderAccount(randomKey.publicKey);
+      .holderAccount(userHC.identity().address);
 
-    const holderAccount = await honeycomb.currency().holderAccount();
-    await holderAccount.transfer(100_000_000_000, newHolderAccount, {
-      skipPreflight: true,
-    });
+    const holderAccount = await adminHC.currency().holderAccount();
+    await holderAccount.transfer(100_000_000_000, newHolderAccount);
   });
 
-  it.skip("Delegate and Revoke Delegate", async () => {
-    const holderAccount = await honeycomb.currency().holderAccount();
-    await holderAccount.approveDelegate(10, honeycomb.identity().address);
+  it("Delegate and Revoke Delegate", async () => {
+    const holderAccount = await adminHC.currency().holderAccount();
+    await holderAccount.approveDelegate(
+      10_000_000_000,
+      userHC.identity().address
+    );
     await holderAccount.revokeDelegate();
   });
 
-  it.skip("Freeze and Thaw", async () => {
-    const holderAccount = await honeycomb.currency().holderAccount();
+  it("Freeze and Thaw", async () => {
+    const holderAccount = await adminHC.currency().holderAccount();
     await holderAccount.setHolderStatus(HolderStatus.Inactive);
     await holderAccount.setHolderStatus(HolderStatus.Active);
   });
 
   it.skip("Wrapped currency", async () => {
-    // let mint = web3.Keypair.generate();
-    // const token = await metaplex.tokens().createMint({
-    //   decimals: 9,
-    //   mint: mint,
-    // });
-
-    // await metaplex.tokens().mint({
-    //   amount: tokenAmount(100_000_000_000, token.mint.decimals),
-    //   mintAddress: token.mint.address,
-    // });
-
-    honeycomb.use(
-      await HplCurrency.new(honeycomb, {
+    adminHC.use(
+      await HplCurrency.new(adminHC, {
         mint: new web3.PublicKey(
           "GsRHzw9G6at1hjiq7YEGKiZmm3opMvp1iguqkq4TsXcE"
         ),
@@ -229,10 +201,10 @@ describe("Currency Manager", () => {
       })
     );
 
-    const holderAccount = await honeycomb
+    const holderAccount = await adminHC
       .currency()
       .create()
-      .holderAccount(honeycomb.identity().address);
+      .holderAccount(adminHC.identity().address);
     await holderAccount.fund(10_000_000_000);
   });
 });

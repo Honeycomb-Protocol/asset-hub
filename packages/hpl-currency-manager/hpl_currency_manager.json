@@ -322,7 +322,7 @@
         },
         {
           "name": "mint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The account representing the project to which the currency is associated."
@@ -1953,10 +1953,6 @@
               {
                 "name": "state",
                 "type": "bytes"
-              },
-              {
-                "name": "timestamp",
-                "type": "i64"
               }
             ]
           },
@@ -1970,10 +1966,6 @@
               {
                 "name": "state",
                 "type": "bytes"
-              },
-              {
-                "name": "timestamp",
-                "type": "i64"
               }
             ]
           },
@@ -1987,10 +1979,6 @@
               {
                 "name": "state",
                 "type": "bytes"
-              },
-              {
-                "name": "timestamp",
-                "type": "i64"
               }
             ]
           },
@@ -2004,10 +1992,6 @@
               {
                 "name": "state",
                 "type": "bytes"
-              },
-              {
-                "name": "timestamp",
-                "type": "i64"
               }
             ]
           }

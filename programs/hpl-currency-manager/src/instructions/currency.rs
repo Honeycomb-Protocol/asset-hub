@@ -2,7 +2,7 @@ use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
-    hpl_events::program::HplEvents,
+    hpl_events::HplEvents,
     hpl_hive_control::state::{DelegateAuthority, Project},
     hpl_utils::traits::Default,
     mpl_token_metadata::{
@@ -195,8 +195,12 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
         Some(currency_signer),
     )?;
 
-    Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
-        .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
+    Event::new_currency(
+        currency.key(),
+        currency.try_to_vec().unwrap(),
+        &ctx.accounts.clock_sysvar,
+    )
+    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }
@@ -341,10 +345,10 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
 
     Event::update_currency(
         ctx.accounts.currency.key(),
-        &ctx.accounts.currency,
+        ctx.accounts.currency.try_to_vec().unwrap(),
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
+    .emit(ctx.accounts.hpl_events.to_account_info())?;
     Ok(())
 }
 
@@ -372,7 +376,7 @@ pub struct WrapCurrency<'info> {
     pub currency: Account<'info, Currency>,
 
     /// The account representing the project to which the currency is associated.
-    #[account()]
+    #[account(mut)]
     pub mint: Account<'info, Mint>,
 
     /// [Option] The account representing the delegate authority containing permissions of the wallet for the project.
@@ -464,8 +468,12 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
         Some(currency.key()),
     )?;
 
-    Event::new_currency(currency.key(), &currency, &ctx.accounts.clock_sysvar)
-        .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
+    Event::new_currency(
+        currency.key(),
+        currency.try_to_vec().unwrap(),
+        &ctx.accounts.clock_sysvar,
+    )
+    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     // Return Ok to indicate the successful completion of the wrapping process.
     Ok(())

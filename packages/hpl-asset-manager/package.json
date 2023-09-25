@@ -9,6 +9,7 @@
   "peerDependencies": {
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.78.0",
-    "@honeycomb-protocol/hive-control": "^0.1.67"
+    "@honeycomb-protocol/hive-control": "^0.1.69",
+    "@honeycomb-protocol/events": "^0.1.16"
   }
 }

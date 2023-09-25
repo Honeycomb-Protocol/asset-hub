@@ -25,7 +25,7 @@ export const wrapCurrencyStruct = new beet.BeetArgsStruct<{
  *
  * @property [_writable_] project
  * @property [_writable_] currency
- * @property [] mint
+ * @property [_writable_] mint
  * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
  * @property [**signer**] mintAuthority
@@ -94,7 +94,7 @@ export function createWrapCurrencyInstruction(
     },
     {
       pubkey: accounts.mint,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
   ]

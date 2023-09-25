@@ -5,7 +5,7 @@ use {
         associated_token::AssociatedToken,
         token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
     },
-    hpl_events::program::HplEvents,
+    hpl_events::HplEvents,
     hpl_hive_control::state::Project,
     hpl_utils::traits::Default,
 };
@@ -95,10 +95,10 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
 
     Event::new_holder_account(
         holder_account.key(),
-        &holder_account,
+        holder_account.try_to_vec().unwrap(),
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
+    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }
@@ -184,10 +184,10 @@ pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
 
     Event::new_holder_account(
         holder_account.key(),
-        &holder_account,
+        holder_account.try_to_vec().unwrap(),
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
+    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }
@@ -732,10 +732,10 @@ pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) ->
 
     Event::update_holder_account(
         holder_account.key(),
-        &holder_account,
+        holder_account.try_to_vec().unwrap(),
         &ctx.accounts.clock_sysvar,
     )
-    .wrap(ctx.accounts.hpl_events.to_account_info(), crate::id())?;
+    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }

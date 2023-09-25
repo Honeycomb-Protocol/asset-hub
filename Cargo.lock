@@ -517,6 +517,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3ad85c1f65dc7b37604eb0e89748faf0b9653065f2a8ef69f96a687ec1e9279"
 
 [[package]]
+name = "convert_case"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -855,10 +864,11 @@ dependencies = [
 
 [[package]]
 name = "hpl-attribute-event"
-version = "0.1.13"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5d22d1203c358ee3c318e81542369434a776d30377337a9e785f780c6affa98"
+checksum = "d36cf2401bd8bddcb380356e21d7b8d06dafa57c84fdf48a0103c89c3d663ca0"
 dependencies = [
+ "convert_case",
  "proc-macro2",
  "quote",
  "syn 2.0.28",
@@ -882,20 +892,21 @@ dependencies = [
 
 [[package]]
 name = "hpl-events"
-version = "0.1.13"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d511f296f73cac8127da764ccbaf6db8a84eac069cfb90fe38a333c2bef7d69c"
+checksum = "0dbc4ff9fa9b5ffda0936e90ef3494c89416443be170fec4dfc887c557986a07"
 dependencies = [
  "anchor-lang",
  "borsh",
  "hpl-attribute-event",
+ "solana-program",
 ]
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.1.68"
+version = "0.1.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e780a9e6ece1edbb34f6459c7738b53490fd5e37b79f20f48f6a2c5eee76e05"
+checksum = "406f1e1301a72fa45596a6cf33b2e7427191234b1eb99ccc42d3bb7bc7bab1a4"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

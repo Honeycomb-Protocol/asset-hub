@@ -2,7 +2,7 @@ use {
     crate::state::{Assembler, AssemblingAction, Creator, TokenStandard},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, Token},
-    hpl_events::program::HplEvents,
+    hpl_events::HplEvents,
     hpl_hive_control::{
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
