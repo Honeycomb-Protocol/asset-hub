@@ -1,3 +1,7 @@
+# 0.0.66
+
+- Accepts mint keypair while creating new currency
+
 # 0.0.63
 
 - Compatibility with latest hpl-events & hpl-hive-control

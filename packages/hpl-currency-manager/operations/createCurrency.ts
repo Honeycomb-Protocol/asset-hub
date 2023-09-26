@@ -19,7 +19,7 @@ import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
  * @category Types
  */
 type CreateCurrencyArgsPack =
-  | CreateCurrencyArgs
+  | (CreateCurrencyArgs & { useMint?: web3.Keypair })
   | {
       mint: web3.PublicKey;
       mintAuthority: web3.Keypair | web3.PublicKey;
@@ -76,7 +76,10 @@ export async function createCreateCurrencyOperation(
   const programId = args.programId || PROGRAM_ID;
 
   // Generate a new mint keypair if mint public key is not provided.
-  const mint = web3.Keypair.generate();
+  const mint =
+    "useMint" in args.args && args.args.useMint
+      ? args.args.useMint
+      : web3.Keypair.generate();
 
   // Find the currency and metadata PDAs based on whether mint public key is provided or not.
   const [currency] = currencyPda(
