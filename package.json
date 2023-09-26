@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@honeycomb-protocol/events": "^0.1.16",
-    "@honeycomb-protocol/hive-control": "^0.1.69",
+    "@honeycomb-protocol/hive-control": "^0.1.71",
     "@metaplex-foundation/js": "^0.18.1",
     "@metaplex-foundation/mpl-candy-guard": "https://gitpkg.now.sh/Solana-Studio/mpl-candy-guard/js?main",
     "@metaplex-foundation/mpl-token-metadata": "^2.8.3",
