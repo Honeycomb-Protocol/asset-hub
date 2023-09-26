@@ -1,6 +1,6 @@
 {
   "name": "@honeycomb-protocol/asset-assembler",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "private": false,
   "dependencies": {
     "@metaplex-foundation/js": "^0.18.1"
@@ -8,7 +8,7 @@
   "peerDependencies": {
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.78.0",
-    "@honeycomb-protocol/hive-control": "^0.1.70",
+    "@honeycomb-protocol/hive-control": "^0.1.71",
     "@honeycomb-protocol/events": "^0.1.17"
   }
 }
