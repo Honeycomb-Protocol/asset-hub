@@ -1,7 +1,9 @@
 {
-  "version": "0.0.62",
+  "version": "0.0.63",
   "name": "hpl_currency_manager",
-  "docs": ["The entry point for the HPL currency manager program."],
+  "docs": [
+    "The entry point for the HPL currency manager program."
+  ],
   "instructions": [
     {
       "name": "createCurrency",
@@ -28,25 +30,33 @@
           "name": "project",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "mint",
           "isMut": true,
           "isSigner": true,
-          "docs": ["Currency mint"]
+          "docs": [
+            "Currency mint"
+          ]
         },
         {
           "name": "metadata",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Currency metadata"]
+          "docs": [
+            "Currency metadata"
+          ]
         },
         {
           "name": "delegateAuthority",
@@ -61,55 +71,73 @@
           "name": "authority",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The wallet that holds the authority over the project"]
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["this account collects the protocol fee"]
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Solana System Program."]
+          "docs": [
+            "The Solana System Program."
+          ]
         },
         {
           "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Token Metadata Program ID."]
+          "docs": [
+            "The Token Metadata Program ID."
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Token Program ID."]
+          "docs": [
+            "The Token Program ID."
+          ]
         },
         {
           "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
-          "docs": ["HPL Events Program"]
+          "docs": [
+            "HPL Events Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Instructions System Variable Account."]
+          "docs": [
+            "The Instructions System Variable Account."
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Clock System Variable Account."]
+          "docs": [
+            "The Clock System Variable Account."
+          ]
         }
       ],
       "args": [
@@ -146,25 +174,33 @@
           "name": "project",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "mint",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency mint"]
+          "docs": [
+            "Currency mint"
+          ]
         },
         {
           "name": "metadata",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Currency metadata"]
+          "docs": [
+            "Currency metadata"
+          ]
         },
         {
           "name": "delegateAuthority",
@@ -179,49 +215,65 @@
           "name": "authority",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The wallet that holds the authority over the project"]
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["this account collects the protocol fee"]
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The token metadata program account."]
+          "docs": [
+            "The token metadata program account."
+          ]
         },
         {
           "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
-          "docs": ["HPL Events Program"]
+          "docs": [
+            "HPL Events Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Instructions System Variable Account."]
+          "docs": [
+            "The Instructions System Variable Account."
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Clock System Variable Account."]
+          "docs": [
+            "The Clock System Variable Account."
+          ]
         }
       ],
       "args": [
@@ -289,13 +341,17 @@
           "name": "authority",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The wallet that holds the authority over the project."]
+          "docs": [
+            "The wallet that holds the authority over the project."
+          ]
         },
         {
           "name": "mintAuthority",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The wallet that has the authority to mint tokens."]
+          "docs": [
+            "The wallet that has the authority to mint tokens."
+          ]
         },
         {
           "name": "freezeAuthority",
@@ -309,43 +365,57 @@
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent."]
+          "docs": [
+            "The wallet that pays for the rent."
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["this account collects the protocol fee"]
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Token Program"]
+          "docs": [
+            "Token Program"
+          ]
         },
         {
           "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
-          "docs": ["HPL Events Program"]
+          "docs": [
+            "HPL Events Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Instructions System Variable Account."]
+          "docs": [
+            "The Instructions System Variable Account."
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Clock System Variable Account."]
+          "docs": [
+            "The Clock System Variable Account."
+          ]
         }
       ],
       "args": []
@@ -373,85 +443,113 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "mint",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency mint"]
+          "docs": [
+            "Currency mint"
+          ]
         },
         {
           "name": "holderAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Holder account"]
+          "docs": [
+            "Holder account"
+          ]
         },
         {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Token account holding the token"]
+          "docs": [
+            "Token account holding the token"
+          ]
         },
         {
           "name": "owner",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The wallet that will own the token_account"]
+          "docs": [
+            "The wallet that will own the token_account"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["this account collects the protocol fee"]
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Associated Token program"]
+          "docs": [
+            "SPL Associated Token program"
+          ]
         },
         {
           "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
-          "docs": ["HPL Events Program"]
+          "docs": [
+            "HPL Events Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Instructions System Variable Account."]
+          "docs": [
+            "The Instructions System Variable Account."
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Clock System Variable Account."]
+          "docs": [
+            "The Clock System Variable Account."
+          ]
         }
       ],
       "args": []
@@ -479,85 +577,113 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "mint",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency mint"]
+          "docs": [
+            "Currency mint"
+          ]
         },
         {
           "name": "holderAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Holder account"]
+          "docs": [
+            "Holder account"
+          ]
         },
         {
           "name": "tokenAccount",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Token account holding the token"]
+          "docs": [
+            "Token account holding the token"
+          ]
         },
         {
           "name": "owner",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The wallet that will own the token_account"]
+          "docs": [
+            "The wallet that will own the token_account"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["this account collects the protocol fee"]
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Associated Token program"]
+          "docs": [
+            "SPL Associated Token program"
+          ]
         },
         {
           "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
-          "docs": ["HPL Events Program"]
+          "docs": [
+            "HPL Events Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Instructions System Variable Account."]
+          "docs": [
+            "The Instructions System Variable Account."
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Clock System Variable Account."]
+          "docs": [
+            "The Clock System Variable Account."
+          ]
         }
       ],
       "args": []
@@ -585,13 +711,17 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project account associated with the currency."]
+          "docs": [
+            "The project account associated with the currency."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The currency account to be burned."]
+          "docs": [
+            "The currency account to be burned."
+          ]
         },
         {
           "name": "holderAccount",
@@ -605,31 +735,41 @@
           "name": "mint",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The mint account of the currency."]
+          "docs": [
+            "The mint account of the currency."
+          ]
         },
         {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The token account that will be burned."]
+          "docs": [
+            "The token account that will be burned."
+          ]
         },
         {
           "name": "newTokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Token account holding the token"]
+          "docs": [
+            "Token account holding the token"
+          ]
         },
         {
           "name": "owner",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The owner of the token account."]
+          "docs": [
+            "The owner of the token account."
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
@@ -643,25 +783,33 @@
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Associated Token program"]
+          "docs": [
+            "SPL Associated Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["NATIVE INSTRUCTIONS SYSVAR"]
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": []
@@ -723,7 +871,9 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "delegateAuthority",
@@ -738,37 +888,49 @@
           "name": "authority",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The wallet that holds the authority over the project."]
+          "docs": [
+            "The wallet that holds the authority over the project."
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent."]
+          "docs": [
+            "The wallet that pays for the rent."
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["this account collects the protocol fee"]
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program."]
+          "docs": [
+            "System Program."
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token Program."]
+          "docs": [
+            "SPL Token Program."
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["NATIVE INSTRUCTIONS SYSVAR."]
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR."
+          ]
         }
       ],
       "args": [
@@ -857,37 +1019,49 @@
           "name": "owner",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The owner of the source token account."]
+          "docs": [
+            "The owner of the source token account."
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["this account collects the protocol fee"]
+          "docs": [
+            "this account collects the protocol fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token Program"]
+          "docs": [
+            "SPL Token Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["NATIVE INSTRUCTIONS SYSVAR."]
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR."
+          ]
         }
       ],
       "args": [
@@ -928,13 +1102,17 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project account associated with the currency."]
+          "docs": [
+            "The project account associated with the currency."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The currency account to be burned."]
+          "docs": [
+            "The currency account to be burned."
+          ]
         },
         {
           "name": "holderAccount",
@@ -948,25 +1126,33 @@
           "name": "mint",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The mint account of the currency."]
+          "docs": [
+            "The mint account of the currency."
+          ]
         },
         {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The token account that will be burned."]
+          "docs": [
+            "The token account that will be burned."
+          ]
         },
         {
           "name": "owner",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The owner of the token account."]
+          "docs": [
+            "The owner of the token account."
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
@@ -980,19 +1166,25 @@
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["NATIVE INSTRUCTIONS SYSVAR"]
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -1035,19 +1227,25 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "mint",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency mint"]
+          "docs": [
+            "Currency mint"
+          ]
         },
         {
           "name": "senderHolderAccount",
@@ -1063,7 +1261,9 @@
           "name": "senderTokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Sender token account"]
+          "docs": [
+            "Sender token account"
+          ]
         },
         {
           "name": "receiverHolderAccount",
@@ -1079,43 +1279,57 @@
           "name": "receiverTokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Receiver token account"]
+          "docs": [
+            "Receiver token account"
+          ]
         },
         {
           "name": "owner",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The owner of the source holder account"]
+          "docs": [
+            "The owner of the source holder account"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["This account is used to collect the platform fee"]
+          "docs": [
+            "This account is used to collect the platform fee"
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["NATIVE INSTRUCTIONS SYSVAR"]
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -1155,73 +1369,97 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "mint",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency mint"]
+          "docs": [
+            "Currency mint"
+          ]
         },
         {
           "name": "holderAccount",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Holder account"]
+          "docs": [
+            "Holder account"
+          ]
         },
         {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Token account holding the currency"]
+          "docs": [
+            "Token account holding the currency"
+          ]
         },
         {
           "name": "delegate",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The delegate authority account"]
+          "docs": [
+            "The delegate authority account"
+          ]
         },
         {
           "name": "owner",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The wallet that holds the authority over the project"]
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["This account is used to collect the platform fee."]
+          "docs": [
+            "This account is used to collect the platform fee."
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["NATIVE INSTRUCTIONS SYSVAR"]
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -1261,67 +1499,89 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "mint",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency mint"]
+          "docs": [
+            "Currency mint"
+          ]
         },
         {
           "name": "holderAccount",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Holder account"]
+          "docs": [
+            "Holder account"
+          ]
         },
         {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Token account holding the currency"]
+          "docs": [
+            "Token account holding the currency"
+          ]
         },
         {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The wallet that holds the authority over the project"]
+          "docs": [
+            "The wallet that holds the authority over the project"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["This account is used to collect the platform fee."]
+          "docs": [
+            "This account is used to collect the platform fee."
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["System Program"]
+          "docs": [
+            "System Program"
+          ]
         },
         {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["NATIVE INSTRUCTIONS SYSVAR"]
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": []
@@ -1355,67 +1615,89 @@
           "name": "project",
           "isMut": true,
           "isSigner": false,
-          "docs": ["The project this currency is associated with."]
+          "docs": [
+            "The project this currency is associated with."
+          ]
         },
         {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
-          "docs": ["Currency account"]
+          "docs": [
+            "Currency account"
+          ]
         },
         {
           "name": "holderAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Holder account"]
+          "docs": [
+            "Holder account"
+          ]
         },
         {
           "name": "tokenAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Holder account"]
+          "docs": [
+            "Holder account"
+          ]
         },
         {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
-          "docs": ["The authority of the project"]
+          "docs": [
+            "The authority of the project"
+          ]
         },
         {
           "name": "payer",
           "isMut": true,
           "isSigner": true,
-          "docs": ["The wallet that pays for the rent and fees"]
+          "docs": [
+            "The wallet that pays for the rent and fees"
+          ]
         },
         {
           "name": "vault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["This account is used to collect the platform fee."]
+          "docs": [
+            "This account is used to collect the platform fee."
+          ]
         },
         {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": ["SPL Token program"]
+          "docs": [
+            "SPL Token program"
+          ]
         },
         {
           "name": "hplEvents",
           "isMut": false,
           "isSigner": false,
-          "docs": ["HPL Events Program"]
+          "docs": [
+            "HPL Events Program"
+          ]
         },
         {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Instructions System Variable Account."]
+          "docs": [
+            "The Instructions System Variable Account."
+          ]
         },
         {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
-          "docs": ["The Clock System Variable Account."]
+          "docs": [
+            "The Clock System Variable Account."
+          ]
         }
       ],
       "args": [
@@ -1446,17 +1728,23 @@
           },
           {
             "name": "project",
-            "docs": ["The project this currency is associated with."],
+            "docs": [
+              "The project this currency is associated with."
+            ],
             "type": "publicKey"
           },
           {
             "name": "mint",
-            "docs": ["The spl mint of the currency."],
+            "docs": [
+              "The spl mint of the currency."
+            ],
             "type": "publicKey"
           },
           {
             "name": "kind",
-            "docs": ["The type of currency."],
+            "docs": [
+              "The type of currency."
+            ],
             "type": {
               "defined": "CurrencyKind"
             }
@@ -1481,29 +1769,39 @@
           },
           {
             "name": "currency",
-            "docs": ["The currency associated with this account"],
+            "docs": [
+              "The currency associated with this account"
+            ],
             "type": "publicKey"
           },
           {
             "name": "owner",
-            "docs": ["The owner of this account."],
+            "docs": [
+              "The owner of this account."
+            ],
             "type": "publicKey"
           },
           {
             "name": "tokenAccount",
-            "docs": ["The token account that holds the currency."],
+            "docs": [
+              "The token account that holds the currency."
+            ],
             "type": "publicKey"
           },
           {
             "name": "status",
-            "docs": ["Holder status"],
+            "docs": [
+              "Holder status"
+            ],
             "type": {
               "defined": "HolderStatus"
             }
           },
           {
             "name": "createdAt",
-            "docs": ["When this holder account was created"],
+            "docs": [
+              "When this holder account was created"
+            ],
             "type": "i64"
           }
         ]
@@ -1518,12 +1816,16 @@
         "fields": [
           {
             "name": "name",
-            "docs": ["The name of the currency."],
+            "docs": [
+              "The name of the currency."
+            ],
             "type": "string"
           },
           {
             "name": "symbol",
-            "docs": ["The symbol of the currency."],
+            "docs": [
+              "The symbol of the currency."
+            ],
             "type": "string"
           },
           {
@@ -1556,7 +1858,9 @@
     },
     {
       "name": "UpdateCurrencyArgs",
-      "docs": ["Arguments for updating a currency."],
+      "docs": [
+        "Arguments for updating a currency."
+      ],
       "type": {
         "kind": "struct",
         "fields": [
@@ -1619,7 +1923,9 @@
     },
     {
       "name": "PermissionedCurrencyKind",
-      "docs": ["The sub-type of permissioned currency."],
+      "docs": [
+        "The sub-type of permissioned currency."
+      ],
       "type": {
         "kind": "enum",
         "variants": [
@@ -1694,7 +2000,9 @@
     },
     {
       "name": "HolderStatus",
-      "docs": ["The status of a holder account."],
+      "docs": [
+        "The status of a holder account."
+      ],
       "type": {
         "kind": "enum",
         "variants": [

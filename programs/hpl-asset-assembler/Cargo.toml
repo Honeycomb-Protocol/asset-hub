@@ -2,7 +2,7 @@
 name = "hpl-asset-assembler"
 description = "Honeycomb protocol library assembler program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.62"
+version = "0.0.63"
 edition = "2021"
 license = "MIT"
 
@@ -25,6 +25,6 @@ solana-program = "=1.14.17"
 winnow = "=0.4.1"
 toml_datetime = "=0.6.1"
 hpl-utils = "0.1.4"
-hpl-events = { version = "0.1.16", features = ["no-entrypoint"] }
-hpl-hive-control = { version = "0.1.69", features = ["cpi"] }
+hpl-events = { version = "0.1.17", features = ["no-entrypoint"] }
+hpl-hive-control = { version = "0.1.70", features = ["cpi"] }
 mpl-token-metadata = { version = "1.9.0", features = ["no-entrypoint"] }

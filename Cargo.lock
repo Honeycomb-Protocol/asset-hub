@@ -832,7 +832,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.62"
+version = "0.0.63"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -848,7 +848,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.62"
+version = "0.0.63"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -864,9 +864,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-attribute-event"
-version = "0.1.16"
+version = "0.1.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d36cf2401bd8bddcb380356e21d7b8d06dafa57c84fdf48a0103c89c3d663ca0"
+checksum = "6f838de98ff9bf14e16a8a8257dcb68c4420578be79ed3764f5f98b1a2177e99"
 dependencies = [
  "convert_case",
  "proc-macro2",
@@ -876,7 +876,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.62"
+version = "0.0.63"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -892,9 +892,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-events"
-version = "0.1.16"
+version = "0.1.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0dbc4ff9fa9b5ffda0936e90ef3494c89416443be170fec4dfc887c557986a07"
+checksum = "5d25d4a888802e4f884889e1b1df540966cf2e643ada7067301b3d2cf541f7b3"
 dependencies = [
  "anchor-lang",
  "borsh",
@@ -904,9 +904,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.1.69"
+version = "0.1.70"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "406f1e1301a72fa45596a6cf33b2e7427191234b1eb99ccc42d3bb7bc7bab1a4"
+checksum = "fef44c2a70a61e10e74bc427d885a49a991c36e23948732afd944518e3d255f9"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
