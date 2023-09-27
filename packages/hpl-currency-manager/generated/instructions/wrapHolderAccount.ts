@@ -31,6 +31,7 @@ export const wrapHolderAccountStruct = new beet.BeetArgsStruct<{
  * @property [] owner
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
+ * @property [] hiveControl
  * @property [] associatedTokenProgram
  * @property [] hplEvents
  * @property [] instructionsSysvar
@@ -49,6 +50,7 @@ export type WrapHolderAccountInstructionAccounts = {
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
   associatedTokenProgram: web3.PublicKey
   hplEvents: web3.PublicKey
@@ -119,6 +121,11 @@ export function createWrapHolderAccountInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.hiveControl,
       isWritable: false,
       isSigner: false,
     },

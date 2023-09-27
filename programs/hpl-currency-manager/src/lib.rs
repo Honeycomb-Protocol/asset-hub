@@ -36,16 +36,29 @@ pub mod hpl_currency_manager {
     /// This function can return an error if the platform gate fails or if the currency creation
     /// encounters any issues.
     pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assets,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageCurrencies,
+                service: None,
+            },
         )?;
 
         instructions::create_currency(ctx, args)
@@ -68,16 +81,29 @@ pub mod hpl_currency_manager {
     /// This function can return an error if the platform gate fails or if the currency update
     /// encounters any issues.
     pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assets,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageCurrencies,
+                service: None,
+            },
         )?;
 
         instructions::update_currency(ctx, args)
@@ -98,16 +124,29 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails or if the currency wrapping
     /// encounters any issues.
     pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assets,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageCurrencies,
+                service: None,
+            },
         )?;
 
         instructions::wrap_currency(ctx)
@@ -128,16 +167,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails or if any issues occur during the
     /// holder account creation process.
     pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.payer.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.payer.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
         )?;
 
         let currency = &ctx.accounts.currency.clone();
@@ -165,17 +211,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails or if any issues occur during the
     /// holder account creation process.
     pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
-        // Perform platform gate to manage public low-level actions for the project
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.payer.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.payer.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
         )?;
 
         let currency = &ctx.accounts.currency.clone();
@@ -204,17 +256,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails or if any issues occur during the
     /// holder account creation process.
     pub fn fix_holder_account(ctx: Context<FixHolderAccount>) -> Result<()> {
-        // Perform platform gate to manage public low-level actions for the project
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.owner.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.owner.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
         )?;
 
         // Perform pre-actions before instructionn
@@ -253,29 +311,24 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// or if any issues occur during the currency minting process.
     pub fn mint_currency(ctx: Context<MintCurrency>, amount: u64) -> Result<()> {
-        // Perform platform gate to manage assets for the project
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assets,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
-        )
-        .or(hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assets,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
-        ))?;
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
+        )?;
 
         // Check if the holder account status is active, if not, return an error
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
@@ -324,16 +377,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the funding process.
     pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.fee_exempt,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.owner.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.owner.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::FeeExempt,
+                service: None,
+            },
         )?;
 
         // Perform pre-actions before instructionn
@@ -378,16 +438,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the burning process.
     pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.fee_exempt,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.owner.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.owner.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::FeeExempt,
+                service: None,
+            },
         )?;
 
         // Perform pre-actions before instructionn
@@ -434,16 +501,23 @@ pub mod hpl_currency_manager {
     /// holder account is inactive, the caller's program ID is not authorized, or if any issues occur
     /// during the transfer process.
     pub fn transfer_currency(ctx: Context<TransferCurrency>, amount: u64) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.fee_exempt,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.owner.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.owner.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::FeeExempt,
+                service: None,
+            },
         )?;
 
         // Perform pre-actions before instructionn
@@ -497,16 +571,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the approval process.
     pub fn approve_delegate(ctx: Context<ApproveDelegate>, amount: u64) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.owner.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.owner.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::FeeExempt,
+                service: None,
+            },
         )?;
 
         // Perform pre-actions before instructionn
@@ -550,16 +631,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the holder account is inactive,
     /// the caller's program ID is not authorized, or if any issues occur during the revoking process.
     pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicHigh,
+                service: None,
+            },
         )?;
 
         // Perform pre-actions before instructionn
@@ -602,16 +690,23 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails, the caller's program ID is not authorized,
     /// or if any issues occur during the process of setting the holder account's status.
     pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assets,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: Some(ctx.accounts.hive_control.to_account_info()),
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageCurrencyStatus,
+                service: None,
+            },
         )?;
 
         // Call the `set_holder_status` instruction to set the holder account's status

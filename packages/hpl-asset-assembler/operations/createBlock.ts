@@ -1,4 +1,9 @@
-import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  Operation,
+  VAULT,
+  HPL_HIVE_CONTROL_PROGRAM,
+} from "@honeycomb-protocol/hive-control";
 import * as web3 from "@solana/web3.js";
 import {
   createCreateBlockInstruction,

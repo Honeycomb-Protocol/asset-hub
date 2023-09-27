@@ -1,15 +1,24 @@
-use crate::{
-    errors::ErrorCode,
-    state::{Assembler, Block, BlockDefinition, BlockDefinitionValue, BlockType},
+use {
+    crate::{
+        errors::ErrorCode,
+        state::{Assembler, Block, BlockDefinition, BlockDefinitionValue, BlockType},
+    },
+    anchor_lang::prelude::*,
+    anchor_spl::token::Mint,
+    hpl_hive_control::{
+        program::HplHiveControl,
+        state::{DelegateAuthority, Project},
+    },
 };
-use anchor_lang::prelude::*;
-use anchor_spl::token::Mint;
-use hpl_hive_control::state::{DelegateAuthority, Project};
 
 /// Accounts used in the create block instruction
 #[derive(Accounts)]
 #[instruction(args: CreateBlockArgs)]
 pub struct CreateBlock<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account( has_one = project )]
     pub assembler: Account<'info, Assembler>,
@@ -28,6 +37,9 @@ pub struct CreateBlock<'info> {
     )]
     pub block: Account<'info, Block>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that holds the authority over the assembler
     #[account()]
     pub authority: Signer<'info>,
@@ -36,22 +48,20 @@ pub struct CreateBlock<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -78,6 +88,10 @@ pub fn create_block(ctx: Context<CreateBlock>, args: CreateBlockArgs) -> Result<
 /// Accounts used in the create block definition instruction
 #[derive(Accounts)]
 pub struct CreateBlockDefinition<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account( has_one = project )]
     pub assembler: Account<'info, Assembler>,
@@ -103,6 +117,9 @@ pub struct CreateBlockDefinition<'info> {
     #[account(mut)]
     pub block_definition_mint: Account<'info, Mint>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that holds the authority over the assembler
     #[account()]
     pub authority: Signer<'info>,
@@ -111,22 +128,20 @@ pub struct CreateBlockDefinition<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
 }
 
 /// Create a new block definition

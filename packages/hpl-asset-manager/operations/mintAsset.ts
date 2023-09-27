@@ -2,7 +2,11 @@ import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { createMintInstruction } from "@metaplex-foundation/mpl-candy-guard";
 import { createMintAssetInstruction, PROGRAM_ID } from "../generated";
-import { Honeycomb, VAULT } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  VAULT,
+  HPL_HIVE_CONTROL_PROGRAM,
+} from "@honeycomb-protocol/hive-control";
 import { Metaplex, Signer } from "@metaplex-foundation/js";
 import { AssetManagerAsset } from "../AssetManager";
 

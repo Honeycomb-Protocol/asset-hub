@@ -1,5 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import {
+  HPL_HIVE_CONTROL_PROGRAM,
   Honeycomb,
   HoneycombProject,
   Operation,
@@ -121,6 +122,7 @@ describe("Currency Manager", () => {
           owner: holderAccount.owner,
           payer: adminHC.identity().address,
           vault: VAULT,
+          hiveControl: HPL_HIVE_CONTROL_PROGRAM,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         }),
@@ -156,7 +158,7 @@ describe("Currency Manager", () => {
     const holderAccount = await adminHC
       .currency()
       .create()
-      .holderAccount(adminHC.identity().address);
+      .holderAccount(adminHC.identity().address, { skipPreflight: true });
     await holderAccount.mint(1000_000_000_000);
   });
 

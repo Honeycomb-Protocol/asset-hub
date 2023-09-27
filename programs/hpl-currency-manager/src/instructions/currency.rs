@@ -3,7 +3,10 @@ use {
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
     hpl_events::HplEvents,
-    hpl_hive_control::state::{DelegateAuthority, Project},
+    hpl_hive_control::{
+        program::HplHiveControl,
+        state::{DelegateAuthority, Project},
+    },
     hpl_utils::traits::Default,
     mpl_token_metadata::{
         instruction::{
@@ -67,6 +70,9 @@ pub struct CreateCurrency<'info> {
 
     /// The Solana System Program.
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// The Token Metadata Program ID.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -244,6 +250,9 @@ pub struct UpdateCurrency<'info> {
     /// System Program
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// The token metadata program account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = mpl_token_metadata::ID)]
@@ -404,6 +413,9 @@ pub struct WrapCurrency<'info> {
     /// System Program
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// Token Program
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
@@ -550,6 +562,9 @@ pub struct MintCurrency<'info> {
     /// System Program.
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// SPL Token Program.
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
@@ -636,6 +651,9 @@ pub struct FundAccount<'info> {
 
     /// System Program
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL Token Program
     #[account(address = token::ID)]

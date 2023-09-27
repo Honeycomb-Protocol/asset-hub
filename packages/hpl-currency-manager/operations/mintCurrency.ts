@@ -59,6 +59,7 @@ export async function createMintCurrencyOperation(
         authority: honeycomb.identity().address,
         payer: honeycomb.identity().address,
         vault: VAULT,
+        hiveControl: HPL_HIVE_CONTROL_PROGRAM,
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       {

@@ -1,5 +1,10 @@
 import * as web3 from "@solana/web3.js";
-import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  Operation,
+  VAULT,
+  HPL_HIVE_CONTROL_PROGRAM,
+} from "@honeycomb-protocol/hive-control";
 import { createBurnCurrencyInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
 
@@ -51,6 +56,7 @@ export async function createBurnCurrencyOperation(
         owner: args.holderAccount.owner,
         payer: honeycomb.identity().address,
         vault: VAULT,
+        hiveControl: HPL_HIVE_CONTROL_PROGRAM,
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },
       {

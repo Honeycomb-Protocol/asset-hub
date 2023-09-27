@@ -55,16 +55,29 @@ pub mod hpl_asset_assembler {
         args: UpdateAssemblerArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index, ctx.accounts.assembler.key())),
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageAssembler,
+                service: Some((proof_index, ctx.accounts.assembler.key())),
+            },
         )?;
 
         instructions::update_assembler(ctx, args)
@@ -75,16 +88,29 @@ pub mod hpl_asset_assembler {
         args: CreateBlockArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index, ctx.accounts.assembler.key())),
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageAssembler,
+                service: Some((proof_index, ctx.accounts.assembler.key())),
+            },
         )?;
 
         instructions::create_block(ctx, args)
@@ -95,96 +121,174 @@ pub mod hpl_asset_assembler {
         args: BlockDefinitionValue,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index, ctx.accounts.assembler.key())),
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageAssembler,
+                service: Some((proof_index, ctx.accounts.assembler.key())),
+            },
         )?;
 
         instructions::create_block_definition(ctx, args)
     }
 
     pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
         )?;
 
         instructions::create_nft(ctx)
     }
 
     pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicHigh,
+                service: None,
+            },
         )?;
 
         instructions::add_block(ctx)
     }
 
     pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
         )?;
 
         instructions::mint_nft(ctx)
     }
 
     pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_low,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
         )?;
 
         instructions::burn_nft(ctx)
     }
 
     pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.public_high,
-            None,
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::PublicLow,
+                service: None,
+            },
         )?;
 
         instructions::remove_block(ctx)
@@ -195,16 +299,29 @@ pub mod hpl_asset_assembler {
         args: SetNFTGeneratedArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index, ctx.accounts.assembler.key())),
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageAssembler,
+                service: Some((proof_index, ctx.accounts.assembler.key())),
+            },
         )?;
 
         instructions::set_nft_generated(ctx, args)
@@ -215,16 +332,29 @@ pub mod hpl_asset_assembler {
         args: UpdateMetadataArgs,
         proof_index: u8,
     ) -> Result<()> {
-        hpl_hive_control::instructions::platform_gate_fn(
-            hpl_hive_control::constants::ACTIONS.manage_assembler,
-            Some((proof_index, ctx.accounts.assembler.key())),
-            &ctx.accounts.project,
-            ctx.accounts.authority.key(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &ctx.accounts.delegate_authority,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
+        hpl_hive_control::cpi::platform_gate(
+            CpiContext::new(
+                ctx.accounts.hive_control.to_account_info(),
+                hpl_hive_control::cpi::accounts::PlatformGate {
+                    project: ctx.accounts.project.to_account_info(),
+                    delegate_authority: if let Some(delegate_authority) =
+                        &ctx.accounts.delegate_authority
+                    {
+                        Some(delegate_authority.to_account_info())
+                    } else {
+                        Some(ctx.accounts.hive_control.to_account_info())
+                    },
+                    signer: ctx.accounts.authority.to_account_info(),
+                    payer: ctx.accounts.payer.to_account_info(),
+                    system_program: ctx.accounts.system_program.to_account_info(),
+                    instructions_sysvar: ctx.accounts.instructions_sysvar.to_account_info(),
+                    vault: ctx.accounts.vault.to_account_info(),
+                },
+            ),
+            hpl_hive_control::instructions::PlatformGateArgs {
+                action: hpl_hive_control::state::SerializableActions::ManageAssembler,
+                service: Some((proof_index, ctx.accounts.assembler.key())),
+            },
         )?;
 
         instructions::update_metadata(ctx, args)

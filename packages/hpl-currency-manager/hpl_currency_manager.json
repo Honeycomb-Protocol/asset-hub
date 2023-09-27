@@ -1,5 +1,5 @@
 {
-  "version": "0.0.66",
+  "version": "0.0.67",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -97,6 +97,14 @@
           "isSigner": false,
           "docs": [
             "The Solana System Program."
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -244,6 +252,14 @@
           ]
         },
         {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
           "name": "tokenMetadataProgram",
           "isMut": false,
           "isSigner": false,
@@ -386,6 +402,14 @@
           ]
         },
         {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -509,6 +533,14 @@
           "isSigner": false,
           "docs": [
             "System Program"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -643,6 +675,14 @@
           "isSigner": false,
           "docs": [
             "System Program"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -788,6 +828,14 @@
           ]
         },
         {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -914,6 +962,14 @@
           "isSigner": false,
           "docs": [
             "System Program."
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -1048,6 +1104,14 @@
           ]
         },
         {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -1168,6 +1232,14 @@
           "isSigner": false,
           "docs": [
             "System Program"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -1316,6 +1388,14 @@
           ]
         },
         {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -1446,6 +1526,14 @@
           ]
         },
         {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -1568,6 +1656,14 @@
           ]
         },
         {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -1673,6 +1769,14 @@
           "isSigner": false,
           "docs": [
             "SPL Token program"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {

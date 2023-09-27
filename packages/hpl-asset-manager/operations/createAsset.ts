@@ -9,7 +9,12 @@ import {
   TransactionBuilder,
 } from "@metaplex-foundation/js";
 import { getAssetPda, getMetadataAccount_, METADATA_PROGRAM_ID } from "../pdas";
-import { Honeycomb, Operation, VAULT } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  Operation,
+  VAULT,
+  HPL_HIVE_CONTROL_PROGRAM,
+} from "@honeycomb-protocol/hive-control";
 
 type CreateCreateAssetCtx = {
   args: CreateAssetArgsChain;

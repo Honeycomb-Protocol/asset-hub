@@ -1,5 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import {
+  HPL_HIVE_CONTROL_PROGRAM,
   Honeycomb,
   HoneycombProject,
   Operation,
@@ -110,6 +111,7 @@ export async function createCreateCurrencyOperation(
                 : args.args.freezeAuthority,
             payer: honeycomb.identity().address,
             vault: VAULT,
+            hiveControl: HPL_HIVE_CONTROL_PROGRAM,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
@@ -127,6 +129,7 @@ export async function createCreateCurrencyOperation(
             authority: honeycomb.identity().address,
             payer: honeycomb.identity().address,
             vault: VAULT,
+            hiveControl: HPL_HIVE_CONTROL_PROGRAM,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             tokenMetadataProgram: METADATA_PROGRAM_ID,
             hplEvents: HPL_EVENTS_PROGRAM,

@@ -116,6 +116,9 @@ pub struct CreateAsset<'info> {
     /// The system program.
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
@@ -236,6 +239,9 @@ pub struct MintAsset<'info> {
 
     /// The system program.
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]

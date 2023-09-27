@@ -32,6 +32,7 @@ export const fixHolderAccountStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
+ * @property [] hiveControl
  * @property [] associatedTokenProgram
  * @property [] instructionsSysvar
  * @category Instructions
@@ -49,6 +50,7 @@ export type FixHolderAccountInstructionAccounts = {
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
   associatedTokenProgram: web3.PublicKey
   instructionsSysvar: web3.PublicKey
@@ -122,6 +124,11 @@ export function createFixHolderAccountInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.hiveControl,
       isWritable: false,
       isSigner: false,
     },

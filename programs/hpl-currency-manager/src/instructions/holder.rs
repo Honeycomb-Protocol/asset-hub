@@ -6,7 +6,7 @@ use {
         token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
     },
     hpl_events::HplEvents,
-    hpl_hive_control::state::Project,
+    hpl_hive_control::{program::HplHiveControl, state::Project},
     hpl_utils::traits::Default,
 };
 
@@ -61,6 +61,9 @@ pub struct CreateHolderAccount<'info> {
 
     /// System Program
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL Token program
     pub token_program: Program<'info, Token>,
@@ -151,6 +154,9 @@ pub struct WrapHolderAccount<'info> {
     /// System Program
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// SPL Token program
     pub token_program: Program<'info, Token>,
 
@@ -238,6 +244,9 @@ pub struct FixHolderAccount<'info> {
 
     /// System Program
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL Token program
     pub token_program: Program<'info, Token>,
@@ -334,6 +343,9 @@ pub struct BurnCurrency<'info> {
 
     /// System Program
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL Token program
     pub token_program: Program<'info, Token>,
@@ -447,6 +459,9 @@ pub struct TransferCurrency<'info> {
     /// System Program
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// SPL Token program
     pub token_program: Program<'info, Token>,
 
@@ -551,6 +566,9 @@ pub struct ApproveDelegate<'info> {
     /// System Program
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// SPL Token program
     pub token_program: Program<'info, Token>,
 
@@ -645,6 +663,9 @@ pub struct RevokeDelegate<'info> {
     /// System Program
     pub system_program: Program<'info, System>,
 
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
+
     /// SPL Token program
     pub token_program: Program<'info, Token>,
 
@@ -703,6 +724,9 @@ pub struct SetHolderStatus<'info> {
 
     /// SPL Token program
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// HPL Events Program
     pub hpl_events: Program<'info, HplEvents>,

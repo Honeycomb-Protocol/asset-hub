@@ -47,6 +47,7 @@ export const updateCurrencyStruct = new beet.FixableBeetArgsStruct<
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
+ * @property [] hiveControl
  * @property [] tokenMetadataProgram
  * @property [] hplEvents
  * @property [] instructionsSysvar
@@ -65,6 +66,7 @@ export type UpdateCurrencyInstructionAccounts = {
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
   hplEvents: web3.PublicKey
   instructionsSysvar: web3.PublicKey
@@ -147,6 +149,11 @@ export function createUpdateCurrencyInstruction(
   })
   keys.push({
     pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControl,
     isWritable: false,
     isSigner: false,
   })

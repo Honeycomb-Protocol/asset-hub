@@ -13,7 +13,10 @@ use {
         associated_token::AssociatedToken,
         token::{self, Burn, CloseAccount, Mint, Token, TokenAccount},
     },
-    hpl_hive_control::state::{DelegateAuthority, Project},
+    hpl_hive_control::{
+        program::HplHiveControl,
+        state::{DelegateAuthority, Project},
+    },
     hpl_utils::{self, reallocate, BpfWriter},
     mpl_token_metadata::{
         self,
@@ -28,6 +31,10 @@ use {
 /// Accounts used in the create nft instruction
 #[derive(Accounts)]
 pub struct CreateNFT<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account(mut, has_one = project)]
     pub assembler: Box<Account<'info, Assembler>>,
@@ -78,16 +85,26 @@ pub struct CreateNFT<'info> {
     )]
     pub nft: Account<'info, NFT>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that holds the pre mint authority over this NFT
     /// CHECK: This is not dangerous because we don't read or write from this account
-    pub authority: AccountInfo<'info>,
+    pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent_sysvar
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
@@ -98,21 +115,12 @@ pub struct CreateNFT<'info> {
     pub token_metadata_program: AccountInfo<'info>,
 
     /// SYSVAR RENT
-    pub rent: Sysvar<'info, Rent>,
+    pub rent_sysvar: Sysvar<'info, Rent>,
 
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
 }
 
 /// Create a new nft
@@ -210,6 +218,10 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
 /// Accounts used in the add block instruction
 #[derive(Accounts)]
 pub struct AddBlock<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account(has_one = project)]
     pub assembler: Box<Account<'info, Assembler>>,
@@ -269,16 +281,26 @@ pub struct AddBlock<'info> {
     #[account(mut)]
     pub deposit_token_record: Option<AccountInfo<'info>>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent_sysvar
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     pub token_program: Program<'info, Token>,
@@ -290,22 +312,13 @@ pub struct AddBlock<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: AccountInfo<'info>,
 
+    /// SYSVAR RENT
+    pub rent_sysvar: Sysvar<'info, Rent>,
+
     /// NATIVE Instructions SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
-
-    /// SYSVAR RENT
-    pub rent: Sysvar<'info, Rent>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
 }
 
 /// Create a new nft
@@ -484,7 +497,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
         isize::try_from(NFTAttribute::LEN).unwrap(),
         nft.to_account_info(),
         ctx.accounts.payer.to_account_info(),
-        &ctx.accounts.rent,
+        &ctx.accounts.rent_sysvar,
         &ctx.accounts.system_program,
     )?;
 
@@ -496,6 +509,10 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
 /// Accounts used in the mint nft instruction
 #[derive(Accounts)]
 pub struct MintNFT<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account(has_one = project)]
     pub assembler: Box<Account<'info, Assembler>>,
@@ -532,16 +549,26 @@ pub struct MintNFT<'info> {
     #[account(mut)]
     pub unique_constraint: Option<AccountInfo<'info>>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent_sysvar
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
@@ -560,16 +587,7 @@ pub struct MintNFT<'info> {
     pub token_metadata_program: AccountInfo<'info>,
 
     /// SYSVAR RENT
-    pub rent: Sysvar<'info, Rent>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
+    pub rent_sysvar: Sysvar<'info, Rent>,
 }
 
 /// Create a new nft
@@ -631,7 +649,9 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
                     },
                     signers,
                 ),
-                ctx.accounts.rent.minimum_balance(NFTUniqueConstraint::LEN),
+                ctx.accounts
+                    .rent_sysvar
+                    .minimum_balance(NFTUniqueConstraint::LEN),
                 NFTUniqueConstraint::LEN as u64,
                 ctx.program_id,
             )?;
@@ -675,7 +695,7 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.instructions_sysvar.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.rent.to_account_info(),
+        ctx.accounts.rent_sysvar.to_account_info(),
         None,
         None,
         Some(assembler_signer),
@@ -689,6 +709,10 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
 /// Accounts used in the burn nft instruction
 #[derive(Accounts)]
 pub struct BurnNFT<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account(has_one = project)]
     pub assembler: Box<Account<'info, Assembler>>,
@@ -719,14 +743,24 @@ pub struct BurnNFT<'info> {
     #[account(mut, has_one = nft, close = authority)]
     pub unique_constraint: Option<Account<'info, NFTUniqueConstraint>>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that holds the pre mint authority over this NFT
     pub authority: Signer<'info>,
 
     /// Payer account
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
@@ -740,15 +774,6 @@ pub struct BurnNFT<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
 }
 
 /// Burn a nft
@@ -821,6 +846,10 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
 /// Accounts used in the remove block instruction
 #[derive(Accounts)]
 pub struct RemoveBlock<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account(has_one = project)]
     pub assembler: Box<Account<'info, Assembler>>,
@@ -873,16 +902,26 @@ pub struct RemoveBlock<'info> {
     #[account(mut)]
     pub deposit_token_record: Option<AccountInfo<'info>>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that has pre mint authority over this NFT
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent
+    /// The wallet that pays for the rent_sysvar
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     pub token_program: Program<'info, Token>,
@@ -900,16 +939,7 @@ pub struct RemoveBlock<'info> {
     pub instructions_sysvar: AccountInfo<'info>,
 
     /// RENT PROGRAM
-    pub rent: Sysvar<'info, Rent>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
+    pub rent_sysvar: Sysvar<'info, Rent>,
 }
 
 /// Create a new nft
@@ -1059,7 +1089,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
             isize::try_from(NFTAttribute::LEN).unwrap() * -1,
             nft.to_account_info(),
             ctx.accounts.authority.to_account_info(),
-            &ctx.accounts.rent,
+            &ctx.accounts.rent_sysvar,
             &ctx.accounts.system_program,
         )?;
 
@@ -1074,6 +1104,10 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
 /// Accounts used in set nft generated instruction
 #[derive(Accounts)]
 pub struct SetNFTGenerated<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account(has_one = project)]
     pub assembler: Account<'info, Assembler>,
@@ -1103,14 +1137,24 @@ pub struct SetNFTGenerated<'info> {
     #[account(mut)]
     pub nft_master_edition: AccountInfo<'info>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that holds the authority to execute this instruction
     pub authority: Signer<'info>,
 
     /// The payer account
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
@@ -1120,15 +1164,6 @@ pub struct SetNFTGenerated<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -1193,6 +1228,10 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
 /// Accounts used in update metadata
 #[derive(Accounts)]
 pub struct UpdateMetadata<'info> {
+    // HIVE CONTROL
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
     /// Assembler state account
     #[account(has_one = project)]
     pub assembler: Box<Account<'info, Assembler>>,
@@ -1215,14 +1254,24 @@ pub struct UpdateMetadata<'info> {
     #[account(mut)]
     pub nft_master_edition: AccountInfo<'info>,
 
+    #[account(has_one = authority)]
+    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
+
     /// The wallet that holds the authority to execute this instruction
     pub authority: Signer<'info>,
 
     /// The payer account
     pub payer: Signer<'info>,
 
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(mut)]
+    pub vault: AccountInfo<'info>,
+
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
+
+    /// HIVE CONTROL PROGRAM
+    pub hive_control: Program<'info, HplHiveControl>,
 
     /// SPL TOKEN PROGRAM
     #[account(address = token::ID)]
@@ -1232,15 +1281,6 @@ pub struct UpdateMetadata<'info> {
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = solana_program::sysvar::instructions::ID)]
     pub instructions_sysvar: AccountInfo<'info>,
-
-    // HIVE CONTROL
-    #[account()]
-    pub project: Box<Account<'info, Project>>,
-    #[account(has_one = authority)]
-    pub delegate_authority: Option<Account<'info, DelegateAuthority>>,
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
