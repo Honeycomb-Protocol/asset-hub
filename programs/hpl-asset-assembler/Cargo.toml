@@ -2,7 +2,7 @@
 name = "hpl-asset-assembler"
 description = "Honeycomb protocol library assembler program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.67"
+version = "0.0.68"
 edition = "2021"
 license = "MIT"
 

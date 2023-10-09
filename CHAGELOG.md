@@ -1,5 +1,9 @@
 # 0.0.x
 
+## 0.0.68
+
+- Implemented `hpl_macros` for cpis
+
 ## 0.0.67
 
 - Compatibility with latest hpl-hive-control

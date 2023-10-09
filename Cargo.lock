@@ -832,7 +832,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -848,7 +848,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -876,13 +876,14 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
  "hpl-events",
  "hpl-hive-control",
+ "hpl-macros",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
@@ -904,9 +905,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.1.75"
+version = "0.1.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1da1af34c76d909f578b925ef31d9ff3677c7c9884c2a9715b3b5d3cf29d40a2"
+checksum = "6d4c9f69b7b883019429cd75749f3e98cc9b0fd0a52548d9d0e95587445b82ce"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -919,6 +920,40 @@ dependencies = [
  "spl-account-compression",
  "toml_datetime",
  "winnow",
+]
+
+[[package]]
+name = "hpl-macro-add-service"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "871935cd97593c022e144853ba989a9efab33f7752744c43ea42c1ec8c56aeb2"
+dependencies = [
+ "convert_case",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.28",
+]
+
+[[package]]
+name = "hpl-macro-platform-gate"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "909ff3c2ff55849e4a0f5f137aeb4da0ed10e28d34aae0048496b2edff3485d0"
+dependencies = [
+ "convert_case",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.28",
+]
+
+[[package]]
+name = "hpl-macros"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c6711149f771cae31959af1ce6ef86bde0c4e6625f9528f662fd3825edb33c3"
+dependencies = [
+ "hpl-macro-add-service",
+ "hpl-macro-platform-gate",
 ]
 
 [[package]]
