@@ -86,7 +86,7 @@ pub struct CreateAssembler<'info> {
     pub clock_sysvar: Sysvar<'info, Clock>,
 
     /// SYSVAR RENT
-    pub rent: Sysvar<'info, Rent>,
+    pub rent_sysvar: Sysvar<'info, Rent>,
 
     /// NATIVE INSTRUCTIONS SYSVAR
     /// CHECK: This is not dangerous because we don't read or write from this account

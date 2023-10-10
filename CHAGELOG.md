@@ -1,5 +1,9 @@
 # 0.0.x
 
+## 0.0.69
+
+- Implemented `hpl_macros` in assembler programs
+
 ## 0.0.68
 
 - Implemented `hpl_macros` for cpis

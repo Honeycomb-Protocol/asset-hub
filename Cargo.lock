@@ -832,13 +832,14 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.68"
+version = "0.0.69"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
  "hpl-events",
  "hpl-hive-control",
+ "hpl-macros",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
@@ -848,13 +849,14 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.68"
+version = "0.0.69"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "getrandom 0.2.9",
  "hpl-events",
  "hpl-hive-control",
+ "hpl-macros",
  "hpl-utils",
  "mpl-token-metadata",
  "solana-program",
@@ -876,7 +878,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.68"
+version = "0.0.69"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
