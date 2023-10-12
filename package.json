@@ -1,21 +1,14 @@
 {
-  "name": "honeycomb",
-  "version": "1.0.0",
-  "private": false,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "bin": {
-    "honeycomb": "./dist/bin/index.ts"
+  "name": "@honeycomb-protocol/asset-hub",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "prepare": "husky install",
-    "postinstall": "node scripts/postinstall.js",
-    "precommit": "node ./scripts/precommit.js && git add programs/**/Cargo.toml && git add Cargo.lock",
-    "prepush": "echo LFG",
+    "rollout": "node ./scripts/rollout.js",
     "publishall": "node ./scripts/publishall.js",
-    "compile": "tsc",
     "build:program": "anchor build",
-    "build:sdk": "yarn solita && yarn compile",
+    "build:sdk": "yarn solita && tsc",
     "build": "yarn build:program && yarn build:sdk",
     "deploy": "anchor deploy",
     "test": "jest --verbose",
@@ -41,7 +34,6 @@
     "@types/yargs": "^17.0.20",
     "copyfiles": "^2.4.1",
     "dotenv": "^16.0.3",
-    "husky": "^8.0.3",
     "jest": "^29.5.0",
     "prettier": "^2.6.2",
     "ts-jest": "^29.1.0",
