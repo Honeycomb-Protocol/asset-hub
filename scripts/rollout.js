@@ -5,7 +5,7 @@ const path = require("path");
 // write the version in cargo.toml of all programs
 const packages = fs.readdirSync("packages");
 packages.forEach((package) => {
-  if (package === "idl") return;
+  if (package === "idl" || package === ".DS_Store") return;
 
   const packageJsonPath = path.join(
     __dirname,
