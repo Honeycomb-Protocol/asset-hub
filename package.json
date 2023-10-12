@@ -1,13 +1,11 @@
 {
-  "name": "honeycomb",
-  "version": "1.0.0",
-  "private": false,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "bin": {
-    "honeycomb": "./dist/bin/index.ts"
+  "name": "@honeycomb-protocol/asset-hub",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
+    "rollout": "node ./scripts/rollout.js",
     "publishall": "node ./scripts/publishall.js",
     "build:program": "anchor build",
     "build:sdk": "yarn solita && tsc",
