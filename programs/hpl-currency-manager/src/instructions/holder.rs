@@ -695,7 +695,7 @@ pub fn revoke_delegate(ctx: Context<RevokeDelegate>) -> Result<()> {
 #[derive(Accounts)]
 pub struct SetHolderStatus<'info> {
     /// The project this currency is associated with.
-    #[account(mut, has_one = authority)]
+    #[account(mut)]
     pub project: Box<Account<'info, Project>>,
 
     /// Currency account
