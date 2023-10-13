@@ -15,15 +15,14 @@
     "build-deploy": "yarn build && yarn deploy"
   },
   "dependencies": {
-    "@honeycomb-protocol/events": "^0.1.16",
-    "@honeycomb-protocol/hive-control": "^0.1.73",
-    "@metaplex-foundation/js": "^0.18.1",
+    "@honeycomb-protocol/events": "^0.1.21",
+    "@honeycomb-protocol/hive-control": "^0.1.80",
+    "@metaplex-foundation/js": "^0.19.5",
     "@metaplex-foundation/mpl-candy-guard": "^0.5.0",
-    "@metaplex-foundation/mpl-token-metadata": "^2.8.3",
-    "@project-serum/anchor": "^0.26.0",
+    "@metaplex-foundation/mpl-token-metadata": "2.8.3",
     "@solana/spl-account-compression": "^0.1.10",
     "@solana/spl-token": "^0.3.8",
-    "@solana/web3.js": "^1.78.4",
+    "@solana/web3.js": "^1.87.1",
     "yargs": "^17.6.2"
   },
   "devDependencies": {
@@ -32,7 +31,6 @@
     "@types/debug": "^4.1.7",
     "@types/jest": "^29.5.1",
     "@types/yargs": "^17.0.20",
-    "copyfiles": "^2.4.1",
     "dotenv": "^16.0.3",
     "jest": "^29.5.0",
     "prettier": "^2.6.2",

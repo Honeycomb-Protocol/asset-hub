@@ -3,12 +3,12 @@
   "version": "0.0.70",
   "private": false,
   "dependencies": {
-    "@metaplex-foundation/js": "^0.18.1"
+    "@metaplex-foundation/js": "^0.19.5"
   },
   "peerDependencies": {
     "@solana/spl-token": "^0.3.8",
-    "@solana/web3.js": "^1.78.0",
-    "@honeycomb-protocol/hive-control": "^0.1.71",
-    "@honeycomb-protocol/events": "^0.1.17"
+    "@solana/web3.js": "^1.87.1",
+    "@honeycomb-protocol/hive-control": "^0.1.80",
+    "@honeycomb-protocol/events": "^0.1.21"
   }
 }
