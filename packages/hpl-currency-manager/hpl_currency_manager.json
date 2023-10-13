@@ -1,5 +1,5 @@
 {
-  "version": "0.0.71",
+  "version": "0.0.72",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
