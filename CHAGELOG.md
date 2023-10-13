@@ -1,5 +1,10 @@
 # 0.0.x
 
+## 0.0.70
+
+- Fixed compiler issues
+- Fetch HPL Currency using name
+
 ## 0.0.69
 
 - Implemented `hpl_macros` in assembler programs
