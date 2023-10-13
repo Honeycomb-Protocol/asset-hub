@@ -240,11 +240,15 @@ export class HplCurrency extends Module {
     }
     honeycomb._currencies[this.address.toString()] = this;
 
-    honeycomb.currency = (key?: string | web3.PublicKey) => {
-      if (key) {
-        return honeycomb._currencies[
-          key instanceof web3.PublicKey ? key.toString() : key
-        ];
+    honeycomb.currency = (nameOrKey?: string | web3.PublicKey) => {
+      if (nameOrKey) {
+        if (typeof nameOrKey === "string") {
+          return Object.values(honeycomb._currencies).find(
+            (c) => c.name === nameOrKey
+          );
+        } else {
+          return honeycomb._currencies[nameOrKey.toString()];
+        }
       } else {
         return this;
       }
