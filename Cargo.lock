@@ -832,7 +832,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.69"
+version = "0.0.70"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
