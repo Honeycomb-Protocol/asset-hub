@@ -849,7 +849,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.72"
+version = "0.0.73"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
