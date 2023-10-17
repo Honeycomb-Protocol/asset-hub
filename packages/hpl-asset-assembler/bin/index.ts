@@ -4,6 +4,7 @@ import { readConfigFile, saveConfigFile } from "../node-utils";
 import fs from "fs/promises";
 import path from "path";
 import yargs from "yargs";
+import * as web3 from "@solana/web3.js";
 import { hideBin } from "yargs/helpers";
 import { setupAssembler, uploadFiles } from "../operations";
 import { Block, BlockDefinition } from "../generated";
@@ -13,7 +14,6 @@ import {
   Metaplex,
   toMetaplexFile,
 } from "@metaplex-foundation/js";
-import { web3 } from "@project-serum/anchor";
 import { AssemblerConfig } from "../types";
 
 yargs(hideBin(process.argv))
