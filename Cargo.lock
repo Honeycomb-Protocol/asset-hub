@@ -907,9 +907,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.1.82"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f5622be5699a530095e170b2ca45d84555a66d0752385af5477cee21e1595be"
+checksum = "f9a149ad0141d9ea5b88569fb16d6a81653512e956d8cad6133e66598e0cc3ba"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

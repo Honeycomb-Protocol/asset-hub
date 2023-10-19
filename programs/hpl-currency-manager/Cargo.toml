@@ -26,6 +26,6 @@ winnow = "=0.4.1"
 toml_datetime = "=0.6.1"
 hpl-utils = "0.1.4"
 hpl-events = { version = "0.1.21", features = ["no-entrypoint"] }
+hpl-hive-control = { version = "0.2.0", features = ["cpi"] }
 mpl-token-metadata = { version = "1.9.0", features = ["no-entrypoint"] }
-hpl-hive-control = { version = "0.1.82", features = ["cpi"] }
 hpl-macros = { version = "0.0.2" }

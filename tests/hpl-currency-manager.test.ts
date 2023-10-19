@@ -29,10 +29,7 @@ describe("Currency Manager", () => {
     expect(adminHC.project().name).toBe("Project");
 
     userHC.use(
-      await HoneycombProject.fromAddress(
-        userHC.connection,
-        adminHC.project().address
-      )
+      await HoneycombProject.fromAddress(userHC, adminHC.project().address)
     );
   });
 
