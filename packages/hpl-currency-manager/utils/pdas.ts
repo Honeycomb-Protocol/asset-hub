@@ -9,7 +9,7 @@ import {
   PROGRAM_ID,
   PermissionedCurrencyKind,
 } from "../generated";
-import { PdaClient } from "@honeycomb-protocol/hive-control";
+import { PdaModule } from "@honeycomb-protocol/hive-control";
 
 /**
  * Represents the different types of metadata PDAs.
@@ -60,7 +60,7 @@ export const metadataPda = (
     }
   }
 
-  return PdaClient.findProgramAddressSyncWithSeeds(seeds, programId);
+  return PdaModule.findProgramAddressSyncWithSeeds(seeds, programId);
 };
 
 /**
@@ -71,7 +71,7 @@ export const metadataPda = (
  * @returns The generated PDA address for the currency program.
  */
 export const currencyPda = (mint: PublicKey, programId = PROGRAM_ID) =>
-  PdaClient.findProgramAddressSyncWithSeeds(
+  PdaModule.findProgramAddressSyncWithSeeds(
     [Buffer.from("currency"), mint.toBuffer()],
     programId
   );
@@ -89,7 +89,7 @@ export const holderAccountPda = (
   mint: PublicKey,
   programId = PROGRAM_ID
 ) =>
-  PdaClient.findProgramAddressSyncWithSeeds(
+  PdaModule.findProgramAddressSyncWithSeeds(
     [Buffer.from("holder_account"), owner.toBuffer(), mint.toBuffer()],
     programId
   );
@@ -109,7 +109,7 @@ export const tokenAccountPda = (
   tokenProgram = TOKEN_PROGRAM_ID,
   programId = ASSOCIATED_TOKEN_PROGRAM_ID
 ) =>
-  PdaClient.findProgramAddressSyncWithSeeds(
+  PdaModule.findProgramAddressSyncWithSeeds(
     [
       owner.toBuffer(),
       mint.toBuffer(),
