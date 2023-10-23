@@ -7,7 +7,6 @@ import {
 } from "@honeycomb-protocol/hive-control";
 import { createTransferCurrencyInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
-import { holderAccountPdas } from "../utils";
 import { createCreateHolderAccountOperation } from "./createHolderAccount";
 
 /**
@@ -58,12 +57,15 @@ export async function createTransferCurrencyOperation(
 
   // If the receiver is a public key, fetch the holder account and token account PDAs.
   if (args.receiver instanceof web3.PublicKey) {
-    const accounts = holderAccountPdas(
-      args.receiver,
-      args.holderAccount.currency().mint.address,
-      args.holderAccount.currency().kind,
-      programId
-    );
+    const accounts = honeycomb
+      .pda()
+      .currencyManager()
+      .holderAccountWithTokenAccount(
+        args.receiver,
+        args.holderAccount.currency().mint.address,
+        args.holderAccount.currency().kind,
+        programId
+      );
     receiverHolderAccount = accounts.holderAccount;
     receiverTokenAccount = accounts.tokenAccount;
 

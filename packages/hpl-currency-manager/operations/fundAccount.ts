@@ -1,7 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { createFundAccountInstruction, PROGRAM_ID } from "../generated";
-import { holderAccountPdas } from "../utils";
 import {
   Honeycomb,
   Operation,
@@ -58,12 +57,15 @@ export async function createFundAccountOperation(
   );
 
   // Get the holder account and token account PDAs for the specified receiver wallet and currency.
-  const { holderAccount, tokenAccount } = holderAccountPdas(
-    args.receiverWallet,
-    args.currency.mint.address,
-    args.currency.kind,
-    programId
-  );
+  const { holderAccount, tokenAccount } = honeycomb
+    .pda()
+    .currencyManager()
+    .holderAccountWithTokenAccount(
+      args.receiverWallet,
+      args.currency.mint.address,
+      args.currency.kind,
+      programId
+    );
 
   // Create the instruction for the "Fund Account" operation.
   const instructions = [

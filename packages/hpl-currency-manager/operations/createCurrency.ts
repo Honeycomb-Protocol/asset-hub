@@ -12,7 +12,7 @@ import {
   createWrapCurrencyInstruction,
   PROGRAM_ID,
 } from "../generated";
-import { METADATA_PROGRAM_ID, currencyPda, metadataPda } from "../utils";
+import { METADATA_PROGRAM_ID, metadataPda } from "../utils";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**
@@ -83,9 +83,10 @@ export async function createCreateCurrencyOperation(
       : web3.Keypair.generate();
 
   // Find the currency and metadata PDAs based on whether mint public key is provided or not.
-  const [currency] = currencyPda(
-    "mint" in args.args ? args.args.mint : mint.publicKey
-  );
+  const [currency] = honeycomb
+    .pda()
+    .currencyManager()
+    .currency("mint" in args.args ? args.args.mint : mint.publicKey);
   const [metadata] = metadataPda(
     "mint" in args.args ? args.args.mint : mint.publicKey
   );

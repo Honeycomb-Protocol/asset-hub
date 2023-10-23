@@ -14,7 +14,7 @@ import {
   PROGRAM_ID,
   UpdateCurrencyArgs,
 } from "./generated";
-import { holderAccountPda, metadataPda } from "./utils";
+import { currencyManagerPdas, metadataPda } from "./utils";
 import {
   createApproveDelegateOperation,
   createBurnCurrencyOperation,
@@ -237,6 +237,7 @@ export class HplCurrency extends Module {
   public install(honeycomb: Honeycomb): Honeycomb {
     if (!honeycomb._currencies) {
       honeycomb._currencies = {};
+      honeycomb.pda().register(currencyManagerPdas());
     }
     honeycomb._currencies[this.address.toString()] = this;
 
@@ -275,7 +276,11 @@ export class HplCurrencyFetch {
     owner: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
   ) {
-    const [address] = holderAccountPda(owner, this.currency.mint.address);
+    const [address] = this.currency
+      .honeycomb()
+      .pda()
+      .currencyManager()
+      .holderAccount(owner, this.currency.mint.address);
     const holderAccount = await HolderAccount.fromAccountAddress(
       this.currency.honeycomb().connection,
       address,

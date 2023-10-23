@@ -10,7 +10,6 @@ import {
   createWrapHolderAccountInstruction,
   PROGRAM_ID,
 } from "../generated";
-import { holderAccountPdas } from "../utils";
 import { ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
@@ -56,12 +55,15 @@ export async function createCreateHolderAccountOperation(
   const programId = args.programId || PROGRAM_ID;
 
   // Get the holder account and token account PDAs for the specified owner and currency.
-  const { holderAccount, tokenAccount } = holderAccountPdas(
-    args.owner,
-    args.currency.mint.address,
-    args.currency.kind,
-    programId
-  );
+  const { holderAccount, tokenAccount } = honeycomb
+    .pda()
+    .currencyManager()
+    .holderAccountWithTokenAccount(
+      args.owner,
+      args.currency.mint.address,
+      args.currency.kind,
+      programId
+    );
 
   const wrap = args.currency.kind.__kind === "Wrapped";
   const needed = {
