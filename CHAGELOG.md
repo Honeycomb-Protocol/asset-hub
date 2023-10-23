@@ -1,5 +1,10 @@
 # 0.0.x
 
+## 0.0.75
+
+- Updates to latest hpl-hive-control
+- Utilizes latest PDA Module
+
 ## 0.0.72 - 0.0.74
 
 - Fix: version mismatch

@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import { PROGRAM_ID } from "./generated";
-import { PdaClient } from "@honeycomb-protocol/hive-control";
+import { PdaModule } from "@honeycomb-protocol/hive-control";
 type MetadataPDaType =
   | { __kind: "edition" }
   | { __kind: "token_record"; tokenAccount: web3.PublicKey }
@@ -35,7 +35,7 @@ export const getMetadataAccount_ = (
     }
   }
 
-  return PdaClient.findProgramAddressSyncWithSeeds(seeds, programId);
+  return PdaModule.findProgramAddressSyncWithSeeds(seeds, programId);
 };
 
 export const getAssetManagerPda = (
@@ -43,7 +43,7 @@ export const getAssetManagerPda = (
   service_index: number,
   programId = PROGRAM_ID
 ) => {
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [
       Buffer.from("asset_manager"),
       project.toBuffer(),
@@ -55,7 +55,7 @@ export const getAssetManagerPda = (
 };
 
 export const getAssetPda = (mint: web3.PublicKey, programId = PROGRAM_ID) => {
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [Buffer.from("asset"), mint.toBuffer()],
     programId
   );

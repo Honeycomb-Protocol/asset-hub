@@ -1,6 +1,6 @@
 {
   "name": "@honeycomb-protocol/currency-manager",
-  "version": "0.0.74",
+  "version": "0.0.75",
   "private": false,
   "dependencies": {
     "@metaplex-foundation/mpl-token-metadata": "2.8.3"
@@ -9,6 +9,6 @@
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.87.1",
     "@honeycomb-protocol/events": "^0.1.21",
-    "@honeycomb-protocol/hive-control": "^0.2.0"
+    "@honeycomb-protocol/hive-control": "^0.2.2"
   }
 }

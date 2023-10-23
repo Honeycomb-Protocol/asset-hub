@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import { PROGRAM_ID as ASSEMBLER_PROGRAM_ID } from "./generated";
-import { PdaClient } from "@honeycomb-protocol/hive-control";
+import { PdaModule } from "@honeycomb-protocol/hive-control";
 type MetadataPDaType =
   | { __kind: "edition" }
   | { __kind: "token_record"; tokenAccount: web3.PublicKey }
@@ -35,7 +35,7 @@ export const getMetadataAccount_ = (
     }
   }
 
-  return PdaClient.findProgramAddressSyncWithSeeds(seeds, programId);
+  return PdaModule.findProgramAddressSyncWithSeeds(seeds, programId);
 };
 
 // Assembler
@@ -43,7 +43,7 @@ export const getAssemblerPda = (
   collectionMint: web3.PublicKey,
   programId = ASSEMBLER_PROGRAM_ID
 ) => {
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [Buffer.from("assembler"), collectionMint.toBuffer()],
     programId
   );
@@ -53,7 +53,7 @@ export const getNftPda = (
   mint: web3.PublicKey,
   programId = ASSEMBLER_PROGRAM_ID
 ) => {
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [Buffer.from("nft"), mint.toBuffer()],
     programId
   );
@@ -64,7 +64,7 @@ export const getDepositPda = (
   nftMint: web3.PublicKey,
   programId = ASSEMBLER_PROGRAM_ID
 ) => {
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [Buffer.from("deposit"), tokenMint.toBuffer(), nftMint.toBuffer()],
     programId
   );
@@ -75,7 +75,7 @@ export const getBlockPda = (
   blockOrder: number,
   programId = ASSEMBLER_PROGRAM_ID
 ) => {
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [
       Buffer.from("block"),
       // Buffer.from(`${args.blockName}`),
@@ -92,7 +92,7 @@ export const getBlockDefinitionPda = (
   blockDefinitionMint: web3.PublicKey,
   programId = ASSEMBLER_PROGRAM_ID
 ) => {
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [
       Buffer.from("block_definition"),
       block.toBuffer(),
@@ -119,7 +119,7 @@ export function getUniqueConstraintPda(
       buffer.writeUint16BE(x.order, i * 4 + 2); // 2 bytes offset after each block
     });
 
-  return PdaClient.findProgramAddressSyncWithSeeds(
+  return PdaModule.findProgramAddressSyncWithSeeds(
     [buffer, assembler.toBuffer()],
     programId
   );
