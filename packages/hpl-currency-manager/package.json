@@ -1,6 +1,6 @@
 {
   "name": "@honeycomb-protocol/currency-manager",
-  "version": "0.0.74",
+  "version": "0.0.75",
   "private": false,
   "dependencies": {
     "@metaplex-foundation/mpl-token-metadata": "2.8.3"
