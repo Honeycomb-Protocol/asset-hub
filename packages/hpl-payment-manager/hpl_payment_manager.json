@@ -1,0 +1,1132 @@
+{
+  "version": "0.0.0",
+  "name": "hpl_payment_manager",
+  "instructions": [
+    {
+      "name": "createPaymentStructure",
+      "accounts": [
+        {
+          "name": "unique",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "paymentStructure",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payment structure account"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that has authority over this action"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payer wallet"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana System Program"
+          ]
+        },
+        {
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Events Program"
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana Clock Sysvar"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CreatePaymentStructureArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deletePaymentStructure",
+      "accounts": [
+        {
+          "name": "paymentStructure",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payment structure account"
+          ]
+        },
+        {
+          "name": "benificiary",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The wallet that receives SOL after account is closed"
+          ]
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "The wallet that has authority over this action"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana System Program"
+          ]
+        },
+        {
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Events Program"
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana Clock Sysvar"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "startPaymentSession",
+      "accounts": [
+        {
+          "name": "paymentStructure",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The payment structure account"
+          ]
+        },
+        {
+          "name": "paymentSession",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payment session account"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payer wallet"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana System Program"
+          ]
+        },
+        {
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Events Program"
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana Clock Sysvar"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "makeHplCurrencyPayment",
+      "accounts": [
+        {
+          "name": "paymentStructure",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The payment structure account"
+          ]
+        },
+        {
+          "name": "paymentSession",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payment session account"
+          ]
+        },
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The project this currency is associated with"
+          ]
+        },
+        {
+          "name": "currency",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The currency account"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The currency mint"
+          ]
+        },
+        {
+          "name": "holderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The payer's holder account"
+          ]
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payer's token account"
+          ]
+        },
+        {
+          "name": "beneficiary",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The wallet that receives the payment"
+          ]
+        },
+        {
+          "name": "beneficiaryHolderAccount",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The receiver's holder account"
+          ]
+        },
+        {
+          "name": "beneficiaryTokenAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The receiver's token account"
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "HPL Vault to collect honeycomb fees"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payer wallet"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana System Program"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Token Program"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Hive Control Program"
+          ]
+        },
+        {
+          "name": "hplCurrencyManager",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Currency Manager Program"
+          ]
+        },
+        {
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Events Program"
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana Clock Sysvar"
+          ]
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "MakePaymentArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeNftPayment",
+      "accounts": [
+        {
+          "name": "paymentStructure",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The payment structure account"
+          ]
+        },
+        {
+          "name": "paymentSession",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payment session account"
+          ]
+        },
+        {
+          "name": "nftMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account of the NFT"
+          ]
+        },
+        {
+          "name": "nftMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT token metadata"
+          ]
+        },
+        {
+          "name": "nftEdition",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "NFT edition"
+          ]
+        },
+        {
+          "name": "nftTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "NFT token record"
+          ]
+        },
+        {
+          "name": "depositAccount",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The account that will hold the nft sent on expedition"
+          ]
+        },
+        {
+          "name": "depositTokenRecord",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "Deposit token_record"
+          ]
+        },
+        {
+          "name": "beneficiary",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The wallet that receives the payment"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payer wallet"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana System Program"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Token Program"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Events Program"
+          ]
+        },
+        {
+          "name": "authorizationRulesProgram",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "authorizationRules",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana Clock Sysvar"
+          ]
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "MakePaymentArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "makeCnftPayment",
+      "accounts": [
+        {
+          "name": "paymentStructure",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The payment structure account"
+          ]
+        },
+        {
+          "name": "paymentSession",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payment session account"
+          ]
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "creatorHash",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dataHash",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "root",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "beneficiary",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true,
+          "docs": [
+            "The wallet that receives the payment"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payer wallet"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana System Program"
+          ]
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "MPL Bubblegum program for cNFTs"
+          ]
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Compression Program"
+          ]
+        },
+        {
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Events Program"
+          ]
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL NOOP Program"
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana Clock Sysvar"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "MakeCnftPaymentArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "closePaymentSession",
+      "accounts": [
+        {
+          "name": "paymentSession",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payment session account"
+          ]
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The payer wallet"
+          ]
+        },
+        {
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Events Program"
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Solana Clock Sysvar"
+          ]
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "PaymentSession",
+      "docs": [
+        "A Payment structure account defines a single or series of payments required to be made by a user.",
+        "PDA: ['payment_session', payment_structure, payer]",
+        "Category: payment_session_state"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "paymentStructure",
+            "docs": [
+              "The payment structure."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "payer",
+            "docs": [
+              "The payer of this payment structure."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "paymentsStatus",
+            "docs": [
+              "Payments conditional status"
+            ],
+            "type": {
+              "defined": "Conditionalbool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaymentStructure",
+      "docs": [
+        "A Payment structure account defines a single or series of payments required to be made by a user.",
+        "PDA: ['payment_structure', unique_key]",
+        "Category: payment_structure_state"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "uniqueKey",
+            "docs": [
+              "The unique identifier for this payment structure."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "docs": [
+              "The authority over this payment structure"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "payments",
+            "docs": [
+              "Requirements"
+            ],
+            "type": {
+              "defined": "ConditionalPayment"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "MakePaymentArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "path",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MakeCnftPaymentArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "path",
+            "type": "bytes"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "index",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreatePaymentStructureArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "payments",
+            "type": {
+              "defined": "ConditionalPayment"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Payment",
+      "docs": [
+        "The payment required to be accepted from user."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "paymentMethod",
+            "docs": [
+              "Indicates whether this payment should be bbur."
+            ],
+            "type": {
+              "defined": "PaymentMethod"
+            }
+          },
+          {
+            "name": "kind",
+            "docs": [
+              "The kind of payment method."
+            ],
+            "type": {
+              "defined": "PaymentKind"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaymentMethod",
+      "docs": [
+        "The payment method to be used for a specific payment."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Burn"
+          },
+          {
+            "name": "Transfer",
+            "fields": [
+              "publicKey"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PaymentKind",
+      "docs": [
+        "Represents the asset to be accepted as payment."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Nft",
+            "fields": [
+              {
+                "defined": "NftPayment"
+              }
+            ]
+          },
+          {
+            "name": "HplCurrency",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "NftPayment",
+      "docs": [
+        "Represents criteria for NFT payments."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Mint",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "Creator",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "Collection",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "Tree",
+            "fields": [
+              "publicKey"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Event",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NewPaymentStructure",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "state",
+                "type": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "DeletePaymentStructure",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "state",
+                "type": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "NewPaymentSession",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "state",
+                "type": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "MakePayment",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "state",
+                "type": "bytes"
+              }
+            ]
+          },
+          {
+            "name": "ClosePaymentSession",
+            "fields": [
+              {
+                "name": "address",
+                "type": "publicKey"
+              },
+              {
+                "name": "state",
+                "type": "bytes"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Conditionalbool",
+      "docs": [
+        "Represents payment information with support for nested conditions."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Item",
+            "fields": [
+              "bool"
+            ]
+          },
+          {
+            "name": "Or",
+            "fields": [
+              {
+                "vec": {
+                  "defined": "Conditionalbool"
+                }
+              }
+            ]
+          },
+          {
+            "name": "And",
+            "fields": [
+              {
+                "vec": {
+                  "defined": "Conditionalbool"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConditionalPayment",
+      "docs": [
+        "Represents payment information with support for nested conditions."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Item",
+            "fields": [
+              {
+                "defined": "Payment"
+              }
+            ]
+          },
+          {
+            "name": "Or",
+            "fields": [
+              {
+                "vec": {
+                  "defined": "ConditionalPayment"
+                }
+              }
+            ]
+          },
+          {
+            "name": "And",
+            "fields": [
+              {
+                "vec": {
+                  "defined": "ConditionalPayment"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Overflow",
+      "msg": "Opertaion overflowed"
+    },
+    {
+      "code": 6001,
+      "name": "ConditionValidationFailed",
+      "msg": "Condition validation failed"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidConditionalPath",
+      "msg": "Invalid Conditional path"
+    },
+    {
+      "code": 6003,
+      "name": "IncompletePayment",
+      "msg": "Incomplete Payment"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidPayment",
+      "msg": "Invalid payment kind"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidNftPayment",
+      "msg": "Invalid nft passed as payment"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMetadata",
+      "msg": "The metadata provided for nft is not valid"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidHplCurrencyPayment",
+      "msg": "Invalid hpl currency passes as payment"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidInstructionForCnft",
+      "msg": "Invalid instruction for cnft"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidBeneficiary",
+      "msg": "Invalid beneficiary"
+    },
+    {
+      "code": 6010,
+      "name": "PaymentAlreadyMade",
+      "msg": "Payment already made"
+    }
+  ],
+  "metadata": {
+    "address": "Pay9ZxrVRXjt9Da8qpwqq4yBRvvrfx3STWnKK4FstPr",
+    "origin": "anchor",
+    "binaryVersion": "0.26.0",
+    "libVersion": "0.26.0"
+  }
+}

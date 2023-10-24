@@ -27,5 +27,5 @@
   },
   "include": ["./packages", "packages/**/*.json"],
   "exclude": ["node_modules",
-    "dist", "build", "lib"]
+    "dist", "build", "lib", "packages/**/post-fix", "packages/hpl-asset-assembler", "packages/hpl-asset-manager"]
 }

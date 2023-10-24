@@ -41,24 +41,28 @@ export const updateAssemblerStruct = new beet.FixableBeetArgsStruct<
 /**
  * Accounts required by the _updateAssembler_ instruction
  *
+ * @property [] project
  * @property [_writable_] assembler
+ * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
  * @property [**signer**] payer
- * @property [] project
- * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
+ * @property [] hiveControl
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category UpdateAssembler
  * @category generated
  */
 export type UpdateAssemblerInstructionAccounts = {
+  project: web3.PublicKey
   assembler: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
-  systemProgram?: web3.PublicKey
-  project: web3.PublicKey
-  delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
+  systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -92,28 +96,13 @@ export function createUpdateAssemblerInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.assembler,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.authority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.project,
       isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.assembler,
+      isWritable: true,
       isSigner: false,
     },
   ]
@@ -126,8 +115,33 @@ export function createUpdateAssemblerInstruction(
     })
   }
   keys.push({
+    pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
     pubkey: accounts.vault,
     isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControl,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.instructionsSysvar,
+    isWritable: false,
     isSigner: false,
   })
 

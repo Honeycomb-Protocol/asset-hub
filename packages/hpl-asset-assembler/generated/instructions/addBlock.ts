@@ -23,6 +23,7 @@ export const addBlockStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _addBlock_ instruction
  *
+ * @property [] project
  * @property [] assembler
  * @property [_writable_] nft
  * @property [] block
@@ -34,19 +35,21 @@ export const addBlockStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] tokenRecord (optional)
  * @property [_writable_] depositAccount (optional)
  * @property [_writable_] depositTokenRecord (optional)
+ * @property [] delegateAuthority (optional)
  * @property [_writable_, **signer**] authority
  * @property [_writable_, **signer**] payer
+ * @property [_writable_] vault
+ * @property [] hiveControl
  * @property [] associatedTokenProgram
  * @property [] tokenMetadataProgram
+ * @property [] rentSysvar
  * @property [] instructionsSysvar
- * @property [] project
- * @property [] delegateAuthority (optional)
- * @property [_writable_] vault
  * @category Instructions
  * @category AddBlock
  * @category generated
  */
 export type AddBlockInstructionAccounts = {
+  project: web3.PublicKey
   assembler: web3.PublicKey
   nft: web3.PublicKey
   block: web3.PublicKey
@@ -58,17 +61,17 @@ export type AddBlockInstructionAccounts = {
   tokenRecord?: web3.PublicKey
   depositAccount?: web3.PublicKey
   depositTokenRecord?: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
   associatedTokenProgram: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
+  rentSysvar: web3.PublicKey
   instructionsSysvar: web3.PublicKey
-  rent?: web3.PublicKey
-  project: web3.PublicKey
-  delegateAuthority?: web3.PublicKey
-  vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -97,6 +100,11 @@ export function createAddBlockInstruction(
     instructionDiscriminator: addBlockInstructionDiscriminator,
   })
   const keys: web3.AccountMeta[] = [
+    {
+      pubkey: accounts.project,
+      isWritable: false,
+      isSigner: false,
+    },
     {
       pubkey: accounts.assembler,
       isWritable: false,
@@ -181,6 +189,23 @@ export function createAddBlockInstruction(
       isSigner: false,
     })
   }
+  if (accounts.delegateAuthority != null) {
+    if (
+      accounts.tokenEdition == null ||
+      accounts.tokenRecord == null ||
+      accounts.depositAccount == null ||
+      accounts.depositTokenRecord == null
+    ) {
+      throw new Error(
+        "When providing 'delegateAuthority' then 'accounts.tokenEdition', 'accounts.tokenRecord', 'accounts.depositAccount', 'accounts.depositTokenRecord' need(s) to be provided as well."
+      )
+    }
+    keys.push({
+      pubkey: accounts.delegateAuthority,
+      isWritable: false,
+      isSigner: false,
+    })
+  }
   keys.push({
     pubkey: accounts.authority,
     isWritable: true,
@@ -192,7 +217,17 @@ export function createAddBlockInstruction(
     isSigner: true,
   })
   keys.push({
+    pubkey: accounts.vault,
+    isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
     pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControl,
     isWritable: false,
     isSigner: false,
   })
@@ -212,40 +247,13 @@ export function createAddBlockInstruction(
     isSigner: false,
   })
   keys.push({
+    pubkey: accounts.rentSysvar,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
     pubkey: accounts.instructionsSysvar,
     isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.project,
-    isWritable: false,
-    isSigner: false,
-  })
-  if (accounts.delegateAuthority != null) {
-    if (
-      accounts.tokenEdition == null ||
-      accounts.tokenRecord == null ||
-      accounts.depositAccount == null ||
-      accounts.depositTokenRecord == null
-    ) {
-      throw new Error(
-        "When providing 'delegateAuthority' then 'accounts.tokenEdition', 'accounts.tokenRecord', 'accounts.depositAccount', 'accounts.depositTokenRecord' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.delegateAuthority,
-      isWritable: false,
-      isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.vault,
-    isWritable: true,
     isSigner: false,
   })
 

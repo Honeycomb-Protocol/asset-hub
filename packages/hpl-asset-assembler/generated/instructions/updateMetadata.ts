@@ -42,35 +42,37 @@ export const updateMetadataStruct = new beet.FixableBeetArgsStruct<
 /**
  * Accounts required by the _updateMetadata_ instruction
  *
+ * @property [] project
  * @property [] assembler
  * @property [] nft
  * @property [_writable_] nftMint
  * @property [_writable_] nftMetadata
  * @property [_writable_] nftMasterEdition
+ * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
  * @property [**signer**] payer
- * @property [] instructionsSysvar
- * @property [] project
- * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
+ * @property [] hiveControl
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category UpdateMetadata
  * @category generated
  */
 export type UpdateMetadataInstructionAccounts = {
+  project: web3.PublicKey
   assembler: web3.PublicKey
   nft: web3.PublicKey
   nftMint: web3.PublicKey
   nftMetadata: web3.PublicKey
   nftMasterEdition: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
   instructionsSysvar: web3.PublicKey
-  project: web3.PublicKey
-  delegateAuthority?: web3.PublicKey
-  vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -104,6 +106,11 @@ export function createUpdateMetadataInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.project,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.assembler,
       isWritable: false,
       isSigner: false,
@@ -128,36 +135,6 @@ export function createUpdateMetadataInstruction(
       isWritable: true,
       isSigner: false,
     },
-    {
-      pubkey: accounts.authority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.instructionsSysvar,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: false,
-      isSigner: false,
-    },
   ]
 
   if (accounts.delegateAuthority != null) {
@@ -168,8 +145,38 @@ export function createUpdateMetadataInstruction(
     })
   }
   keys.push({
+    pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
     pubkey: accounts.vault,
     isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControl,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.instructionsSysvar,
+    isWritable: false,
     isSigner: false,
   })
 
