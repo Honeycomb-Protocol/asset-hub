@@ -1,9 +1,14 @@
 import * as web3 from "@solana/web3.js";
-import { Honeycomb, Module } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  HoneycombProject,
+  Module,
+} from "@honeycomb-protocol/hive-control";
 import { paymentManagerPdas } from "./utils";
-import { PaymentStructure } from "./generated";
+import { ConditionalPayment, PROGRAM_ID, PaymentStructure } from "./generated";
 import { HplPaymentSession } from "./HplPaymentSession";
 import { HplConditionalPayments } from "./HplPayment";
+import { createCreatePaymentStructureOperation } from "./operations";
 
 // Extend the Honeycomb interface to include HplPaymentStructure related functions
 declare module "@honeycomb-protocol/hive-control" {
@@ -18,6 +23,7 @@ declare module "@honeycomb-protocol/hive-control" {
  * @category Modules
  */
 export class HplPaymentStructure extends Module {
+  readonly programId = PROGRAM_ID;
   private _payments: HplConditionalPayments;
   private _sessions: { [payer: string]: HplPaymentSession };
 
@@ -28,13 +34,41 @@ export class HplPaymentStructure extends Module {
 
   public static async fromAddress(
     honeycomb: Honeycomb,
-    address: web3.PublicKey
+    address: web3.PublicKey,
+    commitmentOrConfig:
+      | web3.Commitment
+      | web3.GetAccountInfoConfig = "processed"
   ) {
     const solita = await PaymentStructure.fromAccountAddress(
-      honeycomb.connection,
-      address
+      honeycomb.processedConnection,
+      address,
+      commitmentOrConfig
     );
     return new HplPaymentStructure(solita);
+  }
+
+  /**
+   * Creates a new HplPaymentStructure instance.
+   * @param honeycomb The Honeycomb instance.
+   * @param args The arguments for creating the currency.
+   * @param confirmOptions Optional confirm options for the transaction.
+   */
+  static async new(
+    honeycomb: Honeycomb,
+    payments: ConditionalPayment,
+    confirmOptions?: web3.ConfirmOptions
+  ) {
+    const { paymentStructure, operation } =
+      await createCreatePaymentStructureOperation(honeycomb, {
+        args: {
+          payments,
+        },
+        programId: PROGRAM_ID,
+      });
+
+    await operation.send(confirmOptions);
+
+    return await HplPaymentStructure.fromAddress(honeycomb, paymentStructure);
   }
 
   /**
@@ -122,3 +156,17 @@ export class HplPaymentStructure extends Module {
     return honeycomb;
   }
 }
+
+/**
+ * Factory function to create or fetch an HplPaymentStructure instance from the Honeycomb.
+ * @category Factory
+ * @param honeycomb The Honeycomb instance.
+ * @param args The arguments for creating the currency or the address of the existing currency.
+ */
+export const paymentStructure = (
+  honeycomb: Honeycomb,
+  args: web3.PublicKey | ConditionalPayment
+) =>
+  args instanceof web3.PublicKey
+    ? HplPaymentStructure.fromAddress(honeycomb, args)
+    : HplPaymentStructure.new(honeycomb, args);
