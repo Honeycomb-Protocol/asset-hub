@@ -1,8 +1,33 @@
 export class Conditional<T> {
-  protected _kind: "Item" | "Or" | "And";
-  protected _value: T | Conditional<T>[];
+  constructor(
+    protected _kind: "None" | "Item" | "Or" | "And" = "None",
+    protected _value: T | Conditional<T>[] = null,
+    protected _path: number[] = []
+  ) {}
 
-  constructor() {}
+  public get path() {
+    return this._path;
+  }
+
+  public get kind() {
+    return this._kind;
+  }
+
+  public get value() {
+    return this._value;
+  }
+
+  public pretty() {
+    return {
+      __kind: this.kind,
+      fields: [
+        this.value instanceof Array
+          ? this.value.map((item) => item.pretty())
+          : this.value,
+      ],
+      path: this.path,
+    };
+  }
 
   public find(path: number[]): T {
     switch (path[0]) {

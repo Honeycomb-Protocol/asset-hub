@@ -3,24 +3,27 @@ import { ConditionalPayment, Conditionalbool, Payment } from "./generated";
 import { Conditional } from "./utils";
 
 export class HplConditionalPaymentStatuses extends Conditional<boolean> {
-  constructor(readonly solita: Conditionalbool) {
-    super();
+  constructor(readonly solita: Conditionalbool, path: number[] = []) {
+    super("None", null, path);
     if (solita.__kind === "None")
       throw new Error("Invalid conditional payment");
 
     this._kind = solita.__kind;
     switch (solita.__kind) {
       case "Item":
+        this._path.push(1);
         this._value = solita.fields[0];
         break;
       case "Or":
+        this._path.push(2);
         this._value = solita.fields[0].map(
-          (item) => new HplConditionalPaymentStatuses(item)
+          (item) => new HplConditionalPaymentStatuses(item, [...path])
         );
         break;
       case "And":
+        this._path.push(3);
         this._value = solita.fields[0].map(
-          (item) => new HplConditionalPaymentStatuses(item)
+          (item) => new HplConditionalPaymentStatuses(item, [...path])
         );
         break;
       default:
@@ -33,28 +36,30 @@ export class HplConditionalPayments extends Conditional<HplPayment> {
   constructor(
     readonly paymentStructure: HplPaymentStructure,
     readonly solita: ConditionalPayment,
-    readonly path: number[] = []
+    path: number[] = []
   ) {
-    super();
+    super("None", null, path);
     if (solita.__kind === "None")
       throw new Error("Invalid conditional payment");
 
     this._kind = solita.__kind;
     switch (solita.__kind) {
       case "Item":
-        const item = solita.fields[0];
+        this._path.push(1);
         this._value =
-          item.kind.__kind === "Nft"
-            ? new HplNftPayment(this, item, [...path, 1])
-            : new HplCurrencyPayment(this, item, [...path, 1]);
+          solita.fields[0].kind.__kind === "Nft"
+            ? new HplNftPayment(this, solita.fields[0], [...path, 1])
+            : new HplCurrencyPayment(this, solita.fields[0], [...path, 1]);
         break;
       case "Or":
+        this._path.push(2);
         this._value = solita.fields[0].map(
           (item, i) =>
             new HplConditionalPayments(paymentStructure, item, [...path, 2, i])
         );
         break;
       case "And":
+        this._path.push(3);
         this._value = solita.fields[0].map(
           (item, i) =>
             new HplConditionalPayments(paymentStructure, item, [...path, 3, i])
