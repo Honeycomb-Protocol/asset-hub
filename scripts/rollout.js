@@ -61,7 +61,7 @@ packages.forEach((package) => {
   if (version !== currentVersion) {
     execSync(
       `cargo update -p ${package} && ${
-        ignoreBuild ? "" : "yarn build: sdk &&"
+        ignoreBuild ? "" : "yarn build:sdk &&"
       } git add packages/**/*.json && git add programs/**/Cargo.toml && git add Cargo.lock && git commit -m "bump version to ${version}"`,
       {
         stdio: "inherit",
