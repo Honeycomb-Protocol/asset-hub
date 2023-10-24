@@ -8,6 +8,9 @@ const ignoreBuild = process.argv.includes("--ignore-build");
 packages.forEach((package) => {
   if (package === "idl" || package === ".DS_Store") return;
 
+  const packageFlag = process.argv.indexOf("--package");
+  if (packageFlag !== -1 && package !== process.argv[packageFlag + 1]) return;
+
   const packageJsonPath = path.join(
     __dirname,
     "..",
