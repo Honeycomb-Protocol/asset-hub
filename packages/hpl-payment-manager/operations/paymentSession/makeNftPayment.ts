@@ -26,10 +26,12 @@ import {
 type MakeNftPaymentOperationArgs = {
   payment: HplPayment;
   nft: AvailableNft;
+  proof?: AssetProof;
+  helius_rpc?: string;
   payer?: web3.PublicKey;
   doNotCheckAccounts?: boolean;
   programId?: web3.PublicKey;
-} & ({ proof: AssetProof } | { helius_rpc: string });
+};
 
 export async function createMakeNftPaymentOperation(
   honeycomb: Honeycomb,
@@ -57,10 +59,12 @@ export async function createMakeNftPaymentOperation(
         [args.nft.compression.tree.toBuffer()],
         BUBBLEGUM_PROGRAM_ID
       );
+
+      if (!args.proof && !args.helius_rpc)
+        throw new Error("Please pass either proof or helius rpc for cNFT");
+
       const proof =
-        "proof" in args
-          ? args.proof
-          : await fetchAssetProof(args.helius_rpc, args.nft.mint);
+        args.proof || (await fetchAssetProof(args.helius_rpc, args.nft.mint));
 
       instructions.push(
         createMakeCnftPaymentInstruction(

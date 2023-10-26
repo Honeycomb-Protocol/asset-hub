@@ -1,6 +1,12 @@
+import { ConfirmedContext } from "@honeycomb-protocol/hive-control";
 import { HplPaymentStructure } from "./HplPaymentStructure";
 import { ConditionalPayment, Conditionalbool, Payment } from "./generated";
 import { Conditional } from "./utils";
+import { AssetProof, AvailableNft } from "./types";
+import {
+  createMakeHplCurrencyPaymentOperation,
+  createMakeNftPaymentOperation,
+} from ".";
 
 export class HplConditionalPaymentStatuses extends Conditional<boolean> {
   constructor(readonly solita: Conditionalbool, path: number[] = []) {
@@ -93,6 +99,42 @@ export class HplPayment {
 
   public isHplCurrency(): this is HplCurrencyPayment {
     return this.solita.kind.__kind === "HplCurrency";
+  }
+
+  public pay(): Promise<ConfirmedContext[]>;
+  public pay(nft: AvailableNft): Promise<ConfirmedContext[]>;
+  public pay(nft: AvailableNft, proof: AssetProof): Promise<ConfirmedContext[]>;
+  public pay(nft: AvailableNft, heliusRpc: string): Promise<ConfirmedContext[]>;
+  public async pay(nft?: AvailableNft, proofOrHeliusRpc?: AssetProof | string) {
+    if (this.isNft()) {
+      if (!nft) throw new Error("Missing NFT");
+      const { operation } = await createMakeNftPaymentOperation(
+        this.conditional.paymentStructure.honeycomb(),
+        {
+          payment: this,
+          nft,
+          programId: this.conditional.paymentStructure.programId,
+          ...(typeof proofOrHeliusRpc === "string"
+            ? {
+                helius_rpc: proofOrHeliusRpc,
+              }
+            : {
+                proof: proofOrHeliusRpc,
+              }),
+        }
+      );
+      return operation.send();
+    } else if (this.isHplCurrency()) {
+      const { operation } = await createMakeHplCurrencyPaymentOperation(
+        this.conditional.paymentStructure.honeycomb(),
+        {
+          payment: this,
+        }
+      );
+      return operation.send();
+    } else {
+      throw new Error("Invalid payment kind");
+    }
   }
 }
 
