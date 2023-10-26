@@ -41,30 +41,34 @@ export const createBlockDefinitionStruct = new beet.FixableBeetArgsStruct<
 /**
  * Accounts required by the _createBlockDefinition_ instruction
  *
+ * @property [] project
  * @property [] assembler
  * @property [_writable_] block
  * @property [_writable_] blockDefinition
  * @property [_writable_] blockDefinitionMint
+ * @property [] delegateAuthority (optional)
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
- * @property [] project
- * @property [] delegateAuthority (optional)
  * @property [_writable_] vault
+ * @property [] hiveControl
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category CreateBlockDefinition
  * @category generated
  */
 export type CreateBlockDefinitionInstructionAccounts = {
+  project: web3.PublicKey
   assembler: web3.PublicKey
   block: web3.PublicKey
   blockDefinition: web3.PublicKey
   blockDefinitionMint: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
-  systemProgram?: web3.PublicKey
-  project: web3.PublicKey
-  delegateAuthority?: web3.PublicKey
   vault: web3.PublicKey
+  systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -98,6 +102,11 @@ export function createCreateBlockDefinitionInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.project,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.assembler,
       isWritable: false,
       isSigner: false,
@@ -117,26 +126,6 @@ export function createCreateBlockDefinitionInstruction(
       isWritable: true,
       isSigner: false,
     },
-    {
-      pubkey: accounts.authority,
-      isWritable: false,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: false,
-      isSigner: false,
-    },
   ]
 
   if (accounts.delegateAuthority != null) {
@@ -147,8 +136,33 @@ export function createCreateBlockDefinitionInstruction(
     })
   }
   keys.push({
+    pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: true,
+    isSigner: true,
+  })
+  keys.push({
     pubkey: accounts.vault,
     isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControl,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.instructionsSysvar,
+    isWritable: false,
     isSigner: false,
   })
 

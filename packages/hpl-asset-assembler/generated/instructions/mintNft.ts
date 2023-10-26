@@ -23,6 +23,7 @@ export const mintNftStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _mintNft_ instruction
  *
+ * @property [] project
  * @property [] assembler
  * @property [_writable_] nft
  * @property [_writable_] nftMint
@@ -31,19 +32,21 @@ export const mintNftStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] nftTokenRecord (optional)
  * @property [_writable_] tokenAccount
  * @property [_writable_] uniqueConstraint (optional)
+ * @property [] delegateAuthority (optional)
  * @property [_writable_, **signer**] authority
  * @property [_writable_, **signer**] payer
+ * @property [_writable_] vault
+ * @property [] hiveControl
  * @property [] associatedTokenProgram
  * @property [] instructionsSysvar
  * @property [] tokenMetadataProgram
- * @property [] project
- * @property [] delegateAuthority (optional)
- * @property [_writable_] vault
+ * @property [] rentSysvar
  * @category Instructions
  * @category MintNft
  * @category generated
  */
 export type MintNftInstructionAccounts = {
+  project: web3.PublicKey
   assembler: web3.PublicKey
   nft: web3.PublicKey
   nftMint: web3.PublicKey
@@ -52,17 +55,17 @@ export type MintNftInstructionAccounts = {
   nftTokenRecord?: web3.PublicKey
   tokenAccount: web3.PublicKey
   uniqueConstraint?: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
   associatedTokenProgram: web3.PublicKey
   instructionsSysvar: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
-  rent?: web3.PublicKey
-  project: web3.PublicKey
-  delegateAuthority?: web3.PublicKey
-  vault: web3.PublicKey
+  rentSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -91,6 +94,11 @@ export function createMintNftInstruction(
     instructionDiscriminator: mintNftInstructionDiscriminator,
   })
   const keys: web3.AccountMeta[] = [
+    {
+      pubkey: accounts.project,
+      isWritable: false,
+      isSigner: false,
+    },
     {
       pubkey: accounts.assembler,
       isWritable: false,
@@ -142,6 +150,18 @@ export function createMintNftInstruction(
       isSigner: false,
     })
   }
+  if (accounts.delegateAuthority != null) {
+    if (accounts.nftTokenRecord == null || accounts.uniqueConstraint == null) {
+      throw new Error(
+        "When providing 'delegateAuthority' then 'accounts.nftTokenRecord', 'accounts.uniqueConstraint' need(s) to be provided as well."
+      )
+    }
+    keys.push({
+      pubkey: accounts.delegateAuthority,
+      isWritable: false,
+      isSigner: false,
+    })
+  }
   keys.push({
     pubkey: accounts.authority,
     isWritable: true,
@@ -153,7 +173,17 @@ export function createMintNftInstruction(
     isSigner: true,
   })
   keys.push({
+    pubkey: accounts.vault,
+    isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
     pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControl,
     isWritable: false,
     isSigner: false,
   })
@@ -178,30 +208,8 @@ export function createMintNftInstruction(
     isSigner: false,
   })
   keys.push({
-    pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
+    pubkey: accounts.rentSysvar,
     isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.project,
-    isWritable: false,
-    isSigner: false,
-  })
-  if (accounts.delegateAuthority != null) {
-    if (accounts.nftTokenRecord == null || accounts.uniqueConstraint == null) {
-      throw new Error(
-        "When providing 'delegateAuthority' then 'accounts.nftTokenRecord', 'accounts.uniqueConstraint' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.delegateAuthority,
-      isWritable: false,
-      isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.vault,
-    isWritable: true,
     isSigner: false,
   })
 

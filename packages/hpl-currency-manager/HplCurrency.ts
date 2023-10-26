@@ -4,6 +4,7 @@ import {
   Honeycomb,
   HoneycombProject,
   Module,
+  isPublicKey,
   toBigNumber,
 } from "@honeycomb-protocol/hive-control";
 import {
@@ -193,6 +194,7 @@ export class HplCurrency extends Module {
         },
     confirmOptions?: web3.ConfirmOptions
   ) {
+    honeycomb.pda().register(currencyManagerPdas());
     const { currency, operation } = await createCreateCurrencyOperation(
       honeycomb,
       {
@@ -482,7 +484,7 @@ export class HplHolderAccount {
       }
     );
     const context = await operation.send(confirmOptions);
-    if (!this.owner.equals(to instanceof web3.PublicKey ? to : to.owner))
+    if (!this.owner.equals(isPublicKey(to) ? to : to.owner))
       this._perceivedAmount -= amount;
     return context;
   }
@@ -565,7 +567,7 @@ export const currencyModule = (
           }
       )
 ) =>
-  args instanceof web3.PublicKey
+  isPublicKey(args)
     ? HplCurrency.fromAddress(honeycomb.connection, args)
     : HplCurrency.new(honeycomb, args);
 

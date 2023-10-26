@@ -1,6 +1,10 @@
 import * as web3 from "@solana/web3.js";
 import * as beet from "@metaplex-foundation/beet";
-import { Honeycomb, Module } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  Module,
+  isPublicKey,
+} from "@honeycomb-protocol/hive-control";
 import {
   Assembler,
   AssemblingAction,
@@ -564,6 +568,6 @@ export const assetAssemblerModule = (
   honeycomb: Honeycomb,
   args: web3.PublicKey | CreateAssemblerArgs
 ) =>
-  args instanceof web3.PublicKey
+  isPublicKey(args)
     ? AssetAssembler.fromAddress(honeycomb.connection, args)
     : AssetAssembler.new(honeycomb, args);

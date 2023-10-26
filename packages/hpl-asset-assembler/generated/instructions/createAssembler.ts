@@ -40,38 +40,43 @@ export const createAssemblerStruct = new beet.FixableBeetArgsStruct<
 /**
  * Accounts required by the _createAssembler_ instruction
  *
+ * @property [_writable_] project
+ * @property [_writable_] assembler
  * @property [_writable_, **signer**] collectionMint
  * @property [_writable_] collectionMetadata
  * @property [_writable_] collectionMasterEdition
- * @property [_writable_] assembler
- * @property [] authority
- * @property [_writable_, **signer**] payer
- * @property [] tokenMetadataProgram
- * @property [] instructionsSysvar
- * @property [_writable_] project
  * @property [] delegateAuthority (optional)
+ * @property [**signer**] authority
+ * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] hiveControl
+ * @property [] tokenMetadataProgram
+ * @property [] hplEvents
+ * @property [] clockSysvar
+ * @property [] rentSysvar
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category CreateAssembler
  * @category generated
  */
 export type CreateAssemblerInstructionAccounts = {
+  project: web3.PublicKey
+  assembler: web3.PublicKey
   collectionMint: web3.PublicKey
   collectionMetadata: web3.PublicKey
   collectionMasterEdition: web3.PublicKey
-  assembler: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
-  rent?: web3.PublicKey
+  hplEvents: web3.PublicKey
+  clockSysvar: web3.PublicKey
+  rentSysvar: web3.PublicKey
   instructionsSysvar: web3.PublicKey
-  project: web3.PublicKey
-  delegateAuthority?: web3.PublicKey
-  vault: web3.PublicKey
-  hiveControl: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -105,6 +110,16 @@ export function createCreateAssemblerInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
+      pubkey: accounts.project,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.assembler,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.collectionMint,
       isWritable: true,
       isSigner: true,
@@ -119,51 +134,6 @@ export function createCreateAssemblerInstruction(
       isWritable: true,
       isSigner: false,
     },
-    {
-      pubkey: accounts.assembler,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.authority,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenMetadataProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.instructionsSysvar,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: true,
-      isSigner: false,
-    },
   ]
 
   if (accounts.delegateAuthority != null) {
@@ -174,12 +144,57 @@ export function createCreateAssemblerInstruction(
     })
   }
   keys.push({
+    pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: true,
+    isSigner: true,
+  })
+  keys.push({
     pubkey: accounts.vault,
     isWritable: true,
     isSigner: false,
   })
   keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
     pubkey: accounts.hiveControl,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenMetadataProgram,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hplEvents,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.clockSysvar,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.rentSysvar,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.instructionsSysvar,
     isWritable: false,
     isSigner: false,
   })

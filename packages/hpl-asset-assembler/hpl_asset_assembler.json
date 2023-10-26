@@ -1,10 +1,26 @@
 {
-  "version": "0.0.37",
+  "version": "0.0.75",
   "name": "hpl_asset_assembler",
   "instructions": [
     {
       "name": "createAssembler",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL"
+          ]
+        },
+        {
+          "name": "assembler",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Assembler state account"
+          ]
+        },
         {
           "name": "collectionMint",
           "isMut": true,
@@ -30,17 +46,15 @@
           ]
         },
         {
-          "name": "assembler",
-          "isMut": true,
+          "name": "delegateAuthority",
+          "isMut": false,
           "isSigner": false,
-          "docs": [
-            "Assembler state account"
-          ]
+          "isOptional": true
         },
         {
           "name": "authority",
           "isMut": false,
-          "isSigner": false,
+          "isSigner": true,
           "docs": [
             "The wallet that holds the authority over the assembler"
           ]
@@ -54,11 +68,24 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -78,7 +105,23 @@
           ]
         },
         {
-          "name": "rent",
+          "name": "hplEvents",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
+          "name": "clockSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SYSVAR CLOCK"
+          ]
+        },
+        {
+          "name": "rentSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -90,34 +133,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "NATIVE Instructions SYSVAR"
-          ]
-        },
-        {
-          "name": "project",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "HIVE CONTROL"
-          ]
-        },
-        {
-          "name": "delegateAuthority",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "hiveControl",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HIVE CONTROL PROGRAM"
+            "NATIVE INSTRUCTIONS SYSVAR"
           ]
         }
       ],
@@ -134,12 +150,23 @@
       "name": "updateAssembler",
       "accounts": [
         {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "assembler",
           "isMut": true,
           "isSigner": false,
           "docs": [
             "Assembler state account"
           ]
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "authority",
@@ -158,25 +185,30 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
+          "name": "hiveControl",
           "isMut": false,
           "isSigner": false,
-          "isOptional": true
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -196,6 +228,11 @@
       "name": "createBlock",
       "accounts": [
         {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "assembler",
           "isMut": false,
           "isSigner": false,
@@ -210,6 +247,12 @@
           "docs": [
             "Block account"
           ]
+        },
+        {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "authority",
@@ -228,6 +271,11 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
@@ -236,20 +284,20 @@
           ]
         },
         {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
+          "name": "hiveControl",
           "isMut": false,
           "isSigner": false,
-          "isOptional": true
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -268,6 +316,11 @@
     {
       "name": "createBlockDefinition",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "assembler",
           "isMut": false,
@@ -301,6 +354,12 @@
           ]
         },
         {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
@@ -317,6 +376,11 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
@@ -325,20 +389,20 @@
           ]
         },
         {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
+          "name": "hiveControl",
           "isMut": false,
           "isSigner": false,
-          "isOptional": true
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
         }
       ],
       "args": [
@@ -357,6 +421,11 @@
     {
       "name": "createNft",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "assembler",
           "isMut": true,
@@ -422,9 +491,15 @@
           ]
         },
         {
-          "name": "authority",
+          "name": "delegateAuthority",
           "isMut": false,
           "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
           "docs": [
             "The wallet that holds the pre mint authority over this NFT"
           ]
@@ -434,8 +509,13 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent_sysvar"
           ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -443,6 +523,14 @@
           "isSigner": false,
           "docs": [
             "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -462,7 +550,7 @@
           ]
         },
         {
-          "name": "rent",
+          "name": "rentSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -476,22 +564,6 @@
           "docs": [
             "NATIVE Instructions SYSVAR"
           ]
-        },
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": []
@@ -499,6 +571,11 @@
     {
       "name": "addBlock",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "assembler",
           "isMut": false,
@@ -592,6 +669,12 @@
           ]
         },
         {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "authority",
           "isMut": true,
           "isSigner": true,
@@ -604,8 +687,13 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent_sysvar"
           ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -613,6 +701,14 @@
           "isSigner": false,
           "docs": [
             "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -640,15 +736,7 @@
           ]
         },
         {
-          "name": "instructionsSysvar",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "NATIVE Instructions SYSVAR"
-          ]
-        },
-        {
-          "name": "rent",
+          "name": "rentSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -656,20 +744,12 @@
           ]
         },
         {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
+          "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
+          "docs": [
+            "NATIVE Instructions SYSVAR"
+          ]
         }
       ],
       "args": []
@@ -677,6 +757,11 @@
     {
       "name": "mintNft",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "assembler",
           "isMut": false,
@@ -744,6 +829,12 @@
           ]
         },
         {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "authority",
           "isMut": true,
           "isSigner": true,
@@ -756,8 +847,13 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent_sysvar"
           ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -765,6 +861,14 @@
           "isSigner": false,
           "docs": [
             "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -800,28 +904,12 @@
           ]
         },
         {
-          "name": "rent",
+          "name": "rentSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "SYSVAR RENT"
           ]
-        },
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": []
@@ -829,6 +917,11 @@
     {
       "name": "burnNft",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "assembler",
           "isMut": false,
@@ -887,6 +980,12 @@
           ]
         },
         {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
@@ -903,11 +1002,24 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -933,22 +1045,6 @@
           "docs": [
             "NATIVE Instructions SYSVAR"
           ]
-        },
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": []
@@ -956,6 +1052,11 @@
     {
       "name": "removeBlock",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "assembler",
           "isMut": false,
@@ -1049,6 +1150,12 @@
           ]
         },
         {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "authority",
           "isMut": true,
           "isSigner": true,
@@ -1061,8 +1168,13 @@
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The wallet that pays for the rent"
+            "The wallet that pays for the rent_sysvar"
           ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -1070,6 +1182,14 @@
           "isSigner": false,
           "docs": [
             "SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -1105,28 +1225,12 @@
           ]
         },
         {
-          "name": "rent",
+          "name": "rentSysvar",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "RENT PROGRAM"
           ]
-        },
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": []
@@ -1134,6 +1238,11 @@
     {
       "name": "setNftGenerated",
       "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
         {
           "name": "assembler",
           "isMut": false,
@@ -1175,6 +1284,12 @@
           ]
         },
         {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
@@ -1191,11 +1306,24 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -1213,22 +1341,6 @@
           "docs": [
             "NATIVE Instructions SYSVAR"
           ]
-        },
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": [
@@ -1248,6 +1360,11 @@
       "name": "updateMetadata",
       "accounts": [
         {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "assembler",
           "isMut": false,
           "isSigner": false,
@@ -1288,6 +1405,12 @@
           ]
         },
         {
+          "name": "delegateAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "authority",
           "isMut": false,
           "isSigner": true,
@@ -1304,11 +1427,24 @@
           ]
         },
         {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
           ]
         },
         {
@@ -1326,22 +1462,6 @@
           "docs": [
             "NATIVE Instructions SYSVAR"
           ]
-        },
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "delegateAuthority",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false
         }
       ],
       "args": [

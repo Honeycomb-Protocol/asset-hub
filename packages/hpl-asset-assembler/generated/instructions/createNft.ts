@@ -23,6 +23,7 @@ export const createNftStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _createNft_ instruction
  *
+ * @property [] project
  * @property [_writable_] assembler
  * @property [_writable_] collectionMint
  * @property [_writable_] collectionMetadataAccount
@@ -31,18 +32,20 @@ export const createNftStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] nftMetadata
  * @property [_writable_] nftMasterEdition
  * @property [_writable_] nft
- * @property [] authority
- * @property [_writable_, **signer**] payer
- * @property [] tokenMetadataProgram
- * @property [] instructionsSysvar
- * @property [] project
  * @property [] delegateAuthority (optional)
+ * @property [**signer**] authority
+ * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
+ * @property [] hiveControl
+ * @property [] tokenMetadataProgram
+ * @property [] rentSysvar
+ * @property [] instructionsSysvar
  * @category Instructions
  * @category CreateNft
  * @category generated
  */
 export type CreateNftInstructionAccounts = {
+  project: web3.PublicKey
   assembler: web3.PublicKey
   collectionMint: web3.PublicKey
   collectionMetadataAccount: web3.PublicKey
@@ -51,16 +54,16 @@ export type CreateNftInstructionAccounts = {
   nftMetadata: web3.PublicKey
   nftMasterEdition: web3.PublicKey
   nft: web3.PublicKey
+  delegateAuthority?: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tokenMetadataProgram: web3.PublicKey
-  rent?: web3.PublicKey
+  rentSysvar: web3.PublicKey
   instructionsSysvar: web3.PublicKey
-  project: web3.PublicKey
-  delegateAuthority?: web3.PublicKey
-  vault: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -89,6 +92,11 @@ export function createCreateNftInstruction(
     instructionDiscriminator: createNftInstructionDiscriminator,
   })
   const keys: web3.AccountMeta[] = [
+    {
+      pubkey: accounts.project,
+      isWritable: false,
+      isSigner: false,
+    },
     {
       pubkey: accounts.assembler,
       isWritable: true,
@@ -129,46 +137,6 @@ export function createCreateNftInstruction(
       isWritable: true,
       isSigner: false,
     },
-    {
-      pubkey: accounts.authority,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenMetadataProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.instructionsSysvar,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.project,
-      isWritable: false,
-      isSigner: false,
-    },
   ]
 
   if (accounts.delegateAuthority != null) {
@@ -179,8 +147,48 @@ export function createCreateNftInstruction(
     })
   }
   keys.push({
+    pubkey: accounts.authority,
+    isWritable: false,
+    isSigner: true,
+  })
+  keys.push({
+    pubkey: accounts.payer,
+    isWritable: true,
+    isSigner: true,
+  })
+  keys.push({
     pubkey: accounts.vault,
     isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.hiveControl,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.tokenMetadataProgram,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.rentSysvar,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.instructionsSysvar,
+    isWritable: false,
     isSigner: false,
   })
 
