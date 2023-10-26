@@ -22,6 +22,7 @@ import {
  */
 type MakeHplCurrencyPaymentOperationArgs = {
   payment: HplPayment;
+  payer?: web3.PublicKey;
   doNotCheckAccounts?: boolean;
   programId?: web3.PublicKey;
 };
@@ -33,12 +34,13 @@ export async function createMakeHplCurrencyPaymentOperation(
   // If programId is not provided, use the default PROGRAM_ID.
   const programId = args.programId || PROGRAM_ID;
 
+  const payer = args.payer || honeycomb.identity().address;
   const [paymentSession] = honeycomb
     .pda()
     .paymentManager()
     .paymentSession(
       args.payment.conditional.paymentStructure.address,
-      honeycomb.identity().address,
+      payer,
       programId
     );
 
@@ -50,7 +52,7 @@ export async function createMakeHplCurrencyPaymentOperation(
       .pda()
       .currencyManager()
       .holderAccountWithTokenAccount(
-        honeycomb.identity().address,
+        payer,
         args.payment.currency.mint.address,
         args.payment.currency.kind
       );
@@ -65,7 +67,7 @@ export async function createMakeHplCurrencyPaymentOperation(
         .pda()
         .currencyManager()
         .holderAccountWithTokenAccount(
-          honeycomb.identity().address,
+          beneficiary,
           args.payment.currency.mint.address,
           args.payment.currency.kind
         );
@@ -74,46 +76,46 @@ export async function createMakeHplCurrencyPaymentOperation(
 
       if (args.doNotCheckAccounts !== false) {
         try {
-          await args.payment.currency.holderAccount(
-            honeycomb.identity().address
-          );
+          await args.payment.currency.holderAccount(beneficiary);
         } catch {
           instructions.push(
             ...(await createCreateHolderAccountOperation(honeycomb, {
               currency: args.payment.currency,
-              owner: honeycomb.identity().address,
+              owner: beneficiary,
             }).then(({ operation }) => operation.instructions))
           );
         }
       }
     }
 
-    createMakeHplCurrencyPaymentInstruction(
-      {
-        paymentStructure: args.payment.conditional.paymentStructure.address,
-        paymentSession,
-        project: args.payment.currency.project().address,
-        currency: args.payment.currency.address,
-        mint: args.payment.currency.mint.address,
-        holderAccount,
-        tokenAccount,
-        beneficiary,
-        beneficiaryHolderAccount,
-        beneficiaryTokenAccount,
-        vault: VAULT,
-        payer: honeycomb.identity().address,
-        hiveControl: HPL_HIVE_CONTROL_PROGRAM,
-        hplCurrencyManager: HPL_CURRENCY_MANAGER_PROGRAM,
-        hplEvents: HPL_EVENTS_PROGRAM,
-        clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
-        instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-      },
-      {
-        args: {
-          path: Uint8Array.from(args.payment.path),
+    instructions.push(
+      createMakeHplCurrencyPaymentInstruction(
+        {
+          paymentStructure: args.payment.conditional.paymentStructure.address,
+          paymentSession,
+          project: args.payment.currency.project().address,
+          currency: args.payment.currency.address,
+          mint: args.payment.currency.mint.address,
+          holderAccount,
+          tokenAccount,
+          beneficiary,
+          beneficiaryHolderAccount,
+          beneficiaryTokenAccount,
+          vault: VAULT,
+          payer,
+          hiveControl: HPL_HIVE_CONTROL_PROGRAM,
+          hplCurrencyManager: HPL_CURRENCY_MANAGER_PROGRAM,
+          hplEvents: HPL_EVENTS_PROGRAM,
+          clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
+          instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         },
-      },
-      programId
+        {
+          args: {
+            path: Uint8Array.from(args.payment.path),
+          },
+        },
+        programId
+      )
     );
   } else {
     throw new Error("Not implemented");

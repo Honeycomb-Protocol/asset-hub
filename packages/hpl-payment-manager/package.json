@@ -1,12 +1,15 @@
 {
-  "name": "@honeycomb-protocol/currency-manager",
-  "version": "0.0.76",
+  "name": "@honeycomb-protocol/payment-manager",
+  "version": "0.0.0",
   "private": false,
   "peerDependencies": {
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.87.1",
     "@honeycomb-protocol/events": "^0.1.21",
     "@honeycomb-protocol/hive-control": "^0.2.2",
-    "@honeycomb-protocol/currency-manager": "^0.0.76"
+    "@honeycomb-protocol/currency-manager": "^0.0.76",
+    "@metaplex-foundation/mpl-bubblegum": "^0.7.0",
+    "@metaplex-foundation/mpl-token-auth-rules": "^1.2.0",
+    "@msgpack/msgpack": "^3.0.0-beta2"
   }
 }
