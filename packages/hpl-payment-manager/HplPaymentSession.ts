@@ -163,6 +163,7 @@ export class HplPaymentSession {
     const { operation } = await createClosePaymentSessionOperation(
       this.paymentStructure.honeycomb(),
       {
+        paymentStructure: this.paymentStructure.address,
         paymentSession: this.address,
       }
     );

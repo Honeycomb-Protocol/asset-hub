@@ -12,12 +12,14 @@ pub struct PaymentStructure {
     pub authority: Pubkey,
     /// Requirements
     pub payments: Conditional<Payment>,
+    /// Currently active payment sessions
+    pub active_sessions: u64,
 }
 
 /// Default implementation for `PaymentStructure`.
 impl Default for PaymentStructure {
     /// The size of the serialized `PaymentStructure` account.
-    const LEN: usize = 8 + 160;
+    const LEN: usize = 8 + 168;
 
     /// Sets default values for `PaymentStructure`.
     fn set_defaults(&mut self) {
@@ -25,6 +27,7 @@ impl Default for PaymentStructure {
         self.unique_key = Pubkey::default();
         self.authority = Pubkey::default();
         self.payments = Conditional::None;
+        self.active_sessions = 0;
     }
 }
 

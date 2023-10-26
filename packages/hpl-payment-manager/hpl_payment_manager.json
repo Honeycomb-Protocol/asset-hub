@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.0.1",
   "name": "hpl_payment_manager",
   "instructions": [
     {
@@ -127,7 +127,7 @@
       "accounts": [
         {
           "name": "paymentStructure",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The payment structure account"
@@ -630,6 +630,14 @@
       "name": "closePaymentSession",
       "accounts": [
         {
+          "name": "paymentStructure",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The payment structure account"
+          ]
+        },
+        {
           "name": "paymentSession",
           "isMut": true,
           "isSigner": false,
@@ -742,6 +750,13 @@
             "type": {
               "defined": "ConditionalPayment"
             }
+          },
+          {
+            "name": "activeSessions",
+            "docs": [
+              "Currently active payment sessions"
+            ],
+            "type": "u64"
           }
         ]
       }

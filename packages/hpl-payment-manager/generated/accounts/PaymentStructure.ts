@@ -23,6 +23,7 @@ export type PaymentStructureArgs = {
   uniqueKey: web3.PublicKey
   authority: web3.PublicKey
   payments: ConditionalPayment
+  activeSessions: beet.bignum
 }
 
 export const paymentStructureDiscriminator = [
@@ -40,7 +41,8 @@ export class PaymentStructure implements PaymentStructureArgs {
     readonly bump: number,
     readonly uniqueKey: web3.PublicKey,
     readonly authority: web3.PublicKey,
-    readonly payments: ConditionalPayment
+    readonly payments: ConditionalPayment,
+    readonly activeSessions: beet.bignum
   ) {}
 
   /**
@@ -51,7 +53,8 @@ export class PaymentStructure implements PaymentStructureArgs {
       args.bump,
       args.uniqueKey,
       args.authority,
-      args.payments
+      args.payments,
+      args.activeSessions
     )
   }
 
@@ -164,6 +167,17 @@ export class PaymentStructure implements PaymentStructureArgs {
       uniqueKey: this.uniqueKey.toBase58(),
       authority: this.authority.toBase58(),
       payments: this.payments.__kind,
+      activeSessions: (() => {
+        const x = <{ toNumber: () => number }>this.activeSessions
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
     }
   }
 }
@@ -184,6 +198,7 @@ export const paymentStructureBeet = new beet.FixableBeetStruct<
     ['uniqueKey', beetSolana.publicKey],
     ['authority', beetSolana.publicKey],
     ['payments', conditionalPaymentBeet],
+    ['activeSessions', beet.u64],
   ],
   PaymentStructure.fromArgs,
   'PaymentStructure'

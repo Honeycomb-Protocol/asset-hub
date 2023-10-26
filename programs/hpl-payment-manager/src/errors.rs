@@ -5,6 +5,9 @@ pub enum ErrorCode {
     #[msg("Opertaion overflowed")]
     Overflow,
 
+    #[msg("This payment structure has active payment sessions")]
+    HasActivePaymentSessions,
+
     #[msg("Condition validation failed")]
     ConditionValidationFailed,
 

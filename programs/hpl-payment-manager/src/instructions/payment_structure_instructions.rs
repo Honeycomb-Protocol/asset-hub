@@ -1,5 +1,6 @@
 use {
     crate::{
+        errors::ErrorCode,
         state::*,
         utils::{Conditional, Event},
     },
@@ -137,6 +138,9 @@ pub struct DeletePaymentStructure<'info> {
 /// # }
 /// ```
 pub fn delete_payment_structure(ctx: Context<DeletePaymentStructure>) -> Result<()> {
+    if ctx.accounts.payment_structure.active_sessions > 0 {
+        return Err(ErrorCode::HasActivePaymentSessions.into());
+    }
     Event::delete_payment_structure(
         ctx.accounts.payment_structure.key(),
         ctx.accounts.payment_structure.try_to_vec().unwrap(),

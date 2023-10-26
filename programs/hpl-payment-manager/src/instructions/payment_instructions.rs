@@ -29,6 +29,7 @@ use {
 #[derive(Accounts)]
 pub struct StartPaymentSession<'info> {
   /// The payment structure account
+  #[account(mut)]
   pub payment_structure: Account<'info, PaymentStructure>,
 
   /// The payment session account
@@ -88,6 +89,8 @@ pub fn start_payment_session(
     &ctx.accounts.payment_structure.payments,
     &|_payment| false, 
 );
+
+ctx.accounts.payment_structure.active_sessions += 1;
 
   Event::new_payment_session(
       payment_session.key(),
@@ -278,7 +281,6 @@ pub fn make_hpl_currency_payment(
   }?;
 
   *payment_status = true;
-  msg!("Payment Status: {}", payment_session.payments_status.get_item(args.path)?);
 
   Event::make_payment(
       payment_session.key(),
@@ -667,6 +669,10 @@ pub fn make_cnft_payment<'info>(
 /// Accounts used in close payment session instruction
 #[derive(Accounts)]
 pub struct ClosePaymentSession<'info> {
+  /// The payment structure account
+  #[account(mut)]
+  pub payment_structure: Account<'info, PaymentStructure>,
+
   /// The payment session account
   #[account(mut, has_one = payer, close = payer)]
   pub payment_session: Account<'info, PaymentSession>,
@@ -708,6 +714,8 @@ pub fn close_payment_session(
   payment_session.payments_status.evaluate(&|&item| {
     if item { Ok(()) } else { Err(ErrorCode::IncompletePayment.into()) }
   })?;
+
+  ctx.accounts.payment_structure.active_sessions -= 1;
 
   Event::close_payment_session(
       payment_session.key(),

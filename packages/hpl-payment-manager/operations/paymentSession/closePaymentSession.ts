@@ -11,6 +11,7 @@ import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
  * @category Types
  */
 type ClosePaymentSessionOperationArgs = {
+  paymentStructure: web3.PublicKey;
   paymentSession: web3.PublicKey;
   payer?: web3.PublicKey;
   programId?: web3.PublicKey;
@@ -27,6 +28,7 @@ export async function createClosePaymentSessionOperation(
   const instructions = [
     createClosePaymentSessionInstruction(
       {
+        paymentStructure: args.paymentStructure,
         paymentSession: args.paymentSession,
         payer: args.payer || honeycomb.identity().address,
         hplEvents: HPL_EVENTS_PROGRAM,
