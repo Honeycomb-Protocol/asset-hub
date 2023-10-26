@@ -1,7 +1,14 @@
 import * as web3 from "@solana/web3.js";
 import { PaymentSession } from "./generated";
 import { HplPaymentStructure } from "./HplPaymentStructure";
-import { HplConditionalPaymentStatuses } from "./HplPayment";
+import { HplConditionalPaymentStatuses, HplPayment } from "./utils";
+import {
+  createClosePaymentSessionOperation,
+  createMakeHplCurrencyPaymentOperation,
+  createMakeNftPaymentOperation,
+} from "./operations";
+import { ConfirmedContext } from "@honeycomb-protocol/hive-control";
+import { AssetProof, AvailableNft } from "./types";
 
 /**
  * HplPaymentSession class represents a Payment session managed by the Honeycomb protocol.
@@ -94,5 +101,72 @@ export class HplPaymentSession {
    */
   public get status() {
     return this._status;
+  }
+
+  public pay(payment: HplPayment): Promise<ConfirmedContext[]>;
+  public pay(
+    payment: HplPayment,
+    nft: AvailableNft
+  ): Promise<ConfirmedContext[]>;
+  public pay(
+    payment: HplPayment,
+    nft: AvailableNft,
+    proof: AssetProof
+  ): Promise<ConfirmedContext[]>;
+  public pay(
+    payment: HplPayment,
+    nft: AvailableNft,
+    heliusRpc: string
+  ): Promise<ConfirmedContext[]>;
+  public async pay(
+    payment: HplPayment,
+    nft?: AvailableNft,
+    proofOrHeliusRpc?: AssetProof | string
+  ) {
+    if (payment.isNft()) {
+      if (!nft) throw new Error("Missing NFT");
+      const { operation } = await createMakeNftPaymentOperation(
+        this.paymentStructure.honeycomb(),
+        {
+          paymentStructure: this.paymentStructure,
+          payment,
+          nft,
+          programId: this.paymentStructure.programId,
+          ...(typeof proofOrHeliusRpc === "string"
+            ? {
+                helius_rpc: proofOrHeliusRpc,
+              }
+            : {
+                proof: proofOrHeliusRpc,
+              }),
+        }
+      );
+      return operation.send();
+    } else if (payment.isHplCurrency()) {
+      const { operation } = await createMakeHplCurrencyPaymentOperation(
+        this.paymentStructure.honeycomb(),
+        {
+          paymentStructure: this.paymentStructure,
+          payment,
+        }
+      );
+      return operation.send();
+    } else {
+      throw new Error("Invalid payment kind");
+    }
+  }
+
+  /**
+   * Close this session
+   */
+  public async close(confirmOptions?: web3.ConfirmOptions) {
+    const { operation } = await createClosePaymentSessionOperation(
+      this.paymentStructure.honeycomb(),
+      {
+        paymentSession: this.address,
+      }
+    );
+    const [context] = await operation.send(confirmOptions);
+    return context;
   }
 }

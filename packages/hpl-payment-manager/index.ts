@@ -4,4 +4,3 @@ export * from "./utils";
 export * from "./types";
 export * from "./HplPaymentStructure";
 export * from "./HplPaymentSession";
-export * from "./HplPayment";

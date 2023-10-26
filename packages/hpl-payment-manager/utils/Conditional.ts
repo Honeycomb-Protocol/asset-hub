@@ -1,4 +1,4 @@
-export class Conditional<T> {
+export class Conditional<T extends object> {
   constructor(
     protected _kind: "None" | "Item" | "Or" | "And" = "None",
     protected _value: T | Conditional<T>[] = null,
@@ -23,6 +23,8 @@ export class Conditional<T> {
       fields: [
         this.value instanceof Array
           ? this.value.map((item) => item.pretty())
+          : "pretty" in this.value && typeof this.value.pretty === "function"
+          ? this.value.pretty()
           : this.value,
       ],
       path: this.path,

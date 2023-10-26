@@ -10,7 +10,7 @@ import {
   PROGRAM_ID,
 } from "../../generated";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
-import { HplPayment } from "../..";
+import { HplPayment, HplPaymentStructure } from "../..";
 import {
   HPL_CURRENCY_MANAGER_PROGRAM,
   createCreateHolderAccountOperation,
@@ -21,6 +21,7 @@ import {
  * @category Types
  */
 type MakeHplCurrencyPaymentOperationArgs = {
+  paymentStructure: HplPaymentStructure;
   payment: HplPayment;
   payer?: web3.PublicKey;
   doNotCheckAccounts?: boolean;
@@ -38,23 +39,20 @@ export async function createMakeHplCurrencyPaymentOperation(
   const [paymentSession] = honeycomb
     .pda()
     .paymentManager()
-    .paymentSession(
-      args.payment.conditional.paymentStructure.address,
-      payer,
-      programId
-    );
+    .paymentSession(args.paymentStructure.address, payer, programId);
 
   // Create the instruction for the "Create Payment Session" operation based on provided arguments.
   const instructions = [];
 
   if (args.payment.isHplCurrency()) {
+    const currency = honeycomb.currency(args.payment.currency);
     const { holderAccount, tokenAccount } = honeycomb
       .pda()
       .currencyManager()
       .holderAccountWithTokenAccount(
         payer,
-        args.payment.currency.mint.address,
-        args.payment.currency.kind
+        currency.mint.address,
+        currency.kind
       );
 
     let beneficiary = programId,
@@ -68,19 +66,19 @@ export async function createMakeHplCurrencyPaymentOperation(
         .currencyManager()
         .holderAccountWithTokenAccount(
           beneficiary,
-          args.payment.currency.mint.address,
-          args.payment.currency.kind
+          currency.mint.address,
+          currency.kind
         );
       (beneficiaryHolderAccount = holderAccount),
         (beneficiaryTokenAccount = tokenAccount);
 
       if (args.doNotCheckAccounts !== false) {
         try {
-          await args.payment.currency.holderAccount(beneficiary);
+          await currency.holderAccount(beneficiary);
         } catch {
           instructions.push(
             ...(await createCreateHolderAccountOperation(honeycomb, {
-              currency: args.payment.currency,
+              currency,
               owner: beneficiary,
             }).then(({ operation }) => operation.instructions))
           );
@@ -91,11 +89,11 @@ export async function createMakeHplCurrencyPaymentOperation(
     instructions.push(
       createMakeHplCurrencyPaymentInstruction(
         {
-          paymentStructure: args.payment.conditional.paymentStructure.address,
+          paymentStructure: args.paymentStructure.address,
           paymentSession,
-          project: args.payment.currency.project().address,
-          currency: args.payment.currency.address,
-          mint: args.payment.currency.mint.address,
+          project: currency.project().address,
+          currency: currency.address,
+          mint: currency.mint.address,
           holderAccount,
           tokenAccount,
           beneficiary,

@@ -6,7 +6,13 @@ import {
   PROGRAM_ID,
 } from "../../generated";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
-import { AssetProof, AvailableNft, HplPayment, fetchAssetProof } from "../..";
+import {
+  AssetProof,
+  AvailableNft,
+  HplPayment,
+  HplPaymentStructure,
+  fetchAssetProof,
+} from "../..";
 import { metadataPda } from "@honeycomb-protocol/currency-manager";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -24,6 +30,7 @@ import {
  * @category Types
  */
 type MakeNftPaymentOperationArgs = {
+  paymentStructure: HplPaymentStructure;
   payment: HplPayment;
   nft: AvailableNft;
   proof?: AssetProof;
@@ -44,11 +51,7 @@ export async function createMakeNftPaymentOperation(
   const [paymentSession] = honeycomb
     .pda()
     .paymentManager()
-    .paymentSession(
-      args.payment.conditional.paymentStructure.address,
-      payer,
-      programId
-    );
+    .paymentSession(args.paymentStructure.address, payer, programId);
 
   // Create the instruction for the "Create Payment Session" operation based on provided arguments.
   const instructions = [];
@@ -69,7 +72,7 @@ export async function createMakeNftPaymentOperation(
       instructions.push(
         createMakeCnftPaymentInstruction(
           {
-            paymentStructure: args.payment.conditional.paymentStructure.address,
+            paymentStructure: args.paymentStructure.address,
             paymentSession,
             merkleTree: args.nft.compression.tree,
             treeAuthority,
@@ -136,7 +139,7 @@ export async function createMakeNftPaymentOperation(
       instructions.push(
         createMakeNftPaymentInstruction(
           {
-            paymentStructure: args.payment.conditional.paymentStructure.address,
+            paymentStructure: args.paymentStructure.address,
             paymentSession,
             nftMint,
             nftAccount,

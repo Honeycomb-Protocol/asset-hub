@@ -1,14 +1,7 @@
-import { ConfirmedContext } from "@honeycomb-protocol/hive-control";
-import { HplPaymentStructure } from "./HplPaymentStructure";
-import { ConditionalPayment, Conditionalbool, Payment } from "./generated";
-import { Conditional } from "./utils";
-import { AssetProof, AvailableNft } from "./types";
-import {
-  createMakeHplCurrencyPaymentOperation,
-  createMakeNftPaymentOperation,
-} from ".";
+import { Conditional } from "./Conditional";
+import { ConditionalPayment, Conditionalbool, Payment } from "..";
 
-export class HplConditionalPaymentStatuses extends Conditional<boolean> {
+export class HplConditionalPaymentStatuses extends Conditional<Boolean> {
   constructor(readonly solita: Conditionalbool, path: number[] = []) {
     super("None", null, path);
     if (solita.__kind === "None")
@@ -39,11 +32,7 @@ export class HplConditionalPaymentStatuses extends Conditional<boolean> {
 }
 
 export class HplConditionalPayments extends Conditional<HplPayment> {
-  constructor(
-    readonly paymentStructure: HplPaymentStructure,
-    readonly solita: ConditionalPayment,
-    path: number[] = []
-  ) {
+  constructor(readonly solita: ConditionalPayment, path: number[] = []) {
     super("None", null, path);
     if (solita.__kind === "None")
       throw new Error("Invalid conditional payment");
@@ -60,20 +49,41 @@ export class HplConditionalPayments extends Conditional<HplPayment> {
       case "Or":
         this._path.push(2);
         this._value = solita.fields[0].map(
-          (item, i) =>
-            new HplConditionalPayments(paymentStructure, item, [...path, 2, i])
+          (item, i) => new HplConditionalPayments(item, [...path, 2, i])
         );
         break;
       case "And":
         this._path.push(3);
         this._value = solita.fields[0].map(
-          (item, i) =>
-            new HplConditionalPayments(paymentStructure, item, [...path, 3, i])
+          (item, i) => new HplConditionalPayments(item, [...path, 3, i])
         );
         break;
       default:
         throw new Error("Invalid conditional payment");
     }
+  }
+
+  public static createSolita() {
+    const or = (items: ConditionalPayment[]): ConditionalPayment => ({
+      __kind: "Or",
+      fields: [items],
+    });
+
+    const and = (items: ConditionalPayment[]): ConditionalPayment => ({
+      __kind: "And",
+      fields: [items],
+    });
+
+    const item = (item: Payment): ConditionalPayment => ({
+      __kind: "Item",
+      fields: [item],
+    });
+
+    return {
+      or,
+      and,
+      item,
+    };
   }
 }
 
@@ -99,42 +109,6 @@ export class HplPayment {
 
   public isHplCurrency(): this is HplCurrencyPayment {
     return this.solita.kind.__kind === "HplCurrency";
-  }
-
-  public pay(): Promise<ConfirmedContext[]>;
-  public pay(nft: AvailableNft): Promise<ConfirmedContext[]>;
-  public pay(nft: AvailableNft, proof: AssetProof): Promise<ConfirmedContext[]>;
-  public pay(nft: AvailableNft, heliusRpc: string): Promise<ConfirmedContext[]>;
-  public async pay(nft?: AvailableNft, proofOrHeliusRpc?: AssetProof | string) {
-    if (this.isNft()) {
-      if (!nft) throw new Error("Missing NFT");
-      const { operation } = await createMakeNftPaymentOperation(
-        this.conditional.paymentStructure.honeycomb(),
-        {
-          payment: this,
-          nft,
-          programId: this.conditional.paymentStructure.programId,
-          ...(typeof proofOrHeliusRpc === "string"
-            ? {
-                helius_rpc: proofOrHeliusRpc,
-              }
-            : {
-                proof: proofOrHeliusRpc,
-              }),
-        }
-      );
-      return operation.send();
-    } else if (this.isHplCurrency()) {
-      const { operation } = await createMakeHplCurrencyPaymentOperation(
-        this.conditional.paymentStructure.honeycomb(),
-        {
-          payment: this,
-        }
-      );
-      return operation.send();
-    } else {
-      throw new Error("Invalid payment kind");
-    }
   }
 }
 
@@ -194,8 +168,6 @@ export class HplCurrencyPayment extends HplPayment {
   public get currency() {
     if (this.solita.kind.__kind !== "HplCurrency")
       throw new Error("Invalid payment kind");
-    return this.conditional.paymentStructure
-      .honeycomb()
-      .currency(this.solita.kind.address);
+    return this.solita.kind.address;
   }
 }

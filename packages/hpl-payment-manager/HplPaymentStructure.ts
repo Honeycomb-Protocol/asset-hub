@@ -7,8 +7,11 @@ import {
 import { paymentManagerPdas } from "./utils";
 import { ConditionalPayment, PROGRAM_ID, PaymentStructure } from "./generated";
 import { HplPaymentSession } from "./HplPaymentSession";
-import { HplConditionalPayments } from "./HplPayment";
-import { createCreatePaymentStructureOperation } from "./operations";
+import { HplConditionalPayments } from "./utils";
+import {
+  createCreatePaymentStructureOperation,
+  createStartPaymentSessionOperation,
+} from "./operations";
 
 // Extend the Honeycomb interface to include HplPaymentStructure related functions
 declare module "@honeycomb-protocol/hive-control" {
@@ -29,7 +32,7 @@ export class HplPaymentStructure extends Module {
 
   constructor(private solita: PaymentStructure) {
     super();
-    this._payments = new HplConditionalPayments(this, solita.payments);
+    this._payments = new HplConditionalPayments(solita.payments);
   }
 
   public static async fromAddress(
@@ -131,6 +134,18 @@ export class HplPaymentStructure extends Module {
       );
     }
     return this._sessions[payer.toString()];
+  }
+
+  /**
+   * Start a new payment session
+   */
+  public async startSession(confirmOptions?: web3.ConfirmOptions) {
+    const { operation, paymentSession } =
+      await createStartPaymentSessionOperation(this.honeycomb(), {
+        paymentStructure: this.address,
+      });
+    await operation.send(confirmOptions);
+    return HplPaymentSession.fromAddress(this, paymentSession);
   }
 
   /**
