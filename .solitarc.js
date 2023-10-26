@@ -62,6 +62,10 @@ const createConfig = (name, programId) => {
     programDir: path.join(__dirname, "programs", packageName),
     removeExistingIdl: false,
     idlHook: (idl) => {
+      // idl = {
+      //   ...idl,
+      //   ...require("./target/idl/" + programName + ".json"),
+      // };
       const variantsOfConditinal = {};
       const okTypes = (type) => {
         if (type.defined.startsWith("Conditional<")) {
@@ -156,5 +160,4 @@ const configs = {
 };
 
 const defaultProgram = Object.keys(configs)[0];
-
 module.exports = configs[process.env.PROGRAM_NAME || defaultProgram];

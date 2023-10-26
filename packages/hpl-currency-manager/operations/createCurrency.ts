@@ -5,6 +5,7 @@ import {
   HoneycombProject,
   Operation,
   VAULT,
+  isKeypair,
 } from "@honeycomb-protocol/hive-control";
 import {
   createCreateCurrencyInstruction,
@@ -102,14 +103,12 @@ export async function createCreateCurrencyOperation(
             delegateAuthority:
               honeycomb.identity().delegateAuthority()?.address || programId,
             authority: honeycomb.identity().address,
-            mintAuthority:
-              args.args.mintAuthority instanceof web3.Keypair
-                ? args.args.mintAuthority.publicKey
-                : args.args.mintAuthority,
-            freezeAuthority:
-              args.args.freezeAuthority instanceof web3.Keypair
-                ? args.args.freezeAuthority.publicKey
-                : args.args.freezeAuthority,
+            mintAuthority: isKeypair(args.args.mintAuthority)
+              ? args.args.mintAuthority.publicKey
+              : args.args.mintAuthority,
+            freezeAuthority: isKeypair(args.args.freezeAuthority)
+              ? args.args.freezeAuthority.publicKey
+              : args.args.freezeAuthority,
             payer: honeycomb.identity().address,
             vault: VAULT,
             hiveControl: HPL_HIVE_CONTROL_PROGRAM,
@@ -146,10 +145,10 @@ export async function createCreateCurrencyOperation(
   let signers = [];
 
   if ("mint" in args.args) {
-    if (args.args.mintAuthority instanceof web3.Keypair) {
+    if (isKeypair(args.args.mintAuthority)) {
       signers.push(args.args.mintAuthority);
     }
-    if (args.args.freezeAuthority instanceof web3.Keypair) {
+    if (isKeypair(args.args.freezeAuthority)) {
       signers.push(args.args.freezeAuthority);
     }
   } else {

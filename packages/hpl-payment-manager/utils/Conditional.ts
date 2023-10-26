@@ -21,7 +21,7 @@ export class Conditional<T extends object> {
     return {
       __kind: this.kind,
       fields: [
-        this.value instanceof Array
+        Array.isArray(this.value)
           ? this.value.map((item) => item.pretty())
           : "pretty" in this.value && typeof this.value.pretty === "function"
           ? this.value.pretty()

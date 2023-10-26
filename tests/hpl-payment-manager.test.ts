@@ -1,5 +1,9 @@
 import * as web3 from "@solana/web3.js";
-import { Honeycomb, HoneycombProject } from "@honeycomb-protocol/hive-control";
+import {
+  Honeycomb,
+  HoneycombProject,
+  wait,
+} from "@honeycomb-protocol/hive-control";
 import {
   HplConditionalPayments,
   HplPayment,
@@ -84,6 +88,8 @@ describe("Currency Manager", () => {
   it("Make Payment", async () => {
     const session = await userHC.paymentStructure().startSession();
     await session.pay(userHC.paymentStructure().payments.value as HplPayment);
-    await session.close();
+    await session.close({
+      preflightCommitment: "processed",
+    });
   });
 });

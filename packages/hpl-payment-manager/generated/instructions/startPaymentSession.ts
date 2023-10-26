@@ -23,7 +23,7 @@ export const startPaymentSessionStruct = new beet.BeetArgsStruct<{
  * Accounts required by the _startPaymentSession_ instruction
  *
  * @property [] paymentStructure
- * @property [_writable_, **signer**] paymentSession
+ * @property [_writable_] paymentSession
  * @property [_writable_, **signer**] payer
  * @property [] hplEvents
  * @property [] clockSysvar
@@ -69,7 +69,7 @@ export function createStartPaymentSessionInstruction(
     {
       pubkey: accounts.paymentSession,
       isWritable: true,
-      isSigner: true,
+      isSigner: false,
     },
     {
       pubkey: accounts.payer,

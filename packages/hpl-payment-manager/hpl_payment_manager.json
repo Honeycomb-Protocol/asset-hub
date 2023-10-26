@@ -136,7 +136,7 @@
         {
           "name": "paymentSession",
           "isMut": true,
-          "isSigner": true,
+          "isSigner": false,
           "docs": [
             "The payment session account"
           ]
@@ -197,7 +197,7 @@
         },
         {
           "name": "project",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "The project this currency is associated with"

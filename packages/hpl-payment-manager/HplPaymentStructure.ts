@@ -3,6 +3,7 @@ import {
   Honeycomb,
   HoneycombProject,
   Module,
+  isPublicKey,
 } from "@honeycomb-protocol/hive-control";
 import { paymentManagerPdas } from "./utils";
 import { ConditionalPayment, PROGRAM_ID, PaymentStructure } from "./generated";
@@ -28,7 +29,7 @@ declare module "@honeycomb-protocol/hive-control" {
 export class HplPaymentStructure extends Module {
   readonly programId = PROGRAM_ID;
   private _payments: HplConditionalPayments;
-  private _sessions: { [payer: string]: HplPaymentSession };
+  private _sessions: { [payer: string]: HplPaymentSession } = {};
 
   constructor(private solita: PaymentStructure) {
     super();
@@ -61,6 +62,7 @@ export class HplPaymentStructure extends Module {
     payments: ConditionalPayment,
     confirmOptions?: web3.ConfirmOptions
   ) {
+    honeycomb.pda().register(paymentManagerPdas());
     const { paymentStructure, operation } =
       await createCreatePaymentStructureOperation(honeycomb, {
         args: {
@@ -182,6 +184,6 @@ export const paymentStructure = (
   honeycomb: Honeycomb,
   args: web3.PublicKey | ConditionalPayment
 ) =>
-  args instanceof web3.PublicKey
+  isPublicKey(args)
     ? HplPaymentStructure.fromAddress(honeycomb, args)
     : HplPaymentStructure.new(honeycomb, args);

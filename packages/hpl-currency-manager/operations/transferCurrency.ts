@@ -4,6 +4,7 @@ import {
   Operation,
   VAULT,
   HPL_HIVE_CONTROL_PROGRAM,
+  isPublicKey,
 } from "@honeycomb-protocol/hive-control";
 import { createTransferCurrencyInstruction, PROGRAM_ID } from "../generated";
 import { HplHolderAccount } from "../HplCurrency";
@@ -56,7 +57,7 @@ export async function createTransferCurrencyOperation(
     receiverTokenAccount: web3.PublicKey;
 
   // If the receiver is a public key, fetch the holder account and token account PDAs.
-  if (args.receiver instanceof web3.PublicKey) {
+  if (isPublicKey(args.receiver)) {
     const accounts = honeycomb
       .pda()
       .currencyManager()

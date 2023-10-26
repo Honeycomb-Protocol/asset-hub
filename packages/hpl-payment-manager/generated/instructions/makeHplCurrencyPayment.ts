@@ -39,7 +39,7 @@ export const makeHplCurrencyPaymentStruct = new beet.FixableBeetArgsStruct<
  *
  * @property [] paymentStructure
  * @property [_writable_] paymentSession
- * @property [] project
+ * @property [_writable_] project
  * @property [] currency
  * @property [_writable_] mint
  * @property [] holderAccount
@@ -122,7 +122,7 @@ export function createMakeHplCurrencyPaymentInstruction(
     },
     {
       pubkey: accounts.project,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {

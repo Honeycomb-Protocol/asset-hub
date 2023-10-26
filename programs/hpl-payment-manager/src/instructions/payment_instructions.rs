@@ -103,14 +103,14 @@ pub fn start_payment_session(
 #[derive(Accounts)]
 pub struct MakeHplCurrencyPayment<'info> {
   /// The payment structure account
-  pub payment_structure: Account<'info, PaymentStructure>,
+  pub payment_structure: Box<Account<'info, PaymentStructure>>,
 
   /// The payment session account
   #[account(mut, has_one = payer, has_one = payment_structure)]
-  pub payment_session: Account<'info, PaymentSession>,
+  pub payment_session: Box<Account<'info, PaymentSession>>,
 
   /// The project this currency is associated with
-  #[account()]
+  #[account(mut)]
   pub project: Box<Account<'info, Project>>,
 
   /// The currency account
@@ -205,7 +205,7 @@ pub fn make_hpl_currency_payment(
 ) -> Result<()> {
   let payment_session = &mut ctx.accounts.payment_session;
   let payment = ctx.accounts.payment_structure.payments.get_item(args.path.clone())?;
-  let payment_status = payment_session.payments_status.get_item_mut(args.path)?;
+  let payment_status = payment_session.payments_status.get_item_mut(args.path.clone())?;
 
   if *payment_status {
     return Err(ErrorCode::PaymentAlreadyMade.into());
@@ -277,6 +277,8 @@ pub fn make_hpl_currency_payment(
       }
   }?;
 
+  *payment_status = true;
+  msg!("Payment Status: {}", payment_session.payments_status.get_item(args.path)?);
 
   Event::make_payment(
       payment_session.key(),
@@ -502,7 +504,9 @@ pub fn make_nft_payment(
       )
     }
   }?;
+
   
+  *payment_status = true;
 
   Event::make_payment(
       payment_session.key(),
@@ -647,6 +651,8 @@ pub fn make_cnft_payment<'info>(
       }
   }
 
+
+  *payment_status = true;
 
   Event::make_payment(
       payment_session.key(),

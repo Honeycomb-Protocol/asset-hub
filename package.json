@@ -11,7 +11,7 @@
     "compile": "tsc",
     "build:program": "anchor build",
     "build:sdk": "yarn solita && yarn compile",
-    "build": "yarn build:program && yarn build:sdk",
+    "build": "yarn build:sdk",
     "deploy": "anchor deploy",
     "test": "jest --verbose",
     "build-deploy": "yarn build && yarn deploy"
