@@ -5,16 +5,26 @@
     "access": "public"
   },
   "scripts": {
-    "rollout": "node ./scripts/rollout.js",
-    "publishall": "node ./scripts/publishall.js",
+    "link:currency": "cd ./packages/hpl-currency-manager && yarn link && cd ../.. && yarn link @honeycomb-protocol/currency-manager",
+    "link:payment": "cd ./packages/hpl-payment-manager && yarn link && cd ../.. && yarn link @honeycomb-protocol/payment-manager",
+    "link": "yarn link:currency && yarn link:payment",
+    "prepare": "yarn link",
     "precompile": "node ./scripts/precompile.js",
     "compile": "tsc",
-    "build:program": "anchor build",
     "build:sdk": "yarn solita && yarn compile",
     "build": "yarn build:sdk",
+    "build:currency": "PROGRAM_NAME=currency-manager yarn build",
+    "build:payment": "PROGRAM_NAME=payment-manager yarn build",
+    "build:all": "yarn build:currency && yarn build:payment",
     "deploy": "anchor deploy",
+    "deploy:currency": "yarn deploy --package-name hpl-currency-manager",
+    "deploy:payment": "yarn deploy --package-name hpl-payment-manager",
+    "build-deploy": "yarn build:all && yarn deploy",
+    "currency": "yarn build:currency && yarn deploy:currency",
+    "payment": "yarn build:payment && yarn deploy:payment",
     "test": "jest --verbose",
-    "build-deploy": "yarn build && yarn deploy"
+    "rollout": "node ./scripts/rollout.js",
+    "publishall": "node ./scripts/publishall.js"
   },
   "dependencies": {
     "@honeycomb-protocol/events": "^0.1.21",
