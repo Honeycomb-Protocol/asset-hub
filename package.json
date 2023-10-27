@@ -8,7 +8,7 @@
     "link:currency": "cd ./packages/hpl-currency-manager && yarn link && cd ../.. && yarn link @honeycomb-protocol/currency-manager",
     "link:payment": "cd ./packages/hpl-payment-manager && yarn link && cd ../.. && yarn link @honeycomb-protocol/payment-manager",
     "link": "yarn link:currency && yarn link:payment",
-    "prepare": "yarn link",
+    "prepare": "yarn run link",
     "precompile": "node ./scripts/precompile.js",
     "compile": "tsc",
     "build:sdk": "yarn solita && yarn compile",
