@@ -86,22 +86,30 @@ pub struct CreateHolderAccount<'info> {
 /// Create a holder account
 pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
+    let bump = ctx.bumps["holder_account"];
+    let currency = ctx.accounts.currency.key();
+    if bump != holder_account.bump || !currency.eq(&holder_account.currency) {
+        // Set the bump value for the holder account.
+        holder_account.bump = bump;
+        holder_account.currency = currency;
+        holder_account.owner = ctx.accounts.owner.key();
+        holder_account.token_account = ctx.accounts.token_account.key();
 
-    // Set the bump value for the holder account.
-    holder_account.bump = ctx.bumps["holder_account"];
-    holder_account.currency = ctx.accounts.currency.key();
-    holder_account.owner = ctx.accounts.owner.key();
-    holder_account.token_account = ctx.accounts.token_account.key();
-
-    // Set the creation timestamp for the holder account.
-    holder_account.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
-
-    Event::new_holder_account(
-        holder_account.key(),
-        holder_account.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
+        // Set the creation timestamp for the holder account.
+        holder_account.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
+        msg!("holder_account created_at: {}", holder_account.created_at);
+        Event::new_holder_account(
+            holder_account.key(),
+            holder_account.try_to_vec().unwrap(),
+            &ctx.accounts.clock_sysvar,
+        )
+        .emit(ctx.accounts.hpl_events.to_account_info())?;
+    } else {
+        msg!(
+            "holder_account was already created_at: {}",
+            holder_account.created_at
+        );
+    }
 
     Ok(())
 }
