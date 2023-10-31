@@ -28,7 +28,7 @@ hpl-utils = "0.1.4"
 hpl-macros = "0.0.2"
 hpl-events = { version = "0.1.21", features = ["no-entrypoint"] }
 hpl-hive-control = { version = "0.2.1", features = ["cpi"] }
-hpl-currency-manager = { version = "0.0.76", path = "../hpl-currency-manager", features = [
+hpl-currency-manager = { version = "0.0.77", path = "../hpl-currency-manager", features = [
   "cpi",
 ] }
 mpl-token-metadata = { version = "1.9.0", features = ["no-entrypoint"] }

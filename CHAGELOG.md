@@ -1,5 +1,9 @@
 # 0.0.x
 
+## 0.0.77
+
+- Updates to latest hpl-hive-control
+
 ## 0.0.76
 
 - Added HplCurrencyManagerPdaClient
