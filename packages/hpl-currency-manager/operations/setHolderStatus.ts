@@ -10,7 +10,7 @@ import {
   HolderStatus,
   PROGRAM_ID,
 } from "../generated";
-import { HplHolderAccount } from "../HplCurrency";
+import { HplHolderAccount } from "../HplHolderAccount";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**

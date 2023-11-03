@@ -6,7 +6,7 @@ import {
   VAULT,
 } from "@honeycomb-protocol/hive-control";
 import { createMintCurrencyInstruction, PROGRAM_ID } from "../generated";
-import { HplHolderAccount } from "../HplCurrency";
+import { HplHolderAccount } from "../HplHolderAccount";
 
 /**
  * Represents the arguments for creating a "Mint Currency" operation.

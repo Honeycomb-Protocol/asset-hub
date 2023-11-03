@@ -46,18 +46,14 @@ describe("Currency Manager", () => {
     expect(adminHC.currency().name).toBe("Bounty");
 
     userHC.use(
-      await HplCurrency.fromAddress(
-        userHC.connection,
-        adminHC.currency().address
-      )
+      await HplCurrency.fromAddress(userHC, adminHC.currency().address)
     );
   });
 
   it("Create holder account and mint", async () => {
     const holderAccount = await adminHC
       .currency()
-      .create()
-      .holderAccount(userHC.identity().address);
+      .newHolderAccount(userHC.identity().address);
     await holderAccount.mint(1000_000_000_000);
   });
 
@@ -69,8 +65,7 @@ describe("Currency Manager", () => {
   it("Transfer tokens", async () => {
     const newHolderAccount = await userHC
       .currency()
-      .create()
-      .holderAccount(web3.Keypair.generate().publicKey);
+      .newHolderAccount(web3.Keypair.generate().publicKey);
 
     const holderAccount = await userHC.currency().holderAccount();
     await holderAccount.transfer(100_000_000_000, newHolderAccount);

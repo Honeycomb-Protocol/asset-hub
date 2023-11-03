@@ -7,7 +7,7 @@ import {
   isPublicKey,
 } from "@honeycomb-protocol/hive-control";
 import { createTransferCurrencyInstruction, PROGRAM_ID } from "../generated";
-import { HplHolderAccount } from "../HplCurrency";
+import { HplHolderAccount } from "../HplHolderAccount";
 import { createCreateHolderAccountOperation } from "./createHolderAccount";
 
 /**

@@ -6,7 +6,7 @@ import {
   HPL_HIVE_CONTROL_PROGRAM,
 } from "@honeycomb-protocol/hive-control";
 import { createRevokeDelegateInstruction, PROGRAM_ID } from "../generated";
-import { HplHolderAccount } from "../HplCurrency";
+import { HplHolderAccount } from "../HplHolderAccount";
 
 /**
  * Represents the arguments for creating a "Revoke Delegate" operation.

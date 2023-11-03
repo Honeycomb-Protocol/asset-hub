@@ -54,3 +54,5 @@ export const metadataPda = (
 };
 
 export * from "./CurrencyManagerPdaClient";
+export * from "./CurrencyManagerFetchClient";
+export * from "./CurrencyManagerCreateClient";

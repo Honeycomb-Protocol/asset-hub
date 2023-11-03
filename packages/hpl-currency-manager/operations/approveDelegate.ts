@@ -6,7 +6,7 @@ import {
   VAULT,
 } from "@honeycomb-protocol/hive-control";
 import { createApproveDelegateInstruction, PROGRAM_ID } from "../generated";
-import { HplHolderAccount } from "../HplCurrency";
+import { HplHolderAccount } from "../HplHolderAccount";
 
 /**
  * Represents the arguments for creating an "Approve Delegate" operation.
