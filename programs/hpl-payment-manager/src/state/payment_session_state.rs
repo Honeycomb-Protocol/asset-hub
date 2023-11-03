@@ -1,4 +1,8 @@
-use {crate::utils::Conditional, anchor_lang::prelude::*, hpl_utils::Default};
+use {
+    crate::{errors::ErrorCode, utils::Conditional},
+    anchor_lang::prelude::*,
+    hpl_utils::Default,
+};
 
 /// A Payment structure account defines a single or series of payments required to be made by a user.
 /// PDA: ['payment_session', payment_structure, payer]
@@ -28,5 +32,19 @@ impl Default for PaymentSession {
 impl PaymentSession {
     pub fn get_initial_len(payment: &Conditional<bool>) -> usize {
         Self::LEN + payment.get_len()
+    }
+
+    pub fn eval_status(&self) -> Result<()> {
+        self.payments_status.evaluate(&|&item| {
+            if item {
+                Ok(())
+            } else {
+                Err(ErrorCode::IncompletePayment.into())
+            }
+        })
+    }
+
+    pub fn is_completed(&self) -> bool {
+        self.eval_status().is_ok()
     }
 }

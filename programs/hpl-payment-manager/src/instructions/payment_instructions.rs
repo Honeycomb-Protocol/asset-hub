@@ -711,9 +711,7 @@ pub fn close_payment_session(
 ) -> Result<()> {
   let payment_session = &mut ctx.accounts.payment_session;
 
-  payment_session.payments_status.evaluate(&|&item| {
-    if item { Ok(()) } else { Err(ErrorCode::IncompletePayment.into()) }
-  })?;
+  payment_session.eval_status()?;
 
   ctx.accounts.payment_structure.active_sessions -= 1;
 

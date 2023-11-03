@@ -32,13 +32,36 @@ createErrorFromCodeLookup.set(0x1770, () => new OverflowError())
 createErrorFromNameLookup.set('Overflow', () => new OverflowError())
 
 /**
+ * HasActivePaymentSessions: 'This payment structure has active payment sessions'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class HasActivePaymentSessionsError extends Error {
+  readonly code: number = 0x1771
+  readonly name: string = 'HasActivePaymentSessions'
+  constructor() {
+    super('This payment structure has active payment sessions')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, HasActivePaymentSessionsError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1771, () => new HasActivePaymentSessionsError())
+createErrorFromNameLookup.set(
+  'HasActivePaymentSessions',
+  () => new HasActivePaymentSessionsError()
+)
+
+/**
  * ConditionValidationFailed: 'Condition validation failed'
  *
  * @category Errors
  * @category generated
  */
 export class ConditionValidationFailedError extends Error {
-  readonly code: number = 0x1771
+  readonly code: number = 0x1772
   readonly name: string = 'ConditionValidationFailed'
   constructor() {
     super('Condition validation failed')
@@ -49,7 +72,7 @@ export class ConditionValidationFailedError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1771,
+  0x1772,
   () => new ConditionValidationFailedError()
 )
 createErrorFromNameLookup.set(
@@ -64,7 +87,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidConditionalPathError extends Error {
-  readonly code: number = 0x1772
+  readonly code: number = 0x1773
   readonly name: string = 'InvalidConditionalPath'
   constructor() {
     super('Invalid Conditional path')
@@ -74,7 +97,7 @@ export class InvalidConditionalPathError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1772, () => new InvalidConditionalPathError())
+createErrorFromCodeLookup.set(0x1773, () => new InvalidConditionalPathError())
 createErrorFromNameLookup.set(
   'InvalidConditionalPath',
   () => new InvalidConditionalPathError()
@@ -87,7 +110,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class IncompletePaymentError extends Error {
-  readonly code: number = 0x1773
+  readonly code: number = 0x1774
   readonly name: string = 'IncompletePayment'
   constructor() {
     super('Incomplete Payment')
@@ -97,7 +120,7 @@ export class IncompletePaymentError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1773, () => new IncompletePaymentError())
+createErrorFromCodeLookup.set(0x1774, () => new IncompletePaymentError())
 createErrorFromNameLookup.set(
   'IncompletePayment',
   () => new IncompletePaymentError()
@@ -110,7 +133,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidPaymentError extends Error {
-  readonly code: number = 0x1774
+  readonly code: number = 0x1775
   readonly name: string = 'InvalidPayment'
   constructor() {
     super('Invalid payment kind')
@@ -120,7 +143,7 @@ export class InvalidPaymentError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1774, () => new InvalidPaymentError())
+createErrorFromCodeLookup.set(0x1775, () => new InvalidPaymentError())
 createErrorFromNameLookup.set('InvalidPayment', () => new InvalidPaymentError())
 
 /**
@@ -130,7 +153,7 @@ createErrorFromNameLookup.set('InvalidPayment', () => new InvalidPaymentError())
  * @category generated
  */
 export class InvalidNftPaymentError extends Error {
-  readonly code: number = 0x1775
+  readonly code: number = 0x1776
   readonly name: string = 'InvalidNftPayment'
   constructor() {
     super('Invalid nft passed as payment')
@@ -140,7 +163,7 @@ export class InvalidNftPaymentError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1775, () => new InvalidNftPaymentError())
+createErrorFromCodeLookup.set(0x1776, () => new InvalidNftPaymentError())
 createErrorFromNameLookup.set(
   'InvalidNftPayment',
   () => new InvalidNftPaymentError()
@@ -153,7 +176,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidMetadataError extends Error {
-  readonly code: number = 0x1776
+  readonly code: number = 0x1777
   readonly name: string = 'InvalidMetadata'
   constructor() {
     super('The metadata provided for nft is not valid')
@@ -163,7 +186,7 @@ export class InvalidMetadataError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1776, () => new InvalidMetadataError())
+createErrorFromCodeLookup.set(0x1777, () => new InvalidMetadataError())
 createErrorFromNameLookup.set(
   'InvalidMetadata',
   () => new InvalidMetadataError()
@@ -176,7 +199,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidHplCurrencyPaymentError extends Error {
-  readonly code: number = 0x1777
+  readonly code: number = 0x1778
   readonly name: string = 'InvalidHplCurrencyPayment'
   constructor() {
     super('Invalid hpl currency passes as payment')
@@ -187,7 +210,7 @@ export class InvalidHplCurrencyPaymentError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1777,
+  0x1778,
   () => new InvalidHplCurrencyPaymentError()
 )
 createErrorFromNameLookup.set(
@@ -202,7 +225,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidInstructionForCnftError extends Error {
-  readonly code: number = 0x1778
+  readonly code: number = 0x1779
   readonly name: string = 'InvalidInstructionForCnft'
   constructor() {
     super('Invalid instruction for cnft')
@@ -213,7 +236,7 @@ export class InvalidInstructionForCnftError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1778,
+  0x1779,
   () => new InvalidInstructionForCnftError()
 )
 createErrorFromNameLookup.set(
@@ -228,7 +251,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class InvalidBeneficiaryError extends Error {
-  readonly code: number = 0x1779
+  readonly code: number = 0x177a
   readonly name: string = 'InvalidBeneficiary'
   constructor() {
     super('Invalid beneficiary')
@@ -238,7 +261,7 @@ export class InvalidBeneficiaryError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1779, () => new InvalidBeneficiaryError())
+createErrorFromCodeLookup.set(0x177a, () => new InvalidBeneficiaryError())
 createErrorFromNameLookup.set(
   'InvalidBeneficiary',
   () => new InvalidBeneficiaryError()
@@ -251,7 +274,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class PaymentAlreadyMadeError extends Error {
-  readonly code: number = 0x177a
+  readonly code: number = 0x177b
   readonly name: string = 'PaymentAlreadyMade'
   constructor() {
     super('Payment already made')
@@ -261,7 +284,7 @@ export class PaymentAlreadyMadeError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x177a, () => new PaymentAlreadyMadeError())
+createErrorFromCodeLookup.set(0x177b, () => new PaymentAlreadyMadeError())
 createErrorFromNameLookup.set(
   'PaymentAlreadyMade',
   () => new PaymentAlreadyMadeError()
