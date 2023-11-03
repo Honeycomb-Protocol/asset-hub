@@ -41,7 +41,7 @@ export const burnCurrencyStruct = new beet.BeetArgsStruct<
  * @property [] holderAccount
  * @property [_writable_] mint
  * @property [_writable_] tokenAccount
- * @property [**signer**] owner
+ * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] hiveControl
@@ -56,7 +56,7 @@ export type BurnCurrencyInstructionAccounts = {
   holderAccount: web3.PublicKey
   mint: web3.PublicKey
   tokenAccount: web3.PublicKey
-  owner: web3.PublicKey
+  authority: web3.PublicKey
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -116,7 +116,7 @@ export function createBurnCurrencyInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.owner,
+      pubkey: accounts.authority,
       isWritable: false,
       isSigner: true,
     },

@@ -377,7 +377,7 @@ pub mod hpl_currency_manager {
             hpl_hive_control::state::SerializableActions::FeeExempt,
             None,
             ctx.accounts.project.to_account_info(),
-            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.authority.to_account_info(),
             ctx.accounts.payer.to_account_info(),
             ctx.accounts.vault.to_account_info(),
             &None,

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.76",
+  "version": "0.0.77",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -1203,7 +1203,7 @@
           ]
         },
         {
-          "name": "owner",
+          "name": "authority",
           "isMut": false,
           "isSigner": true,
           "docs": [

@@ -1,5 +1,9 @@
 # 0.0.x
 
+## 0.0.78
+
+- Allow project authority to burn custodial tokens
+
 ## 0.0.77
 
 - Updates to latest hpl-hive-control

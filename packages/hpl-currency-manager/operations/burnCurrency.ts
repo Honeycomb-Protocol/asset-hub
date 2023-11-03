@@ -53,7 +53,7 @@ export async function createBurnCurrencyOperation(
         holderAccount: args.holderAccount.address,
         mint: args.holderAccount.currency().mint.address,
         tokenAccount: args.holderAccount.tokenAccount,
-        owner: args.holderAccount.owner,
+        authority: honeycomb.identity().address,
         payer: honeycomb.identity().address,
         vault: VAULT,
         hiveControl: HPL_HIVE_CONTROL_PROGRAM,

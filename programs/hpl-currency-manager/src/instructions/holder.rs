@@ -326,7 +326,7 @@ pub struct BurnCurrency<'info> {
     pub currency: Account<'info, Currency>,
 
     /// The holder account associated with the currency, which holds the token.
-    #[account(has_one = currency, has_one = token_account, has_one = owner)]
+    #[account(has_one = currency, has_one = token_account)]
     pub holder_account: Account<'info, HolderAccount>,
 
     /// The mint account of the currency.
@@ -338,7 +338,7 @@ pub struct BurnCurrency<'info> {
     pub token_account: Account<'info, TokenAccount>,
 
     /// The owner of the token account.
-    pub owner: Signer<'info>,
+    pub authority: Signer<'info>,
 
     /// The wallet that pays for the rent and fees
     #[account(mut)]
@@ -366,6 +366,8 @@ pub struct BurnCurrency<'info> {
 
 /// Burn currency
 pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
+    let authority = &ctx.accounts.authority;
+    let authority_key = authority.key();
     // Check if the holder account is inactive
     if ctx.accounts.holder_account.status == HolderStatus::Inactive {
         return Err(ErrorCode::InactiveHolder.into());
@@ -377,6 +379,11 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
             kind: PermissionedCurrencyKind::Custodial,
         })
     {
+        if !authority_key.eq(&ctx.accounts.holder_account.owner)
+            && !authority_key.eq(&ctx.accounts.project.authority)
+        {
+            return Err(ErrorCode::Unauthorized.into());
+        }
         // For custodial permissioned currency, use the holder account as the authority
         let holder_seeds = &[
             b"holder_account",
@@ -399,6 +406,9 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
             amount,
         )?;
     } else {
+        if !authority_key.eq(&ctx.accounts.holder_account.owner) {
+            return Err(ErrorCode::Unauthorized.into());
+        }
         // For non-custodial permissioned or other kinds of currency, use the owner as the authority
         token::burn(
             CpiContext::new(
@@ -406,7 +416,7 @@ pub fn burn_currency(ctx: Context<BurnCurrency>, amount: u64) -> Result<()> {
                 Burn {
                     mint: ctx.accounts.mint.to_account_info(),
                     from: ctx.accounts.token_account.to_account_info(),
-                    authority: ctx.accounts.owner.to_account_info(),
+                    authority: authority.to_account_info(),
                 },
             ),
             amount,
