@@ -235,7 +235,7 @@ pub fn make_hpl_currency_payment(
               holder_account: ctx.accounts.holder_account.to_account_info(),
               mint: ctx.accounts.mint.to_account_info(),
               token_account: ctx.accounts.token_account.to_account_info(),
-              owner: ctx.accounts.payer.to_account_info(),
+              authority: ctx.accounts.payer.to_account_info(),
               payer: ctx.accounts.payer.to_account_info(),
               vault: ctx.accounts.vault.to_account_info(),
               system_program: ctx.accounts.system_program.to_account_info(),

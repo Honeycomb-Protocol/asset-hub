@@ -28,7 +28,9 @@ hpl-utils = "0.1.4"
 hpl-macros = "0.0.2"
 hpl-events = { version = "0.1.21", features = ["no-entrypoint"] }
 hpl-hive-control = { version = "0.2.6", features = ["cpi"] }
-hpl-currency-manager = { version = "0.0.76", features = ["cpi"] }
+hpl-currency-manager = { version = "0.0.78", path = "../hpl-currency-manager", features = [
+  "cpi",
+] }
 mpl-token-metadata = { version = "1.9.0", features = ["no-entrypoint"] }
 mpl-bubblegum = { version = "0.7.0", features = ["cpi"] }
 spl-account-compression = { version = "0.1.8", features = ["cpi"] }
