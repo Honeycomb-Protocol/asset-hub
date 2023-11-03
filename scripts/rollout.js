@@ -2,7 +2,7 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-const ignore = ["idl", "hpl-ledger-identity"];
+const ignore = ["idl", "hpl-asset-assembler", "hpl-asset-manager"];
 const ignoreBuild = process.argv.includes("--ignore-build");
 
 versionBump = (package) => {
