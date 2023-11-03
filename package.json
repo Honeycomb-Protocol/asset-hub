@@ -5,11 +5,13 @@
     "access": "public"
   },
   "scripts": {
+    "postinstall": "node ./scripts/postinstall.js",
     "link:currency-manager": "cd ./packages/hpl-currency-manager && yarn link && cd ../.. && yarn link @honeycomb-protocol/currency-manager",
     "link:payment-manager": "cd ./packages/hpl-payment-manager && yarn link && cd ../.. && yarn link @honeycomb-protocol/payment-manager",
     "link": "yarn link:currency-manager && yarn link:payment-manager",
     "prepare": "yarn run link",
     "build": "solita",
+    "postbuild": "node ./scripts/postbuild.js",
     "build:currency-manager": "PROGRAM_NAME=currency-manager yarn build",
     "build:payment-manager": "PROGRAM_NAME=payment-manager yarn build",
     "build:all": "yarn build:currency-manager && yarn build:payment-manager",
