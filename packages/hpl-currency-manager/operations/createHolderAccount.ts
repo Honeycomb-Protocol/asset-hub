@@ -21,6 +21,7 @@ import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 type CreateCreateHolderAccountOperationArgs = {
   currency: HplCurrency;
   owner: web3.PublicKey;
+  runAllways?: boolean;
   programId?: web3.PublicKey;
 };
 
@@ -67,8 +68,10 @@ export async function createCreateHolderAccountOperation(
 
   const wrap = args.currency.kind.__kind === "Wrapped";
   const needed = {
-    tokenAccount: !(await honeycomb.rpc().getBalance(tokenAccount)),
-    holderAccount: !(await honeycomb.rpc().getBalance(holderAccount)),
+    tokenAccount:
+      args.runAllways || !(await honeycomb.rpc().getBalance(tokenAccount)),
+    holderAccount:
+      args.runAllways || !(await honeycomb.rpc().getBalance(holderAccount)),
   };
 
   const instructions: web3.TransactionInstruction[] = [];
