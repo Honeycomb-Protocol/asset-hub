@@ -27,24 +27,22 @@ export class HplPaymentSession {
   public static async fromAddress(
     paymentStructure: HplPaymentStructure,
     address: web3.PublicKey,
-    commitmentOrConfig:
-      | web3.Commitment
-      | web3.GetAccountInfoConfig = "processed"
+    commitment: web3.Commitment = "processed"
   ) {
-    const solita = await PaymentSession.fromAccountAddress(
-      paymentStructure.honeycomb().processedConnection,
-      address,
-      commitmentOrConfig
+    return new HplPaymentSession(
+      paymentStructure,
+      await paymentStructure
+        .honeycomb()
+        .fetch()
+        .paymentManager()
+        .session(address, commitment)
     );
-    return new HplPaymentSession(paymentStructure, solita);
   }
 
   public static of(
     paymentStructure: HplPaymentStructure,
     payer: web3.PublicKey,
-    commitmentOrConfig:
-      | web3.Commitment
-      | web3.GetAccountInfoConfig = "processed"
+    commitment: web3.Commitment = "processed"
   ) {
     return HplPaymentSession.fromAddress(
       paymentStructure,
@@ -53,7 +51,7 @@ export class HplPaymentSession {
         .pda()
         .paymentManager()
         .paymentSession(paymentStructure.address, payer)[0],
-      commitmentOrConfig
+      commitment
     );
   }
 

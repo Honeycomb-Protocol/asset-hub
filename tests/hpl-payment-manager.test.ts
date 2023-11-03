@@ -49,8 +49,7 @@ describe("Currency Manager", () => {
 
     adminHC
       .currency()
-      .create()
-      .holderAccount(userHC.identity().address)
+      .newHolderAccount(userHC.identity().address)
       .then((holderAccount) =>
         holderAccount.mint(10 * 10 ** adminHC.currency().mint.decimals)
       );

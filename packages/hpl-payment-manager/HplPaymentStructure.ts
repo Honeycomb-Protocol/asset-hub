@@ -1,11 +1,14 @@
 import * as web3 from "@solana/web3.js";
 import {
   Honeycomb,
-  HoneycombProject,
   Module,
   isPublicKey,
 } from "@honeycomb-protocol/hive-control";
-import { paymentManagerPdas } from "./utils";
+import {
+  paymentManagerCreate,
+  paymentManagerFetch,
+  paymentManagerPdas,
+} from "./utils";
 import { ConditionalPayment, PROGRAM_ID, PaymentStructure } from "./generated";
 import { HplPaymentSession } from "./HplPaymentSession";
 import { HplConditionalPayments } from "./utils";
@@ -36,23 +39,29 @@ export class HplPaymentStructure extends Module {
     this._payments = new HplConditionalPayments(solita.payments);
   }
 
+  /**
+   * Creates a HplPaymentStructure instance from given address.
+   * @param honeycomb The Honeycomb instance.
+   * @param args The arguments for creating the currency.
+   * @param confirmOptions Optional confirm options for the transaction.
+   */
   public static async fromAddress(
     honeycomb: Honeycomb,
     address: web3.PublicKey,
-    commitmentOrConfig:
-      | web3.Commitment
-      | web3.GetAccountInfoConfig = "processed"
+    commitment: web3.Commitment = "processed",
+    reFetch = false
   ) {
-    const solita = await PaymentStructure.fromAccountAddress(
-      honeycomb.processedConnection,
-      address,
-      commitmentOrConfig
+    honeycomb.fetch().register(paymentManagerFetch());
+    return new HplPaymentStructure(
+      await honeycomb
+        .fetch()
+        .paymentManager()
+        .structure(address, commitment, reFetch)
     );
-    return new HplPaymentStructure(solita);
   }
 
   /**
-   * Creates a new HplPaymentStructure instance.
+   * Creates a new HplPaymentStructure account.
    * @param honeycomb The Honeycomb instance.
    * @param args The arguments for creating the currency.
    * @param confirmOptions Optional confirm options for the transaction.
@@ -63,17 +72,12 @@ export class HplPaymentStructure extends Module {
     confirmOptions?: web3.ConfirmOptions
   ) {
     honeycomb.pda().register(paymentManagerPdas());
-    const { paymentStructure, operation } =
-      await createCreatePaymentStructureOperation(honeycomb, {
-        args: {
-          payments,
-        },
-        programId: PROGRAM_ID,
-      });
-
-    await operation.send(confirmOptions);
-
-    return await HplPaymentStructure.fromAddress(honeycomb, paymentStructure);
+    honeycomb.create().register(paymentManagerCreate());
+    const { paymentStructure } = await honeycomb
+      .create()
+      .paymentManager()
+      .structure(payments);
+    return HplPaymentStructure.fromAddress(honeycomb, paymentStructure);
   }
 
   /**
@@ -142,11 +146,10 @@ export class HplPaymentStructure extends Module {
    * Start a new payment session
    */
   public async startSession(confirmOptions?: web3.ConfirmOptions) {
-    const { operation, paymentSession } =
-      await createStartPaymentSessionOperation(this.honeycomb(), {
-        paymentStructure: this.address,
-      });
-    await operation.send(confirmOptions);
+    const { paymentSession } = await this.honeycomb()
+      .create()
+      .paymentManager()
+      .session(this.address, confirmOptions);
     return HplPaymentSession.fromAddress(this, paymentSession);
   }
 
@@ -158,6 +161,8 @@ export class HplPaymentStructure extends Module {
     if (!honeycomb._paymentStructures) {
       honeycomb._paymentStructures = {};
       honeycomb.pda().register(paymentManagerPdas());
+      honeycomb.fetch().register(paymentManagerFetch());
+      honeycomb.create().register(paymentManagerCreate());
     }
     this._honeycomb = honeycomb;
     honeycomb._paymentStructures[this.address.toString()] = this;
