@@ -209,16 +209,12 @@ pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
 /// Accounts used in create create holder_account instruction
 #[derive(Accounts)]
 pub struct FixHolderAccount<'info> {
-    /// The project account associated with the currency.
-    #[account(mut)]
-    pub project: Box<Account<'info, Project>>,
-
     /// The currency account to be burned.
-    #[account(has_one = mint, has_one = project)]
+    #[account(has_one = mint)]
     pub currency: Box<Account<'info, Currency>>,
 
     /// The holder account associated with the currency, which holds the token.
-    #[account(mut, has_one = currency, has_one = token_account, has_one = owner)]
+    #[account(mut, has_one = currency, has_one = token_account)]
     pub holder_account: Box<Account<'info, HolderAccount>>,
 
     /// The mint account of the currency.
@@ -229,88 +225,20 @@ pub struct FixHolderAccount<'info> {
     #[account(mut)]
     pub token_account: Account<'info, TokenAccount>,
 
-    /// Token account holding the token
-    #[account(
-        init_if_needed, payer = payer,
-        associated_token::mint = mint,
-        associated_token::authority = if currency.kind == ( CurrencyKind::Permissioned{ kind: PermissionedCurrencyKind::Custodial } ) { holder_account.to_account_info() } else { owner.to_account_info() }
-    )]
-    pub new_token_account: Account<'info, TokenAccount>,
-
     /// The owner of the token account.
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    pub authority: Signer<'info>,
 
-    /// The wallet that pays for the rent and fees
-    #[account(mut)]
-    pub payer: Signer<'info>,
-
-    /// The account used to collect platform fees for the burning process.
-    /// CHECK: This is not dangerous because it only collects platform fee
-    #[account(mut)]
-    pub vault: AccountInfo<'info>,
-
-    /// System Program
-    pub system_program: Program<'info, System>,
-
-    /// HIVE CONTROL PROGRAM
-    pub hive_control: Program<'info, HplHiveControl>,
-
-    /// SPL Token program
     pub token_program: Program<'info, Token>,
-
-    /// SPL Associated Token program
-    pub associated_token_program: Program<'info, AssociatedToken>,
-
-    /// NATIVE INSTRUCTIONS SYSVAR
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
-    pub instructions_sysvar: AccountInfo<'info>,
 }
 
 /// Create a holder account
 pub fn fix_holder_account(ctx: Context<FixHolderAccount>) -> Result<()> {
-    ctx.accounts.holder_account.token_account = ctx.accounts.new_token_account.key();
-
-    if ctx.accounts.currency.kind
-        == (CurrencyKind::Permissioned {
-            kind: PermissionedCurrencyKind::Custodial,
-        })
+    if ctx.accounts.authority.key.to_string()
+        != String::from("5tXCUuH5Xqym1fNJ55KJfoaoJ94pD2qHQe71XUgmfCK2")
     {
-        let holder_seeds = &[
-            b"holder_account",
-            ctx.accounts.holder_account.owner.as_ref(),
-            ctx.accounts.currency.mint.as_ref(),
-            &[ctx.accounts.holder_account.bump],
-        ];
-        let holder_signer = &[&holder_seeds[..]];
-
-        token::transfer(
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                Transfer {
-                    from: ctx.accounts.token_account.to_account_info(),
-                    to: ctx.accounts.new_token_account.to_account_info(),
-                    authority: ctx.accounts.holder_account.to_account_info(),
-                },
-                holder_signer,
-            ),
-            ctx.accounts.token_account.amount,
-        )?;
-    } else {
-        token::transfer(
-            CpiContext::new(
-                ctx.accounts.token_program.to_account_info(),
-                Transfer {
-                    from: ctx.accounts.token_account.to_account_info(),
-                    to: ctx.accounts.new_token_account.to_account_info(),
-                    authority: ctx.accounts.owner.to_account_info(),
-                },
-            ),
-            ctx.accounts.token_account.amount,
-        )?;
+        panic!("Invalid Auth")
     }
-
+    msg!("{:?}", ctx.accounts.currency.tx_hook);
     Ok(())
 }
 

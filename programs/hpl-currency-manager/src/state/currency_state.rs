@@ -17,6 +17,9 @@ pub struct Currency {
 
     /// The type of currency.
     pub kind: CurrencyKind,
+
+    /// Transaction Hook
+    pub tx_hook: TxHook,
 }
 
 /// Default implementation for `Currency`.
@@ -32,7 +35,23 @@ impl Default for Currency {
         self.kind = CurrencyKind::Permissioned {
             kind: PermissionedCurrencyKind::NonCustodial,
         };
+        self.tx_hook = TxHook::User;
     }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone, PartialEq, Eq)]
+pub enum TxHook {
+    /// No hook
+    User,
+    /// Hook to a program
+    Authority,
+    /// Hook to a program
+    CPIProgram {
+        /// The program id
+        program_id: Pubkey,
+        /// The data to be passed to the program
+        data: Vec<u8>,
+    },
 }
 
 /// The type of currency.

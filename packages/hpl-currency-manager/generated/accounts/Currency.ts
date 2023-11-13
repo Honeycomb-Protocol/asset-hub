@@ -9,6 +9,7 @@ import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
 import { CurrencyKind, currencyKindBeet } from '../types/CurrencyKind'
+import { TxHook, txHookBeet } from '../types/TxHook'
 
 /**
  * Arguments used to create {@link Currency}
@@ -20,6 +21,7 @@ export type CurrencyArgs = {
   project: web3.PublicKey
   mint: web3.PublicKey
   kind: CurrencyKind
+  txHook: TxHook
 }
 
 export const currencyDiscriminator = [191, 62, 116, 219, 163, 67, 229, 200]
@@ -35,14 +37,21 @@ export class Currency implements CurrencyArgs {
     readonly bump: number,
     readonly project: web3.PublicKey,
     readonly mint: web3.PublicKey,
-    readonly kind: CurrencyKind
+    readonly kind: CurrencyKind,
+    readonly txHook: TxHook
   ) {}
 
   /**
    * Creates a {@link Currency} instance from the provided args.
    */
   static fromArgs(args: CurrencyArgs) {
-    return new Currency(args.bump, args.project, args.mint, args.kind)
+    return new Currency(
+      args.bump,
+      args.project,
+      args.mint,
+      args.kind,
+      args.txHook
+    )
   }
 
   /**
@@ -154,6 +163,7 @@ export class Currency implements CurrencyArgs {
       project: this.project.toBase58(),
       mint: this.mint.toBase58(),
       kind: this.kind.__kind,
+      txHook: this.txHook.__kind,
     }
   }
 }
@@ -174,6 +184,7 @@ export const currencyBeet = new beet.FixableBeetStruct<
     ['project', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
     ['kind', currencyKindBeet],
+    ['txHook', txHookBeet],
   ],
   Currency.fromArgs,
   'Currency'

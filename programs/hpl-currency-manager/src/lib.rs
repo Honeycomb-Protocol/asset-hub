@@ -209,30 +209,9 @@ pub mod hpl_currency_manager {
     /// This function returns an error if the platform gate fails or if any issues occur during the
     /// holder account creation process.
     pub fn fix_holder_account(ctx: Context<FixHolderAccount>) -> Result<()> {
-        platform_gate_cpi(
-            hpl_hive_control::state::SerializableActions::PublicLow,
-            None,
-            ctx.accounts.project.to_account_info(),
-            ctx.accounts.owner.to_account_info(),
-            ctx.accounts.payer.to_account_info(),
-            ctx.accounts.vault.to_account_info(),
-            &None,
-            ctx.accounts.system_program.to_account_info(),
-            ctx.accounts.hive_control.to_account_info(),
-            ctx.accounts.instructions_sysvar.to_account_info(),
-        )?;
-
-        // Perform pre-actions before instructionn
-        pre_actions(
-            &ctx.accounts.currency,
-            &ctx.accounts.mint,
-            &ctx.accounts.token_account,
-            &ctx.accounts.token_program,
-        )?;
-
         let currency = &ctx.accounts.currency.clone();
         let token_program = &ctx.accounts.token_program.clone();
-        let token_account = &ctx.accounts.new_token_account.clone();
+        let token_account = &ctx.accounts.token_account.clone();
         let mint = &ctx.accounts.mint.clone();
 
         // Create the holder account

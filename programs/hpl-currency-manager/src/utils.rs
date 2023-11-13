@@ -13,10 +13,6 @@ pub fn pre_actions<'info>(
     if token_account.is_frozen()
         && mint.freeze_authority.is_some()
         && mint.freeze_authority.unwrap().eq(&currency.key())
-        && currency.kind
-            != (CurrencyKind::Permissioned {
-                kind: PermissionedCurrencyKind::Custodial,
-            })
     {
         let currency_seeds = &[
             b"currency".as_ref(),
@@ -47,10 +43,6 @@ pub fn post_actions<'info>(
     if !token_account.is_frozen()
         && mint.freeze_authority.is_some()
         && mint.freeze_authority.unwrap().eq(&currency.key())
-        && currency.kind
-            != (CurrencyKind::Permissioned {
-                kind: PermissionedCurrencyKind::Custodial,
-            })
     {
         let currency_seeds = &[
             b"currency".as_ref(),

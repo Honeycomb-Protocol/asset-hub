@@ -748,14 +748,6 @@
       ],
       "accounts": [
         {
-          "name": "project",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The project account associated with the currency."
-          ]
-        },
-        {
           "name": "currency",
           "isMut": false,
           "isSigner": false,
@@ -788,76 +780,17 @@
           ]
         },
         {
-          "name": "newTokenAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account holding the token"
-          ]
-        },
-        {
-          "name": "owner",
-          "isMut": true,
+          "name": "authority",
+          "isMut": false,
           "isSigner": true,
           "docs": [
             "The owner of the token account."
           ]
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "The wallet that pays for the rent and fees"
-          ]
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The account used to collect platform fees for the burning process."
-          ]
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "System Program"
-          ]
-        },
-        {
-          "name": "hiveControl",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HIVE CONTROL PROGRAM"
-          ]
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Token program"
-          ]
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Associated Token program"
-          ]
-        },
-        {
-          "name": "instructionsSysvar",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "NATIVE INSTRUCTIONS SYSVAR"
-          ]
+          "isSigner": false
         }
       ],
       "args": []
@@ -1852,6 +1785,15 @@
             "type": {
               "defined": "CurrencyKind"
             }
+          },
+          {
+            "name": "txHook",
+            "docs": [
+              "Transaction Hook"
+            ],
+            "type": {
+              "defined": "TxHook"
+            }
           }
         ]
       }
@@ -1994,6 +1936,39 @@
             "type": {
               "option": "string"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TxHook",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "User"
+          },
+          {
+            "name": "Authority"
+          },
+          {
+            "name": "CPIProgram",
+            "fields": [
+              {
+                "name": "program_id",
+                "docs": [
+                  "The program id"
+                ],
+                "type": "publicKey"
+              },
+              {
+                "name": "data",
+                "docs": [
+                  "The data to be passed to the program"
+                ],
+                "type": "bytes"
+              }
+            ]
           }
         ]
       }

@@ -23,37 +23,22 @@ export const fixHolderAccountStruct = new beet.BeetArgsStruct<{
 /**
  * Accounts required by the _fixHolderAccount_ instruction
  *
- * @property [_writable_] project
  * @property [] currency
  * @property [_writable_] holderAccount
  * @property [_writable_] mint
  * @property [_writable_] tokenAccount
- * @property [_writable_] newTokenAccount
- * @property [_writable_, **signer**] owner
- * @property [_writable_, **signer**] payer
- * @property [_writable_] vault
- * @property [] hiveControl
- * @property [] associatedTokenProgram
- * @property [] instructionsSysvar
+ * @property [**signer**] authority
  * @category Instructions
  * @category FixHolderAccount
  * @category generated
  */
 export type FixHolderAccountInstructionAccounts = {
-  project: web3.PublicKey
   currency: web3.PublicKey
   holderAccount: web3.PublicKey
   mint: web3.PublicKey
   tokenAccount: web3.PublicKey
-  newTokenAccount: web3.PublicKey
-  owner: web3.PublicKey
-  payer: web3.PublicKey
-  vault: web3.PublicKey
-  systemProgram?: web3.PublicKey
-  hiveControl: web3.PublicKey
+  authority: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  associatedTokenProgram: web3.PublicKey
-  instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -78,11 +63,6 @@ export function createFixHolderAccountInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.project,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.currency,
       isWritable: false,
       isSigner: false,
@@ -103,47 +83,12 @@ export function createFixHolderAccountInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.newTokenAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.owner,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.payer,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.vault,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      pubkey: accounts.authority,
       isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.hiveControl,
-      isWritable: false,
-      isSigner: false,
+      isSigner: true,
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.associatedTokenProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.instructionsSysvar,
       isWritable: false,
       isSigner: false,
     },
