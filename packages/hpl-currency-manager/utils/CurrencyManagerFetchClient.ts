@@ -3,6 +3,7 @@ import {
   FetchModule,
   FetchClient,
   isPublicKey,
+  ForceScenario,
 } from "@honeycomb-protocol/hive-control";
 import { Currency, HolderAccount } from "../generated";
 import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
@@ -39,13 +40,13 @@ export class CurrencyManagerFetchClient extends FetchClient {
    * Fetches the Currency object.
    * @param address - The public address of the Currency account.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async currency(
     address: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<Currency | null> {
     try {
       return Currency.fromAccountInfo(
@@ -60,13 +61,13 @@ export class CurrencyManagerFetchClient extends FetchClient {
    * Fetches the mint object.
    * @param address - The mint address.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async mint(
     address: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<Mint | null> {
     try {
       return unpackMint(
@@ -82,13 +83,13 @@ export class CurrencyManagerFetchClient extends FetchClient {
    * Fetches the Metadata object.
    * @param mint - The minnt address of the token.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async metadata(
     mint: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<Metadata | null> {
     try {
       return Metadata.fromAccountInfo(
@@ -103,13 +104,13 @@ export class CurrencyManagerFetchClient extends FetchClient {
    * Fetches the Currecy object along with it's dependencies.
    * @param address - The public address of the token.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async currencyWithDeps(
     address: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<{ currency: Currency; mint: Mint; metadata: Metadata } | null> {
     try {
       const currency = await this.currency(address, commitment, forceFetch);
@@ -135,32 +136,32 @@ export class CurrencyManagerFetchClient extends FetchClient {
    * Fetches the Holder Account object.
    * @param args - The currency address and owner of holder account.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async holderAccount(
     args: { currency: PublicKey; owner: PublicKey },
     commitment?: Commitment,
-    forceFetch?: boolean
+    forceFetch?: ForceScenario
   ): Promise<HolderAccount | null>;
 
   /**
    * Fetches the Holder Account object.
    * @param address - The public address of the holderAccount.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async holderAccount(
     address: PublicKey,
     commitment?: Commitment,
-    forceFetch?: boolean
+    forceFetch?: ForceScenario
   ): Promise<HolderAccount | null>;
 
   public async holderAccount(
     addressOrArgs: PublicKey | { currency: PublicKey; owner: PublicKey },
     commitment: Commitment = "processed",
-    forceFetch = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<HolderAccount | null> {
     try {
       const address = isPublicKey(addressOrArgs)
@@ -182,13 +183,13 @@ export class CurrencyManagerFetchClient extends FetchClient {
    * Fetches the Token Account object.
    * @param address - The public address of the tokenAccount.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async tokenAccount(
     address: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<TokenAccount | null> {
     try {
       return unpackTokenAccount(
@@ -204,13 +205,13 @@ export class CurrencyManagerFetchClient extends FetchClient {
    * Fetches the Currecy object along with it's dependencies.
    * @param address - The public address of the holderAccount.
    * @param commitment The Solana block commitment.
-   * @param forceFetch Wether to use cache data or forcefully refetch.
+   * @param forceFetch Wether to use cache data or forcefully forceFetch.
    * @returns An instance of HoneycombProject.
    */
   public async holderAccountWithDeps(
     address: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<{
     holderAccount: HolderAccount;
     tokenAccount: TokenAccount;

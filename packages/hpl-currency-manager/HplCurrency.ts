@@ -1,6 +1,7 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import {
+  ForceScenario,
   Honeycomb,
   HoneycombProject,
   Module,
@@ -141,10 +142,10 @@ export class HplCurrency extends Module<
 
   /**
    * Fetches URI data for the currency.
-   * @param reFetch Set to true to force re-fetching of the data.
+   * @param forceFetch Set to true to force re-fetching of the data.
    */
-  public async uriData(reFetch = false) {
-    if (!this._uriData || reFetch) {
+  public async uriData(forceFetch = ForceScenario.NoForce) {
+    if (!this._uriData || forceFetch) {
       this._uriData = await fetch(this.uri, {
         method: "GET",
         redirect: "follow",
@@ -171,19 +172,19 @@ export class HplCurrency extends Module<
    * Gets the holder account for the given owner.
    * @param owner The owner of the holder account. If not provided, uses the identity address.
    * @param commitment The Solana block commitment.
-   * @param reFetch Set to true to force re-fetching of the holder account data.
+   * @param forceFetch Set to true to force re-fetching of the holder account data.
    */
   public async holderAccount(
     owner?: web3.PublicKey,
     commitment: web3.Commitment = "processed",
-    reFetch = false
+    forceFetch = ForceScenario.NoForce
   ) {
     if (!owner) owner = this.honeycomb().identity().address;
     return this.cache.getOrFetch(
       "holderAccount",
       owner.toString(),
-      () => HplHolderAccount.of(this, owner, commitment, reFetch),
-      reFetch
+      () => HplHolderAccount.of(this, owner, commitment, forceFetch),
+      forceFetch
     );
   }
 

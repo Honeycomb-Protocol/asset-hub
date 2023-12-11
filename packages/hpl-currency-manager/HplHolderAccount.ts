@@ -12,7 +12,11 @@ import {
   createSetHolderStatusOperation,
   createTransferCurrencyOperation,
 } from ".";
-import { isPublicKey, toBigNumber } from "@honeycomb-protocol/hive-control";
+import {
+  ForceScenario,
+  isPublicKey,
+  toBigNumber,
+} from "@honeycomb-protocol/hive-control";
 
 /**
  * HplHolderAccount class represents the holder account of HplCurrency.
@@ -37,13 +41,13 @@ export class HplHolderAccount {
     currency: HplCurrency,
     address: PublicKey,
     commitment: Commitment = "processed",
-    reFetch = false
+    forceFetch = ForceScenario.NoForce
   ) {
     const { holderAccount, tokenAccount } = await currency
       .honeycomb()
       .fetch()
       .currencyManager()
-      .holderAccountWithDeps(address, commitment, reFetch);
+      .holderAccountWithDeps(address, commitment, forceFetch);
     return new HplHolderAccount(currency, address, holderAccount, tokenAccount);
   }
 
@@ -56,14 +60,19 @@ export class HplHolderAccount {
     currency: HplCurrency,
     wallet: PublicKey,
     commitment: Commitment = "processed",
-    reFetch = false
+    forceFetch = ForceScenario.NoForce
   ) {
     const [address] = currency
       .honeycomb()
       .pda()
       .currencyManager()
       .holderAccount(wallet, currency.mint.address);
-    return HplHolderAccount.fromAddress(currency, address, commitment, reFetch);
+    return HplHolderAccount.fromAddress(
+      currency,
+      address,
+      commitment,
+      forceFetch
+    );
   }
 
   /**
