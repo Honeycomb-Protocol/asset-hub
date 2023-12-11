@@ -1,5 +1,9 @@
 import { Commitment, PublicKey } from "@solana/web3.js";
-import { FetchModule, FetchClient } from "@honeycomb-protocol/hive-control";
+import {
+  FetchModule,
+  FetchClient,
+  ForceScenario,
+} from "@honeycomb-protocol/hive-control";
 import { PaymentSession, PaymentStructure } from "../generated";
 
 /**
@@ -32,7 +36,7 @@ export class PaymentManagerFetchClient extends FetchClient {
   public async structure(
     address: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch: boolean = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<PaymentStructure | null> {
     try {
       return PaymentStructure.fromAccountInfo(
@@ -55,7 +59,7 @@ export class PaymentManagerFetchClient extends FetchClient {
   public async session(
     address: PublicKey,
     commitment: Commitment = "processed",
-    forceFetch: boolean = false
+    forceFetch = ForceScenario.NoForce
   ): Promise<PaymentSession | null> {
     try {
       return PaymentSession.fromAccountInfo(

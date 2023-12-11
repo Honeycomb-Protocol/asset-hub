@@ -1,5 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import {
+  ForceScenario,
   Honeycomb,
   Module,
   isPublicKey,
@@ -49,14 +50,14 @@ export class HplPaymentStructure extends Module {
     honeycomb: Honeycomb,
     address: web3.PublicKey,
     commitment: web3.Commitment = "processed",
-    reFetch = false
+    forceFetch = ForceScenario.NoForce
   ) {
     honeycomb.fetch().register(paymentManagerFetch());
     return new HplPaymentStructure(
       await honeycomb
         .fetch()
         .paymentManager()
-        .structure(address, commitment, reFetch)
+        .structure(address, commitment, forceFetch)
     );
   }
 
@@ -112,8 +113,8 @@ export class HplPaymentStructure extends Module {
   /**
    * Fetch all payment sessions of this payment structure.
    */
-  public async sessions(reFetch = false) {
-    if (!Object.values(this._sessions).length || reFetch) {
+  public async sessions(forceFetch = ForceScenario.NoForce) {
+    if (!Object.values(this._sessions).length || forceFetch) {
       await HplPaymentSession.allOf(this).then((sessions) => {
         this._sessions = sessions.reduce(
           (acc, session) => ({
@@ -130,10 +131,13 @@ export class HplPaymentStructure extends Module {
   /**
    * Fetch the payment session of a particular payer
    * @param payer The payer of the payment session.
-   * @param reFetch Whether to re-fetch the payment session.
+   * @param forceFetch Whether to re-fetch the payment session.
    */
-  public async session(payer: web3.PublicKey, reFetch = false) {
-    if (this._sessions[payer.toString()] == undefined || reFetch) {
+  public async session(
+    payer: web3.PublicKey,
+    forceFetch = ForceScenario.NoForce
+  ) {
+    if (this._sessions[payer.toString()] == undefined || forceFetch) {
       this._sessions[payer.toString()] = await HplPaymentSession.of(
         this,
         payer
