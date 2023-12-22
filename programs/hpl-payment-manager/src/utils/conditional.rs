@@ -47,33 +47,58 @@ impl<T> AnchorDeserialize for Conditional<T>
 where
     T: AnchorSerialize + AnchorDeserialize + Clone + PartialEq,
 {
-    #[inline]
-    fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        if buf.is_empty() {
+    fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
+        let mut buf: [u8; 1] = [0; 1];
+        let limit = reader.read(&mut buf)?;
+        if limit != 1 {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 ERROR_UNEXPECTED_LENGTH_OF_INPUT,
             ));
         }
-        let flag = buf[0];
-        *buf = &buf[1..];
-        if flag == 0 {
-            Ok(Self::None)
-        } else if flag == 1 {
-            Ok(Self::Item(T::deserialize(buf)?))
-        } else if flag == 2 {
-            Ok(Self::Or(Vec::deserialize(buf)?))
-        } else if flag == 3 {
-            Ok(Self::And(Vec::deserialize(buf)?))
-        } else {
-            let msg = format!(
-                "Invalid Option representation: {}. The first byte must be 0 till 3",
-                flag
-            );
+        match buf[0] {
+            0 => Ok(Self::None),
+            1 => Ok(Self::Item(T::deserialize_reader(reader)?)),
+            2 => Ok(Self::Or(Vec::deserialize_reader(reader)?)),
+            3 => Ok(Self::And(Vec::deserialize_reader(reader)?)),
+            _ => {
+                let msg = format!(
+                    "Invalid Option representation: {}. The first byte must be 0 till 3",
+                    buf[0]
+                );
 
-            Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, msg))
+                Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, msg))
+            }
         }
     }
+
+    // #[inline]
+    // fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+    //     if buf.is_empty() {
+    //         return Err(std::io::Error::new(
+    //             std::io::ErrorKind::InvalidInput,
+    //             ERROR_UNEXPECTED_LENGTH_OF_INPUT,
+    //         ));
+    //     }
+    //     let flag = buf[0];
+    //     *buf = &buf[1..];
+    //     if flag == 0 {
+    //         Ok(Self::None)
+    //     } else if flag == 1 {
+    //         Ok(Self::Item(T::deserialize(buf)?))
+    //     } else if flag == 2 {
+    //         Ok(Self::Or(Vec::deserialize(buf)?))
+    //     } else if flag == 3 {
+    //         Ok(Self::And(Vec::deserialize(buf)?))
+    //     } else {
+    //         let msg = format!(
+    //             "Invalid Option representation: {}. The first byte must be 0 till 3",
+    //             flag
+    //         );
+
+    //         Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, msg))
+    //     }
+    // }
 }
 
 impl<T: AnchorSerialize + AnchorDeserialize + Clone + PartialEq> Conditional<T> {

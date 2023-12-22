@@ -1,5 +1,5 @@
 {
-  "version": "0.0.81",
+  "version": "0.0.83",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -1955,7 +1955,7 @@
             "name": "CPIProgram",
             "fields": [
               {
-                "name": "program_id",
+                "name": "programId",
                 "docs": [
                   "The program id"
                 ],
@@ -2120,7 +2120,7 @@
   "metadata": {
     "address": "CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4",
     "origin": "anchor",
-    "binaryVersion": "0.26.0",
-    "libVersion": "0.26.0"
+    "binaryVersion": "0.29.0",
+    "libVersion": "0.28.0"
   }
 }

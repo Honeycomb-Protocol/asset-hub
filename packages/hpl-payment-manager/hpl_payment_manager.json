@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "hpl_payment_manager",
   "instructions": [
     {
@@ -578,7 +578,7 @@
         },
         {
           "name": "bubblegumProgram",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "MPL Bubblegum program for cNFTs"
@@ -1146,7 +1146,7 @@
   "metadata": {
     "address": "Pay9ZxrVRXjt9Da8qpwqq4yBRvvrfx3STWnKK4FstPr",
     "origin": "anchor",
-    "binaryVersion": "0.26.0",
-    "libVersion": "0.26.0"
+    "binaryVersion": "0.29.0",
+    "libVersion": "0.28.0"
   }
 }

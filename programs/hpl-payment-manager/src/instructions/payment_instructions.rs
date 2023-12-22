@@ -1,3 +1,6 @@
+use anchor_lang::solana_program::program::invoke;
+use hpl_utils::metadata::mpl_token_metadata::state::ToAccountMeta;
+
 use {
   crate::{
       state::*,
@@ -9,7 +12,7 @@ use {
     token::{Token, Mint, TokenAccount},
     associated_token::AssociatedToken
   },
-  mpl_token_metadata::{instruction::BurnArgs, state::{Metadata, TokenMetadataAccount}},
+  hpl_utils::mpl_token_metadata::{instruction::BurnArgs, state::{Metadata, TokenMetadataAccount}},
   hpl_hive_control::{
     program::HplHiveControl,
     state::Project
@@ -19,7 +22,7 @@ use {
     program::HplCurrencyManager,
     cpi::{transfer_currency, burn_currency, accounts::{TransferCurrency, BurnCurrency}}
   },
-  mpl_bubblegum::program::Bubblegum,
+  mpl_bubblegum::ID as MPL_BUBBLEGUM_ID,
   spl_account_compression::{program::SplAccountCompression, Noop},
   hpl_events::HplEvents,
   hpl_utils::traits::Default,
@@ -559,7 +562,9 @@ pub struct MakeCNftPayment<'info> {
   pub system_program: Program<'info, System>,
 
   /// MPL Bubblegum program for cNFTs
-  pub bubblegum_program: Program<'info, Bubblegum>,
+  /// CHECK: This is not dangerous
+  #[account(mut, constraint = bubblegum_program.key().eq(&MPL_BUBBLEGUM_ID))]
+  pub bubblegum_program: AccountInfo<'info>,
 
   /// SPL Compression Program
   pub compression_program: Program<'info, SplAccountCompression>,
@@ -620,36 +625,33 @@ pub fn make_cnft_payment<'info>(
         if !beneficiary.eq(beneficiary_info.key) {
           return Err(ErrorCode::InvalidBeneficiary.into());
         }
+        let ix = mpl_bubblegum::instructions::TransferBuilder::new()
+          .tree_config(ctx.accounts.tree_authority.key())
+          .leaf_owner(ctx.accounts.payer.key(), true)
+          .leaf_delegate(ctx.accounts.payer.key(), true)
+          .new_leaf_owner(ctx.accounts.beneficiary.clone().unwrap().key())
+          .merkle_tree(ctx.accounts.merkle_tree.key())
+          .log_wrapper(ctx.accounts.log_wrapper.key())
+          .compression_program(ctx.accounts.compression_program.key())
+          .system_program(ctx.accounts.system_program.key())
+          .add_remaining_accounts(&ctx.remaining_accounts.iter().map(|f| f.to_account_meta()).collect::<Vec<_>>()).instruction();
 
-        let mut cpi_ctx = CpiContext::new(
-          ctx.accounts.bubblegum_program.to_account_info(),
-          mpl_bubblegum::cpi::accounts::Transfer {
-              tree_authority: ctx.accounts.tree_authority.to_account_info(),
-              leaf_owner: ctx.accounts.payer.to_account_info(),
-              leaf_delegate: ctx.accounts.payer.to_account_info(),
-              new_leaf_owner: ctx.accounts.beneficiary.clone().unwrap().to_account_info(),
-              merkle_tree: ctx.accounts.merkle_tree.to_account_info(),
-              log_wrapper: ctx.accounts.log_wrapper.to_account_info(),
-              compression_program: ctx.accounts.compression_program.to_account_info(),
-              system_program: ctx.accounts.system_program.to_account_info(),
-          },
-      )
-      .with_remaining_accounts(ctx.remaining_accounts.to_vec());
-  
-      msg!(
-          "Is leaf owner signer {}",
-          cpi_ctx.accounts.leaf_owner.is_signer
-      );
-      cpi_ctx.accounts.leaf_owner.is_signer = true;
-  
-      mpl_bubblegum::cpi::transfer(
-          cpi_ctx,
-          ctx.accounts.root.key().to_bytes(),
-          ctx.accounts.data_hash.key().to_bytes(),
-          ctx.accounts.creator_hash.key().to_bytes(),
-          args.nonce,
-          args.index,
-      )?;
+        invoke(
+          &ix,
+          &[
+            vec![
+              ctx.accounts.tree_authority.to_account_info(),
+              ctx.accounts.payer.to_account_info(),
+              ctx.accounts.payer.to_account_info(),
+              ctx.accounts.beneficiary.clone().unwrap().to_account_info(),
+              ctx.accounts.merkle_tree.to_account_info(),
+              ctx.accounts.log_wrapper.to_account_info(),
+              ctx.accounts.compression_program.to_account_info(),
+              ctx.accounts.system_program.to_account_info(),
+            ],
+            ctx.remaining_accounts.to_vec()
+          ].concat()
+        )?;
       }
   }
 

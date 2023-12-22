@@ -7,14 +7,14 @@ use {
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
     },
-    hpl_utils::traits::Default,
-    mpl_token_metadata::{
+    hpl_utils::mpl_token_metadata::{
         instruction::{
             CollectionDetailsToggle, CollectionToggle, CreateArgs, RuleSetToggle, UpdateArgs,
             UsesToggle,
         },
         state::{AssetData, Data, Metadata, TokenMetadataAccount},
     },
+    hpl_utils::traits::Default,
 };
 
 /// Accounts used in create currency instruction
@@ -76,7 +76,7 @@ pub struct CreateCurrency<'info> {
 
     /// The Token Metadata Program ID.
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = mpl_token_metadata::ID)]
+    #[account(address = hpl_utils::mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
 
     /// The Token Program ID.
@@ -178,7 +178,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
                 creators: None,
                 primary_sale_happened: false,
                 is_mutable: true,
-                token_standard: mpl_token_metadata::state::TokenStandard::Fungible,
+                token_standard: hpl_utils::mpl_token_metadata::state::TokenStandard::Fungible,
                 collection: None,
                 uses: None,
                 collection_details: None,
@@ -255,7 +255,7 @@ pub struct UpdateCurrency<'info> {
 
     /// The token metadata program account.
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = mpl_token_metadata::ID)]
+    #[account(address = hpl_utils::mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
 
     /// HPL Events Program

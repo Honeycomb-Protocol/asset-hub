@@ -1,7 +1,5 @@
 [workspace]
-members = [
-    "programs/*"
-]
+members = ["programs/hpl-payment-manager", "programs/hpl-payment-manager"]
 
 [profile.release]
 overflow-checks = true

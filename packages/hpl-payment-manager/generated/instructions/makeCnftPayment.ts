@@ -48,7 +48,7 @@ export const makeCnftPaymentStruct = new beet.FixableBeetArgsStruct<
  * @property [] root
  * @property [] beneficiary (optional)
  * @property [_writable_, **signer**] payer
- * @property [] bubblegumProgram
+ * @property [_writable_] bubblegumProgram
  * @property [] compressionProgram
  * @property [] hplEvents
  * @property [] logWrapper
@@ -161,7 +161,7 @@ export function createMakeCnftPaymentInstruction(
   })
   keys.push({
     pubkey: accounts.bubblegumProgram,
-    isWritable: false,
+    isWritable: true,
     isSigner: false,
   })
   keys.push({
