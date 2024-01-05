@@ -1041,12 +1041,87 @@ dependencies = [
 ]
 
 [[package]]
+name = "hpl-attribute-compressed-account"
+version = "0.0.1-beta.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce7269993811c11a8d68f79772f8108d5652975b78bdd149f3677d7af871a2a8"
+dependencies = [
+ "convert_case",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.32",
+]
+
+[[package]]
 name = "hpl-attribute-event"
 version = "0.1.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "872e0b545ceedcb508c12a17f7706898eb147805d0e88fd08ad08b81dc724a86"
 dependencies = [
  "convert_case",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.32",
+]
+
+[[package]]
+name = "hpl-character-manager"
+version = "0.0.77"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "hpl-compression",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-utils",
+ "mpl-bubblegum",
+ "spl-account-compression",
+]
+
+[[package]]
+name = "hpl-compression"
+version = "0.1.8-beta.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8eab8ccfed99f89e38530b409dfa39e46ce9b9c2c89078b5e9dc0503b47acfb6"
+dependencies = [
+ "anchor-lang",
+ "hpl-attribute-compressed-account",
+ "hpl-compression-macro-merkle-tree-apply-fn",
+ "hpl-compression-macro-merkle-tree-apply-fn-deep",
+ "hpl-compression-macro-merkle-tree-utils",
+ "serde_json",
+ "spl-account-compression",
+]
+
+[[package]]
+name = "hpl-compression-macro-merkle-tree-apply-fn"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fa4fbea6f7e7f6d2ca8ebc33473525e2bdb83a6fc9f9d8626ff7445972e9385e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.32",
+]
+
+[[package]]
+name = "hpl-compression-macro-merkle-tree-apply-fn-deep"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85debf5db12b48bcd5f480a94f2628bb438bd6c89eb9e50ce1357021731d1b1d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.32",
+]
+
+[[package]]
+name = "hpl-compression-macro-merkle-tree-utils"
+version = "0.0.3-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29d7f87f9d69a9d3856cb1872ce1a8435ade29723fa1942071f86eae822d2a1e"
+dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.32",
@@ -1353,9 +1428,9 @@ dependencies = [
 
 [[package]]
 name = "mpl-bubblegum"
-version = "1.0.0"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed2b46151f15d312a10739cd2c23a73ffc8e7c384dbda9c9e93cdbf52e901b60"
+checksum = "c5a1b35011638a594a660e8ec1fce8612fb1da428b31feeb2fdcdfca95162554"
 dependencies = [
  "borsh 0.10.3",
  "kaigan",
