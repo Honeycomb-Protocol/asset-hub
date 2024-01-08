@@ -24,10 +24,9 @@ pub struct CharacterSchema {
 }
 
 impl CharacterSchema {
-    pub fn is_used(&self) -> bool {
-        match self.used_by {
-            CharacterUsedBy::None => false,
-            _ => true,
+    pub fn id(&self) -> Pubkey {
+        match self.source {
+            CharacterSource::Wrapped { mint, .. } => mint,
         }
     }
 }
@@ -109,6 +108,24 @@ pub enum CharacterUsedBy {
         role: GuildRole,
         order: u8,
     },
+}
+
+impl CharacterUsedBy {
+    pub fn is_used(&self) -> bool {
+        match self {
+            CharacterUsedBy::None => false,
+            _ => true,
+        }
+    }
+
+    pub fn user(&self) -> Pubkey {
+        match self {
+            CharacterUsedBy::None => panic!("Character is not used by anything"),
+            CharacterUsedBy::Staking { pool, .. } => *pool,
+            CharacterUsedBy::Missions { participation } => *participation,
+            CharacterUsedBy::Guild { id, .. } => *id,
+        }
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
