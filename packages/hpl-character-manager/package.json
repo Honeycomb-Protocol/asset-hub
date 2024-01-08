@@ -1,0 +1,14 @@
+{
+  "name": "@honeycomb-protocol/character-manager",
+  "version": "0.0.1-beta.1",
+  "private": false,
+  "peerDependencies": {
+    "@solana/spl-token": "^0.3.8",
+    "@solana/web3.js": "^1.87.1",
+    "@honeycomb-protocol/events": "^0.1.21",
+    "@honeycomb-protocol/hive-control": "^0.2.6",
+    "@metaplex-foundation/mpl-bubblegum": "^0.7.0",
+    "@metaplex-foundation/mpl-token-auth-rules": "^1.2.0",
+    "@msgpack/msgpack": "^3.0.0-beta2"
+  }
+}

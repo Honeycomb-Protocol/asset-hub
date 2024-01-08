@@ -12,6 +12,7 @@
     "prepare": "yarn run link",
     "build": "solita",
     "postbuild": "node ./scripts/postbuild.js",
+    "build:character-manager": "PROGRAM_NAME=character-manager yarn build",
     "build:currency-manager": "PROGRAM_NAME=currency-manager yarn build",
     "build:payment-manager": "PROGRAM_NAME=payment-manager yarn build",
     "build:all": "yarn build:currency-manager && yarn build:payment-manager",
