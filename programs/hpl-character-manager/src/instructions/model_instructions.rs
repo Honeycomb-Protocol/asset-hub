@@ -9,17 +9,26 @@ use {
 
 /// Accounts used in init NFT instruction
 #[derive(Accounts)]
+#[instruction(args: NewCharacterModelArgs)]
 pub struct NewCharacterModel<'info> {
     // HIVE CONTROL
     #[account()]
     pub project: Box<Account<'info, Project>>,
 
-    #[account()]
+    /// CHECK: this is not dangerous
+    pub key: AccountInfo<'info>,
+
+    #[account(
+        init, payer = authority,
+        space = CharacterModel::get_size(&args.attributes),
+        seeds = [b"character_model", project.key().as_ref(), key.key().as_ref()],
+        bump
+    )]
     pub character_model: Box<Account<'info, CharacterModel>>,
 
     /// The wallet that pays for the rent
     #[account(mut)]
-    pub wallet: Signer<'info>,
+    pub authority: Signer<'info>,
 
     /// HPL Fee collection vault
     /// CHECK: This is not dangerous because we don't read or write from this account
