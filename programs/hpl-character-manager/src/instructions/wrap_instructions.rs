@@ -68,6 +68,10 @@ pub fn wrap_character(ctx: Context<WrapCharacter>) -> Result<()> {
         return Err(HplCharacterManagerError::CustodialAssetSourceNotFound.into());
     }
 
+    ctx.accounts
+        .character_model
+        .assert_merkle_tree(ctx.accounts.merkle_tree.key())?;
+
     let (leaf_idx, seq) = ctx
         .accounts
         .character_model
@@ -126,7 +130,7 @@ pub struct UnwrapCharacter<'info> {
         space = AssetCustody::LEN,
         seeds = [
           b"asset_custody",
-          args.character.id().as_ref()
+          args.source.id().as_ref()
         ],
         bump
       )]
@@ -170,7 +174,8 @@ pub struct UnwrapCharacter<'info> {
 pub struct UnwrapCharacterArgs {
     root: [u8; 32],
     leaf_idx: u32,
-    character: CharacterSchema,
+    source: CharacterSource,
+    used_by: CharacterUsedBy,
 }
 
 /// Init NFT
@@ -178,7 +183,26 @@ pub fn unwrap_character<'info>(
     ctx: Context<'_, '_, '_, 'info, UnwrapCharacter<'info>>,
     args: UnwrapCharacterArgs,
 ) -> Result<()> {
-    if args.character.used_by.is_used() {
+    ctx.accounts
+        .character_model
+        .assert_merkle_tree(ctx.accounts.merkle_tree.key())?;
+
+    let character_compressed = CharacterSchemaCompressed {
+        owner: ctx.accounts.wallet.key(),
+        source: args.source.to_node(),
+        used_by: args.used_by.to_node(),
+    };
+
+    hpl_compression::verify_leaf(
+        args.root,
+        character_compressed.to_node(),
+        args.leaf_idx,
+        &ctx.accounts.merkle_tree,
+        &ctx.accounts.compression_program,
+        ctx.remaining_accounts.to_vec(),
+    )?;
+
+    if args.used_by.is_used() {
         return Err(HplCharacterManagerError::CharacterInUse.into());
     }
 
@@ -202,7 +226,7 @@ pub fn unwrap_character<'info>(
 
     hpl_compression::replace_leaf(
         args.root,
-        args.character.to_compressed().to_node(),
+        character_compressed.to_node(),
         [0; 32],
         args.leaf_idx,
         &ctx.accounts.character_model.to_account_info(),

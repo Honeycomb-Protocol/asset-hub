@@ -23,14 +23,6 @@ pub struct CharacterSchema {
     pub used_by: CharacterUsedBy,
 }
 
-impl CharacterSchema {
-    pub fn id(&self) -> Pubkey {
-        match self.source {
-            CharacterSource::Wrapped { mint, .. } => mint,
-        }
-    }
-}
-
 #[compressed_account(chunk = source)]
 pub enum CharacterSource {
     Wrapped {
@@ -38,6 +30,13 @@ pub enum CharacterSource {
         criteria: NftWrapCriteria,
         is_compressed: bool,
     },
+}
+impl CharacterSource {
+    pub fn id(&self) -> Pubkey {
+        match self {
+            Self::Wrapped { mint, .. } => *mint,
+        }
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
