@@ -9,7 +9,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd");
+declare_id!("ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg");
 hpl_macros::platform_gate!();
 
 #[program]
