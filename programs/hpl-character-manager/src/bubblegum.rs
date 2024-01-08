@@ -79,48 +79,42 @@ pub fn transfer_cnft_cpi<'info>(
     }
 }
 
-pub fn verify_cnft_cpi<'info>(
-    merkle_tree: AccountInfo<'info>,
-    remaining_accounts: Vec<AccountInfo<'info>>,
+// pub fn verify_cnft_cpi<'info>(
+//     merkle_tree: AccountInfo<'info>,
+//     remaining_accounts: Vec<AccountInfo<'info>>,
 
-    id: Pubkey,
-    owner: Pubkey,
-    delegate: Pubkey,
-    root: [u8; 32],
-    data_hash: [u8; 32],
-    creator_hash: [u8; 32],
-    nonce: u64,
-    index: u32,
-) -> Result<()> {
-    msg!(
-        "attempting to transfer an nft {} from tree {}",
-        index,
-        merkle_tree.key()
-    );
+//     id: Pubkey,
+//     owner: Pubkey,
+//     delegate: Pubkey,
+//     root: [u8; 32],
+//     data_hash: [u8; 32],
+//     creator_hash: [u8; 32],
+//     nonce: u64,
+//     index: u32,
+// ) -> Result<()> {
+//     let leaf = mpl_bubblegum::types::LeafSchema::V1 {
+//         id,
+//         owner,
+//         delegate,
+//         nonce,
+//         data_hash,
+//         creator_hash,
+//     };
 
-    let leaf = mpl_bubblegum::types::LeafSchema::V1 {
-        id,
-        owner,
-        delegate,
-        nonce,
-        data_hash,
-        creator_hash,
-    };
+//     let ix = mpl_bubblegum::instructions::VerifyLeafBuilder::new()
+//         .merkle_tree(merkle_tree.key())
+//         .root(root)
+//         .leaf(leaf.hash())
+//         .index(index)
+//         .add_remaining_accounts(
+//             &remaining_accounts
+//                 .iter()
+//                 .map(|f| f.to_account_meta())
+//                 .collect::<Vec<_>>(),
+//         )
+//         .instruction();
 
-    let ix = mpl_bubblegum::instructions::VerifyLeafBuilder::new()
-        .merkle_tree(merkle_tree.key())
-        .root(root)
-        .leaf(leaf.hash())
-        .index(index)
-        .add_remaining_accounts(
-            &remaining_accounts
-                .iter()
-                .map(|f| f.to_account_meta())
-                .collect::<Vec<_>>(),
-        )
-        .instruction();
+//     let account_infos = [vec![merkle_tree], remaining_accounts].concat();
 
-    let account_infos = [vec![merkle_tree], remaining_accounts].concat();
-
-    anchor_lang::solana_program::program::invoke(&ix, &account_infos).map_err(Into::into)
-}
+//     anchor_lang::solana_program::program::invoke(&ix, &account_infos).map_err(Into::into)
+// }
