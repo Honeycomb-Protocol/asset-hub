@@ -8,98 +8,97 @@
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  NewCharacterModelArgs,
-  newCharacterModelArgsBeet,
-} from '../types/NewCharacterModelArgs'
+  CreateNewCharactersTreeArgs,
+  createNewCharactersTreeArgsBeet,
+} from '../types/CreateNewCharactersTreeArgs'
 
 /**
  * @category Instructions
- * @category NewCharacterModel
+ * @category CreateNewCharactersTree
  * @category generated
  */
-export type NewCharacterModelInstructionArgs = {
-  args: NewCharacterModelArgs
+export type CreateNewCharactersTreeInstructionArgs = {
+  args: CreateNewCharactersTreeArgs
 }
 /**
  * @category Instructions
- * @category NewCharacterModel
+ * @category CreateNewCharactersTree
  * @category generated
  */
-export const newCharacterModelStruct = new beet.FixableBeetArgsStruct<
-  NewCharacterModelInstructionArgs & {
+export const createNewCharactersTreeStruct = new beet.BeetArgsStruct<
+  CreateNewCharactersTreeInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', newCharacterModelArgsBeet],
+    ['args', createNewCharactersTreeArgsBeet],
   ],
-  'NewCharacterModelInstructionArgs'
+  'CreateNewCharactersTreeInstructionArgs'
 )
 /**
- * Accounts required by the _newCharacterModel_ instruction
+ * Accounts required by the _createNewCharactersTree_ instruction
  *
- * @property [] project
- * @property [] key
+ * @property [_writable_] project
  * @property [_writable_] characterModel
- * @property [_writable_, **signer**] authority
+ * @property [_writable_] merkleTree
+ * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
- * @property [] hiveControl
  * @property [] hplEvents
+ * @property [] compressionProgram
+ * @property [] logWrapper
  * @property [] clock
+ * @property [] rentSysvar
  * @property [] instructionsSysvar
  * @category Instructions
- * @category NewCharacterModel
+ * @category CreateNewCharactersTree
  * @category generated
  */
-export type NewCharacterModelInstructionAccounts = {
+export type CreateNewCharactersTreeInstructionAccounts = {
   project: web3.PublicKey
-  key: web3.PublicKey
   characterModel: web3.PublicKey
+  merkleTree: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
-  hiveControl: web3.PublicKey
   hplEvents: web3.PublicKey
+  compressionProgram: web3.PublicKey
+  logWrapper: web3.PublicKey
   clock: web3.PublicKey
+  rentSysvar: web3.PublicKey
   instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const newCharacterModelInstructionDiscriminator = [
-  198, 165, 162, 86, 250, 33, 203, 101,
+export const createNewCharactersTreeInstructionDiscriminator = [
+  122, 215, 168, 38, 142, 213, 116, 250,
 ]
 
 /**
- * Creates a _NewCharacterModel_ instruction.
+ * Creates a _CreateNewCharactersTree_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category NewCharacterModel
+ * @category CreateNewCharactersTree
  * @category generated
  */
-export function createNewCharacterModelInstruction(
-  accounts: NewCharacterModelInstructionAccounts,
-  args: NewCharacterModelInstructionArgs,
+export function createCreateNewCharactersTreeInstruction(
+  accounts: CreateNewCharactersTreeInstructionAccounts,
+  args: CreateNewCharactersTreeInstructionArgs,
   programId = new web3.PublicKey('ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg')
 ) {
-  const [data] = newCharacterModelStruct.serialize({
-    instructionDiscriminator: newCharacterModelInstructionDiscriminator,
+  const [data] = createNewCharactersTreeStruct.serialize({
+    instructionDiscriminator: createNewCharactersTreeInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
       pubkey: accounts.project,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.key,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -108,8 +107,13 @@ export function createNewCharacterModelInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.authority,
+      pubkey: accounts.merkleTree,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.authority,
+      isWritable: false,
       isSigner: true,
     },
     {
@@ -128,17 +132,27 @@ export function createNewCharacterModelInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.hiveControl,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.hplEvents,
       isWritable: false,
       isSigner: false,
     },
     {
+      pubkey: accounts.compressionProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.logWrapper,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.clock,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.rentSysvar,
       isWritable: false,
       isSigner: false,
     },

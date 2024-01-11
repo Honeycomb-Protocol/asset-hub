@@ -23,6 +23,13 @@ pub mod hpl_character_manager {
         instructions::new_character_model(ctx, args)
     }
 
+    pub fn create_new_characters_tree(
+        ctx: Context<CreateNewCharactersTree>,
+        args: CreateNewCharactersTreeArgs,
+    ) -> Result<()> {
+        instructions::create_new_characters_tree(ctx, args)
+    }
+
     pub fn deposit_nft(ctx: Context<DepositNft>) -> Result<()> {
         instructions::deposit_nft(ctx)
     }

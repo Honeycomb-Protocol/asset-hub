@@ -222,6 +222,30 @@ const configs = {
             ],
           },
         },
+        {
+          name: "CharacterSchema",
+          type: {
+            kind: "struct",
+            fields: [
+              {
+                name: "owner",
+                type: "publicKey",
+              },
+              {
+                name: "source",
+                type: {
+                  defined: "CharacterSource",
+                },
+              },
+              {
+                name: "usedBy",
+                type: {
+                  defined: "CharacterUsedBy",
+                },
+              },
+            ],
+          },
+        },
       ],
     }
   ),

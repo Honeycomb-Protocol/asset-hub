@@ -1,3 +1,4 @@
+export * from './createNewCharactersTree'
 export * from './depositCnft'
 export * from './depositNft'
 export * from './newCharacterModel'

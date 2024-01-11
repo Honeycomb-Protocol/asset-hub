@@ -48,8 +48,11 @@ impl Default for CharacterModel {
 }
 
 impl CharacterModel {
-    pub fn get_size(attributes: &Schema) -> usize {
-        8 + 89
+    pub fn get_size(attributes: &Schema, config: &CharacterConfig) -> usize {
+        8 + 1
+            + 32
+            + 32
+            + config.get_size()
             + attributes.size_for_borsh()
             + ControlledMerkleTrees::get_size_for_borsh(&CharacterSchema::schema(), 0)
     }
@@ -66,4 +69,12 @@ impl CharacterModel {
 pub enum CharacterConfig {
     Wrapped(Vec<NftWrapCriteria>),
     // ... rest
+}
+
+impl CharacterConfig {
+    pub fn get_size(&self) -> usize {
+        match self {
+            Self::Wrapped(v) => 5 + v.len() * 33,
+        }
+    }
 }

@@ -18,7 +18,7 @@ import * as beet from '@metaplex-foundation/beet'
  * @private
  */
 export type EventRecord = {
-  NewCharacterModel: { address: web3.PublicKey; state: Uint8Array }
+  CharacterModel: { address: web3.PublicKey; state: Uint8Array }
 }
 
 /**
@@ -34,10 +34,9 @@ export type EventRecord = {
  */
 export type Event = beet.DataEnumKeyAsKind<EventRecord>
 
-export const isEventNewCharacterModel = (
+export const isEventCharacterModel = (
   x: Event
-): x is Event & { __kind: 'NewCharacterModel' } =>
-  x.__kind === 'NewCharacterModel'
+): x is Event & { __kind: 'CharacterModel' } => x.__kind === 'CharacterModel'
 
 /**
  * @category userTypes
@@ -45,13 +44,13 @@ export const isEventNewCharacterModel = (
  */
 export const eventBeet = beet.dataEnum<EventRecord>([
   [
-    'NewCharacterModel',
-    new beet.FixableBeetArgsStruct<EventRecord['NewCharacterModel']>(
+    'CharacterModel',
+    new beet.FixableBeetArgsStruct<EventRecord['CharacterModel']>(
       [
         ['address', beetSolana.publicKey],
         ['state', beet.bytes],
       ],
-      'EventRecord["NewCharacterModel"]'
+      'EventRecord["CharacterModel"]'
     ),
   ],
 ]) as beet.FixableBeet<Event, Event>
