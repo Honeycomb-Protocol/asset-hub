@@ -15,7 +15,7 @@ pub struct AssetCustody {
 }
 
 impl Default for AssetCustody {
-    const LEN: usize = 8 + 131;
+    const LEN: usize = 8 + 134;
 
     fn set_defaults(&mut self) {
         self.bump = 0;
