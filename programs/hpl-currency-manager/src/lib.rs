@@ -9,7 +9,6 @@ declare_id!("CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4");
 hpl_macros::platform_gate!();
 
 use {
-    errors::ErrorCode,
     instructions::*,
     state::HolderStatus,
     utils::{post_actions, pre_actions},
@@ -252,7 +251,7 @@ pub mod hpl_currency_manager {
 
         // Check if the holder account status is active, if not, return an error
         if ctx.accounts.holder_account.status == HolderStatus::Inactive {
-            return Err(ErrorCode::InactiveHolder.into());
+            return Err(errors::ErrorCode::InactiveHolder.into());
         }
 
         // Perform pre-actions before instructionn
