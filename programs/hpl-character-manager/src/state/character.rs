@@ -49,25 +49,33 @@ pub enum NftWrapCriteria {
 impl CompressedSchema for NftWrapCriteria {
     fn schema() -> Schema {
         let mut schema = HashMap::new();
-        schema.insert(String::from("Collection"), Option::<Pubkey>::schema());
-        schema.insert(String::from("Creator"), Option::<Pubkey>::schema());
-        schema.insert(String::from("MerkleTree"), Option::<Pubkey>::schema());
+        schema.insert(String::from("__kind"), String::schema());
+        schema.insert(String::from("address"), Pubkey::schema());
         Schema::Object(schema)
     }
     fn schema_value(&self) -> SchemaValue {
         let mut schema = HashMap::new();
-        schema.insert(String::from("Collection"), None::<Pubkey>.schema_value());
-        schema.insert(String::from("Creator"), None::<Pubkey>.schema_value());
-        schema.insert(String::from("MerkleTree"), None::<Pubkey>.schema_value());
         match self {
             Self::Collection(pubkey) => {
-                schema.insert(String::from("Collection"), pubkey.schema_value());
+                schema.insert(
+                    String::from("__kind"),
+                    String::from("Collection").schema_value(),
+                );
+                schema.insert(String::from("address"), pubkey.schema_value());
             }
             Self::Creator(pubkey) => {
-                schema.insert(String::from("Creator"), pubkey.schema_value());
+                schema.insert(
+                    String::from("__kind"),
+                    String::from("Creator").schema_value(),
+                );
+                schema.insert(String::from("address"), pubkey.schema_value());
             }
             Self::MerkleTree(pubkey) => {
-                schema.insert(String::from("MerkleTree"), pubkey.schema_value());
+                schema.insert(
+                    String::from("__kind"),
+                    String::from("MerkleTree").schema_value(),
+                );
+                schema.insert(String::from("address"), pubkey.schema_value());
             }
         }
         SchemaValue::Object(schema)
@@ -136,20 +144,20 @@ pub enum GuildRole {
 impl CompressedSchema for GuildRole {
     fn schema() -> Schema {
         let mut schema = HashMap::new();
-        schema.insert(String::from("Chief"), Option::<bool>::schema());
-        schema.insert(String::from("Member"), Option::<bool>::schema());
+        schema.insert(String::from("__kind"), String::schema());
         Schema::Object(schema)
     }
     fn schema_value(&self) -> SchemaValue {
         let mut schema = HashMap::new();
-        schema.insert(String::from("Chief"), None::<bool>.schema_value());
-        schema.insert(String::from("Member"), None::<bool>.schema_value());
         match self {
             Self::Chief => {
-                schema.insert(String::from("Collection"), true.schema_value());
+                schema.insert(String::from("__kind"), String::from("Chief").schema_value());
             }
             Self::Member => {
-                schema.insert(String::from("Creator"), true.schema_value());
+                schema.insert(
+                    String::from("__kind"),
+                    String::from("Member").schema_value(),
+                );
             }
         }
         SchemaValue::Object(schema)
