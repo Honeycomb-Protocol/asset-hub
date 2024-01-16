@@ -43,10 +43,11 @@ export const withdrawCnftStruct = new beet.BeetArgsStruct<
  * @property [] characterModel
  * @property [_writable_] assetCustody
  * @property [] treeAuthority
- * @property [] merkleTree
+ * @property [_writable_] merkleTree
  * @property [_writable_, **signer**] wallet
  * @property [_writable_] vault
  * @property [] hiveControl
+ * @property [] bubblegum
  * @property [] compressionProgram
  * @property [] logWrapper
  * @property [] clock
@@ -65,6 +66,7 @@ export type WithdrawCnftInstructionAccounts = {
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   hiveControl: web3.PublicKey
+  bubblegum: web3.PublicKey
   compressionProgram: web3.PublicKey
   logWrapper: web3.PublicKey
   clock: web3.PublicKey
@@ -118,7 +120,7 @@ export function createWithdrawCnftInstruction(
     },
     {
       pubkey: accounts.merkleTree,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -138,6 +140,11 @@ export function createWithdrawCnftInstruction(
     },
     {
       pubkey: accounts.hiveControl,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.bubblegum,
       isWritable: false,
       isSigner: false,
     },

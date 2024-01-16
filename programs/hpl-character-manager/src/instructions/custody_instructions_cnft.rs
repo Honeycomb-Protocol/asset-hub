@@ -3,7 +3,7 @@ use {
     anchor_lang::prelude::*,
     hpl_hive_control::{program::HplHiveControl, state::Project},
     hpl_utils::Default,
-    mpl_bubblegum::utils::get_asset_id,
+    mpl_bubblegum::{programs::MPL_BUBBLEGUM_ID, utils::get_asset_id},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -35,6 +35,7 @@ pub struct DepositCnft<'info> {
     pub tree_authority: UncheckedAccount<'info>,
 
     /// CHECK: This is not dangerous
+    #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
 
     /// The wallet that pays for the rent
@@ -51,6 +52,11 @@ pub struct DepositCnft<'info> {
 
     /// HPL Hive Control Program
     pub hive_control: Program<'info, HplHiveControl>,
+
+    /// MPL Bubblegum program
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = MPL_BUBBLEGUM_ID)]
+    pub bubblegum: AccountInfo<'info>,
 
     /// SPL account compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
@@ -69,6 +75,9 @@ pub struct DepositCnft<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct DepositCnftArgs {
+    pub root: [u8; 32],
+    pub data_hash: [u8; 32],
+    pub creator_hash: [u8; 32],
     pub nonce: u64,
     pub index: u32,
 }
@@ -114,6 +123,10 @@ pub fn deposit_cnft<'info>(
         ctx.accounts.compression_program.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
         ctx.remaining_accounts.to_vec(),
+        args.root,
+        args.data_hash,
+        args.creator_hash,
+        args.nonce,
         args.index,
         None,
     )?;
@@ -148,6 +161,7 @@ pub struct WithdrawCnft<'info> {
     pub tree_authority: UncheckedAccount<'info>,
 
     /// CHECK: This is not dangerous
+    #[account(mut)]
     pub merkle_tree: UncheckedAccount<'info>,
 
     /// The wallet that pays for the rent
@@ -164,6 +178,11 @@ pub struct WithdrawCnft<'info> {
 
     /// HPL Hive Control Program
     pub hive_control: Program<'info, HplHiveControl>,
+
+    /// MPL Bubblegum program
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    #[account(address = MPL_BUBBLEGUM_ID)]
+    pub bubblegum: AccountInfo<'info>,
 
     /// SPL account compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
@@ -182,6 +201,10 @@ pub struct WithdrawCnft<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct WithdrawCnftArgs {
+    pub root: [u8; 32],
+    pub data_hash: [u8; 32],
+    pub creator_hash: [u8; 32],
+    pub nonce: u64,
     pub index: u32,
 }
 
@@ -230,6 +253,10 @@ pub fn withdraw_cnft<'info>(
         ctx.accounts.compression_program.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
         ctx.remaining_accounts.to_vec(),
+        args.root,
+        args.data_hash,
+        args.creator_hash,
+        args.nonce,
         args.index,
         Some(character_model_signer),
     )?;

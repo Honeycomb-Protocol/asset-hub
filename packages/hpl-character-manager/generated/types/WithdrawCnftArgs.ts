@@ -7,6 +7,10 @@
 
 import * as beet from '@metaplex-foundation/beet'
 export type WithdrawCnftArgs = {
+  root: number[] /* size: 32 */
+  dataHash: number[] /* size: 32 */
+  creatorHash: number[] /* size: 32 */
+  nonce: beet.bignum
   index: number
 }
 
@@ -15,6 +19,12 @@ export type WithdrawCnftArgs = {
  * @category generated
  */
 export const withdrawCnftArgsBeet = new beet.BeetArgsStruct<WithdrawCnftArgs>(
-  [['index', beet.u32]],
+  [
+    ['root', beet.uniformFixedSizeArray(beet.u8, 32)],
+    ['dataHash', beet.uniformFixedSizeArray(beet.u8, 32)],
+    ['creatorHash', beet.uniformFixedSizeArray(beet.u8, 32)],
+    ['nonce', beet.u64],
+    ['index', beet.u32],
+  ],
   'WithdrawCnftArgs'
 )
