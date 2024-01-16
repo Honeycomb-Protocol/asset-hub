@@ -43,10 +43,11 @@
     "@solana/spl-account-compression": "^0.1.10",
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.87.1",
+    "keccak": "^3.0.4",
     "yargs": "^17.6.2"
   },
   "devDependencies": {
-    "@metaplex-foundation/solita": "^0.19.3",
+    "@metaplex-foundation/solita": "^0.20.1",
     "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.7",
     "@types/jest": "^29.5.1",
