@@ -518,7 +518,7 @@
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -551,6 +551,14 @@
           "isSigner": false,
           "docs": [
             "HPL Hive Control Program"
+          ]
+        },
+        {
+          "name": "bubblegum",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "MPL Bubblegum program"
           ]
         },
         {
@@ -620,7 +628,7 @@
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -653,6 +661,14 @@
           "isSigner": false,
           "docs": [
             "HPL Hive Control Program"
+          ]
+        },
+        {
+          "name": "bubblegum",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "MPL Bubblegum program"
           ]
         },
         {
@@ -1126,6 +1142,33 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "dataHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "creatorHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
             "name": "nonce",
             "type": "u64"
           },
@@ -1141,6 +1184,37 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "dataHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "creatorHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
           {
             "name": "index",
             "type": "u32"
@@ -1466,6 +1540,21 @@
                 "defined": "Schema"
               }
             ]
+          },
+          {
+            "name": "Enum",
+            "fields": [
+              {
+                "vec": {
+                  "tuple": [
+                    "string",
+                    {
+                      "defined": "Schema"
+                    }
+                  ]
+                }
+              }
+            ]
           }
         ]
       }
@@ -1531,6 +1620,6 @@
     "address": "ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
-    "libVersion": "0.28.0"
+    "libVersion": "unknown"
   }
 }
