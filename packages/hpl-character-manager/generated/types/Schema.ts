@@ -25,6 +25,7 @@ export type SchemaRecord = {
   Pubkey: void /* scalar variant */;
   Option: { fields: [Schema] };
   HashMap: { fields: [Schema, Schema] };
+  Enum: { fields: [[string, Schema][]] };
 };
 
 /**
@@ -59,6 +60,8 @@ export const isSchemaOption = (x: Schema): x is Schema & { __kind: "Option" } =>
 export const isSchemaHashMap = (
   x: Schema
 ): x is Schema & { __kind: "HashMap" } => x.__kind === "HashMap";
+export const isSchemaEnum = (x: Schema): x is Schema & { __kind: "Enum" } =>
+  x.__kind === "Enum";
 
 const enumVariants: beet.DataEnumBeet<SchemaRecord, keyof SchemaRecord>[] = [
   ["Null", beet.unit],
@@ -103,6 +106,18 @@ enumVariants.push(
     new beet.FixableBeetArgsStruct<SchemaRecord["HashMap"]>(
       [["fields", beet.tuple([schemaBeet, schemaBeet])]],
       'SchemaRecord["HashMap"]'
+    ),
+  ],
+  [
+    "Enum",
+    new beet.FixableBeetArgsStruct<SchemaRecord["Enum"]>(
+      [
+        [
+          "fields",
+          beet.tuple([beet.array(beet.tuple([beet.utf8String, schemaBeet]))]),
+        ],
+      ],
+      'SchemaRecord["Enum"]'
     ),
   ]
 );

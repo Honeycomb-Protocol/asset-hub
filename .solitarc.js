@@ -219,6 +219,21 @@ const configs = {
                   },
                 ],
               },
+              {
+                name: "Enum",
+                fields: [
+                  {
+                    vec: {
+                      tuple: [
+                        "string",
+                        {
+                          defined: "Schema",
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
             ],
           },
         },
