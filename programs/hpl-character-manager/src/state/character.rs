@@ -23,7 +23,7 @@ pub struct CharacterSchema {
     pub used_by: CharacterUsedBy,
 }
 
-#[compressed_account(chunk = source)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum CharacterSource {
     Wrapped {
         mint: Pubkey,
@@ -31,6 +31,59 @@ pub enum CharacterSource {
         is_compressed: bool,
     },
 }
+
+impl CompressedDataChunk for CharacterSource {
+    const KEY: &'static str = "source";
+}
+
+impl CompressedSchema for CharacterSource {
+    fn schema() -> Schema {
+        let mut wrapped = HashMap::new();
+        wrapped.insert(String::from("mint"), Pubkey::schema());
+        wrapped.insert(String::from("criteria"), NftWrapCriteria::schema());
+        wrapped.insert(String::from("is_compressed"), bool::schema());
+
+        Schema::Enum(vec![(String::from("Wrapped"), Schema::Object(wrapped))])
+    }
+    fn schema_value(&self) -> SchemaValue {
+        match self {
+            Self::Wrapped {
+                mint,
+                criteria,
+                is_compressed,
+            } => {
+                let mut wrapped = HashMap::new();
+                wrapped.insert(String::from("mint"), mint.schema_value());
+                wrapped.insert(String::from("criteria"), criteria.schema_value());
+                wrapped.insert(String::from("is_compressed"), is_compressed.schema_value());
+
+                SchemaValue::Enum(
+                    String::from("Wrapped"),
+                    Box::new(SchemaValue::Object(wrapped)),
+                )
+            }
+        }
+    }
+}
+
+impl ToNode for CharacterSource {
+    fn to_node(&self) -> Node {
+        match self {
+            Self::Wrapped {
+                mint,
+                criteria,
+                is_compressed,
+            } => keccak::hashv(&[
+                "Wrapped".as_bytes(),
+                mint.to_node().as_ref(),
+                criteria.to_node().as_ref(),
+                is_compressed.to_node().as_ref(),
+            ])
+            .to_bytes(),
+        }
+    }
+}
+
 impl CharacterSource {
     pub fn id(&self) -> Pubkey {
         match self {
@@ -48,37 +101,24 @@ pub enum NftWrapCriteria {
 
 impl CompressedSchema for NftWrapCriteria {
     fn schema() -> Schema {
-        let mut schema = HashMap::new();
-        schema.insert(String::from("__kind"), String::schema());
-        schema.insert(String::from("address"), Pubkey::schema());
-        Schema::Object(schema)
+        Schema::Enum(vec![
+            (String::from("Collection"), Pubkey::schema()),
+            (String::from("Creator"), Pubkey::schema()),
+            (String::from("MerkleTree"), Pubkey::schema()),
+        ])
     }
     fn schema_value(&self) -> SchemaValue {
-        let mut schema = HashMap::new();
         match self {
             Self::Collection(pubkey) => {
-                schema.insert(
-                    String::from("__kind"),
-                    String::from("Collection").schema_value(),
-                );
-                schema.insert(String::from("address"), pubkey.schema_value());
+                SchemaValue::Enum(String::from("Collection"), Box::new(pubkey.schema_value()))
             }
             Self::Creator(pubkey) => {
-                schema.insert(
-                    String::from("__kind"),
-                    String::from("Creator").schema_value(),
-                );
-                schema.insert(String::from("address"), pubkey.schema_value());
+                SchemaValue::Enum(String::from("Creator"), Box::new(pubkey.schema_value()))
             }
             Self::MerkleTree(pubkey) => {
-                schema.insert(
-                    String::from("__kind"),
-                    String::from("MerkleTree").schema_value(),
-                );
-                schema.insert(String::from("address"), pubkey.schema_value());
+                SchemaValue::Enum(String::from("MerkleTree"), Box::new(pubkey.schema_value()))
             }
         }
-        SchemaValue::Object(schema)
     }
 }
 
@@ -98,7 +138,7 @@ impl ToNode for NftWrapCriteria {
     }
 }
 
-#[compressed_account(chunk = used_by)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum CharacterUsedBy {
     None,
     Staking {
@@ -115,6 +155,108 @@ pub enum CharacterUsedBy {
         role: GuildRole,
         order: u8,
     },
+}
+
+impl CompressedDataChunk for CharacterUsedBy {
+    const KEY: &'static str = "used_by";
+}
+
+impl CompressedSchema for CharacterUsedBy {
+    fn schema() -> Schema {
+        let mut schema = Vec::<(String, Schema)>::new();
+
+        schema.push((String::from("None"), Schema::Null));
+
+        let mut staking = HashMap::new();
+        staking.insert(String::from("pool"), Pubkey::schema());
+        staking.insert(String::from("staker"), Pubkey::schema());
+        staking.insert(String::from("staked_at"), i64::schema());
+        staking.insert(String::from("claimed_at"), i64::schema());
+        schema.push((String::from("Staking"), Schema::Object(staking)));
+
+        let mut missions = HashMap::new();
+        missions.insert(String::from("participation"), Pubkey::schema());
+        schema.push((String::from("Missions"), Schema::Object(missions)));
+
+        let mut guild = HashMap::new();
+        guild.insert(String::from("id"), Pubkey::schema());
+        guild.insert(String::from("role"), GuildRole::schema());
+        guild.insert(String::from("order"), u8::schema());
+        schema.push((String::from("Guild"), Schema::Object(guild)));
+
+        Schema::Enum(schema)
+    }
+
+    fn schema_value(&self) -> SchemaValue {
+        match self {
+            Self::None => SchemaValue::Enum(String::from("None"), Box::new(SchemaValue::Null)),
+            Self::Staking {
+                pool,
+                staker,
+                staked_at,
+                claimed_at,
+            } => {
+                let mut staking = HashMap::new();
+                staking.insert(String::from("pool"), pool.schema_value());
+                staking.insert(String::from("staker"), staker.schema_value());
+                staking.insert(String::from("staked_at"), staked_at.schema_value());
+                staking.insert(String::from("claimed_at"), claimed_at.schema_value());
+
+                SchemaValue::Enum(
+                    String::from("Staking"),
+                    Box::new(SchemaValue::Object(staking)),
+                )
+            }
+            Self::Missions { participation } => {
+                let mut missions = HashMap::new();
+                missions.insert(String::from("participation"), participation.schema_value());
+
+                SchemaValue::Enum(
+                    String::from("Missions"),
+                    Box::new(SchemaValue::Object(missions)),
+                )
+            }
+            Self::Guild { id, role, order } => {
+                let mut guild = HashMap::new();
+                guild.insert(String::from("id"), id.schema_value());
+                guild.insert(String::from("role"), role.schema_value());
+                guild.insert(String::from("order"), order.schema_value());
+
+                SchemaValue::Enum(String::from("Guild"), Box::new(SchemaValue::Object(guild)))
+            }
+        }
+    }
+}
+
+impl ToNode for CharacterUsedBy {
+    fn to_node(&self) -> Node {
+        match self {
+            Self::None {} => keccak::hashv(&["None".as_bytes()]).to_bytes(),
+            Self::Staking {
+                pool,
+                staker,
+                staked_at,
+                claimed_at,
+            } => keccak::hashv(&[
+                "Staking".as_bytes(),
+                pool.to_node().as_ref(),
+                staker.to_node().as_ref(),
+                staked_at.to_node().as_ref(),
+                claimed_at.to_node().as_ref(),
+            ])
+            .to_bytes(),
+            Self::Missions { participation } => {
+                keccak::hashv(&["Missions".as_bytes(), participation.to_node().as_ref()]).to_bytes()
+            }
+            Self::Guild { id, role, order } => keccak::hashv(&[
+                "Guild".as_bytes(),
+                id.to_node().as_ref(),
+                role.to_node().as_ref(),
+                order.to_node().as_ref(),
+            ])
+            .to_bytes(),
+        }
+    }
 }
 
 impl CharacterUsedBy {
@@ -143,24 +285,16 @@ pub enum GuildRole {
 
 impl CompressedSchema for GuildRole {
     fn schema() -> Schema {
-        let mut schema = HashMap::new();
-        schema.insert(String::from("__kind"), String::schema());
-        Schema::Object(schema)
+        Schema::Enum(vec![
+            (String::from("Chief"), Schema::Null),
+            (String::from("Member"), Schema::Null),
+        ])
     }
     fn schema_value(&self) -> SchemaValue {
-        let mut schema = HashMap::new();
         match self {
-            Self::Chief => {
-                schema.insert(String::from("__kind"), String::from("Chief").schema_value());
-            }
-            Self::Member => {
-                schema.insert(
-                    String::from("__kind"),
-                    String::from("Member").schema_value(),
-                );
-            }
+            Self::Chief => SchemaValue::Enum(String::from("Chief"), Box::new(SchemaValue::Null)),
+            Self::Member => SchemaValue::Enum(String::from("Member"), Box::new(SchemaValue::Null)),
         }
-        SchemaValue::Object(schema)
     }
 }
 
