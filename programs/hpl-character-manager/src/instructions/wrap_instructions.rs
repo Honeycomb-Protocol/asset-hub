@@ -94,6 +94,8 @@ pub fn wrap_character(ctx: Context<WrapCharacter>) -> Result<()> {
     };
     event.wrap(&ctx.accounts.log_wrapper)?;
 
+    // panic!("Custom panic {:?}", character.to_compressed().to_node());
+
     let character_model_seeds = &[
         b"character_model",
         ctx.accounts.character_model.project.as_ref(),
@@ -236,6 +238,11 @@ pub fn unwrap_character<'info>(
         ctx.remaining_accounts.to_vec(),
         Some(character_model_signer),
     )?;
+
+    let asset_custody = &mut ctx.accounts.asset_custody;
+    asset_custody.set_defaults();
+    asset_custody.bump = ctx.bumps["asset_custody"];
+    asset_custody.wallet = ctx.accounts.wallet.key();
 
     Ok(())
 }
