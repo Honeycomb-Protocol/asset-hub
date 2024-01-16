@@ -1,5 +1,6 @@
 const fs = require("fs");
-const { spawnSync } = require("child_process");
+const path = require("path");
+const { spawnSync, execSync } = require("child_process");
 if (!fs.existsSync("./node_modules"))
   spawnSync("yarn", ["install"], { stdio: "inherit" });
 const potencialDirs = ["..", "node_modules"];
@@ -17,6 +18,12 @@ for (let index = 0; index < potencialDirs.length; index++) {
       cwd: dir,
     });
   }
+}
+
+const patchDir = path.join(__dirname, "..", "patch");
+
+if (fs.existsSync(patchDir)) {
+  execSync("cp -r patch/. node_modules");
 }
 
 spawnSync("yarn", ["compile"], { stdio: "inherit" });
