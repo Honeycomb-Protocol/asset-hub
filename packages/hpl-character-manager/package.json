@@ -1,6 +1,9 @@
 {
   "name": "@honeycomb-protocol/character-manager",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "private": false,
   "peerDependencies": {
     "@solana/spl-token": "^0.3.8",
