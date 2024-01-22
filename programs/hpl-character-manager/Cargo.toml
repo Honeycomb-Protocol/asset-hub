@@ -2,7 +2,7 @@
 name = "hpl-character-manager"
 description = "Honeycomb protocol library asset manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.1"
+version = "0.0.2-beta.1"
 edition = "2021"
 license = "MIT"
 
