@@ -919,7 +919,15 @@
           "isSigner": false
         },
         {
-          "name": "wallet",
+          "name": "user",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The service that's using the character"
+          ]
+        },
+        {
+          "name": "owner",
           "isMut": true,
           "isSigner": true,
           "docs": [
@@ -1608,10 +1616,15 @@
     {
       "code": 6004,
       "name": "CharacterInUse",
-      "msg": "Character is currently being used by a service"
+      "msg": "Character is currently being used by another service"
     },
     {
       "code": 6005,
+      "name": "UsedByMismatch",
+      "msg": "Cannot change used_by type"
+    },
+    {
+      "code": 6006,
       "name": "MerkleTreeInvalid",
       "msg": "Merkle tree provided does not belong to this model"
     }

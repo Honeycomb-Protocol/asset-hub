@@ -22,9 +22,13 @@ pub struct UseCharacter<'info> {
     #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
+    /// The service that's using the character
+    #[account(mut)]
+    pub user: Signer<'info>,
+
     /// The wallet that pays for the rent
     #[account(mut)]
-    pub wallet: Signer<'info>,
+    pub owner: Signer<'info>,
 
     /// HPL Fee collection vault
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -54,11 +58,11 @@ pub struct UseCharacter<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct UseCharacterArgs {
-    root: [u8; 32],
-    leaf_idx: u32,
-    source_hash: [u8; 32],
-    current_used_by: CharacterUsedBy,
-    new_used_by: CharacterUsedBy,
+    pub root: [u8; 32],
+    pub leaf_idx: u32,
+    pub source_hash: [u8; 32],
+    pub current_used_by: CharacterUsedBy,
+    pub new_used_by: CharacterUsedBy,
 }
 
 /// Init NFT
@@ -71,7 +75,7 @@ pub fn use_character<'info>(
         .assert_merkle_tree(ctx.accounts.merkle_tree.key())?;
 
     let mut character_compressed = CharacterSchemaCompressed {
-        owner: ctx.accounts.wallet.key(),
+        owner: ctx.accounts.owner.key(),
         source: args.source_hash,
         used_by: args.current_used_by.to_node(),
     };
@@ -86,7 +90,13 @@ pub fn use_character<'info>(
     )?;
 
     if args.current_used_by.is_used() {
-        return Err(HplCharacterManagerError::CharacterInUse.into());
+        if !args.current_used_by.match_user(ctx.accounts.user.key) {
+            return Err(HplCharacterManagerError::CharacterInUse.into());
+        }
+
+        if args.new_used_by.is_used() && !args.new_used_by.match_used_by(&args.current_used_by) {
+            return Err(HplCharacterManagerError::UsedByMismatch.into());
+        }
     }
 
     let merkle_tree_bytes = ctx.accounts.merkle_tree.try_borrow_data()?;

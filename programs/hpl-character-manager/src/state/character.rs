@@ -275,6 +275,20 @@ impl CharacterUsedBy {
             CharacterUsedBy::Guild { id, .. } => *id,
         }
     }
+
+    pub fn match_user(&self, user: &Pubkey) -> bool {
+        &self.user() == user
+    }
+
+    pub fn match_used_by(&self, used_by: &Self) -> bool {
+        match (self, used_by) {
+            (Self::None, Self::None) => true,
+            (Self::Staking { .. }, Self::Staking { .. }) => true,
+            (Self::Missions { .. }, Self::Missions { .. }) => true,
+            (Self::Guild { .. }, Self::Guild { .. }) => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]

@@ -10,8 +10,10 @@ pub enum HplCharacterManagerError {
     AssetIDMismatch,
     #[msg("Source not found for the provided asset custody")]
     CustodialAssetSourceNotFound,
-    #[msg("Character is currently being used by a service")]
+    #[msg("Character is currently being used by another service")]
     CharacterInUse,
+    #[msg("Cannot change used_by type")]
+    UsedByMismatch,
     #[msg("Merkle tree provided does not belong to this model")]
     MerkleTreeInvalid,
 }
