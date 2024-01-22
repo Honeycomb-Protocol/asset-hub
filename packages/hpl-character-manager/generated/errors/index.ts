@@ -109,7 +109,7 @@ createErrorFromNameLookup.set(
 )
 
 /**
- * CharacterInUse: 'Character is currently being used by a service'
+ * CharacterInUse: 'Character is currently being used by another service'
  *
  * @category Errors
  * @category generated
@@ -118,7 +118,7 @@ export class CharacterInUseError extends Error {
   readonly code: number = 0x1774
   readonly name: string = 'CharacterInUse'
   constructor() {
-    super('Character is currently being used by a service')
+    super('Character is currently being used by another service')
     if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, CharacterInUseError)
     }
@@ -129,13 +129,33 @@ createErrorFromCodeLookup.set(0x1774, () => new CharacterInUseError())
 createErrorFromNameLookup.set('CharacterInUse', () => new CharacterInUseError())
 
 /**
+ * UsedByMismatch: 'Cannot change used_by type'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class UsedByMismatchError extends Error {
+  readonly code: number = 0x1775
+  readonly name: string = 'UsedByMismatch'
+  constructor() {
+    super('Cannot change used_by type')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, UsedByMismatchError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1775, () => new UsedByMismatchError())
+createErrorFromNameLookup.set('UsedByMismatch', () => new UsedByMismatchError())
+
+/**
  * MerkleTreeInvalid: 'Merkle tree provided does not belong to this model'
  *
  * @category Errors
  * @category generated
  */
 export class MerkleTreeInvalidError extends Error {
-  readonly code: number = 0x1775
+  readonly code: number = 0x1776
   readonly name: string = 'MerkleTreeInvalid'
   constructor() {
     super('Merkle tree provided does not belong to this model')
@@ -145,7 +165,7 @@ export class MerkleTreeInvalidError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1775, () => new MerkleTreeInvalidError())
+createErrorFromCodeLookup.set(0x1776, () => new MerkleTreeInvalidError())
 createErrorFromNameLookup.set(
   'MerkleTreeInvalid',
   () => new MerkleTreeInvalidError()

@@ -42,7 +42,8 @@ export const useCharacterStruct = new beet.FixableBeetArgsStruct<
  * @property [] project
  * @property [] characterModel
  * @property [_writable_] merkleTree
- * @property [_writable_, **signer**] wallet
+ * @property [_writable_, **signer**] user
+ * @property [_writable_, **signer**] owner
  * @property [_writable_] vault
  * @property [] hiveControl
  * @property [] compressionProgram
@@ -57,7 +58,8 @@ export type UseCharacterInstructionAccounts = {
   project: web3.PublicKey
   characterModel: web3.PublicKey
   merkleTree: web3.PublicKey
-  wallet: web3.PublicKey
+  user: web3.PublicKey
+  owner: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   hiveControl: web3.PublicKey
@@ -108,7 +110,12 @@ export function createUseCharacterInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.wallet,
+      pubkey: accounts.user,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.owner,
       isWritable: true,
       isSigner: true,
     },
