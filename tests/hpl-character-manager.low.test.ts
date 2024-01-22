@@ -29,7 +29,6 @@ import {
   ValidDepthSizePair,
   getConcurrentMerkleTreeAccountSize,
 } from "@solana/spl-account-compression";
-import { Metadata, fetchAssetProof, fetchHeliusAssets } from "./helius";
 import { METADATA_PROGRAM_ID, nftPdas } from "./metadata";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -37,7 +36,12 @@ import {
 } from "@solana/spl-token";
 import { PROGRAM_ID as AUTHORIZATION_PROGRAM_ID } from "@metaplex-foundation/mpl-token-auth-rules";
 import { PROGRAM_ID as BUBBLEGUM_PROGRAM_ID } from "@metaplex-foundation/mpl-bubblegum";
-import { Character, getCharacter, getProof, sourceHash } from "./compression";
+import {
+  Asset,
+  fetchAssetProof,
+  fetchHeliusAssets,
+  HplCharacter,
+} from "../packages/hpl-character-manager";
 
 jest.setTimeout(200000);
 
@@ -53,8 +57,8 @@ describe("Character Manager", () => {
   let characterModelAddress: web3.PublicKey;
   let characterModel: CharacterModel;
   let activeCharactersTree: web3.PublicKey;
-  let wrappedCharacterNft: Metadata;
-  let character: Character;
+  let wrappedCharacterNft: Asset;
+  let character: HplCharacter;
 
   it("Prepare", async () => {
     const honeycombs = await getHoneycombs();
@@ -338,11 +342,11 @@ describe("Character Manager", () => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     wrappedCharacterNft = nftToWrap;
-    character = (await getCharacter(
+    character = await HplCharacter.fetchWithTreeAndLeaf(
       userHC.rpcEndpoint,
-      0,
-      activeCharactersTree
-    ))!;
+      activeCharactersTree,
+      0
+    );
 
     console.log("Character", character);
   });
@@ -431,11 +435,11 @@ describe("Character Manager", () => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     wrappedCharacterNft = nftToWrap;
-    character = (await getCharacter(
+    character = await HplCharacter.fetchWithTreeAndLeaf(
       userHC.rpcEndpoint,
-      0,
-      activeCharactersTree
-    ))!;
+      activeCharactersTree,
+      0
+    );
 
     console.log("Character", character);
   });
@@ -446,11 +450,7 @@ describe("Character Manager", () => {
     const project = characterModel.project;
     const wallet = userHC.identity().address;
 
-    const { root, proof } = (await getProof(
-      userHC.rpcEndpoint,
-      character.leafIndex,
-      character.merkleTree
-    ))!;
+    const { root, proof } = (await character.proof(userHC.rpcEndpoint))!;
 
     await new Operation(userHC, [
       createUseCharacterInstruction(
@@ -458,19 +458,25 @@ describe("Character Manager", () => {
           project,
           characterModel: characterModelAddress,
           merkleTree: character.merkleTree,
-          wallet,
+          owner: wallet,
+          user: web3.PublicKey.default,
           vault: VAULT,
           hiveControl: HPL_HIVE_CONTROL_PROGRAM,
           compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
           logWrapper: SPL_NOOP_PROGRAM_ID,
           clock: web3.SYSVAR_CLOCK_PUBKEY,
           instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+          anchorRemainingAccounts: proof.map((pubkey) => ({
+            pubkey,
+            isSigner: false,
+            isWritable: false,
+          })),
         },
         {
           args: {
             root: Array.from(root.toBytes()),
-            leafIdx: character.leafIndex,
-            sourceHash: sourceHash(character.source),
+            leafIdx: character.leafIdx,
+            sourceHash: Array.from(character.sourceHash),
             currentUsedBy: character.usedBy,
             newUsedBy: {
               __kind: "Missions",
@@ -497,11 +503,7 @@ describe("Character Manager", () => {
       PROGRAM_ID
     );
 
-    const { root, proof } = (await getProof(
-      userHC.rpcEndpoint,
-      character.leafIndex,
-      character.merkleTree
-    ))!;
+    const { root, proof } = (await character.proof(userHC.rpcEndpoint))!;
 
     await new Operation(userHC, [
       createUnwrapCharacterInstruction(
@@ -527,7 +529,7 @@ describe("Character Manager", () => {
         {
           args: {
             root: Array.from(root.toBytes()),
-            leafIdx: character.leafIndex,
+            leafIdx: character.leafIdx,
             source: character.source,
             usedBy: character.usedBy,
           },
