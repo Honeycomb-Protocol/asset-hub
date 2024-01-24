@@ -62,6 +62,9 @@ class Rustbin {
             (0, utils_1.logDebug)(toml);
             throw new Error(`${this.libName} not found as dependency in ${this.cargoToml}`);
         }
+        if(this.libName === 'anchor-lang') {
+            return (typeof libVersion === 'string' ? libVersion : libVersion.version) || "0.29.0";    
+        }
         return (typeof libVersion === 'string' ? libVersion : libVersion.version) || "unknown";
     }
     async installMatchinBin(libVersionRange) {

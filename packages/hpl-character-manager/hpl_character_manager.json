@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-beta.2",
+  "version": "0.0.2-beta.3",
   "name": "hpl_character_manager",
   "instructions": [
     {
@@ -1300,6 +1300,22 @@
       }
     },
     {
+      "name": "EarnedReward",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "delta",
+            "type": "u8"
+          },
+          {
+            "name": "rewardIdx",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "Event",
       "type": {
         "kind": "enum",
@@ -1421,11 +1437,25 @@
             ]
           },
           {
-            "name": "Missions",
+            "name": "Mission",
             "fields": [
               {
-                "name": "participation",
+                "name": "id",
                 "type": "publicKey"
+              },
+              {
+                "name": "requirement",
+                "type": {
+                  "defined": "MissionRequirement"
+                }
+              },
+              {
+                "name": "rewards",
+                "type": {
+                  "vec": {
+                    "defined": "EarnedReward"
+                  }
+                }
               }
             ]
           },
@@ -1445,6 +1475,27 @@
               {
                 "name": "order",
                 "type": "u8"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MissionRequirement",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Time",
+            "fields": [
+              {
+                "name": "endTime",
+                "docs": [
+                  "The end time of the mission in unix timestamp",
+                  "Calculated by start_time + mission.duration"
+                ],
+                "type": "i64"
               }
             ]
           }
@@ -1633,6 +1684,6 @@
     "address": "ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
-    "libVersion": "unknown"
+    "libVersion": "0.29.0"
   }
 }
