@@ -1129,7 +1129,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.83"
+version = "0.0.83-beta.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1199,7 +1199,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-payment-manager"
-version = "0.0.5"
+version = "0.0.5-beta.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",

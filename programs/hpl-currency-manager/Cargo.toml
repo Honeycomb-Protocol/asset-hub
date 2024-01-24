@@ -2,7 +2,7 @@
 name = "hpl-currency-manager"
 description = "Honeycomb protocol library currency manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.83"
+version = "0.0.83-beta.1"
 edition = "2021"
 license = "MIT"
 
