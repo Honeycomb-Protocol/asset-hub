@@ -6,5 +6,5 @@ use hpl_events::event;
 
 #[event]
 pub enum Event {
-    NewCharacterModel { address: Pubkey, state: Vec<u8> },
+    CharacterModel { address: Pubkey, state: Vec<u8> },
 }

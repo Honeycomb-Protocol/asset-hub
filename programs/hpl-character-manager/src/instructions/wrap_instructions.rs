@@ -1,17 +1,18 @@
 use {
-    crate::{errors::ErrorCode, state::*},
+    crate::{errors::HplCharacterManagerError, state::*},
     anchor_lang::prelude::*,
-    anchor_spl::token::{Mint, TokenAccount},
-    hpl_compression::{CompressedData, CompressedDataEvent, ToNode},
+    hpl_compression::{
+        merkle_tree_apply_fn_deep, CompressedData, CompressedDataEvent, CompressedDataEventStream,
+        ToNode,
+    },
     hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_utils::mpl_token_metadata::state::{Metadata, TokenMetadataAccount},
-    mpl_bubblegum::utils::get_asset_id,
+    hpl_utils::Default,
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
 /// Accounts used in init NFT instruction
 #[derive(Accounts)]
-pub struct WrapNftCharacter<'info> {
+pub struct WrapCharacter<'info> {
     // HIVE CONTROL
     #[account()]
     pub project: Box<Account<'info, Project>>,
@@ -19,24 +20,17 @@ pub struct WrapNftCharacter<'info> {
     #[account()]
     pub character_model: Box<Account<'info, CharacterModel>>,
 
+    #[account(
+        mut,
+        has_one = wallet,
+        constraint = asset_custody.character_model.is_some() && asset_custody.character_model.unwrap() == character_model.key(),
+        close = wallet,
+    )]
+    pub asset_custody: Box<Account<'info, AssetCustody>>,
+
     /// CHECK: unsafe
     #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
-
-    /// Mint address of the NFT
-    #[account()]
-    pub mint: Account<'info, Mint>,
-
-    /// Mint address of the NFT
-    #[account(
-        constraint = token_account.mint == mint.key(),
-        constraint = token_account.owner == wallet.key()
-    )]
-    pub token_account: Account<'info, TokenAccount>,
-
-    /// NFT token metadata
-    /// CHECK: This is not dangerous because we don't read or write from this account
-    pub metadata: AccountInfo<'info>,
 
     /// The wallet that pays for the rent
     #[account(mut)]
@@ -69,61 +63,14 @@ pub struct WrapNftCharacter<'info> {
 }
 
 /// Init NFT
-pub fn wrap_nft_character(ctx: Context<WrapNftCharacter>) -> Result<()> {
-    let metadata_account_info = &ctx.accounts.metadata;
-
-    if metadata_account_info.data_is_empty() {
-        msg!("Metadata account is empty");
-        return Err(ErrorCode::InvalidMetadata.into());
+pub fn wrap_character(ctx: Context<WrapCharacter>) -> Result<()> {
+    if ctx.accounts.asset_custody.source.is_none() {
+        return Err(HplCharacterManagerError::CustodialAssetSourceNotFound.into());
     }
 
-    let metadata: Metadata = Metadata::from_account_info(metadata_account_info)?;
-    if metadata.mint != ctx.accounts.mint.key() {
-        msg!("Metadata mint does not match NFT mint");
-        return Err(ErrorCode::InvalidMetadata.into());
-    }
-
-    let mut source_criteria = None::<NftWrapCriteria>;
-    match &ctx.accounts.character_model.config {
-        CharacterConfig::Wrapped(criterias) => {
-            for criteria in criterias {
-                match criteria {
-                    NftWrapCriteria::Collection(address) => {
-                        if let Some(collection) = &metadata.collection {
-                            if collection.verified
-                                && collection.key.to_string() == address.to_string()
-                            {
-                                source_criteria = Some(NftWrapCriteria::Collection(*address));
-                                break;
-                            }
-                        }
-                    }
-                    NftWrapCriteria::Creator(address) => {
-                        if let Some(creators) = &metadata.data.creators {
-                            let mut found = false;
-                            for creator in creators {
-                                if creator.verified
-                                    && creator.address.to_string() == address.to_string()
-                                {
-                                    source_criteria = Some(NftWrapCriteria::Creator(*address));
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if found {
-                                break;
-                            }
-                        }
-                    }
-                    NftWrapCriteria::MerkleTree(_) => {}
-                }
-            }
-        }
-    }
-
-    if source_criteria.is_none() {
-        return Err(ErrorCode::NoCriteriaMatched.into());
-    }
+    ctx.accounts
+        .character_model
+        .assert_merkle_tree(ctx.accounts.merkle_tree.key())?;
 
     let (leaf_idx, seq) = ctx
         .accounts
@@ -131,13 +78,10 @@ pub fn wrap_nft_character(ctx: Context<WrapNftCharacter>) -> Result<()> {
         .merkle_trees
         .assert_append(ctx.accounts.merkle_tree.to_account_info())?;
 
+    let source = ctx.accounts.asset_custody.source.clone().unwrap();
     let character = CharacterSchema {
         owner: ctx.accounts.wallet.key(),
-        source: CharacterSource::Wrapped {
-            mint: ctx.accounts.mint.key(),
-            criteria: source_criteria.unwrap(),
-            is_compressed: false,
-        },
+        source,
         used_by: CharacterUsedBy::None,
     };
 
@@ -150,17 +94,23 @@ pub fn wrap_nft_character(ctx: Context<WrapNftCharacter>) -> Result<()> {
     };
     event.wrap(&ctx.accounts.log_wrapper)?;
 
+    // panic!("Custom panic {:?}", character.to_compressed().to_node());
+
+    let character_model_seeds = &[
+        b"character_model",
+        ctx.accounts.character_model.project.as_ref(),
+        ctx.accounts.character_model.key.as_ref(),
+        &[ctx.accounts.character_model.bump],
+    ];
+    let character_model_signer = &[&character_model_seeds[..]];
+
     hpl_compression::append_leaf(
         character.to_compressed().to_node(),
-        &ctx.accounts.vault,
+        &ctx.accounts.character_model.to_account_info(),
         &ctx.accounts.merkle_tree,
         &ctx.accounts.compression_program,
         &ctx.accounts.log_wrapper,
-        Some(&[&[
-            b"vault".as_ref(),
-            crate::id().as_ref(),
-            &[ctx.bumps["vault"]],
-        ][..]]),
+        Some(character_model_signer),
     )?;
 
     Ok(())
@@ -168,7 +118,8 @@ pub fn wrap_nft_character(ctx: Context<WrapNftCharacter>) -> Result<()> {
 
 /// Accounts used in init NFT instruction
 #[derive(Accounts)]
-pub struct WrapCnftCharacter<'info> {
+#[instruction(args: UnwrapCharacterArgs)]
+pub struct UnwrapCharacter<'info> {
     // HIVE CONTROL
     #[account()]
     pub project: Box<Account<'info, Project>>,
@@ -176,24 +127,20 @@ pub struct WrapCnftCharacter<'info> {
     #[account()]
     pub character_model: Box<Account<'info, CharacterModel>>,
 
+    #[account(
+        init, payer = wallet,
+        space = AssetCustody::LEN,
+        seeds = [
+          b"asset_custody",
+          args.source.id().as_ref()
+        ],
+        bump
+      )]
+    pub asset_custody: Box<Account<'info, AssetCustody>>,
+
     /// CHECK: unsafe
     #[account(mut)]
-    pub character_merkle_tree: AccountInfo<'info>,
-
-    /// CHECK: unsafe
-    pub cnft_tree_authority: UncheckedAccount<'info>,
-
-    /// CHECK: unsafe
-    pub cnft_merkle_tree: UncheckedAccount<'info>,
-
-    /// CHECK: unsafe
-    pub data_hash: UncheckedAccount<'info>,
-
-    /// CHECK: unsafe
-    pub root: UncheckedAccount<'info>,
-
-    /// CHECK: unsafe
-    pub creator_hash: UncheckedAccount<'info>,
+    pub merkle_tree: AccountInfo<'info>,
 
     /// The wallet that pays for the rent
     #[account(mut)]
@@ -226,131 +173,76 @@ pub struct WrapCnftCharacter<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct WrapCnftCharacterArgs {
-    pub nonce: u64,
-    pub index: u32,
+pub struct UnwrapCharacterArgs {
+    root: [u8; 32],
+    leaf_idx: u32,
+    source: CharacterSource,
+    used_by: CharacterUsedBy,
 }
 
 /// Init NFT
-pub fn wrap_cnft_character<'info>(
-    ctx: Context<'_, '_, '_, 'info, WrapCnftCharacter<'info>>,
-    args: WrapCnftCharacterArgs,
+pub fn unwrap_character<'info>(
+    ctx: Context<'_, '_, '_, 'info, UnwrapCharacter<'info>>,
+    args: UnwrapCharacterArgs,
 ) -> Result<()> {
-    crate::bubblegum::transfer_cnft_cpi(
-        ctx.accounts.cnft_tree_authority.to_account_info(),
-        ctx.accounts.character_model.to_account_info(),
-        ctx.accounts.character_model.to_account_info(),
-        ctx.accounts.wallet.to_account_info(),
-        ctx.accounts.cnft_merkle_tree.to_account_info(),
-        ctx.accounts.log_wrapper.to_account_info(),
-        ctx.accounts.compression_program.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
-        ctx.remaining_accounts.to_vec(),
-        args.index,
-        None,
-    )?;
-
-    let mut source_criteria = None::<NftWrapCriteria>;
-    match &ctx.accounts.character_model.config {
-        CharacterConfig::Wrapped(criterias) => {
-            for criteria in criterias {
-                match criteria {
-                    NftWrapCriteria::Collection(_) => {}
-                    NftWrapCriteria::Creator(_) => {}
-                    NftWrapCriteria::MerkleTree(address) => {
-                        if *address == ctx.accounts.cnft_merkle_tree.key() {
-                            source_criteria = Some(NftWrapCriteria::MerkleTree(*address));
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if source_criteria.is_none() {
-        return Err(ErrorCode::NoCriteriaMatched.into());
-    }
-
-    let (leaf_idx, seq) = ctx
-        .accounts
+    ctx.accounts
         .character_model
-        .merkle_trees
-        .assert_append(ctx.accounts.character_merkle_tree.to_account_info())?;
+        .assert_merkle_tree(ctx.accounts.merkle_tree.key())?;
 
-    let character = CharacterSchema {
+    let character_compressed = CharacterSchemaCompressed {
         owner: ctx.accounts.wallet.key(),
-        source: CharacterSource::Wrapped {
-            mint: get_asset_id(&ctx.accounts.cnft_merkle_tree.key(), args.nonce),
-            criteria: source_criteria.unwrap(),
-            is_compressed: true,
-        },
-        used_by: CharacterUsedBy::None,
+        source: args.source.to_node(),
+        used_by: args.used_by.to_node(),
     };
 
+    hpl_compression::verify_leaf(
+        args.root,
+        character_compressed.to_node(),
+        args.leaf_idx,
+        &ctx.accounts.merkle_tree,
+        &ctx.accounts.compression_program,
+        ctx.remaining_accounts.to_vec(),
+    )?;
+
+    if args.used_by.is_used() {
+        return Err(HplCharacterManagerError::CharacterInUse.into());
+    }
+
+    let merkle_tree_bytes = ctx.accounts.merkle_tree.try_borrow_data()?;
     let event = CompressedDataEvent::Leaf {
         slot: ctx.accounts.clock.slot,
-        tree_id: ctx.accounts.character_merkle_tree.key().to_bytes(),
-        leaf_idx,
-        seq,
-        stream_type: character.event_stream(),
+        tree_id: ctx.accounts.merkle_tree.key().to_bytes(),
+        leaf_idx: args.leaf_idx,
+        seq: hpl_compression::merkle_tree_apply_fn!(merkle_tree_bytes get_seq) + 1,
+        stream_type: CompressedDataEventStream::Empty,
     };
     event.wrap(&ctx.accounts.log_wrapper)?;
 
-    hpl_compression::append_leaf(
-        character.to_compressed().to_node(),
-        &ctx.accounts.vault,
-        &ctx.accounts.character_merkle_tree,
+    let character_model_seeds = &[
+        b"character_model",
+        ctx.accounts.character_model.project.as_ref(),
+        ctx.accounts.character_model.key.as_ref(),
+        &[ctx.accounts.character_model.bump],
+    ];
+    let character_model_signer = &[&character_model_seeds[..]];
+
+    hpl_compression::replace_leaf(
+        args.root,
+        character_compressed.to_node(),
+        [0; 32],
+        args.leaf_idx,
+        &ctx.accounts.character_model.to_account_info(),
+        &ctx.accounts.merkle_tree,
         &ctx.accounts.compression_program,
         &ctx.accounts.log_wrapper,
-        Some(&[&[
-            b"vault".as_ref(),
-            crate::id().as_ref(),
-            &[ctx.bumps["vault"]],
-        ][..]]),
+        ctx.remaining_accounts.to_vec(),
+        Some(character_model_signer),
     )?;
+
+    let asset_custody = &mut ctx.accounts.asset_custody;
+    asset_custody.set_defaults();
+    asset_custody.bump = ctx.bumps["asset_custody"];
+    asset_custody.wallet = ctx.accounts.wallet.key();
 
     Ok(())
 }
-
-// /// Accounts used in use NFT instruction
-// #[derive(Accounts)]
-// pub struct UnwrapNftCharacter<'info> {
-//     // HIVE CONTROL
-//     #[account()]
-//     pub project: Box<Account<'info, Project>>,
-
-//     /// NFT state account
-//     #[account(
-//         mut,
-//         has_one = project,
-//         constraint = !character.is_used(),
-//         constraint = character.owner == wallet.key(),
-//         close = wallet
-//     )]
-//     pub character: Account<'info, Character>,
-
-//     /// The wallet ownning the cNFT
-//     #[account(mut)]
-//     pub wallet: Signer<'info>,
-
-//     /// NATIVE SYSTEM PROGRAM
-//     pub system_program: Program<'info, System>,
-
-//     /// HPL Hive Control Program
-//     pub hive_control: Program<'info, HplHiveControl>,
-
-//     /// NATIVE INSTRUCTIONS SYSVAR
-//     /// CHECK: This is not dangerous because we don't read or write from this account
-//     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
-//     pub instructions_sysvar: AccountInfo<'info>,
-
-//     /// CHECK: This is not dangerous because we don't read or write from this account
-//     #[account(mut)]
-//     pub vault: AccountInfo<'info>,
-// }
-
-// /// Close NFT
-// pub fn unwrap_nft_character<'info>(_ctx: Context<UnwrapNftCharacter>) -> Result<()> {
-//     Ok(())
-// }

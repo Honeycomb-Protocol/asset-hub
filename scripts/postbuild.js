@@ -2,13 +2,7 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-console.log(process.env.NODE_AUTH_TOKEN);
-
-// write the version in cargo.toml of all programs
-const packages = fs.readdirSync("packages");
-packages.forEach((package) => {
-  if (package === "idl") return;
-
+const postFix = (package) => {
   const postFixPath = path.join(
     __dirname,
     "..",
@@ -25,4 +19,11 @@ packages.forEach((package) => {
       execSync(`cp -r ${path.join(postFixPath, dir)} ${generatedPath}`)
     );
   }
-});
+};
+
+if (process.env.PROGRAM_NAME) {
+  postFix("hpl-" + process.env.PROGRAM_NAME);
+} else {
+  const packages = fs.readdirSync("packages");
+  packages.forEach(postFix);
+}

@@ -1,16 +1,22 @@
 use {
     super::{CharacterSchema, NftWrapCriteria},
+    crate::errors::HplCharacterManagerError,
     anchor_lang::prelude::*,
     hpl_compression::{CompressedSchema, ControlledMerkleTrees, Schema},
     hpl_utils::traits::*,
 };
 
 /// Game character (particulary NFT) PDA Account
-/// PDA: ['character', mint]
+///
+/// PDA: `'character', project, key`
+///
 /// Category: nft_state
 #[account]
 pub struct CharacterModel {
     pub bump: u8,
+
+    /// The project this character is associated with
+    pub key: Pubkey,
 
     /// The project this character is associated with
     pub project: Pubkey,
@@ -41,8 +47,34 @@ impl Default for CharacterModel {
     }
 }
 
+impl CharacterModel {
+    pub fn get_size(attributes: &Schema, config: &CharacterConfig) -> usize {
+        8 + 1
+            + 32
+            + 32
+            + config.get_size()
+            + attributes.size_for_borsh()
+            + ControlledMerkleTrees::get_size_for_borsh(&CharacterSchema::schema(), 0)
+    }
+
+    pub fn assert_merkle_tree(&self, merkle_tree: Pubkey) -> Result<()> {
+        if !self.merkle_trees.merkle_trees.contains(&merkle_tree) {
+            return Err(HplCharacterManagerError::MerkleTreeInvalid.into());
+        }
+        Ok(())
+    }
+}
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum CharacterConfig {
     Wrapped(Vec<NftWrapCriteria>),
     // ... rest
+}
+
+impl CharacterConfig {
+    pub fn get_size(&self) -> usize {
+        match self {
+            Self::Wrapped(v) => 5 + v.len() * 33,
+        }
+    }
 }

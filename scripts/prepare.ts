@@ -1,7 +1,10 @@
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
 import * as web3 from "@solana/web3.js";
 import { Honeycomb, identityModule } from "@honeycomb-protocol/hive-control";
+
+dotenv.config();
 
 export default function () {
   const RPC_URL = process.env.SOLANA_RPC || "https://api.devnet.solana.com";
