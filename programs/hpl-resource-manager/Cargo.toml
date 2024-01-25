@@ -22,6 +22,7 @@ anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
 anchor-spl = "0.28.0"
 hpl-macros = "0.0.2"
 hpl-utils = "0.1.11"
+mpl-token-metadata = { version = "4.0.0" }
 hpl-events = { version = "0.1.24", features = ["no-entrypoint"] }
 hpl-hive-control = { version = "0.2.13", features = ["cpi"] }
 mpl-bubblegum = { version = "1.0.0" }
