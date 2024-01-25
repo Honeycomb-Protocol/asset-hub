@@ -5,7 +5,13 @@ use {
         SchemaValue, ToNode,
     },
     spl_account_compression::Node,
-    std::collections::HashMap,
+    std::{
+        collections::HashMap,
+        time::{
+            SystemTime,
+            UNIX_EPOCH,
+        },
+    },
 };
 
 /// Game character (particulary NFT) PDA Account
@@ -309,7 +315,7 @@ pub enum MissionRequirement {
     Time {
         /// The end time of the mission in unix timestamp
         /// Calculated by start_time + mission.duration
-        end_time: i64,
+        end_time: u64,
     },
     // Add task requirement later down the line
 }
