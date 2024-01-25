@@ -1050,7 +1050,7 @@ dependencies = [
  "hpl-hive-control",
  "hpl-macros",
  "hpl-utils",
- "mpl-token-metadata 1.13.2",
+ "mpl-token-metadata",
 ]
 
 [[package]]
@@ -1063,7 +1063,7 @@ dependencies = [
  "hpl-hive-control",
  "hpl-macros",
  "hpl-utils",
- "mpl-token-metadata 1.13.2",
+ "mpl-token-metadata",
 ]
 
 [[package]]
@@ -1244,13 +1244,11 @@ version = "0.0.5"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-currency-manager",
  "hpl-events",
  "hpl-hive-control",
  "hpl-macros",
  "hpl-utils",
  "mpl-bubblegum",
- "mpl-token-metadata 4.0.0",
  "spl-account-compression",
 ]
 
@@ -1262,7 +1260,7 @@ checksum = "67bc8b56913911b8ae6a50208a057d136e822e3c808c10c91a4d4a462d2b5f79"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "mpl-token-metadata 1.13.2",
+ "mpl-token-metadata",
 ]
 
 [[package]]
@@ -1518,19 +1516,6 @@ dependencies = [
  "solana-program",
  "spl-associated-token-account 2.2.0",
  "spl-token 4.0.0",
- "thiserror",
-]
-
-[[package]]
-name = "mpl-token-metadata"
-version = "4.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "442bfb6479e149afe1ad5a1440de7b90abbcc7e6647709d89229a3c3fdbe3e12"
-dependencies = [
- "borsh 0.10.3",
- "num-derive 0.3.3",
- "num-traits",
- "solana-program",
  "thiserror",
 ]
 
