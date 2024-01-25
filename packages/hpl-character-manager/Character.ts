@@ -37,9 +37,17 @@ export type CharacterOffchainData = {
         };
       }
     | {
-        __kind: "Missions";
+        __kind: "Mission";
         params: {
-          participation: string;
+          id: string;
+          requirement: {
+            __kind: "Time";
+            endTime: number;
+          };
+          rewards: {
+            delta: number;
+            rewardIdx: number;
+          }[];
         };
       }
     | {
@@ -158,12 +166,14 @@ export class HplCharacter {
               stakedAt: offchainData.used_by.params.staked_at,
               claimedAt: offchainData.used_by.params.claimed_at,
             }
-          : "Missions" === offchainData.used_by.__kind
+          : "Mission" === offchainData.used_by.__kind
           ? {
-              __kind: "Missions",
-              participation: new PublicKey(
-                offchainData.used_by.params.participation.replace("pubkey:", "")
+              __kind: "Mission",
+              id: new PublicKey(
+                offchainData.used_by.params.id.replace("pubkey:", "")
               ),
+              requirement: offchainData.used_by.params.requirement,
+              rewards: offchainData.used_by.params.rewards,
             }
           : "Guild" === offchainData.used_by.__kind
           ? {
