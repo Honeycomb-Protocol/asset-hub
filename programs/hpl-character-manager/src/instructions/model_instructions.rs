@@ -159,10 +159,12 @@ pub fn create_new_characters_tree(
         .merkle_trees
         .push(ctx.accounts.merkle_tree.key());
 
-    let event = CompressedDataEvent::TreeSchemaValue {
-        tree_id: ctx.accounts.merkle_tree.key().to_bytes(),
-        schema: character_model.merkle_trees.schema.clone(),
-    };
+    let event = CompressedDataEvent::tree(
+        ctx.accounts.merkle_tree.key(),
+        character_model.merkle_trees.schema.clone(),
+        crate::ID,
+        String::from("Character"),
+    );
     event.wrap(&ctx.accounts.log_wrapper)?;
 
     let character_model_seeds = &[
