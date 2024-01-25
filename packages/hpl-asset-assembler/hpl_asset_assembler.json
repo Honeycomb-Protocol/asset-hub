@@ -1,5 +1,5 @@
 {
-  "version": "0.0.75",
+  "version": "0.0.77",
   "name": "hpl_asset_assembler",
   "instructions": [
     {
@@ -2116,7 +2116,7 @@
             "name": "Enum",
             "fields": [
               {
-                "name": "is_collection",
+                "name": "isCollection",
                 "type": "bool"
               },
               {
@@ -2304,7 +2304,7 @@
   "metadata": {
     "address": "Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz",
     "origin": "anchor",
-    "binaryVersion": "0.26.0",
-    "libVersion": "0.26.0"
+    "binaryVersion": "0.29.0",
+    "libVersion": "0.28.0"
   }
 }

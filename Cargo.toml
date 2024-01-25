@@ -1,8 +1,11 @@
 [workspace]
 members = [
-  "programs/hpl-payment-manager",
+  "programs/hpl-asset-manager",
+  "programs/hpl-asset-assembler",
+  "programs/hpl-currency-manager",
   "programs/hpl-payment-manager",
   "programs/hpl-character-manager",
+  "programs/hpl-resource-manager",
 ]
 
 [profile.release]

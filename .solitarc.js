@@ -97,42 +97,42 @@ const createConfig = (name, programId) => {
         return account;
       });
 
-      idl.types = idl.types
-        .map((type) => {
-          if (["Condition", "Conditional"].includes(type.name)) return null;
+      // idl.types = idl.types
+      //   .map((type) => {
+      //     if (["Condition", "Conditional"].includes(type.name)) return null;
 
-          if (type.type.fields) {
-            type.type.fields = type.type.fields.map((field) => {
-              if (field.type.defined) {
-                field.type = okTypes(field.type);
-              } else if (field.type.vec?.defined) {
-                field.type.vec = okTypes(field.type.vec);
-              }
-              return field;
-            });
-          } else if (type.type.variants) {
-            type.type.variants = type.type.variants.map((variant) => {
-              if (variant.fields) {
-                variant.fields = variant.fields.map((field) => {
-                  if (field.type?.defined) {
-                    field.type = okTypes(field.type);
-                  } else if (field.type?.vec?.defined) {
-                    field.type.vec = okTypes(field.type.vec);
-                  } else if (field.defined) {
-                    field = okTypes(field);
-                  }
+      //     if (type.type.fields) {
+      //       type.type.fields = type.type.fields.map((field) => {
+      //         if (field.type.defined) {
+      //           field.type = okTypes(field.type);
+      //         } else if (field.type.vec?.defined) {
+      //           field.type.vec = okTypes(field.type.vec);
+      //         }
+      //         return field;
+      //       });
+      //     } else if (type.type.variants) {
+      //       type.type.variants = type.type.variants.map((variant) => {
+      //         if (variant.fields) {
+      //           variant.fields = variant.fields.map((field) => {
+      //             if (field.type?.defined) {
+      //               field.type = okTypes(field.type);
+      //             } else if (field.type?.vec?.defined) {
+      //               field.type.vec = okTypes(field.type.vec);
+      //             } else if (field.defined) {
+      //               field = okTypes(field);
+      //             }
 
-                  return field;
-                });
-              }
-              return variant;
-            });
-          }
+      //             return field;
+      //           });
+      //         }
+      //         return variant;
+      //       });
+      //     }
 
-          return type;
-        })
-        .filter((x) => !!x)
-        .concat(...getVariantedConditionalTypes(variantsOfConditinal));
+      //     return type;
+      //   })
+      //   .filter((x) => !!x)
+      //   .concat(...getVariantedConditionalTypes(variantsOfConditinal));
 
       return idl;
     },
@@ -156,7 +156,11 @@ const configs = {
     "payment-manager",
     "Pay9ZxrVRXjt9Da8qpwqq4yBRvvrfx3STWnKK4FstPr"
   ),
+  "resource-manager": createConfig(
+    "resource-manager",
+    "L9A9ZxrVRXjt9Da8qpwqq4yBRvvrfx3STWnKK4FstPr"
+  ),
 };
 
-const defaultProgram = Object.keys(configs)[0];
+const defaultProgram = Object.keys(configs)[4];
 module.exports = configs[process.env.PROGRAM_NAME || defaultProgram];
