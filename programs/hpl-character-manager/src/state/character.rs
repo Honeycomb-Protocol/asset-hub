@@ -5,13 +5,7 @@ use {
         SchemaValue, ToNode,
     },
     spl_account_compression::Node,
-    std::{
-        collections::HashMap,
-        time::{
-            SystemTime,
-            UNIX_EPOCH,
-        },
-    },
+    std::collections::HashMap,
 };
 
 /// Game character (particulary NFT) PDA Account
@@ -155,8 +149,6 @@ pub enum CharacterUsedBy {
     },
     Mission {
         id: Pubkey,
-        requirement: MissionRequirement,
-        rewards: Vec<EarnedReward>,
     },
     Guild {
         id: Pubkey,
@@ -215,14 +207,9 @@ impl CompressedSchema for CharacterUsedBy {
                     Box::new(SchemaValue::Object(staking)),
                 )
             }
-            Self::Mission { id, requirement, rewards } => {
+            Self::Mission { id } => {
                 let mut missions = HashMap::new();
                 missions.insert(String::from("id"), id.schema_value());
-                missions.insert(String::from("requirement"), requirement.schema_value());
-                missions.insert(
-                    String::from("rewards"),
-                    SchemaValue::Array(rewards.iter().map(|r| r.schema_value()).collect()),
-                );
 
                 SchemaValue::Enum(
                     String::from("Missions"),
@@ -258,12 +245,10 @@ impl ToNode for CharacterUsedBy {
                 claimed_at.to_node().as_ref(),
             ])
             .to_bytes(),
-            Self::Mission { id, requirement, rewards } => {
+            Self::Mission { id } => {
                 keccak::hashv(&[
                     "Missions".as_bytes(),
                     id.to_node().as_ref(),
-                    requirement.to_node().as_ref(),
-                    rewards.to_node().as_ref(),
                 ])
                 .to_bytes()
             }
