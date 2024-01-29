@@ -149,6 +149,8 @@ pub enum CharacterUsedBy {
     },
     Mission {
         id: Pubkey,
+        rewards: Vec<EarnedReward>,
+        end_time: u64,
     },
     Guild {
         id: Pubkey,
@@ -174,9 +176,11 @@ impl CompressedSchema for CharacterUsedBy {
         staking.insert(String::from("claimed_at"), i64::schema());
         schema.push((String::from("Staking"), Schema::Object(staking)));
 
-        let mut missions = HashMap::new();
-        missions.insert(String::from("participation"), Pubkey::schema());
-        schema.push((String::from("Missions"), Schema::Object(missions)));
+        let mut mission = HashMap::new();
+        mission.insert(String::from("id"), Pubkey::schema());
+        mission.insert(String::from("rewards"), Vec::<EarnedReward>::schema());
+        mission.insert(String::from("end_time"), u64::schema());
+        schema.push((String::from("Mission"), Schema::Object(mission)));
 
         let mut guild = HashMap::new();
         guild.insert(String::from("id"), Pubkey::schema());
@@ -207,13 +211,16 @@ impl CompressedSchema for CharacterUsedBy {
                     Box::new(SchemaValue::Object(staking)),
                 )
             }
-            Self::Mission { id } => {
-                let mut missions = HashMap::new();
-                missions.insert(String::from("id"), id.schema_value());
+            Self::Mission { id, rewards, end_time } => {
+                let mut mission = HashMap::new();
+                mission.insert(String::from("id"), id.schema_value());
+                mission.insert(String::from("rewards"), rewards.schema_value());
+                mission.insert(String::from("end_time"), end_time.schema_value());
 
+                // Add rewards and end_time here
                 SchemaValue::Enum(
-                    String::from("Missions"),
-                    Box::new(SchemaValue::Object(missions)),
+                    String::from("Mission"),
+                    Box::new(SchemaValue::Object(mission)),
                 )
             }
             Self::Guild { id, role, order } => {
@@ -245,9 +252,11 @@ impl ToNode for CharacterUsedBy {
                 claimed_at.to_node().as_ref(),
             ])
             .to_bytes(),
-            Self::Mission { id } => {
+            Self::Mission { id, rewards, end_time} => {
                 keccak::hashv(&[
                     "Missions".as_bytes(),
+                    rewards.to_node().as_ref(),
+                    end_time.to_node().as_ref(),
                     id.to_node().as_ref(),
                 ])
                 .to_bytes()
