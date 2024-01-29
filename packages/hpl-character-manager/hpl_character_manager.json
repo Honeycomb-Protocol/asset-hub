@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-beta.3",
+  "version": "0.0.2-beta.7",
   "name": "hpl_character_manager",
   "instructions": [
     {
@@ -999,6 +999,82 @@
           }
         }
       ]
+    },
+    {
+      "name": "verifyCharacter",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "characterModel",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The service that's currently using the character"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE SYSTEM PROGRAM"
+          ]
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HPL Hive Control Program"
+          ]
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL account compression program."
+          ]
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Noop program."
+          ]
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "NATIVE INSTRUCTIONS SYSVAR"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "VerifyCharacterArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1139,6 +1215,39 @@
             "name": "newUsedBy",
             "type": {
               "defined": "CharacterUsedBy"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerifyCharacterArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "leafIdx",
+            "type": "u32"
+          },
+          {
+            "name": "source",
+            "type": {
+              "defined": "DataOrHash<CharacterSource>"
+            }
+          },
+          {
+            "name": "usedBy",
+            "type": {
+              "defined": "DataOrHash<CharacterUsedBy>"
             }
           }
         ]
@@ -1408,6 +1517,33 @@
       }
     },
     {
+      "name": "DataOrHash",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Data",
+            "fields": [
+              {
+                "defined": "Data"
+              }
+            ]
+          },
+          {
+            "name": "Hash",
+            "fields": [
+              {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "name": "CharacterUsedBy",
       "type": {
         "kind": "enum",
@@ -1444,18 +1580,16 @@
                 "type": "publicKey"
               },
               {
-                "name": "requirement",
-                "type": {
-                  "defined": "MissionRequirement"
-                }
-              },
-              {
                 "name": "rewards",
                 "type": {
                   "vec": {
                     "defined": "EarnedReward"
                   }
                 }
+              },
+              {
+                "name": "endTime",
+                "type": "u64"
               }
             ]
           },
@@ -1495,7 +1629,7 @@
                   "The end time of the mission in unix timestamp",
                   "Calculated by start_time + mission.duration"
                 ],
-                "type": "i64"
+                "type": "u64"
               }
             ]
           }

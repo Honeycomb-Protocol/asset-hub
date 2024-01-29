@@ -69,4 +69,11 @@ pub mod hpl_character_manager {
     ) -> Result<()> {
         instructions::use_character(ctx, args)
     }
+
+    pub fn verify_character<'info>(
+        ctx: Context<'_, '_, '_, 'info, VerifyCharacter<'info>>,
+        args: VerifyCharacterArgs,
+    ) -> Result<()> {
+        instructions::verify_character(ctx, args)
+    }
 }

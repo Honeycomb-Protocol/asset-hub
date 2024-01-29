@@ -138,6 +138,12 @@ impl ToNode for NftWrapCriteria {
     }
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub enum DataOrHash<Data> {
+    Data(Data),
+    Hash([u8; 32]),
+}
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum CharacterUsedBy {
     None,
