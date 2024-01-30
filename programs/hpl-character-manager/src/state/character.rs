@@ -311,49 +311,6 @@ impl CharacterUsedBy {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub enum MissionRequirement {
-    Time {
-        /// The end time of the mission in unix timestamp
-        /// Calculated by start_time + mission.duration
-        end_time: u64,
-    },
-    // Add task requirement later down the line
-}
-
-impl CompressedSchema for MissionRequirement {
-    fn schema() -> Schema {
-        let mut schema = Vec::<(String, Schema)>::new();
-
-        let mut time = HashMap::new();
-        time.insert(String::from("end_time"), i64::schema());
-        schema.push((String::from("Time"), Schema::Object(time)));
-
-        Schema::Enum(schema)
-    }
-
-    fn schema_value(&self) -> SchemaValue {
-        match self {
-            Self::Time { end_time } => {
-                let mut time = HashMap::new();
-                time.insert(String::from("end_time"), end_time.schema_value());
-
-                SchemaValue::Enum(String::from("Time"), Box::new(SchemaValue::Object(time)))
-            }
-        }
-    }
-}
-
-impl ToNode for MissionRequirement {
-    fn to_node(&self) -> Node {
-        match self {
-            Self::Time { end_time } => {
-                keccak::hashv(&["Time".as_bytes(), end_time.to_node().as_ref()]).to_bytes()
-            }
-        }
-    }
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct EarnedReward {
     pub delta: u8,
     pub reward_idx: u8,
