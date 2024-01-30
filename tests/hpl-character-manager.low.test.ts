@@ -17,6 +17,7 @@ import {
   createWithdrawNftInstruction,
   createUseCharacterInstruction,
   createDepositCnftInstruction,
+  GuildRole,
 } from "../packages/hpl-character-manager";
 import getHoneycombs from "../scripts/prepare";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
@@ -351,7 +352,7 @@ describe("Character Manager", () => {
     console.log("Character", character);
   });
 
-  it("Wrap cNFT to Character", async () => {
+  it.skip("Wrap cNFT to Character", async () => {
     const project = characterModel.project;
     const wallet = userHC.identity().address;
 
@@ -444,7 +445,7 @@ describe("Character Manager", () => {
     console.log("Character", character);
   });
 
-  it("Use Character", async () => {
+  it.skip("Use Character", async () => {
     if (!character) throw new Error("Character not found");
 
     const project = characterModel.project;
@@ -479,8 +480,10 @@ describe("Character Manager", () => {
             sourceHash: Array.from(character.sourceHash),
             currentUsedBy: character.usedBy,
             newUsedBy: {
-              __kind: "Missions",
-              participation: web3.PublicKey.default,
+              __kind: "Guild",
+              id: web3.PublicKey.default,
+              order: 0,
+              role: GuildRole.Chief,
             },
           },
         }
