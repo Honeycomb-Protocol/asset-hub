@@ -157,6 +157,7 @@ pub enum CharacterUsedBy {
         id: Pubkey,
         rewards: Vec<EarnedReward>,
         end_time: u64,
+        rewards_collected: bool,
     },
     Guild {
         id: Pubkey,
@@ -186,6 +187,7 @@ impl CompressedSchema for CharacterUsedBy {
         mission.insert(String::from("id"), Pubkey::schema());
         mission.insert(String::from("rewards"), Vec::<EarnedReward>::schema());
         mission.insert(String::from("end_time"), u64::schema());
+        mission.insert(String::from("rewards_collected"), bool::schema());
         schema.push((String::from("Mission"), Schema::Object(mission)));
 
         let mut guild = HashMap::new();
@@ -217,11 +219,12 @@ impl CompressedSchema for CharacterUsedBy {
                     Box::new(SchemaValue::Object(staking)),
                 )
             }
-            Self::Mission { id, rewards, end_time } => {
+            Self::Mission { id, rewards, end_time, rewards_collected } => {
                 let mut mission = HashMap::new();
                 mission.insert(String::from("id"), id.schema_value());
                 mission.insert(String::from("rewards"), rewards.schema_value());
                 mission.insert(String::from("end_time"), end_time.schema_value());
+                mission.insert(String::from("rewards_collected"), rewards_collected.schema_value());
 
                 // Add rewards and end_time here
                 SchemaValue::Enum(
@@ -258,12 +261,13 @@ impl ToNode for CharacterUsedBy {
                 claimed_at.to_node().as_ref(),
             ])
             .to_bytes(),
-            Self::Mission { id, rewards, end_time} => {
+            Self::Mission { id, rewards, end_time, rewards_collected} => {
                 keccak::hashv(&[
                     "Missions".as_bytes(),
+                    id.to_node().as_ref(),
                     rewards.to_node().as_ref(),
                     end_time.to_node().as_ref(),
-                    id.to_node().as_ref(),
+                    rewards_collected.to_node().as_ref(),
                 ])
                 .to_bytes()
             }
