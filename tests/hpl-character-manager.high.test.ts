@@ -1,26 +1,16 @@
+import base58 from "bs58";
 import * as web3 from "@solana/web3.js";
-import {
-  Honeycomb,
-  HoneycombProject,
-  Operation,
-  VAULT,
-} from "@honeycomb-protocol/hive-control";
+import { Honeycomb, HoneycombProject } from "@honeycomb-protocol/hive-control";
 import getHoneycombs from "../scripts/prepare";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import { createNewTree, mintOneCNFT } from "./helpers";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
-import {
-  SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-  SPL_NOOP_PROGRAM_ID,
-  ValidDepthSizePair,
-  getConcurrentMerkleTreeAccountSize,
-} from "@solana/spl-account-compression";
+
+import { gql, Client, cacheExchange, fetchExchange } from "@urql/core";
 
 import {
   HplCharacter,
   HplCharacterModel,
-  createCreateNewCharactersTreeInstruction,
   createNewCharacterModelOperation,
   createWrapAssetOperation,
   fetchHeliusAssets,
@@ -33,6 +23,11 @@ jest.setTimeout(200000);
 describe("Character Manager", () => {
   const totalNfts = 1;
   const totalcNfts = 1;
+
+  const client = new Client({
+    url: "http://localhost:4001",
+    exchanges: [cacheExchange, fetchExchange],
+  });
 
   let adminHC: Honeycomb;
   let userHC: Honeycomb;
@@ -107,7 +102,7 @@ describe("Character Manager", () => {
       });
     }
 
-    // await new Promise((resolve) => setTimeout(resolve, 30000));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
 
     adminHC.use(
       await HoneycombProject.new(adminHC, {
@@ -116,6 +111,7 @@ describe("Character Manager", () => {
         profileDataConfigs: [],
       })
     );
+    console.log("Project", adminHC.project().address.toString());
     expect(adminHC.project().name).toBe("Project");
   });
 
@@ -173,7 +169,7 @@ describe("Character Manager", () => {
     } catch {
       const [{ signature }] = await (
         await createCreateNewCharactersTreeOperation(adminHC, {
-          project: adminHC.identity().address,
+          project: adminHC.project().address,
           characterModel: characterModelAddress,
           depthSizePair: {
             maxDepth: 3,
@@ -197,6 +193,90 @@ describe("Character Manager", () => {
   });
 
   it("Wrap NFT to Character", async () => {
+    const wallet = userHC.identity().address;
+
+    const nfts = await fetchHeliusAssets(userHC.rpcEndpoint, {
+      walletAddress: wallet,
+      collectionAddress: collection,
+    }).then((nfts) => nfts.filter((n) => !n.frozen && !n.isCompressed));
+
+    if (!nfts.length) throw new Error("No Nfts to wrap");
+
+    console.log("NFT", nfts[0].mint.toString());
+
+    const response = await client.query(
+      gql`
+        query CreateWrapAssetsToCharacterTransactions(
+          $project: Bytes!
+          $characterModel: Bytes!
+          $activeCharactersMerkleTree: Bytes!
+          $wallet: Bytes!
+          $mintList: [Bytes]!
+        ) {
+          createWrapAssetsToCharacterTransactions(
+            project: $project
+            characterModel: $characterModel
+            activeCharactersMerkleTree: $activeCharactersMerkleTree
+            wallet: $wallet
+            mintList: $mintList
+          ) {
+            transactions
+            blockhash
+            lastValidBlockHeight
+          }
+        }
+      `,
+      {
+        project: adminHC.project().address.toString(),
+        characterModel: characterModelAddress.toString(),
+        activeCharactersMerkleTree:
+          characterModel.activeCharactersMerkleTree.toString(),
+        wallet: wallet.toString(),
+        mintList: [nfts[0].mint.toString()],
+      }
+    );
+
+    const txGroup = response.data.createWrapAssetsToCharacterTransactions as {
+      transactions: string[];
+      blockhash: string;
+      lastValidBlockHeight: number;
+    };
+
+    const [txStr] = txGroup.transactions;
+    const tx = web3.Transaction.from(base58.decode(txStr));
+
+    const signedTx = await userHC.identity().signTransaction(tx);
+
+    const response2 = await client.query(
+      gql`
+        query SendBulkTransactions(
+          $txs: [Bytes]!
+          $blockhash: String!
+          $lastValidBlockHeight: Int!
+        ) {
+          sendBulkTransactions(
+            txs: $txs
+            blockhash: $blockhash
+            lastValidBlockHeight: $lastValidBlockHeight
+          ) {
+            signature
+            error
+            status
+          }
+        }
+      `,
+      {
+        txs: [base58.encode(signedTx.serialize())],
+        blockhash: txGroup.blockhash,
+        lastValidBlockHeight: txGroup.lastValidBlockHeight,
+      }
+    );
+
+    console.log("Response", response2);
+    console.log("Response", response2.data);
+  });
+
+  it.skip("Wrap NFT to Character", async () => {
     const wallet = userHC.identity().address;
 
     const nfts = await fetchHeliusAssets(userHC.rpcEndpoint, {

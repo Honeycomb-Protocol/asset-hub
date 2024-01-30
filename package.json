@@ -43,6 +43,7 @@
     "@solana/spl-account-compression": "^0.1.10",
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.87.1",
+    "@urql/core": "^4.2.3",
     "keccak": "^3.0.4",
     "yargs": "^17.6.2"
   },
