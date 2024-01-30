@@ -1,10 +1,5 @@
 import * as web3 from "@solana/web3.js";
-import {
-  Honeycomb,
-  HoneycombProject,
-  Operation,
-  VAULT,
-} from "@honeycomb-protocol/hive-control";
+import { Honeycomb, HoneycombProject } from "@honeycomb-protocol/hive-control";
 import getHoneycombs from "../scripts/prepare";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import { createNewTree, mintOneCNFT } from "./helpers";

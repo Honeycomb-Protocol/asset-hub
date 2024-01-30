@@ -14,6 +14,62 @@ const defaultTypes = [
 
 const undefinedTypes = ["HashMap", "Node", "Wallets", "ProfileData"];
 
+const getVariantedConditionalTypes = (variants) => {
+  return Object.entries(variants).flatMap(([arg, variantedName]) => {
+    return [
+      {
+        name: variantedName,
+        docs: [
+          "Represents payment information with support for nested conditions.",
+        ],
+        type: {
+          kind: "enum",
+          variants: [
+            {
+              name: "None",
+            },
+            {
+              name: "Item",
+              fields: [primitiveTypes.includes(arg) ? arg : { defined: arg }],
+            },
+            {
+              name: "Condition",
+              fields: [
+                {
+                  defined: "Condition" + arg,
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        name: "Condition" + arg,
+        docs: ["Represents a condition type (AND or OR)."],
+        type: {
+          kind: "struct",
+          fields: [
+            {
+              name: "condition",
+              type: {
+                defined: "ConditionKind",
+              },
+            },
+            {
+              name: "items",
+              type: {
+                vec: {
+                  defined: variantedName,
+                },
+              },
+            },
+          ],
+        },
+      },
+    ];
+  });
+};
+
 const stringToType = (strType) => {
   let type;
 
@@ -111,9 +167,28 @@ const createConfig = (name, programId, customs) => {
       versionRangeFallback: "0.29.0",
     },
     idlHook: (idl) => {
+      const variantsOfConditinal = {};
+      const okTypes = (type) => {
+        if (type.defined.startsWith("Conditional<")) {
+          let args = type.defined.slice(12, -1);
+          type.defined = "Conditional" + args;
+          variantsOfConditinal[args] = type.defined;
+        } else if (type.defined.includes("HashMap")) {
+          type = {
+            hashMap: [
+              "string",
+              {
+                defined: type.defined.split(",")[1].slice(0, -1),
+              },
+            ],
+          };
+        }
+
+        return type;
+      };
+
       customs?.types && idl.types.push(...customs.types);
       idl.types = idl.types.map(mapTypes);
-
       idl.accounts = idl.accounts.map((account) => {
         account.type.fields = account.type.fields.map((field) => {
           if (field.type.defined) {
@@ -127,43 +202,44 @@ const createConfig = (name, programId, customs) => {
         return account;
       });
 
-      // idl.types = idl.types
-      //   .map((type) => {
-      //     if (["Condition", "Conditional"].includes(type.name)) return null;
+      idl.types = idl.types
+        .map((type) => {
+          if (["Condition", "Conditional"].includes(type.name)) return null;
 
-      //     if (type.type.fields) {
-      //       type.type.fields = type.type.fields.map((field) => {
-      //         if (field.type.defined) {
-      //           field.type = okTypes(field.type);
-      //         } else if (field.type.vec?.defined) {
-      //           field.type.vec = okTypes(field.type.vec);
-      //         }
-      //         return field;
-      //       });
-      //     } else if (type.type.variants) {
-      //       type.type.variants = type.type.variants.map((variant) => {
-      //         if (variant.fields) {
-      //           variant.fields = variant.fields.map((field) => {
-      //             if (field.type?.defined) {
-      //               field.type = okTypes(field.type);
-      //             } else if (field.type?.vec?.defined) {
-      //               field.type.vec = okTypes(field.type.vec);
-      //             } else if (field.defined) {
-      //               field = okTypes(field);
-      //             }
+          if (type.type.fields) {
+            type.type.fields = type.type.fields.map((field) => {
+              if (field.type.defined) {
+                field.type = okTypes(field.type);
+              } else if (field.type.vec?.defined) {
+                field.type.vec = okTypes(field.type.vec);
+              }
+              return field;
+            });
+          } else if (type.type.variants) {
+            type.type.variants = type.type.variants.map((variant) => {
+              if (variant.fields) {
+                variant.fields = variant.fields.map((field) => {
+                  if (field.type?.defined) {
+                    field.type = okTypes(field.type);
+                  } else if (field.type?.vec?.defined) {
+                    field.type.vec = okTypes(field.type.vec);
+                  } else if (field.defined) {
+                    field = okTypes(field);
+                  }
 
-      //             return field;
-      //           });
-      //         }
-      //         return variant;
-      //       });
-      //     }
+                  return field;
+                });
+              }
+              return variant;
+            });
+          }
 
-      //     return type;
-      //   })
-      //   .filter((x) => !!x)
-      //   .concat(...getVariantedConditionalTypes(variantsOfConditinal));
+          return type;
+        })
+        .filter((x) => !!x)
+        .concat(...getVariantedConditionalTypes(variantsOfConditinal));
 
+      idl;
       return idl;
     },
   };
@@ -322,9 +398,115 @@ const configs = {
   ),
   "resource-manager": createConfig(
     "resource-manager",
-    "L9A9ZxrVRXjt9Da8qpwqq4yBRvvrfx3STWnKK4FstPr"
+    "6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ",
+    {
+      types: [
+        {
+          name: "Schema",
+          type: {
+            kind: "enum",
+            variants: [
+              {
+                name: "Null",
+              },
+              {
+                name: "Bool",
+              },
+              {
+                name: "Number",
+              },
+              {
+                name: "String",
+              },
+              {
+                name: "Array",
+                fields: [
+                  {
+                    defined: "Schema",
+                  },
+                ],
+              },
+              {
+                name: "Object",
+                fields: [
+                  {
+                    hashMap: [
+                      "string",
+                      {
+                        defined: "Schema",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                name: "Pubkey",
+              },
+              {
+                name: "Option",
+                fields: [
+                  {
+                    defined: "Schema",
+                  },
+                ],
+              },
+              {
+                name: "HashMap",
+                fields: [
+                  {
+                    defined: "Schema",
+                  },
+                  {
+                    defined: "Schema",
+                  },
+                ],
+              },
+              {
+                name: "Enum",
+                fields: [
+                  {
+                    vec: {
+                      tuple: [
+                        "string",
+                        {
+                          defined: "Schema",
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          name: "ControlledMerkleTrees",
+          type: {
+            kind: "struct",
+            fields: [
+              {
+                name: "active",
+                type: "u8",
+              },
+              {
+                name: "schema",
+                type: {
+                  defined: "Schema",
+                },
+              },
+              {
+                name: "merkleTrees",
+                type: {
+                  vec: "publicKey",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    }
   ),
 };
 
-const defaultProgram = Object.keys(configs)[4];
+const defaultProgram = Object.keys(configs)[0];
 module.exports = configs[process.env.PROGRAM_NAME || defaultProgram];

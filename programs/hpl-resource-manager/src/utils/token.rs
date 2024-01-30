@@ -1,19 +1,21 @@
 use {
     crate::Resource,
-    anchor_lang::{
-        prelude::*,
-        solana_program::{
-            instruction::Instruction, program::invoke_signed, system_instruction::create_account,
-        },
-    },
+    anchor_lang::prelude::*,
     spl_token_2022::{
         extension::{metadata_pointer, ExtensionType},
         instruction::{
             initialize_mint2, initialize_mint_close_authority, initialize_permanent_delegate,
         },
+        solana_program::{
+            instruction::Instruction,
+            program::{invoke, invoke_signed},
+            program_pack::Pack,
+            system_instruction::create_account,
+        },
         state::Mint,
     },
-    spl_token_metadata_interface::instrucetion::initialize,
+    spl_token_metadata_interface::instruction::initialize,
+    std::ops::Deref,
 };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -65,24 +67,23 @@ impl ExtensionInitializationParams {
 }
 
 pub fn create_mint_with_extensions<'info>(
-    project: &AccountInfo<'info>,
-    mint_authority: &AccountInfo<'info>,
-    freeze_authority: Option<&AccountInfo<'info>>,
+    resource: &Account<'info, Resource>,
     payer: AccountInfo<'info>,
     mint: AccountInfo<'info>,
     rent_sysvar: &Rent,
     token22_program: &AccountInfo<'info>,
     decimals: u8,
-) -> Result<()> {
+    metadata: &ResourceMetadataArgs,
+) -> Result<Mint> {
     let extension_initialization_params = vec![
         ExtensionInitializationParams::MintCloseAuthority {
-            close_authority: Some(mint_authority.key()),
+            close_authority: Some(resource.key()),
         },
         ExtensionInitializationParams::PermanentDelegate {
-            delegate: mint_authority.key(),
+            delegate: resource.key(),
         },
         ExtensionInitializationParams::MetadataPointer {
-            authority: Some(mint_authority.key()),
+            authority: Some(resource.key()),
             metadata_address: Some(mint.key()),
         },
     ];
@@ -92,48 +93,54 @@ pub fn create_mint_with_extensions<'info>(
         .map(|e| e.extension())
         .collect::<Vec<_>>();
 
-    let space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
+    let mut space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
+
+    // add the space for the metadata
+    // space += 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len();
 
     // signature seeds for the mint authority
-    let project_key = project.key();
-    let mint_key = mint.key();
-    let signer_seeds = Resource::static_seeds(&project_key, &mint_key);
-
     let account_instruction = create_account(
         &payer.key(),
-        &mint_key,
-        rent_sysvar.minimum_balance(space),
+        &mint.key(),
+        rent_sysvar.minimum_balance(
+            space + 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len() + 8,
+        ),
         space as u64,
         &token22_program.key(),
     );
 
+    msg!("Creating mint account");
+
     // invoking the mint account creation with the signer seeds
-    invoke_signed(
-        &account_instruction,
-        &[payer, mint.to_owned()],
-        &[&signer_seeds[..]],
-    )?;
+    invoke(&account_instruction, &[payer, mint.to_owned()])?;
 
     for params in extension_initialization_params {
         let instruction = params
             .instruction(&token22_program.key(), &mint.key())
             .unwrap();
+
+        msg!("Creating mint extension account");
         // invoking the extensions instructions with the signer seeds
-        invoke_signed(&instruction, &[mint.to_owned()], &[&signer_seeds[..]])?;
+        invoke(&instruction, &[mint.to_owned()])?;
     }
 
     let mint_instruction = initialize_mint2(
         &token22_program.key(),
-        &mint_key,
-        &mint_authority.key(),
-        Some(&freeze_authority.unwrap().key()),
+        &mint.key(),
+        &resource.key(),
+        Some(&resource.key()),
         decimals,
     )?;
 
     // invoking the mint account creation with the signer seeds
-    invoke_signed(&mint_instruction, &[mint], &[&signer_seeds[..]])?;
+    invoke(&mint_instruction, &[mint.to_owned()])?;
+    msg!("Mint account created");
 
-    Ok(())
+    let data = mint.try_borrow_data().unwrap();
+    let slice = data.deref().to_vec();
+    let mint_data = Mint::unpack_from_slice(&slice)?;
+
+    Ok(mint_data)
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -144,35 +151,33 @@ pub struct ResourceMetadataArgs {
 }
 pub fn create_metadata_for_mint<'info>(
     token22_program: AccountInfo<'info>,
-    project: AccountInfo<'info>,
     mint: AccountInfo<'info>,
-    mint_authority: AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
     metadata: ResourceMetadataArgs,
 ) -> Result<()> {
-    let project_key = project.key();
     let mint_key = mint.key();
-    let signer_seeds = Resource::static_seeds(&project_key, &mint_key);
 
     let instruction = initialize(
         &token22_program.key(),
         &mint_key,
-        &mint_authority.key(),
+        &resource.key(),
         &mint_key,
-        &mint_authority.key(),
+        &resource.key(),
         metadata.name,
         metadata.symbol,
         metadata.uri,
     );
 
+    msg!("Creating metadata account");
     invoke_signed(
         &instruction,
         &[
             mint.to_account_info(),
-            mint_authority.to_account_info(),
+            resource.to_account_info(),
             mint,
-            mint_authority,
+            resource.to_account_info(),
         ],
-        &[&signer_seeds[..]],
+        &[&resource.seeds(&[resource.bump])[..]],
     )?;
 
     Ok(())

@@ -73,10 +73,8 @@ export const updateAssemblerInstructionDiscriminator = [
 /**
  * Creates a _UpdateAssembler_ instruction.
  *
- * Optional accounts that are not provided will be omitted from the accounts
- * array passed with the instruction.
- * An optional account that is set cannot follow an optional account that is unset.
- * Otherwise an Error is raised.
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
@@ -105,45 +103,42 @@ export function createUpdateAssemblerInstruction(
       isWritable: true,
       isSigner: false,
     },
-  ]
-
-  if (accounts.delegateAuthority != null) {
-    keys.push({
-      pubkey: accounts.delegateAuthority,
+    {
+      pubkey: accounts.delegateAuthority ?? programId,
       isWritable: false,
       isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.authority,
-    isWritable: false,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.payer,
-    isWritable: false,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.vault,
-    isWritable: true,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.hiveControl,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.instructionsSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
+    },
+    {
+      pubkey: accounts.authority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.payer,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.vault,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.hiveControl,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+  ]
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

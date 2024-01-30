@@ -76,10 +76,8 @@ export const mintNftInstructionDiscriminator = [
 /**
  * Creates a _MintNft_ instruction.
  *
- * Optional accounts that are not provided will be omitted from the accounts
- * array passed with the instruction.
- * An optional account that is set cannot follow an optional account that is unset.
- * Otherwise an Error is raised.
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @category Instructions
@@ -124,94 +122,77 @@ export function createMintNftInstruction(
       isWritable: true,
       isSigner: false,
     },
-  ]
-
-  if (accounts.nftTokenRecord != null) {
-    keys.push({
-      pubkey: accounts.nftTokenRecord,
+    {
+      pubkey: accounts.nftTokenRecord ?? programId,
+      isWritable: accounts.nftTokenRecord != null,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenAccount,
       isWritable: true,
       isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.tokenAccount,
-    isWritable: true,
-    isSigner: false,
-  })
-  if (accounts.uniqueConstraint != null) {
-    if (accounts.nftTokenRecord == null) {
-      throw new Error(
-        "When providing 'uniqueConstraint' then 'accounts.nftTokenRecord' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.uniqueConstraint,
-      isWritable: true,
+    },
+    {
+      pubkey: accounts.uniqueConstraint ?? programId,
+      isWritable: accounts.uniqueConstraint != null,
       isSigner: false,
-    })
-  }
-  if (accounts.delegateAuthority != null) {
-    if (accounts.nftTokenRecord == null || accounts.uniqueConstraint == null) {
-      throw new Error(
-        "When providing 'delegateAuthority' then 'accounts.nftTokenRecord', 'accounts.uniqueConstraint' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.delegateAuthority,
+    },
+    {
+      pubkey: accounts.delegateAuthority ?? programId,
       isWritable: false,
       isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.authority,
-    isWritable: true,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.payer,
-    isWritable: true,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.vault,
-    isWritable: true,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.hiveControl,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.associatedTokenProgram,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.instructionsSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.tokenMetadataProgram,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.rentSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
+    },
+    {
+      pubkey: accounts.authority,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.payer,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.vault,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.hiveControl,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.associatedTokenProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenMetadataProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.rentSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+  ]
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

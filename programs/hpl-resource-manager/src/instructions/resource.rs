@@ -10,32 +10,28 @@ use {
 };
 
 #[derive(Accounts)]
+#[instruction(args: CreateNewResourceArgs)]
 pub struct CreateNewResource<'info> {
     #[account()]
     pub project: Box<Account<'info, Project>>,
 
     #[account(
         init,
-        payer = owner,
+        payer = payer,
         seeds = [b"resource".as_ref(), project.key().as_ref(), mint.key().as_ref()],
-        space = Resource::LEN,
+        space = Resource::get_size(&args.kind),
         bump,
     )]
     pub resource: Box<Account<'info, Resource>>,
-
-    /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account(mut)]
-    pub mint: AccountInfo<'info>,
-
-    /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account(mut)]
-    pub metadata_account: AccountInfo<'info>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
+
+    #[account(mut)]
+    pub mint: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 
@@ -44,6 +40,12 @@ pub struct CreateNewResource<'info> {
     /// CHECK: this is not dangerous. we are not reading & writing from it
     #[account(address = Token2022)]
     pub token22_program: AccountInfo<'info>,
+
+    /// SPL TOKEN PROGRAM
+    pub token_program: Program<'info, Token>,
+
+    /// ASSOCIATED TOKEN PROGRAM
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -59,33 +61,46 @@ pub fn create_new_resource(
 ) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
 
-    // create the mint account with the extensions
-    create_mint_with_extensions(
-        &ctx.accounts.project.to_account_info(),
-        &resource.to_account_info(),
-        Some(&resource.to_account_info()),
-        ctx.accounts.payer.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-        &ctx.accounts.rent_sysvar,
-        &ctx.accounts.token22_program.to_account_info(),
-        args.decimals,
-    )?;
-
-    // create the metadata account for the mint
-    create_metadata_for_mint(
-        ctx.accounts.token22_program.to_account_info(),
-        ctx.accounts.project.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-        resource.to_account_info(),
-        args.metadata,
-    )?;
-
     // create resource account
     resource.set_defaults();
     resource.bump = ctx.bumps["resource"];
     resource.project = ctx.accounts.project.key();
     resource.mint = ctx.accounts.mint.key();
     resource.kind = args.kind;
+
+    // create the mint account with the extensions
+    let mint = create_mint_with_extensions(
+        &resource,
+        ctx.accounts.payer.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+        &ctx.accounts.rent_sysvar,
+        &ctx.accounts.token22_program.to_account_info(),
+        args.decimals,
+        &args.metadata,
+    )?;
+
+    msg!("Mint account created with decimals: {}", mint.decimals);
+    msg!(
+        "Mint account created with decimals: {}",
+        mint.freeze_authority.unwrap_or(Pubkey::default())
+    );
+    msg!(
+        "Mint account created with decimals: {}",
+        mint.mint_authority.unwrap_or(Pubkey::default())
+    );
+    msg!("Mint account created with decimals: {}", mint.supply);
+    msg!(
+        "Mint account created with decimals: {}",
+        mint.is_initialized
+    );
+
+    // create the metadata account for the mint
+    create_metadata_for_mint(
+        ctx.accounts.token22_program.to_account_info(),
+        ctx.accounts.mint.to_account_info(),
+        &resource,
+        args.metadata,
+    )?;
 
     Ok(())
 }

@@ -29,7 +29,14 @@ pub enum ResourseKind {
 }
 
 impl Resource {
-    pub const LEN: usize = 8 + 200;
+    pub const LEN: usize = 8 + 1 + 32 + 32 + 1 + 4;
+
+    pub fn get_size(kind: &ResourseKind) -> usize {
+        let mut size = Self::LEN;
+        size += kind.try_to_vec().unwrap().len();
+        size += super::Holding::schema().size_for_borsh();
+        size
+    }
 
     pub fn set_defaults(&mut self) {
         self.bump = 0;
@@ -43,13 +50,13 @@ impl Resource {
         }
     }
 
-    pub fn seeds<'a>(&'a self) -> Vec<&'a [u8]> {
-        Self::static_seeds(&self.project, &self.mint)
-    }
-
-    pub fn static_seeds<'a>(project: &'a Pubkey, mint: &'a Pubkey) -> Vec<&'a [u8]> {
-        let resource_signer_seeds: Vec<&[u8]> =
-            vec![b"resource".as_ref(), project.as_ref(), mint.as_ref()];
+    pub fn seeds<'a>(&'a self, bump: &'a [u8]) -> Vec<&'a [u8]> {
+        let resource_signer_seeds: Vec<&'a [u8]> = vec![
+            b"resource".as_ref(),
+            self.project.as_ref(),
+            self.mint.as_ref(),
+            bump,
+        ];
 
         resource_signer_seeds
     }

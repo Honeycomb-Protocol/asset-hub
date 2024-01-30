@@ -3,15 +3,30 @@
   "name": "hpl_resource_manager",
   "instructions": [
     {
-      "name": "initialize",
+      "name": "createNewResource",
       "accounts": [
         {
-          "name": "newAccount",
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "resource",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "signer",
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mint",
           "isMut": true,
           "isSigner": true
         },
@@ -19,34 +34,316 @@
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "token22Program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "ASSOCIATED TOKEN PROGRAM"
+          ]
         }
       ],
       "args": [
         {
-          "name": "data",
-          "type": "u64"
+          "name": "args",
+          "type": {
+            "defined": "CreateNewResourceArgs"
+          }
         }
       ]
     }
   ],
   "accounts": [
     {
-      "name": "NewAccount",
+      "name": "Resource",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "data",
-            "type": "u64"
+            "name": "bump",
+            "docs": [
+              "Bump seed for the PDA"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "project",
+            "docs": [
+              "The project this resouce is associated with"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "docs": [
+              "The mint of this resource"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "merkleTrees",
+            "docs": [
+              "token account trees"
+            ],
+            "type": {
+              "defined": "ControlledMerkleTrees"
+            }
+          },
+          {
+            "name": "kind",
+            "type": {
+              "defined": "ResourseKind"
+            }
           }
         ]
       }
     }
   ],
+  "types": [
+    {
+      "name": "CreateNewResourceArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "kind",
+            "type": {
+              "defined": "ResourseKind"
+            }
+          },
+          {
+            "name": "metadata",
+            "type": {
+              "defined": "ResourceMetadataArgs"
+            }
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResourceMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResourseKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fungible"
+          },
+          {
+            "name": "NonFungible",
+            "fields": [
+              {
+                "name": "characterstics",
+                "type": {
+                  "defined": "Schema"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ExtensionInitializationParams",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MintCloseAuthority",
+            "fields": [
+              {
+                "name": "closeAuthority",
+                "type": {
+                  "option": "publicKey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "PermanentDelegate",
+            "fields": [
+              {
+                "name": "delegate",
+                "type": "publicKey"
+              }
+            ]
+          },
+          {
+            "name": "MetadataPointer",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "publicKey"
+                }
+              },
+              {
+                "name": "metadataAddress",
+                "type": {
+                  "option": "publicKey"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Schema",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Null"
+          },
+          {
+            "name": "Bool"
+          },
+          {
+            "name": "Number"
+          },
+          {
+            "name": "String"
+          },
+          {
+            "name": "Array",
+            "fields": [
+              {
+                "defined": "Schema"
+              }
+            ]
+          },
+          {
+            "name": "Object",
+            "fields": [
+              {
+                "hashMap": [
+                  "string",
+                  {
+                    "defined": "Schema"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Pubkey"
+          },
+          {
+            "name": "Option",
+            "fields": [
+              {
+                "defined": "Schema"
+              }
+            ]
+          },
+          {
+            "name": "HashMap",
+            "fields": [
+              {
+                "defined": "Schema"
+              },
+              {
+                "defined": "Schema"
+              }
+            ]
+          },
+          {
+            "name": "Enum",
+            "fields": [
+              {
+                "vec": {
+                  "tuple": [
+                    "string",
+                    {
+                      "defined": "Schema"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ControlledMerkleTrees",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "active",
+            "type": "u8"
+          },
+          {
+            "name": "schema",
+            "type": {
+              "defined": "Schema"
+            }
+          },
+          {
+            "name": "merkleTrees",
+            "type": {
+              "vec": "publicKey"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ResourceNotInitialized",
+      "msg": "The resource is not initialized"
+    }
+  ],
   "metadata": {
-    "address": "L9A9ZxrVRXjt9Da8qpwqq4yBRvvrfx3STWnKK4FstPr",
+    "address": "6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
-    "libVersion": "0.28.0"
+    "libVersion": "0.29.0"
   }
 }

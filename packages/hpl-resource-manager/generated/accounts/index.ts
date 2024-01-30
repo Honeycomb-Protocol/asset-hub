@@ -1,5 +1,5 @@
-export * from './NewAccount'
+export * from './Resource'
 
-import { NewAccount } from './NewAccount'
+import { Resource } from './Resource'
 
-export const accountProviders = { NewAccount }
+export const accountProviders = { Resource }
