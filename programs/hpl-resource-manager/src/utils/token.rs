@@ -14,7 +14,10 @@ use {
         },
         state::Mint,
     },
-    spl_token_metadata_interface::instruction::initialize,
+    spl_token_metadata_interface::{
+        instruction::{initialize, update_field},
+        state::Field,
+    },
     std::ops::Deref,
 };
 
@@ -179,6 +182,81 @@ pub fn create_metadata_for_mint<'info>(
         ],
         &[&resource.seeds(&[resource.bump])[..]],
     )?;
+
+    Ok(())
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct ResourceMetadataUpdateArgs {
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub uri: Option<String>,
+    pub field: Option<String>,
+    pub value: Option<String>,
+}
+
+pub fn update_metadata_for_mint<'info>(
+    token22_program: AccountInfo<'info>,
+    mint: AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
+    metadata: ResourceMetadataUpdateArgs,
+) -> Result<()> {
+    let mut instructions: Vec<Instruction> = vec![];
+    if let Some(name) = metadata.name {
+        instructions.push(update_field(
+            &token22_program.key(),
+            &mint.key(),
+            &resource.key(),
+            Field::Name,
+            name,
+        ));
+    }
+
+    if let Some(symbol) = metadata.symbol {
+        instructions.push(update_field(
+            &token22_program.key(),
+            &mint.key(),
+            &resource.key(),
+            Field::Symbol,
+            symbol,
+        ));
+    }
+
+    if let Some(uri) = metadata.uri {
+        instructions.push(update_field(
+            &token22_program.key(),
+            &mint.key(),
+            &resource.key(),
+            Field::Uri,
+            uri,
+        ));
+    }
+
+    if let Some(field) = metadata.field {
+        if let Some(value) = metadata.value {
+            instructions.push(update_field(
+                &token22_program.key(),
+                &mint.key(),
+                &resource.key(),
+                Field::Key(field),
+                value,
+            ));
+        }
+    }
+
+    for instruction in instructions {
+        msg!("Updating metadata account");
+        invoke_signed(
+            &instruction,
+            &[
+                mint.to_owned(),
+                resource.to_account_info(),
+                mint.to_owned(),
+                resource.to_account_info(),
+            ],
+            &[&resource.seeds(&[resource.bump])[..]],
+        )?;
+    }
 
     Ok(())
 }
