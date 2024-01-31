@@ -93,7 +93,7 @@ pub fn create_mint_with_extensions<'info>(
         .map(|e| e.extension())
         .collect::<Vec<_>>();
 
-    let mut space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
+    let space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
 
     // add the space for the metadata
     // space += 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len();
