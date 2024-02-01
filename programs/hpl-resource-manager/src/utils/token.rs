@@ -16,7 +16,7 @@ use {
     },
     spl_token_metadata_interface::{
         instruction::{initialize, update_field},
-        state::Field,
+        state::{Field, TokenMetadata},
     },
     std::ops::Deref,
 };
@@ -98,15 +98,12 @@ pub fn create_mint_with_extensions<'info>(
 
     let space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
 
-    // add the space for the metadata
-    // space += 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len();
-
     // signature seeds for the mint authority
     let account_instruction = create_account(
         &payer.key(),
         &mint.key(),
         rent_sysvar.minimum_balance(
-            space + 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len() + 8,
+            space + 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len() + 8, // funding the account with extra space for metadata
         ),
         space as u64,
         &token22_program.key(),
@@ -257,6 +254,51 @@ pub fn update_metadata_for_mint<'info>(
             &[&resource.seeds(&[resource.bump])[..]],
         )?;
     }
+
+    Ok(())
+}
+
+pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) -> Result<TokenMetadata> {
+    let data = mint.try_borrow_data().unwrap();
+    let mint = Mint::get_packed_len();
+    let mut slice = &data.deref().to_vec()[mint..];
+    let mint_data = TokenMetadata::deserialize(&mut slice)?;
+    Ok(mint_data)
+}
+
+pub fn update_compressed_supply<'info>(
+    token22_program: AccountInfo<'info>,
+    mint: AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
+    amount: u64,
+) -> Result<()> {
+    let resource_metadata = get_mint_metadata(mint.to_account_info()).unwrap();
+
+    let new_supply = resource_metadata
+        .additional_metadata
+        .iter()
+        .find_map(|(key, value)| {
+            if key == "compressed_supply" {
+                Some(value.parse::<u64>().unwrap())
+            } else {
+                None
+            }
+        })
+        .unwrap();
+
+    // updateing the compressed supply from mint's metadata
+    update_metadata_for_mint(
+        token22_program.to_account_info(),
+        mint.to_account_info(),
+        &resource,
+        ResourceMetadataUpdateArgs {
+            field: Some("compressed_supply".to_string()),
+            value: Some((new_supply + amount).to_string()),
+            name: None,
+            symbol: None,
+            uri: None,
+        },
+    )?;
 
     Ok(())
 }
