@@ -503,6 +503,22 @@ const configs = {
             ],
           },
         },
+        {
+          name: "Holding",
+          type: {
+            kind: "struct",
+            fields: [
+              {
+                name: "holder",
+                type: "publicKey",
+              },
+              {
+                name: "balance",
+                type: "u64",
+              },
+            ],
+          },
+        },
       ],
     }
   ),

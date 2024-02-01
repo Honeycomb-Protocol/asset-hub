@@ -35,6 +35,31 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * InsufficientAmount: 'The amount provided for burning is greater than the amount of the held in the account'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class InsufficientAmountError extends Error {
+  readonly code: number = 0x1771
+  readonly name: string = 'InsufficientAmount'
+  constructor() {
+    super(
+      'The amount provided for burning is greater than the amount of the held in the account'
+    )
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, InsufficientAmountError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1771, () => new InsufficientAmountError())
+createErrorFromNameLookup.set(
+  'InsufficientAmount',
+  () => new InsufficientAmountError()
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

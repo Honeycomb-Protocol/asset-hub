@@ -9,84 +9,90 @@ import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  CreateNewResourceArgs,
-  createNewResourceArgsBeet,
-} from '../types/CreateNewResourceArgs'
+  BurnResourceArgs,
+  burnResourceArgsBeet,
+} from '../types/BurnResourceArgs'
 
 /**
  * @category Instructions
- * @category CreateNewResource
+ * @category BurnResource
  * @category generated
  */
-export type CreateNewResourceInstructionArgs = {
-  args: CreateNewResourceArgs
+export type BurnResourceInstructionArgs = {
+  args: BurnResourceArgs
 }
 /**
  * @category Instructions
- * @category CreateNewResource
+ * @category BurnResource
  * @category generated
  */
-export const createNewResourceStruct = new beet.FixableBeetArgsStruct<
-  CreateNewResourceInstructionArgs & {
+export const burnResourceStruct = new beet.BeetArgsStruct<
+  BurnResourceInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', createNewResourceArgsBeet],
+    ['args', burnResourceArgsBeet],
   ],
-  'CreateNewResourceInstructionArgs'
+  'BurnResourceInstructionArgs'
 )
 /**
- * Accounts required by the _createNewResource_ instruction
+ * Accounts required by the _burnResource_ instruction
  *
  * @property [] project
- * @property [_writable_] resource
+ * @property [] resource
+ * @property [] mint
+ * @property [] merkleTree
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
- * @property [_writable_, **signer**] mint
  * @property [] rentSysvar
  * @property [] token22Program
- * @property [] associatedTokenProgram
+ * @property [] compressionProgram
+ * @property [] logWrapper
+ * @property [] clock
  * @category Instructions
- * @category CreateNewResource
+ * @category BurnResource
  * @category generated
  */
-export type CreateNewResourceInstructionAccounts = {
+export type BurnResourceInstructionAccounts = {
   project: web3.PublicKey
   resource: web3.PublicKey
+  mint: web3.PublicKey
+  merkleTree: web3.PublicKey
   owner: web3.PublicKey
   payer: web3.PublicKey
-  mint: web3.PublicKey
-  systemProgram?: web3.PublicKey
   rentSysvar: web3.PublicKey
+  systemProgram?: web3.PublicKey
   token22Program: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  associatedTokenProgram: web3.PublicKey
+  compressionProgram: web3.PublicKey
+  logWrapper: web3.PublicKey
+  clock: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const createNewResourceInstructionDiscriminator = [
-  219, 143, 145, 122, 125, 143, 185, 71,
+export const burnResourceInstructionDiscriminator = [
+  252, 54, 4, 35, 74, 224, 187, 19,
 ]
 
 /**
- * Creates a _CreateNewResource_ instruction.
+ * Creates a _BurnResource_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CreateNewResource
+ * @category BurnResource
  * @category generated
  */
-export function createCreateNewResourceInstruction(
-  accounts: CreateNewResourceInstructionAccounts,
-  args: CreateNewResourceInstructionArgs,
+export function createBurnResourceInstruction(
+  accounts: BurnResourceInstructionAccounts,
+  args: BurnResourceInstructionArgs,
   programId = new web3.PublicKey('6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ')
 ) {
-  const [data] = createNewResourceStruct.serialize({
-    instructionDiscriminator: createNewResourceInstructionDiscriminator,
+  const [data] = burnResourceStruct.serialize({
+    instructionDiscriminator: burnResourceInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -97,7 +103,17 @@ export function createCreateNewResourceInstruction(
     },
     {
       pubkey: accounts.resource,
-      isWritable: true,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.mint,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.merkleTree,
+      isWritable: false,
       isSigner: false,
     },
     {
@@ -111,17 +127,12 @@ export function createCreateNewResourceInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.mint,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      pubkey: accounts.rentSysvar,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.rentSysvar,
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
       isWritable: false,
       isSigner: false,
     },
@@ -136,7 +147,17 @@ export function createCreateNewResourceInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.associatedTokenProgram,
+      pubkey: accounts.compressionProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.logWrapper,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clock,
       isWritable: false,
       isSigner: false,
     },

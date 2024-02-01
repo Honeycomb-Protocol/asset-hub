@@ -11,7 +11,7 @@ import {
   ResourceMetadataArgs,
   resourceMetadataArgsBeet,
 } from './ResourceMetadataArgs'
-export type CreateNewResourceArgs = {
+export type CreateResourceArgs = {
   kind: ResourseKind
   metadata: ResourceMetadataArgs
   decimals: number
@@ -21,12 +21,12 @@ export type CreateNewResourceArgs = {
  * @category userTypes
  * @category generated
  */
-export const createNewResourceArgsBeet =
-  new beet.FixableBeetArgsStruct<CreateNewResourceArgs>(
+export const createResourceArgsBeet =
+  new beet.FixableBeetArgsStruct<CreateResourceArgs>(
     [
       ['kind', resourseKindBeet],
       ['metadata', resourceMetadataArgsBeet],
       ['decimals', beet.u8],
     ],
-    'CreateNewResourceArgs'
+    'CreateResourceArgs'
   )

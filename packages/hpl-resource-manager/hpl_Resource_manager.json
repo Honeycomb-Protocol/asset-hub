@@ -3,7 +3,7 @@
   "name": "hpl_resource_manager",
   "instructions": [
     {
-      "name": "createNewResource",
+      "name": "createResource",
       "accounts": [
         {
           "name": "project",
@@ -66,7 +66,263 @@
         {
           "name": "args",
           "type": {
-            "defined": "CreateNewResourceArgs"
+            "defined": "CreateResourceArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initilizeResourceTree",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "resource",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "merkleTree",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Compression program."
+          ]
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Noop program."
+          ]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitilizeResourceTreeArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mintResource",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "resource",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "token22Program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Compression program."
+          ]
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Noop program."
+          ]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "MintResourceArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "burnResource",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "resource",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "token22Program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Compression program."
+          ]
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Noop program."
+          ]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "BurnResourceArgs"
           }
         }
       ]
@@ -120,7 +376,45 @@
   ],
   "types": [
     {
-      "name": "CreateNewResourceArgs",
+      "name": "MintResourceArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holdingState",
+            "type": {
+              "option": {
+                "defined": "HoldingAccountArgs"
+              }
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BurnResourceArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holdingState",
+            "type": {
+              "defined": "HoldingAccountArgs"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateResourceArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -144,6 +438,58 @@
       }
     },
     {
+      "name": "InitilizeResourceTreeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxDepth",
+            "type": "u32"
+          },
+          {
+            "name": "maxBufferSize",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "HoldingAccountArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holding",
+            "type": {
+              "defined": "Holding"
+            }
+          },
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "leafIdx",
+            "type": "u32"
+          },
+          {
+            "name": "sourceHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "ResourceMetadataArgs",
       "type": {
         "kind": "struct",
@@ -159,6 +505,44 @@
           {
             "name": "uri",
             "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResourceMetadataUpdateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "symbol",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "field",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "value",
+            "type": {
+              "option": "string"
+            }
           }
         ]
       }
@@ -331,6 +715,22 @@
           }
         ]
       }
+    },
+    {
+      "name": "Holding",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holder",
+            "type": "publicKey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -338,6 +738,11 @@
       "code": 6000,
       "name": "ResourceNotInitialized",
       "msg": "The resource is not initialized"
+    },
+    {
+      "code": 6001,
+      "name": "InsufficientAmount",
+      "msg": "The amount provided for burning is greater than the amount of the held in the account"
     }
   ],
   "metadata": {
