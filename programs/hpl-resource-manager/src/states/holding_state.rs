@@ -11,8 +11,16 @@ use {
 #[compressed_account()]
 pub struct Holding {
     // the holder of this holding
-    holder: Pubkey,
+    pub holder: Pubkey,
 
     // the resource this holding is associated with
-    balance: u64,
+    pub balance: u64,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct HoldingAccountArgs {
+    pub holding: Holding,
+    pub root: [u8; 32],
+    pub leaf_idx: u32,
+    pub source_hash: [u8; 32],
 }
