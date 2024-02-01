@@ -8,10 +8,6 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import {
-  MissionRequirement,
-  missionRequirementBeet,
-} from './MissionRequirement'
 import { EarnedReward, earnedRewardBeet } from './EarnedReward'
 import { GuildRole, guildRoleBeet } from './GuildRole'
 /**
@@ -33,8 +29,9 @@ export type CharacterUsedByRecord = {
   }
   Mission: {
     id: web3.PublicKey
-    requirement: MissionRequirement
     rewards: EarnedReward[]
+    endTime: beet.bignum
+    rewardsCollected: boolean
   }
   Guild: { id: web3.PublicKey; role: GuildRole; order: number }
 }
@@ -90,8 +87,9 @@ export const characterUsedByBeet = beet.dataEnum<CharacterUsedByRecord>([
     new beet.FixableBeetArgsStruct<CharacterUsedByRecord['Mission']>(
       [
         ['id', beetSolana.publicKey],
-        ['requirement', missionRequirementBeet],
         ['rewards', beet.array(earnedRewardBeet)],
+        ['endTime', beet.u64],
+        ['rewardsCollected', beet.bool],
       ],
       'CharacterUsedByRecord["Mission"]'
     ),
