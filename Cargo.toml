@@ -1,9 +1,6 @@
 [workspace]
 members = [
-  "programs/hpl-character-manager",
-  # "programs/hpl-asset-manager",
-  # "programs/hpl-payment-manager",
-  # "programs/hpl-payment-manager",
+  "programs/*",
 ]
 
 [workspace.package]
