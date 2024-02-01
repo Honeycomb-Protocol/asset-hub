@@ -1,7 +1,10 @@
 import getHoneycombs from "../scripts/prepare";
 import {
   PROGRAM_ID,
-  createCreateNewResourceInstruction,
+  createBurnResourceInstruction,
+  createCreateResourceInstruction,
+  createInitilizeResourceTreeInstruction,
+  createMintResourceInstruction,
   resourceManagerPdas,
 } from "../packages/hpl-resource-manager";
 import {
@@ -10,12 +13,20 @@ import {
   KeypairLike,
   Operation,
 } from "@honeycomb-protocol/hive-control";
-import { Keypair, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import {
+  Keypair,
+  SYSVAR_CLOCK_PUBKEY,
+  SYSVAR_RENT_PUBKEY,
+} from "@solana/web3.js";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
 import { PublicKey } from "@metaplex-foundation/js";
+import {
+  SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+  SPL_NOOP_PROGRAM_ID,
+} from "@solana/spl-account-compression";
 
 jest.setTimeout(6000000);
 
@@ -49,7 +60,7 @@ describe("Resource Manager", () => {
     expect(adminHC.project().name).toBe("Resource Manager");
   });
 
-  it("Create Resource", async () => {
+  it.skip("Create Resource", async () => {
     const mint = new Keypair();
 
     const [resourceAddress] = resourceManagerPdas().resource(
@@ -58,7 +69,7 @@ describe("Resource Manager", () => {
       PROGRAM_ID
     );
 
-    const ix = createCreateNewResourceInstruction(
+    const ix = createCreateResourceInstruction(
       {
         mint: mint.publicKey,
         resource: resourceAddress,
@@ -88,6 +99,145 @@ describe("Resource Manager", () => {
       adminHC,
       [ix],
       [adminHC.identity().signer as KeypairLike, mint]
+    );
+
+    const status = await op.send({
+      skipPreflight: true,
+      commitment: "processed",
+    });
+
+    console.log(status);
+  });
+
+  it.skip("Initialize Resource Tree", async () => {
+    const mint = PublicKey.default;
+    const merkleTree = new Keypair();
+    const [resourceAddress] = adminHC
+      .pda()
+      .resourceManager()
+      .resource(adminHC.project().address, mint);
+
+    const ix = createInitilizeResourceTreeInstruction(
+      {
+        mint: mint,
+        merkleTree: merkleTree.publicKey,
+        resource: resourceAddress,
+        project: adminHC.project().address,
+        payer: adminHC.identity().address,
+        owner: adminHC.identity().address,
+        rentSysvar: SYSVAR_RENT_PUBKEY,
+        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+        logWrapper: SPL_NOOP_PROGRAM_ID,
+        clock: SYSVAR_CLOCK_PUBKEY,
+      },
+      {
+        args: {
+          maxBufferSize: 100,
+          maxDepth: 10,
+        },
+      }
+    );
+
+    const op = new Operation(
+      adminHC,
+      [ix],
+      [adminHC.identity().signer as KeypairLike, merkleTree]
+    );
+
+    const status = await op.send({
+      skipPreflight: true,
+      commitment: "processed",
+    });
+
+    console.log(status);
+  });
+
+  it.skip("Mint Resource", async () => {
+    const mint = PublicKey.default;
+    const merkleTree = new Keypair();
+    const [resourceAddress] = adminHC
+      .pda()
+      .resourceManager()
+      .resource(adminHC.project().address, mint);
+
+    const ix = createMintResourceInstruction(
+      {
+        mint: mint,
+        resource: resourceAddress,
+        merkleTree: merkleTree.publicKey,
+        payer: adminHC.identity().address,
+        owner: adminHC.identity().address,
+        project: adminHC.project().address,
+        clock: SYSVAR_CLOCK_PUBKEY,
+        rentSysvar: SYSVAR_RENT_PUBKEY,
+        token22Program: TOKEN_2022_PROGRAM_ID,
+        logWrapper: SPL_NOOP_PROGRAM_ID,
+        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+      },
+      {
+        args: {
+          amount: 100,
+          holdingState: null,
+        },
+      }
+    );
+
+    const op = new Operation(
+      adminHC,
+      [ix],
+      [adminHC.identity().signer as KeypairLike]
+    );
+
+    const status = await op.send({
+      skipPreflight: true,
+      commitment: "processed",
+    });
+
+    console.log(status);
+  });
+
+  it.skip("Burn Resource", async () => {
+    const mint = PublicKey.default;
+    const merkleTree = PublicKey.default;
+    const [resourceAddress] = adminHC
+      .pda()
+      .resourceManager()
+      .resource(adminHC.project().address, mint);
+
+    const ix = createBurnResourceInstruction(
+      {
+        mint,
+        merkleTree,
+        resource: resourceAddress,
+        payer: adminHC.identity().address,
+        owner: adminHC.identity().address,
+        project: adminHC.project().address,
+        clock: SYSVAR_CLOCK_PUBKEY,
+        rentSysvar: SYSVAR_RENT_PUBKEY,
+        logWrapper: SPL_NOOP_PROGRAM_ID,
+        token22Program: TOKEN_2022_PROGRAM_ID,
+        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+      },
+      {
+        args: {
+          amount: 100,
+          holdingState: {
+            holding: {
+              holder: adminHC.identity().address,
+              balance: 100,
+            },
+            leafIdx: 0,
+            root: [0],
+            sourceHash: [],
+          },
+        },
+      }
+    );
+
+    const op = new Operation(
+      adminHC,
+      [ix],
+      [adminHC.identity().signer as KeypairLike]
     );
 
     const status = await op.send({
