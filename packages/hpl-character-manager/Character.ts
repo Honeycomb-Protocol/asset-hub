@@ -48,6 +48,7 @@ export type CharacterOffchainData = {
             delta: number;
             rewardIdx: number;
           }[];
+          rewardsCollected: boolean;
         };
       }
     | {
@@ -172,8 +173,9 @@ export class HplCharacter {
               id: new PublicKey(
                 offchainData.used_by.params.id.replace("pubkey:", "")
               ),
-              requirement: offchainData.used_by.params.requirement,
+              endTime: offchainData.used_by.params.requirement.endTime,
               rewards: offchainData.used_by.params.rewards,
+              rewardsCollected: offchainData.used_by.params.rewardsCollected,
             }
           : "Guild" === offchainData.used_by.__kind
           ? {

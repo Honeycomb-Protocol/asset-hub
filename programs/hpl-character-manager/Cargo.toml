@@ -1,3 +1,5 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
 name = "hpl-character-manager"
 description = "Honeycomb protocol library asset manager program"

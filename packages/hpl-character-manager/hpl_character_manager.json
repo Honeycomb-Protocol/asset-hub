@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-beta.7",
+  "version": "0.0.2-beta.9",
   "name": "hpl_character_manager",
   "instructions": [
     {
@@ -1241,13 +1241,13 @@
           {
             "name": "source",
             "type": {
-              "defined": "DataOrHash<CharacterSource>"
+              "defined": "DataOrHashSource"
             }
           },
           {
             "name": "usedBy",
             "type": {
-              "defined": "DataOrHash<CharacterUsedBy>"
+              "defined": "DataOrHashUsedBy"
             }
           }
         ]
@@ -1517,7 +1517,7 @@
       }
     },
     {
-      "name": "DataOrHash",
+      "name": "DataOrHashSource",
       "type": {
         "kind": "enum",
         "variants": [
@@ -1525,7 +1525,34 @@
             "name": "Data",
             "fields": [
               {
-                "defined": "Data"
+                "defined": "CharacterSource"
+              }
+            ]
+          },
+          {
+            "name": "Hash",
+            "fields": [
+              {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataOrHashUsedBy",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Data",
+            "fields": [
+              {
+                "defined": "CharacterUsedBy"
               }
             ]
           },
@@ -1590,6 +1617,10 @@
               {
                 "name": "endTime",
                 "type": "u64"
+              },
+              {
+                "name": "rewardsCollected",
+                "type": "bool"
               }
             ]
           },
@@ -1609,27 +1640,6 @@
               {
                 "name": "order",
                 "type": "u8"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "MissionRequirement",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Time",
-            "fields": [
-              {
-                "name": "endTime",
-                "docs": [
-                  "The end time of the mission in unix timestamp",
-                  "Calculated by start_time + mission.duration"
-                ],
-                "type": "u64"
               }
             ]
           }

@@ -1128,18 +1128,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hpl-currency-manager"
-version = "0.0.83-beta.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "hpl-events",
- "hpl-hive-control",
- "hpl-macros",
- "hpl-utils",
-]
-
-[[package]]
 name = "hpl-events"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1195,21 +1183,6 @@ checksum = "5c6711149f771cae31959af1ce6ef86bde0c4e6625f9528f662fd3825edb33c3"
 dependencies = [
  "hpl-macro-add-service",
  "hpl-macro-platform-gate",
-]
-
-[[package]]
-name = "hpl-payment-manager"
-version = "0.0.5-beta.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "hpl-currency-manager",
- "hpl-events",
- "hpl-hive-control",
- "hpl-macros",
- "hpl-utils",
- "mpl-bubblegum",
- "spl-account-compression",
 ]
 
 [[package]]

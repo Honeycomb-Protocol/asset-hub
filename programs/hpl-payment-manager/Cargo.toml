@@ -1,3 +1,5 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
 name = "hpl-payment-manager"
 description = "Honeycomb protocol library payment manager program"

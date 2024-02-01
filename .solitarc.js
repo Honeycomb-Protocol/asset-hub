@@ -90,6 +90,24 @@ const mapTypes = (type) => {
         });
       return variant;
     });
+  
+  const fixTypes = ["VerifyCharacterArgs"];
+
+  if (fixTypes.includes(type.name)) {
+    type.type.fields.forEach((field) => {
+      if (field.name === "source") {
+        field.type = {
+          defined: "DataOrHashSource"
+        };
+      }
+
+      if (field.name === "usedBy") {
+        field.type = {
+          defined: "DataOrHashUsedBy"
+        };
+      }
+    });
+  }
 
   return type;
 };
@@ -115,6 +133,27 @@ const createConfig = (name, programId, customs) => {
       idl.types = idl.types.map(mapTypes);
 
       idl.accounts = idl.accounts.map(mapTypes);
+
+      const dataOrHashIndex = idl.types.findIndex(type => type.name === "DataOrHash");
+      if(dataOrHashIndex >= 0) {
+        const dataOrHashSource = structuredClone(idl.types[dataOrHashIndex]);
+        dataOrHashSource.name = "DataOrHashSource";
+        dataOrHashSource.type.variants.forEach(variant => {
+          if (variant.name === "Data") {
+            variant.fields[0].defined = "CharacterSource";
+          }
+        });
+
+        const dataOrHashUsedBy = structuredClone(idl.types[dataOrHashIndex]);
+        dataOrHashUsedBy.name = "DataOrHashUsedBy";
+        dataOrHashUsedBy.type.variants.forEach(variant => {
+          if (variant.name === "Data") {
+            variant.fields[0].defined = "CharacterUsedBy";
+          }
+        });
+
+        idl.types.splice(dataOrHashIndex, 1, dataOrHashSource, dataOrHashUsedBy);
+      }
 
       return idl;
     },
