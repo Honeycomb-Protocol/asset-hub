@@ -5,13 +5,16 @@ use {
     },
     anchor_lang::prelude::*,
     anchor_spl::{associated_token::AssociatedToken, token::Token},
+    hpl_compression::init_tree,
     hpl_hive_control::state::Project,
+    hpl_utils::reallocate,
+    spl_account_compression::{program::SplAccountCompression, Noop},
     spl_token_2022::ID as Token2022,
 };
 
 #[derive(Accounts)]
-#[instruction(args: CreateNewResourceArgs)]
-pub struct CreateNewResource<'info> {
+#[instruction(args: CreateResourceArgs)]
+pub struct CreateResource<'info> {
     #[account()]
     pub project: Box<Account<'info, Project>>,
 
@@ -49,16 +52,13 @@ pub struct CreateNewResource<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CreateNewResourceArgs {
+pub struct CreateResourceArgs {
     pub kind: ResourseKind,
     pub metadata: ResourceMetadataArgs,
     pub decimals: u8,
 }
 
-pub fn create_new_resource(
-    ctx: Context<CreateNewResource>,
-    args: CreateNewResourceArgs,
-) -> Result<()> {
+pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
 
     // create resource account
@@ -69,7 +69,7 @@ pub fn create_new_resource(
     resource.kind = args.kind;
 
     // create the mint account with the extensions
-    let mint = create_mint_with_extensions(
+    create_mint_with_extensions(
         &resource,
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.mint.to_account_info(),
@@ -79,27 +79,92 @@ pub fn create_new_resource(
         &args.metadata,
     )?;
 
-    msg!("Mint account created with decimals: {}", mint.decimals);
-    msg!(
-        "Mint account created with decimals: {}",
-        mint.freeze_authority.unwrap_or(Pubkey::default())
-    );
-    msg!(
-        "Mint account created with decimals: {}",
-        mint.mint_authority.unwrap_or(Pubkey::default())
-    );
-    msg!("Mint account created with decimals: {}", mint.supply);
-    msg!(
-        "Mint account created with decimals: {}",
-        mint.is_initialized
-    );
-
     // create the metadata account for the mint
     create_metadata_for_mint(
         ctx.accounts.token22_program.to_account_info(),
         ctx.accounts.mint.to_account_info(),
         &resource,
         args.metadata,
+    )?;
+
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct InitilizeResourceTree<'info> {
+    #[account()]
+    pub project: Box<Account<'info, Project>>,
+
+    #[account(has_one = project, has_one = mint)]
+    pub resource: Box<Account<'info, Resource>>,
+
+    /// CHECK: this is not dangerous. we are not reading & writing from it
+    #[account()]
+    pub mint: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account()]
+    pub merkle_tree: Signer<'info>,
+
+    pub rent_sysvar: Sysvar<'info, Rent>,
+
+    pub system_program: Program<'info, System>,
+
+    /// SPL TOKEN PROGRAM
+    pub token_program: Program<'info, Token>,
+
+    /// SPL Compression program.
+    pub compression_program: Program<'info, SplAccountCompression>,
+
+    /// SPL Noop program.
+    pub log_wrapper: Program<'info, Noop>,
+
+    // SYSVAR CLOCK
+    pub clock: Sysvar<'info, Clock>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct InitilizeResourceTreeArgs {
+    pub max_depth: u32,
+    pub max_buffer_size: u32,
+}
+
+pub fn initilize_resource_tree(
+    ctx: Context<InitilizeResourceTree>,
+    args: InitilizeResourceTreeArgs,
+) -> Result<()> {
+    let resource = &mut ctx.accounts.resource;
+
+    reallocate(
+        32,
+        resource.to_account_info(),
+        ctx.accounts.payer.to_account_info(),
+        &ctx.accounts.rent_sysvar,
+        &ctx.accounts.system_program,
+    )?;
+
+    // create the compressed token account using controlled merkle tree
+    resource
+        .merkle_trees
+        .merkle_trees
+        .push(ctx.accounts.merkle_tree.key());
+
+    // create the merkle tree for the resource
+    let bump_binding = [resource.bump];
+    let signer_seeds = resource.seeds(&bump_binding);
+    init_tree(
+        args.max_depth,
+        args.max_buffer_size,
+        &resource.to_account_info(),
+        &ctx.accounts.merkle_tree,
+        &ctx.accounts.compression_program,
+        &ctx.accounts.log_wrapper,
+        Some(&[&signer_seeds[..]]),
     )?;
 
     Ok(())
