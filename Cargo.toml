@@ -1,8 +1,6 @@
 [workspace]
 members = [
-  "programs/hpl-payment-manager",
-  "programs/hpl-payment-manager",
-  "programs/hpl-character-manager",
+  "programs/*"
 ]
 
 [profile.release]

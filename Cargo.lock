@@ -1041,6 +1041,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "hpl-asset-assembler"
+version = "0.0.77"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-utils",
+ "mpl-token-metadata",
+]
+
+[[package]]
+name = "hpl-asset-manager"
+version = "0.0.77"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-utils",
+ "mpl-token-metadata",
+]
+
+[[package]]
 name = "hpl-attribute-compressed-account"
 version = "0.0.1-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
