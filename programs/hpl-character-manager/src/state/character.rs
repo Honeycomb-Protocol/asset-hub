@@ -138,6 +138,12 @@ impl ToNode for NftWrapCriteria {
     }
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub enum DataOrHash<Data> {
+    Data(Data),
+    Hash([u8; 32]),
+}
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum CharacterUsedBy {
     None,
@@ -149,8 +155,9 @@ pub enum CharacterUsedBy {
     },
     Mission {
         id: Pubkey,
-        requirement: MissionRequirement,
         rewards: Vec<EarnedReward>,
+        end_time: u64,
+        rewards_collected: bool,
     },
     Guild {
         id: Pubkey,
@@ -176,9 +183,12 @@ impl CompressedSchema for CharacterUsedBy {
         staking.insert(String::from("claimed_at"), i64::schema());
         schema.push((String::from("Staking"), Schema::Object(staking)));
 
-        let mut missions = HashMap::new();
-        missions.insert(String::from("participation"), Pubkey::schema());
-        schema.push((String::from("Missions"), Schema::Object(missions)));
+        let mut mission = HashMap::new();
+        mission.insert(String::from("id"), Pubkey::schema());
+        mission.insert(String::from("rewards"), Vec::<EarnedReward>::schema());
+        mission.insert(String::from("end_time"), u64::schema());
+        mission.insert(String::from("rewards_collected"), bool::schema());
+        schema.push((String::from("Mission"), Schema::Object(mission)));
 
         let mut guild = HashMap::new();
         guild.insert(String::from("id"), Pubkey::schema());
@@ -209,18 +219,17 @@ impl CompressedSchema for CharacterUsedBy {
                     Box::new(SchemaValue::Object(staking)),
                 )
             }
-            Self::Mission { id, requirement, rewards } => {
-                let mut missions = HashMap::new();
-                missions.insert(String::from("id"), id.schema_value());
-                missions.insert(String::from("requirement"), requirement.schema_value());
-                missions.insert(
-                    String::from("rewards"),
-                    SchemaValue::Array(rewards.iter().map(|r| r.schema_value()).collect()),
-                );
+            Self::Mission { id, rewards, end_time, rewards_collected } => {
+                let mut mission = HashMap::new();
+                mission.insert(String::from("id"), id.schema_value());
+                mission.insert(String::from("rewards"), rewards.schema_value());
+                mission.insert(String::from("end_time"), end_time.schema_value());
+                mission.insert(String::from("rewards_collected"), rewards_collected.schema_value());
 
+                // Add rewards and end_time here
                 SchemaValue::Enum(
-                    String::from("Missions"),
-                    Box::new(SchemaValue::Object(missions)),
+                    String::from("Mission"),
+                    Box::new(SchemaValue::Object(mission)),
                 )
             }
             Self::Guild { id, role, order } => {
@@ -252,12 +261,13 @@ impl ToNode for CharacterUsedBy {
                 claimed_at.to_node().as_ref(),
             ])
             .to_bytes(),
-            Self::Mission { id, requirement, rewards } => {
+            Self::Mission { id, rewards, end_time, rewards_collected} => {
                 keccak::hashv(&[
                     "Missions".as_bytes(),
                     id.to_node().as_ref(),
-                    requirement.to_node().as_ref(),
                     rewards.to_node().as_ref(),
+                    end_time.to_node().as_ref(),
+                    rewards_collected.to_node().as_ref(),
                 ])
                 .to_bytes()
             }
@@ -300,49 +310,6 @@ impl CharacterUsedBy {
             (Self::Mission { .. }, Self::Mission { .. }) => true,
             (Self::Guild { .. }, Self::Guild { .. }) => true,
             _ => false,
-        }
-    }
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub enum MissionRequirement {
-    Time {
-        /// The end time of the mission in unix timestamp
-        /// Calculated by start_time + mission.duration
-        end_time: i64,
-    },
-    // Add task requirement later down the line
-}
-
-impl CompressedSchema for MissionRequirement {
-    fn schema() -> Schema {
-        let mut schema = Vec::<(String, Schema)>::new();
-
-        let mut time = HashMap::new();
-        time.insert(String::from("end_time"), i64::schema());
-        schema.push((String::from("Time"), Schema::Object(time)));
-
-        Schema::Enum(schema)
-    }
-
-    fn schema_value(&self) -> SchemaValue {
-        match self {
-            Self::Time { end_time } => {
-                let mut time = HashMap::new();
-                time.insert(String::from("end_time"), end_time.schema_value());
-
-                SchemaValue::Enum(String::from("Time"), Box::new(SchemaValue::Object(time)))
-            }
-        }
-    }
-}
-
-impl ToNode for MissionRequirement {
-    fn to_node(&self) -> Node {
-        match self {
-            Self::Time { end_time } => {
-                keccak::hashv(&["Time".as_bytes(), end_time.to_node().as_ref()]).to_bytes()
-            }
         }
     }
 }

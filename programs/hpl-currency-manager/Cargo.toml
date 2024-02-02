@@ -1,3 +1,5 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
 name = "hpl-currency-manager"
 description = "Honeycomb protocol library currency manager program"
