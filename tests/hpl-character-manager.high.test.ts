@@ -6,7 +6,7 @@ import { createNewTree, mintOneCNFT } from "./helpers";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 
-import { gql, Client, cacheExchange, fetchExchange } from "@urql/core";
+import { Client, cacheExchange, fetchExchange } from "@urql/core";
 
 import {
   HplCharacter,
@@ -17,17 +17,20 @@ import {
   createUnwrapAssetOperation,
   createCreateNewCharactersTreeOperation,
 } from "../packages/hpl-character-manager";
+import createEdgeClient from "@honeycomb-protocol/edge-client/client";
 
 jest.setTimeout(200000);
 
 describe("Character Manager", () => {
-  const totalNfts = 1;
+  const totalNfts = 10;
   const totalcNfts = 1;
 
-  const client = new Client({
-    url: "http://localhost:4001",
-    exchanges: [cacheExchange, fetchExchange],
-  });
+  const client = createEdgeClient(
+    new Client({
+      url: "http://localhost:4001",
+      exchanges: [cacheExchange, fetchExchange],
+    })
+  );
 
   let adminHC: Honeycomb;
   let userHC: Honeycomb;
@@ -36,7 +39,6 @@ describe("Character Manager", () => {
   let merkleTree: web3.PublicKey;
   let characterModelAddress: web3.PublicKey;
   let characterModel: HplCharacterModel;
-  let character: HplCharacter;
 
   it("Prepare", async () => {
     const honeycombs = await getHoneycombs();
@@ -192,156 +194,86 @@ describe("Character Manager", () => {
     );
   });
 
-  it("Wrap NFT to Character", async () => {
+  it("Wrap Assets to Character", async () => {
     const wallet = userHC.identity().address;
 
-    const nfts = await fetchHeliusAssets(userHC.rpcEndpoint, {
+    const assets = await fetchHeliusAssets(userHC.rpcEndpoint, {
       walletAddress: wallet,
       collectionAddress: collection,
-    }).then((nfts) => nfts.filter((n) => !n.frozen && !n.isCompressed));
+    }).then((assets) => assets.filter((n) => !n.frozen));
 
-    if (!nfts.length) throw new Error("No Nfts to wrap");
+    if (!assets.length) throw new Error("No Assets to wrap");
 
-    console.log("NFT", nfts[0].mint.toString());
-
-    const response = await client.query(
-      gql`
-        query CreateWrapAssetsToCharacterTransactions(
-          $project: Bytes!
-          $characterModel: Bytes!
-          $activeCharactersMerkleTree: Bytes!
-          $wallet: Bytes!
-          $mintList: [Bytes]!
-        ) {
-          createWrapAssetsToCharacterTransactions(
-            project: $project
-            characterModel: $characterModel
-            activeCharactersMerkleTree: $activeCharactersMerkleTree
-            wallet: $wallet
-            mintList: $mintList
-          ) {
-            transactions
-            blockhash
-            lastValidBlockHeight
-          }
-        }
-      `,
-      {
+    const { createWrapAssetsToCharacterTransactions: txResponse } =
+      await client.createWrapAssetsToCharacterTransactions({
         project: adminHC.project().address.toString(),
         characterModel: characterModelAddress.toString(),
         activeCharactersMerkleTree:
           characterModel.activeCharactersMerkleTree.toString(),
         wallet: wallet.toString(),
-        mintList: [nfts[0].mint.toString()],
-      }
+        mintList: assets.map((n) => n.mint.toString()),
+      });
+
+    const signedTxs = await userHC
+      .identity()
+      .signAllTransactions(
+        txResponse!.transactions.map((tx) =>
+          web3.Transaction.from(base58.decode(tx))
+        )
+      );
+
+    const { sendBulkTransactions } = await client.sendBulkTransactions({
+      txs: signedTxs.map((tx) => base58.encode(tx.serialize())),
+      blockhash: txResponse!.blockhash,
+      lastValidBlockHeight: txResponse!.lastValidBlockHeight,
+    });
+
+    if (!sendBulkTransactions)
+      throw new Error("Failed to send wrap transactions");
+
+    console.log("Wrap txs", sendBulkTransactions);
+  });
+
+  it("Unwrap Assets from Character", async () => {
+    const { character } = await client.findCharacters({
+      filters: {
+        owner: userHC.identity().address.toString(),
+      },
+      trees: characterModel.merkleTrees.map((x) => x.toString()),
+    });
+
+    if (!character?.length) throw new Error("No characters to unwrap");
+
+    console.log(
+      "Characters",
+      character.map((x) => x!.id)
     );
 
-    const txGroup = response.data.createWrapAssetsToCharacterTransactions as {
-      transactions: string[];
-      blockhash: string;
-      lastValidBlockHeight: number;
-    };
+    const { createUnwrapAssetsFromCharacterTransactions: txResponse } =
+      await client.createUnwrapAssetsFromCharacterTransactions({
+        characterIds: character.map((x) => x!.id),
+        project: adminHC.project().address.toString(),
+        characterModel: characterModelAddress.toString(),
+        wallet: userHC.identity().address.toString(),
+      });
 
-    const [txStr] = txGroup.transactions;
-    const tx = web3.Transaction.from(base58.decode(txStr));
+    const signedTxs = await userHC
+      .identity()
+      .signAllTransactions(
+        txResponse!.transactions.map((tx) =>
+          web3.Transaction.from(base58.decode(tx))
+        )
+      );
 
-    const signedTx = await userHC.identity().signTransaction(tx);
+    const { sendBulkTransactions } = await client.sendBulkTransactions({
+      txs: signedTxs.map((tx) => base58.encode(tx.serialize())),
+      blockhash: txResponse!.blockhash,
+      lastValidBlockHeight: txResponse!.lastValidBlockHeight,
+    });
 
-    const response2 = await client.query(
-      gql`
-        query SendBulkTransactions(
-          $txs: [Bytes]!
-          $blockhash: String!
-          $lastValidBlockHeight: Int!
-        ) {
-          sendBulkTransactions(
-            txs: $txs
-            blockhash: $blockhash
-            lastValidBlockHeight: $lastValidBlockHeight
-          ) {
-            signature
-            error
-            status
-          }
-        }
-      `,
-      {
-        txs: [base58.encode(signedTx.serialize())],
-        blockhash: txGroup.blockhash,
-        lastValidBlockHeight: txGroup.lastValidBlockHeight,
-      }
-    );
+    if (!sendBulkTransactions)
+      throw new Error("Failed to send unwrap transactions");
 
-    console.log("Response", response2);
-    console.log("Response", response2.data);
-  });
-
-  it.skip("Wrap NFT to Character", async () => {
-    const wallet = userHC.identity().address;
-
-    const nfts = await fetchHeliusAssets(userHC.rpcEndpoint, {
-      walletAddress: wallet,
-      collectionAddress: collection,
-    }).then((nfts) => nfts.filter((n) => !n.frozen && !n.isCompressed));
-
-    if (!nfts.length) throw new Error("No Nfts to wrap");
-
-    (
-      await createWrapAssetOperation(userHC, {
-        asset: nfts[0],
-        characterModel,
-      })
-    ).operation.send();
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    character = (
-      await HplCharacter.fetchWithWallet(
-        userHC.rpcEndpoint,
-        userHC.identity().address
-      )
-    )[0];
-
-    console.log("Character", character);
-  });
-
-  it.skip("Wrap cNFT to Character", async () => {
-    const wallet = userHC.identity().address;
-
-    const nfts = await fetchHeliusAssets(userHC.rpcEndpoint, {
-      walletAddress: wallet,
-      collectionAddress: collection,
-    }).then((nfts) => nfts.filter((n) => !n.frozen && n.isCompressed));
-
-    if (!nfts.length) throw new Error("No Nfts to wrap");
-
-    (
-      await createWrapAssetOperation(userHC, {
-        asset: nfts[0],
-        characterModel,
-      })
-    ).operation.send();
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    character = (
-      await HplCharacter.fetchWithWallet(
-        userHC.rpcEndpoint,
-        userHC.identity().address
-      )
-    )[0];
-
-    console.log("Character", character);
-  });
-
-  it.skip("Unwrap NFT from Character", async () => {
-    if (!character) throw new Error("Character not found");
-
-    (
-      await createUnwrapAssetOperation(userHC, {
-        characterModel,
-        character,
-      })
-    ).operation.send();
+    console.log("Unwrap txs", sendBulkTransactions);
   });
 });
