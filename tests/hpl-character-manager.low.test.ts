@@ -21,7 +21,12 @@ import {
 import getHoneycombs from "../scripts/prepare";
 import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import { createNewTree, mintOneCNFT } from "./helpers";
-import { Metaplex, Nft, keypairIdentity } from "@metaplex-foundation/js";
+import {
+  Metaplex,
+  Nft,
+  PublicKey,
+  keypairIdentity,
+} from "@metaplex-foundation/js";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 import {
   SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
@@ -479,8 +484,11 @@ describe("Character Manager", () => {
             sourceHash: Array.from(character.sourceHash),
             currentUsedBy: character.usedBy,
             newUsedBy: {
-              __kind: "Missions",
-              participation: web3.PublicKey.default,
+              __kind: "Mission",
+              id: PublicKey.default,
+              endTime: 0,
+              rewards: [],
+              rewardsCollected: false,
             },
           },
         }

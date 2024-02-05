@@ -9,88 +9,94 @@ import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  MintResourceArgs,
-  mintResourceArgsBeet,
-} from '../types/MintResourceArgs'
+  UnWrapResourceArgs,
+  unWrapResourceArgsBeet,
+} from '../types/UnWrapResourceArgs'
 
 /**
  * @category Instructions
- * @category MintResource
+ * @category UnwrapResource
  * @category generated
  */
-export type MintResourceInstructionArgs = {
-  args: MintResourceArgs
+export type UnwrapResourceInstructionArgs = {
+  args: UnWrapResourceArgs
 }
 /**
  * @category Instructions
- * @category MintResource
+ * @category UnwrapResource
  * @category generated
  */
-export const mintResourceStruct = new beet.FixableBeetArgsStruct<
-  MintResourceInstructionArgs & {
+export const unwrapResourceStruct = new beet.BeetArgsStruct<
+  UnwrapResourceInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', mintResourceArgsBeet],
+    ['args', unWrapResourceArgsBeet],
   ],
-  'MintResourceInstructionArgs'
+  'UnwrapResourceInstructionArgs'
 )
 /**
- * Accounts required by the _mintResource_ instruction
+ * Accounts required by the _unwrapResource_ instruction
  *
  * @property [] project
  * @property [] resource
  * @property [_writable_] mint
  * @property [_writable_] merkleTree
+ * @property [_writable_] recipientAccount
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
+ * @property [] rentSysvar
  * @property [] token22Program
  * @property [] compressionProgram
  * @property [] logWrapper
  * @property [] clock
+ * @property [] associatedTokenProgram
  * @category Instructions
- * @category MintResource
+ * @category UnwrapResource
  * @category generated
  */
-export type MintResourceInstructionAccounts = {
+export type UnwrapResourceInstructionAccounts = {
   project: web3.PublicKey
   resource: web3.PublicKey
   mint: web3.PublicKey
   merkleTree: web3.PublicKey
+  recipientAccount: web3.PublicKey
   owner: web3.PublicKey
   payer: web3.PublicKey
+  rentSysvar: web3.PublicKey
   systemProgram?: web3.PublicKey
   token22Program: web3.PublicKey
   tokenProgram?: web3.PublicKey
   compressionProgram: web3.PublicKey
   logWrapper: web3.PublicKey
   clock: web3.PublicKey
+  associatedTokenProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const mintResourceInstructionDiscriminator = [
-  2, 118, 133, 91, 220, 176, 214, 105,
+export const unwrapResourceInstructionDiscriminator = [
+  110, 83, 236, 85, 230, 247, 205, 106,
 ]
 
 /**
- * Creates a _MintResource_ instruction.
+ * Creates a _UnwrapResource_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category MintResource
+ * @category UnwrapResource
  * @category generated
  */
-export function createMintResourceInstruction(
-  accounts: MintResourceInstructionAccounts,
-  args: MintResourceInstructionArgs,
+export function createUnwrapResourceInstruction(
+  accounts: UnwrapResourceInstructionAccounts,
+  args: UnwrapResourceInstructionArgs,
   programId = new web3.PublicKey('6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ')
 ) {
-  const [data] = mintResourceStruct.serialize({
-    instructionDiscriminator: mintResourceInstructionDiscriminator,
+  const [data] = unwrapResourceStruct.serialize({
+    instructionDiscriminator: unwrapResourceInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -115,6 +121,11 @@ export function createMintResourceInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.recipientAccount,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.owner,
       isWritable: true,
       isSigner: true,
@@ -123,6 +134,11 @@ export function createMintResourceInstruction(
       pubkey: accounts.payer,
       isWritable: true,
       isSigner: true,
+    },
+    {
+      pubkey: accounts.rentSysvar,
+      isWritable: false,
+      isSigner: false,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
@@ -151,6 +167,11 @@ export function createMintResourceInstruction(
     },
     {
       pubkey: accounts.clock,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.associatedTokenProgram,
       isWritable: false,
       isSigner: false,
     },

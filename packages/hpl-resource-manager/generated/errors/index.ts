@@ -35,7 +35,7 @@ createErrorFromNameLookup.set(
 )
 
 /**
- * InsufficientAmount: 'The amount provided for burning is greater than the amount of the held in the account'
+ * InsufficientAmount: 'The amount provided is greater than the amount that is held in the account'
  *
  * @category Errors
  * @category generated
@@ -45,7 +45,7 @@ export class InsufficientAmountError extends Error {
   readonly name: string = 'InsufficientAmount'
   constructor() {
     super(
-      'The amount provided for burning is greater than the amount of the held in the account'
+      'The amount provided is greater than the amount that is held in the account'
     )
     if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, InsufficientAmountError)

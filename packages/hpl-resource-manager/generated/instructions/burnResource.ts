@@ -42,8 +42,8 @@ export const burnResourceStruct = new beet.BeetArgsStruct<
  *
  * @property [] project
  * @property [] resource
- * @property [] mint
- * @property [] merkleTree
+ * @property [_writable_] mint
+ * @property [_writable_] merkleTree
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
  * @property [] rentSysvar
@@ -108,12 +108,12 @@ export function createBurnResourceInstruction(
     },
     {
       pubkey: accounts.mint,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.merkleTree,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {

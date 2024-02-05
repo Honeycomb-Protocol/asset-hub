@@ -1183,7 +1183,7 @@ dependencies = [
 name = "hpl-asset-assembler"
 version = "0.0.77"
 dependencies = [
- "anchor-lang",
+ "anchor-lang 0.28.0",
  "anchor-spl",
  "hpl-events",
  "hpl-hive-control",
@@ -1196,7 +1196,7 @@ dependencies = [
 name = "hpl-asset-manager"
 version = "0.0.77"
 dependencies = [
- "anchor-lang",
+ "anchor-lang 0.28.0",
  "anchor-spl",
  "hpl-events",
  "hpl-hive-control",
@@ -1293,6 +1293,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "hpl-currency-manager"
+version = "0.0.83-beta.1"
+dependencies = [
+ "anchor-lang 0.28.0",
+ "anchor-spl",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-utils",
+]
+
+[[package]]
 name = "hpl-events"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1348,6 +1360,40 @@ checksum = "5c6711149f771cae31959af1ce6ef86bde0c4e6625f9528f662fd3825edb33c3"
 dependencies = [
  "hpl-macro-add-service",
  "hpl-macro-platform-gate",
+]
+
+[[package]]
+name = "hpl-payment-manager"
+version = "0.0.5-beta.1"
+dependencies = [
+ "anchor-lang 0.28.0",
+ "anchor-spl",
+ "hpl-currency-manager",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-utils",
+ "mpl-bubblegum",
+ "spl-account-compression 0.2.0",
+]
+
+[[package]]
+name = "hpl-resource-manager"
+version = "0.0.5"
+dependencies = [
+ "ahash 0.8.4",
+ "anchor-lang 0.28.0",
+ "anchor-spl",
+ "hpl-compression",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-utils",
+ "mpl-bubblegum",
+ "mpl-token-metadata",
+ "spl-account-compression 0.2.0",
+ "spl-token-2022 0.9.0",
+ "spl-token-metadata-interface",
 ]
 
 [[package]]

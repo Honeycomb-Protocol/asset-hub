@@ -41,11 +41,10 @@ export const initilizeResourceTreeStruct = new beet.BeetArgsStruct<
  * Accounts required by the _initilizeResourceTree_ instruction
  *
  * @property [] project
- * @property [] resource
- * @property [] mint
+ * @property [_writable_] resource
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
- * @property [**signer**] merkleTree
+ * @property [_writable_, **signer**] merkleTree
  * @property [] rentSysvar
  * @property [] compressionProgram
  * @property [] logWrapper
@@ -57,7 +56,6 @@ export const initilizeResourceTreeStruct = new beet.BeetArgsStruct<
 export type InitilizeResourceTreeInstructionAccounts = {
   project: web3.PublicKey
   resource: web3.PublicKey
-  mint: web3.PublicKey
   owner: web3.PublicKey
   payer: web3.PublicKey
   merkleTree: web3.PublicKey
@@ -101,12 +99,7 @@ export function createInitilizeResourceTreeInstruction(
     },
     {
       pubkey: accounts.resource,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.mint,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -121,7 +114,7 @@ export function createInitilizeResourceTreeInstruction(
     },
     {
       pubkey: accounts.merkleTree,
-      isWritable: false,
+      isWritable: true,
       isSigner: true,
     },
     {

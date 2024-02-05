@@ -81,12 +81,7 @@
         },
         {
           "name": "resource",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "mint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -101,7 +96,7 @@
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": true
         },
         {
@@ -168,12 +163,12 @@
         },
         {
           "name": "mint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -185,11 +180,6 @@
           "name": "payer",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "rentSysvar",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -255,12 +245,12 @@
         },
         {
           "name": "mint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
           "name": "merkleTree",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -323,6 +313,200 @@
           "name": "args",
           "type": {
             "defined": "BurnResourceArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "wrapResource",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "resource",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "token22Program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Compression program."
+          ]
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Noop program."
+          ]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "WrapResourceArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "unwrapResource",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "resource",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipientAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "token22Program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Compression program."
+          ]
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL Noop program."
+          ]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UnWrapResourceArgs"
           }
         }
       ]
@@ -449,6 +633,42 @@
           {
             "name": "maxBufferSize",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnWrapResourceArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holdingState",
+            "type": {
+              "defined": "HoldingAccountArgs"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WrapResourceArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holdingState",
+            "type": {
+              "defined": "HoldingAccountArgs"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "u64"
           }
         ]
       }
@@ -742,7 +962,7 @@
     {
       "code": 6001,
       "name": "InsufficientAmount",
-      "msg": "The amount provided for burning is greater than the amount of the held in the account"
+      "msg": "The amount provided is greater than the amount that is held in the account"
     }
   ],
   "metadata": {

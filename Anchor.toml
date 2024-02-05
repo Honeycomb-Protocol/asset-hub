@@ -4,8 +4,8 @@ skip-lint = false
 [programs.devnet]
 anchor_template = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
-
 [provider]
+url = "https://bumpy-concordia-fast-devnet.helius-rpc.com/"
 cluster = "devnet"
 wallet = "key.json"
 

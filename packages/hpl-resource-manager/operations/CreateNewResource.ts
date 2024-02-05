@@ -1,7 +1,10 @@
 import { KeypairLike, Operation } from "@honeycomb-protocol/hive-control";
-import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_2022_PROGRAM_ID,
+} from "@solana/spl-token";
 import { Keypair, PublicKey, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
-import { ResourseKind, createCreateNewResourceInstruction } from "../generated";
+import { ResourseKind, createCreateResourceInstruction } from "../generated";
 import { resourceManagerPdas } from "../utils";
 import { HplResourceManager } from "../HplResource";
 
@@ -31,7 +34,7 @@ export const createNewResource = async (
     mint.publicKey
   );
 
-  const ix = createCreateNewResourceInstruction(
+  const ix = createCreateResourceInstruction(
     {
       payer,
       mint: mint.publicKey,
@@ -40,6 +43,7 @@ export const createNewResource = async (
       owner: params.owner.publicKey,
       rentSysvar: SYSVAR_RENT_PUBKEY,
       token22Program: TOKEN_2022_PROGRAM_ID,
+      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
     },
     {
       args: {

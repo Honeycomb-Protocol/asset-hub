@@ -29,7 +29,7 @@
     "lfg:currency-manager": "yarn build:currency-manager && yarn deploy:currency-manager",
     "lfg:payment-manager": "yarn build:payment-manager && yarn deploy:payment-manager",
     "lfg": "yarn build:all && yarn deploy:all",
-    "test": "jest hpl-resource-manager.high.test.ts",
+    "test": "jest hpl-resource-manager.low.test.ts",
     "compile": "tsc",
     "rollout": "node ./scripts/rollout.js",
     "publishall": "node ./scripts/publishall.js"
