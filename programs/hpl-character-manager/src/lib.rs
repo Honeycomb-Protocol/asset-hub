@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
 mod bubblegum;
+mod metadata;
 
 pub mod errors;
 pub mod events;

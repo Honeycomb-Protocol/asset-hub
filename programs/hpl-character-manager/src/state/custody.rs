@@ -1,4 +1,4 @@
-use {super::CharacterSource, anchor_lang::prelude::*, hpl_utils::traits::*};
+use {super::CharacterSource, anchor_lang::prelude::*};
 
 /// Game character (particulary NFT) PDA Account
 /// PDA: ['character', mint]
@@ -14,10 +14,10 @@ pub struct AssetCustody {
     pub source: Option<CharacterSource>,
 }
 
-impl Default for AssetCustody {
-    const LEN: usize = 8 + 134;
+impl AssetCustody {
+    pub const LEN: usize = 8 + 134;
 
-    fn set_defaults(&mut self) {
+    pub fn set_defaults(&mut self) {
         self.bump = 0;
         self.wallet = Pubkey::default();
         self.character_model = None;

@@ -1068,9 +1068,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-attribute-compressed-account"
-version = "0.0.1-beta.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "236b21dd9d6884c673bed7390909f6167f27f1255cc303fdf9f1adfa9f159fcf"
+version = "0.0.1-beta.1"
 dependencies = [
  "convert_case",
  "proc-macro2",
@@ -1096,61 +1094,25 @@ version = "0.0.2-beta.9"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-compression",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-toolkit",
+ "mpl-bubblegum",
+ "mpl-token-metadata",
+ "spl-account-compression",
+]
+
+[[package]]
+name = "hpl-currency-manager"
+version = "0.0.83-beta.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
  "hpl-events",
  "hpl-hive-control",
  "hpl-macros",
  "hpl-utils",
- "mpl-bubblegum",
- "spl-account-compression",
-]
-
-[[package]]
-name = "hpl-compression"
-version = "0.1.8-beta.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a8884e931e0f9fff2e520db8dde2e23fe5c22254d2770cc11286a9884b638c8"
-dependencies = [
- "anchor-lang",
- "hpl-attribute-compressed-account",
- "hpl-compression-macro-merkle-tree-apply-fn",
- "hpl-compression-macro-merkle-tree-apply-fn-deep",
- "hpl-compression-macro-merkle-tree-utils",
- "serde_json",
- "spl-account-compression",
-]
-
-[[package]]
-name = "hpl-compression-macro-merkle-tree-apply-fn"
-version = "0.0.3-beta.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a68e2aa870424855dac3a7b44740e2cd9c3383aa624633a8d9750222ea05ce4f"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.32",
-]
-
-[[package]]
-name = "hpl-compression-macro-merkle-tree-apply-fn-deep"
-version = "0.0.3-beta.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f8ff570a467cc1cec74c855421bb95079c0595aad984646bb48aee130499988"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.32",
-]
-
-[[package]]
-name = "hpl-compression-macro-merkle-tree-utils"
-version = "0.0.3-beta.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed317c8a828620723875291c255428deecdec8c5b3c1c45e1666256029b2d442"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.32",
 ]
 
 [[package]]
@@ -1209,6 +1171,62 @@ checksum = "5c6711149f771cae31959af1ce6ef86bde0c4e6625f9528f662fd3825edb33c3"
 dependencies = [
  "hpl-macro-add-service",
  "hpl-macro-platform-gate",
+]
+
+[[package]]
+name = "hpl-payment-manager"
+version = "0.0.5-beta.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "hpl-currency-manager",
+ "hpl-events",
+ "hpl-hive-control",
+ "hpl-macros",
+ "hpl-utils",
+ "mpl-bubblegum",
+ "spl-account-compression",
+]
+
+[[package]]
+name = "hpl-toolkit"
+version = "0.0.1-beta.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "hpl-attribute-compressed-account",
+ "hpl-toolkit-macro-merkle-tree-apply-fn",
+ "hpl-toolkit-macro-merkle-tree-apply-fn-deep",
+ "hpl-toolkit-macro-merkle-tree-utils",
+ "serde_json",
+ "spl-account-compression",
+]
+
+[[package]]
+name = "hpl-toolkit-macro-merkle-tree-apply-fn"
+version = "0.0.1-beta.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.32",
+]
+
+[[package]]
+name = "hpl-toolkit-macro-merkle-tree-apply-fn-deep"
+version = "0.0.1-beta.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.32",
+]
+
+[[package]]
+name = "hpl-toolkit-macro-merkle-tree-utils"
+version = "0.0.1-beta.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.32",
 ]
 
 [[package]]

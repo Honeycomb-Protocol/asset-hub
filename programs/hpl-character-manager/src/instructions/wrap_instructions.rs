@@ -1,12 +1,11 @@
 use {
     crate::{errors::HplCharacterManagerError, state::*},
     anchor_lang::prelude::*,
-    hpl_compression::{
+    hpl_hive_control::{program::HplHiveControl, state::Project},
+    hpl_toolkit::{
         merkle_tree_apply_fn_deep, CompressedData, CompressedDataEvent, CompressedDataEventStream,
         ToNode,
     },
-    hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_utils::Default,
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -104,7 +103,7 @@ pub fn wrap_character(ctx: Context<WrapCharacter>) -> Result<()> {
     ];
     let character_model_signer = &[&character_model_seeds[..]];
 
-    hpl_compression::append_leaf(
+    hpl_toolkit::append_leaf(
         character.to_compressed().to_node(),
         &ctx.accounts.character_model.to_account_info(),
         &ctx.accounts.merkle_tree,
@@ -195,7 +194,7 @@ pub fn unwrap_character<'info>(
         used_by: args.used_by.to_node(),
     };
 
-    hpl_compression::verify_leaf(
+    hpl_toolkit::verify_leaf(
         args.root,
         character_compressed.to_node(),
         args.leaf_idx,
@@ -213,7 +212,7 @@ pub fn unwrap_character<'info>(
         slot: ctx.accounts.clock.slot,
         tree_id: ctx.accounts.merkle_tree.key().to_bytes(),
         leaf_idx: args.leaf_idx,
-        seq: hpl_compression::merkle_tree_apply_fn!(merkle_tree_bytes get_seq) + 1,
+        seq: hpl_toolkit::merkle_tree_apply_fn!(merkle_tree_bytes get_seq) + 1,
         stream_type: CompressedDataEventStream::Empty,
     };
     event.wrap(&ctx.accounts.log_wrapper)?;
@@ -226,7 +225,7 @@ pub fn unwrap_character<'info>(
     ];
     let character_model_signer = &[&character_model_seeds[..]];
 
-    hpl_compression::replace_leaf(
+    hpl_toolkit::replace_leaf(
         args.root,
         character_compressed.to_node(),
         [0; 32],

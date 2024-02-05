@@ -1,10 +1,10 @@
-use hpl_compression::CompressedDataChunk;
-
 use {
     crate::{errors::HplCharacterManagerError, state::*},
     anchor_lang::prelude::*,
-    hpl_compression::{merkle_tree_apply_fn_deep, CompressedDataEvent, ToNode},
     hpl_hive_control::{program::HplHiveControl, state::Project},
+    hpl_toolkit::compression::{
+        merkle_tree_apply_fn_deep, CompressedDataChunk, CompressedDataEvent, ToNode,
+    },
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -80,7 +80,7 @@ pub fn use_character<'info>(
         used_by: args.current_used_by.to_node(),
     };
 
-    hpl_compression::verify_leaf(
+    hpl_toolkit::verify_leaf(
         args.root,
         character_compressed.to_node(),
         args.leaf_idx,
@@ -104,7 +104,7 @@ pub fn use_character<'info>(
         slot: ctx.accounts.clock.slot,
         tree_id: ctx.accounts.merkle_tree.key().to_bytes(),
         leaf_idx: args.leaf_idx,
-        seq: hpl_compression::merkle_tree_apply_fn!(merkle_tree_bytes get_seq) + 1,
+        seq: hpl_toolkit::merkle_tree_apply_fn!(merkle_tree_bytes get_seq) + 1,
         stream_type: args.new_used_by.event_stream(),
     };
     event.wrap(&ctx.accounts.log_wrapper)?;
@@ -121,7 +121,7 @@ pub fn use_character<'info>(
     character_compressed.used_by = args.new_used_by.to_node();
     let new_leaf = character_compressed.to_node();
 
-    hpl_compression::replace_leaf(
+    hpl_toolkit::replace_leaf(
         args.root,
         previous_leaf,
         new_leaf,
@@ -204,7 +204,7 @@ pub fn verify_character<'info>(
         used_by: used_by_hash,
     };
 
-    hpl_compression::verify_leaf(
+    hpl_toolkit::verify_leaf(
         args.root,
         character_compressed.to_node(),
         args.leaf_idx,

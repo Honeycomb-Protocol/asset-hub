@@ -1,8 +1,8 @@
 use {
     anchor_lang::{prelude::*, solana_program::keccak},
-    hpl_compression::{
-        compressed_account, CompressedData, CompressedDataChunk, CompressedSchema, Schema,
-        SchemaValue, ToNode,
+    hpl_toolkit::{
+        compressed_account, CompressedData, CompressedDataChunk, Schema, SchemaValue, ToNode,
+        ToSchema,
     },
     spl_account_compression::Node,
     std::collections::HashMap,
@@ -36,7 +36,7 @@ impl CompressedDataChunk for CharacterSource {
     const KEY: &'static str = "source";
 }
 
-impl CompressedSchema for CharacterSource {
+impl ToSchema for CharacterSource {
     fn schema() -> Schema {
         let mut wrapped = HashMap::new();
         wrapped.insert(String::from("mint"), Pubkey::schema());
@@ -99,7 +99,7 @@ pub enum NftWrapCriteria {
     MerkleTree(Pubkey),
 }
 
-impl CompressedSchema for NftWrapCriteria {
+impl ToSchema for NftWrapCriteria {
     fn schema() -> Schema {
         Schema::Enum(vec![
             (String::from("Collection"), Pubkey::schema()),
@@ -170,7 +170,7 @@ impl CompressedDataChunk for CharacterUsedBy {
     const KEY: &'static str = "used_by";
 }
 
-impl CompressedSchema for CharacterUsedBy {
+impl ToSchema for CharacterUsedBy {
     fn schema() -> Schema {
         let mut schema = Vec::<(String, Schema)>::new();
 
@@ -219,12 +219,20 @@ impl CompressedSchema for CharacterUsedBy {
                     Box::new(SchemaValue::Object(staking)),
                 )
             }
-            Self::Mission { id, rewards, end_time, rewards_collected } => {
+            Self::Mission {
+                id,
+                rewards,
+                end_time,
+                rewards_collected,
+            } => {
                 let mut mission = HashMap::new();
                 mission.insert(String::from("id"), id.schema_value());
                 mission.insert(String::from("rewards"), rewards.schema_value());
                 mission.insert(String::from("end_time"), end_time.schema_value());
-                mission.insert(String::from("rewards_collected"), rewards_collected.schema_value());
+                mission.insert(
+                    String::from("rewards_collected"),
+                    rewards_collected.schema_value(),
+                );
 
                 // Add rewards and end_time here
                 SchemaValue::Enum(
@@ -261,16 +269,19 @@ impl ToNode for CharacterUsedBy {
                 claimed_at.to_node().as_ref(),
             ])
             .to_bytes(),
-            Self::Mission { id, rewards, end_time, rewards_collected} => {
-                keccak::hashv(&[
-                    "Missions".as_bytes(),
-                    id.to_node().as_ref(),
-                    rewards.to_node().as_ref(),
-                    end_time.to_node().as_ref(),
-                    rewards_collected.to_node().as_ref(),
-                ])
-                .to_bytes()
-            }
+            Self::Mission {
+                id,
+                rewards,
+                end_time,
+                rewards_collected,
+            } => keccak::hashv(&[
+                "Missions".as_bytes(),
+                id.to_node().as_ref(),
+                rewards.to_node().as_ref(),
+                end_time.to_node().as_ref(),
+                rewards_collected.to_node().as_ref(),
+            ])
+            .to_bytes(),
             Self::Guild { id, role, order } => keccak::hashv(&[
                 "Guild".as_bytes(),
                 id.to_node().as_ref(),
@@ -320,7 +331,7 @@ pub struct EarnedReward {
     pub reward_idx: u8,
 }
 
-impl CompressedSchema for EarnedReward {
+impl ToSchema for EarnedReward {
     fn schema() -> Schema {
         let mut schema = HashMap::new();
 
@@ -356,7 +367,7 @@ pub enum GuildRole {
     Member,
 }
 
-impl CompressedSchema for GuildRole {
+impl ToSchema for GuildRole {
     fn schema() -> Schema {
         Schema::Enum(vec![
             (String::from("Chief"), Schema::Null),

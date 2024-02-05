@@ -1,10 +1,10 @@
 use {
     crate::{events::Event, state::*},
     anchor_lang::prelude::*,
-    hpl_compression::{CompressedDataEvent, Schema},
     hpl_events::HplEvents,
     hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_utils::{reallocate, traits::Default},
+    hpl_toolkit::reallocate,
+    hpl_toolkit::{CompressedDataEvent, Schema},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -175,7 +175,7 @@ pub fn create_new_characters_tree(
     ];
     let character_model_signer = &[&character_model_seeds[..]];
 
-    hpl_compression::init_tree(
+    hpl_toolkit::init_tree(
         args.max_depth,
         args.max_buffer_size,
         &character_model.to_account_info(),

@@ -2,7 +2,6 @@ use {
     crate::{errors::HplCharacterManagerError, state::*},
     anchor_lang::prelude::*,
     hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_utils::Default,
     mpl_bubblegum::{programs::MPL_BUBBLEGUM_ID, utils::get_asset_id},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
