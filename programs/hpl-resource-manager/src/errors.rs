@@ -5,6 +5,6 @@ pub enum ResourceErrorCode {
     #[msg("The resource is not initialized")]
     ResourceNotInitialized,
 
-    #[msg("The amount provided for burning is greater than the amount of the held in the account")]
+    #[msg("The amount provided is greater than the amount that is held in the account")]
     InsufficientAmount,
 }
