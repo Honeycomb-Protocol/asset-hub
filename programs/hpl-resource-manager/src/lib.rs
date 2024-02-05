@@ -37,4 +37,18 @@ pub mod hpl_resource_manager {
     ) -> Result<()> {
         instructions::burn_resource(ctx, args)
     }
+
+    pub fn wrap_resource<'info>(
+        ctx: Context<'_, '_, '_, 'info, WrapResource<'info>>,
+        args: WrapResourceArgs,
+    ) -> Result<()> {
+        instructions::wrap_resource(ctx, args)
+    }
+
+    pub fn unwrap_resource<'info>(
+        ctx: Context<'_, '_, '_, 'info, UnWrapResource<'info>>,
+        args: UnWrapResourceArgs,
+    ) -> Result<()> {
+        instructions::unwrap_resource(ctx, args)
+    }
 }

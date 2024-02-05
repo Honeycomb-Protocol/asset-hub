@@ -95,12 +95,8 @@ pub struct InitilizeResourceTree<'info> {
     #[account()]
     pub project: Box<Account<'info, Project>>,
 
-    #[account(has_one = project, has_one = mint)]
+    #[account(mut, has_one = project)]
     pub resource: Box<Account<'info, Resource>>,
-
-    /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account()]
-    pub mint: AccountInfo<'info>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -108,7 +104,7 @@ pub struct InitilizeResourceTree<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account()]
+    #[account(mut)]
     pub merkle_tree: Signer<'info>,
 
     pub rent_sysvar: Sysvar<'info, Rent>,
@@ -140,6 +136,7 @@ pub fn initilize_resource_tree(
 ) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
 
+    msg!("Reallocating resource account to fit the merkle tree.");
     reallocate(
         32,
         resource.to_account_info(),
@@ -148,12 +145,14 @@ pub fn initilize_resource_tree(
         &ctx.accounts.system_program,
     )?;
 
+    msg!("Initializing the resource tree.");
     // create the compressed token account using controlled merkle tree
     resource
         .merkle_trees
         .merkle_trees
         .push(ctx.accounts.merkle_tree.key());
 
+    msg!("Creating the merkle tree for the resource.");
     // create the merkle tree for the resource
     let bump_binding = [resource.bump];
     let signer_seeds = resource.seeds(&bump_binding);
