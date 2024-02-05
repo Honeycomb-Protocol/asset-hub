@@ -1,10 +1,15 @@
 use {
     crate::Resource,
     anchor_lang::prelude::*,
+    core::slice,
     spl_token_2022::{
-        extension::{metadata_pointer, ExtensionType},
+        extension::{
+            metadata_pointer::{self, MetadataPointer},
+            BaseStateWithExtensions, ExtensionType, StateWithExtensionsMut,
+        },
         instruction::{
-            initialize_mint2, initialize_mint_close_authority, initialize_permanent_delegate,
+            burn, initialize_mint2, initialize_mint_close_authority, initialize_permanent_delegate,
+            mint_to,
         },
         solana_program::{
             instruction::Instruction,
@@ -103,7 +108,15 @@ pub fn create_mint_with_extensions<'info>(
         &payer.key(),
         &mint.key(),
         rent_sysvar.minimum_balance(
-            space + 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len() + 8, // funding the account with extra space for metadata
+            space
+                + 68
+                + 12
+                + metadata.name.len()
+                + metadata.symbol.len()
+                + metadata.uri.len()
+                + 8
+                + 32
+                + 32, // funding the account with extra space for metadata
         ),
         space as u64,
         &token22_program.key(),
@@ -260,9 +273,15 @@ pub fn update_metadata_for_mint<'info>(
 
 pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) -> Result<TokenMetadata> {
     let data = mint.try_borrow_data().unwrap();
-    let mint = Mint::get_packed_len();
-    let mut slice = &data.deref().to_vec()[mint..];
-    let mint_data = TokenMetadata::deserialize(&mut slice)?;
+    let slice = data.deref().to_vec();
+    // let mint_account_with_extensions =
+    //     StateWithExtensionsMut::<Mint>::unpack_uninitialized(&mut data.to_vec()[..])?;
+
+    // let t = mint_account_with_extensions.get_extension_types();
+
+    let mint_size = 170 as usize;
+    let mint_data = TokenMetadata::deserialize(&mut &slice[mint_size..])?;
+
     Ok(mint_data)
 }
 
@@ -274,17 +293,21 @@ pub fn update_compressed_supply<'info>(
 ) -> Result<()> {
     let resource_metadata = get_mint_metadata(mint.to_account_info()).unwrap();
 
-    let new_supply = resource_metadata
-        .additional_metadata
-        .iter()
-        .find_map(|(key, value)| {
-            if key == "compressed_supply" {
-                Some(value.parse::<u64>().unwrap())
-            } else {
-                None
-            }
-        })
-        .unwrap();
+    let mut new_supply = 0;
+
+    if resource_metadata.additional_metadata.len() > 0 {
+        new_supply = resource_metadata
+            .additional_metadata
+            .iter()
+            .find_map(|(key, value)| {
+                if key == "compressed_supply" {
+                    Some(value.parse::<u64>().unwrap())
+                } else {
+                    None
+                }
+            })
+            .unwrap();
+    }
 
     // updateing the compressed supply from mint's metadata
     update_metadata_for_mint(
@@ -299,6 +322,72 @@ pub fn update_compressed_supply<'info>(
             uri: None,
         },
     )?;
+
+    Ok(())
+}
+
+pub fn mint_tokens<'info>(
+    token_program_id: &AccountInfo<'info>,
+    mint: &AccountInfo<'info>,
+    token_account: &AccountInfo<'info>,
+    receiver: &AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
+    amount: u64,
+) -> Result<()> {
+    let mint_to_instruction = mint_to(
+        &token_program_id.key(),
+        &mint.key(),
+        &token_account.key(),
+        &receiver.key(),
+        &[&receiver.key()],
+        amount,
+    )
+    .unwrap();
+
+    msg!("Minting to account");
+    invoke(
+        &mint_to_instruction,
+        &[
+            mint.to_owned(),
+            token_account.to_owned(),
+            receiver.to_owned(),
+            resource.to_account_info(),
+        ],
+    )
+    .unwrap();
+
+    Ok(())
+}
+
+pub fn burn_tokens<'info>(
+    token_program_id: &AccountInfo<'info>,
+    mint: &AccountInfo<'info>,
+    token_account: &AccountInfo<'info>,
+    receiver: &AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
+    amount: u64,
+) -> Result<()> {
+    let burn_instruction = burn(
+        &token_program_id.key(),
+        &token_account.key(),
+        &mint.key(),
+        &receiver.key(),
+        &[&receiver.key()],
+        amount,
+    )
+    .unwrap();
+
+    msg!("Burning from account");
+    invoke(
+        &burn_instruction,
+        &[
+            token_account.to_owned(),
+            mint.to_owned(),
+            receiver.to_owned(),
+            receiver.to_account_info(),
+        ],
+    )
+    .unwrap();
 
     Ok(())
 }
