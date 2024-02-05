@@ -1,8 +1,5 @@
 use {
-    crate::{
-        errors::ResourceErrorCode, utils::update_compressed_supply, Holding, HoldingAccountArgs,
-        Resource,
-    },
+    crate::{errors::ResourceErrorCode, Holding, HoldingAccountArgs, Resource},
     anchor_lang::prelude::*,
     anchor_spl::token::Token,
     hpl_compression::{verify_leaf, CompressedData, CompressedDataEvent, ToNode},
@@ -20,11 +17,11 @@ pub struct MintResource<'info> {
     pub resource: Box<Account<'info, Resource>>,
 
     /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account()]
+    #[account(mut, constraint = resource.mint == mint.key())]
     pub mint: AccountInfo<'info>,
 
     /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account()]
+    #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
     #[account(mut)]
@@ -32,8 +29,6 @@ pub struct MintResource<'info> {
 
     #[account(mut)]
     pub payer: Signer<'info>,
-
-    pub rent_sysvar: Sysvar<'info, Rent>,
 
     pub system_program: Program<'info, System>,
 
@@ -110,11 +105,13 @@ pub fn mint_resource<'info>(
             Some(&[&signer_seeds[..]]),
         )?;
     } else {
+        msg!("Minting without default holding state");
         let holding_account = Holding {
             holder: ctx.accounts.owner.key(),
             balance: args.amount,
         };
 
+        msg!("Event Stream ");
         // event
         let event = CompressedDataEvent::Leaf {
             slot: ctx.accounts.clock.slot,
@@ -125,6 +122,7 @@ pub fn mint_resource<'info>(
         };
         event.wrap(&ctx.accounts.log_wrapper)?;
 
+        msg!("Compressing the holding account");
         // create the compressed token account using controlled merkle tree
         let compressed_holding = holding_account.to_compressed();
         let bump_binding = [resource.bump];
@@ -140,13 +138,14 @@ pub fn mint_resource<'info>(
         )?;
     }
 
+    msg!("Minting the token");
     // update compress supply in mint's metadata
-    update_compressed_supply(
-        ctx.accounts.token22_program.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-        &resource,
-        args.amount,
-    )?;
+    // update_compressed_supply(
+    //     ctx.accounts.token22_program.to_account_info(),
+    //     ctx.accounts.mint.to_account_info(),
+    //     &resource,
+    //     args.amount,
+    // )?;
 
     Ok(())
 }
@@ -160,11 +159,11 @@ pub struct BurnResource<'info> {
     pub resource: Box<Account<'info, Resource>>,
 
     /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account()]
+    #[account(mut)]
     pub mint: AccountInfo<'info>,
 
     /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account()]
+    #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
     #[account(mut)]
@@ -238,6 +237,13 @@ pub fn burn_resource<'info>(
     };
     event.wrap(&ctx.accounts.log_wrapper)?;
 
+    let new_leaf;
+    if args.holding_state.holding.balance - args.amount > 0 {
+        new_leaf = new_holding_state.to_compressed().to_node();
+    } else {
+        new_leaf = [0; 32];
+    }
+
     let bump_binding = [resource.bump];
     let signer_seeds = resource.seeds(&bump_binding);
 
@@ -245,7 +251,7 @@ pub fn burn_resource<'info>(
     hpl_compression::replace_leaf(
         args.holding_state.root,
         args.holding_state.holding.to_compressed().to_node(),
-        new_holding_state.to_compressed().to_node(),
+        new_leaf,
         args.holding_state.leaf_idx,
         &resource.to_account_info(),
         &ctx.accounts.merkle_tree,
