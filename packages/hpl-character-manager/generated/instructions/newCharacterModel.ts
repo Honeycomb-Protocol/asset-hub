@@ -46,7 +46,6 @@ export const newCharacterModelStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] hiveControl
- * @property [] hplEvents
  * @property [] clock
  * @property [] instructionsSysvar
  * @category Instructions
@@ -62,7 +61,6 @@ export type NewCharacterModelInstructionAccounts = {
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
   hiveControl: web3.PublicKey
-  hplEvents: web3.PublicKey
   clock: web3.PublicKey
   instructionsSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -129,11 +127,6 @@ export function createNewCharacterModelInstruction(
     },
     {
       pubkey: accounts.hiveControl,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.hplEvents,
       isWritable: false,
       isSigner: false,
     },

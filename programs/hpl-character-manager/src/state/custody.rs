@@ -1,8 +1,9 @@
-use {super::CharacterSource, anchor_lang::prelude::*};
+use {super::CharacterSource, anchor_lang::prelude::*, hpl_toolkit::schema::*};
 
 /// Game character (particulary NFT) PDA Account
 /// PDA: ['character', mint]
 /// Category: nft_state
+#[derive(ToSchema)]
 #[account]
 pub struct AssetCustody {
     pub bump: u8,

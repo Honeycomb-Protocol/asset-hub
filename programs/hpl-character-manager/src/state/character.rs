@@ -36,7 +36,7 @@ impl CharacterSource {
     }
 }
 
-#[derive(ToSchema, AnchorSerialize, AnchorDeserialize, Clone, ToNode)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema, ToNode)]
 pub enum NftWrapCriteria {
     Collection(Pubkey),
     Creator(Pubkey),

@@ -2,7 +2,7 @@ use {
     super::{CharacterSchema, NftWrapCriteria},
     crate::errors::HplCharacterManagerError,
     anchor_lang::prelude::*,
-    hpl_toolkit::{ControlledMerkleTrees, Schema, ToSchema},
+    hpl_toolkit::{compression::ControlledMerkleTrees, schema::*},
 };
 
 /// Game character (particulary NFT) PDA Account
@@ -11,6 +11,7 @@ use {
 ///
 /// Category: nft_state
 #[account]
+#[derive(ToSchema)]
 pub struct CharacterModel {
     pub bump: u8,
 
@@ -62,7 +63,7 @@ impl CharacterModel {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema)]
 pub enum CharacterConfig {
     Wrapped(Vec<NftWrapCriteria>),
     // ... rest

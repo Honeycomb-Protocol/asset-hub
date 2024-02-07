@@ -1,7 +1,6 @@
 use {
-    crate::{events::Event, state::*},
+    crate::state::*,
     anchor_lang::prelude::*,
-    hpl_events::HplEvents,
     hpl_hive_control::{program::HplHiveControl, state::Project},
     hpl_toolkit::reallocate,
     hpl_toolkit::{CompressedDataEvent, Schema},
@@ -45,9 +44,6 @@ pub struct NewCharacterModel<'info> {
     /// HPL Hive Control Program
     pub hive_control: Program<'info, HplHiveControl>,
 
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
-
     /// NATIVE CLOCK SYSVAR
     pub clock: Sysvar<'info, Clock>,
 
@@ -77,13 +73,6 @@ pub fn new_character_model(
     character_model.config = args.config;
     character_model.attributes = args.attributes;
 
-    Event::character_model(
-        character_model.key(),
-        character_model.try_to_vec().unwrap(),
-        &ctx.accounts.clock,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
-
     Ok(())
 }
 
@@ -112,9 +101,6 @@ pub struct CreateNewCharactersTree<'info> {
 
     /// The system program.
     pub system_program: Program<'info, System>,
-
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
 
     /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
@@ -184,13 +170,6 @@ pub fn create_new_characters_tree(
         &ctx.accounts.log_wrapper,
         Some(character_model_signer),
     )?;
-
-    Event::character_model(
-        character_model.key(),
-        character_model.try_to_vec().unwrap(),
-        &ctx.accounts.clock,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }

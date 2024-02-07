@@ -1,38 +1,36 @@
+import base58 from "bs58";
 import * as web3 from "@solana/web3.js";
-import {
-  Honeycomb,
-  HoneycombProject,
-  Operation,
-  VAULT,
-} from "@honeycomb-protocol/hive-control";
+import { Honeycomb, HoneycombProject } from "@honeycomb-protocol/hive-control";
 import getHoneycombs from "../scripts/prepare";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import { createNewTree, mintOneCNFT } from "./helpers";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
-import {
-  SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-  SPL_NOOP_PROGRAM_ID,
-  ValidDepthSizePair,
-  getConcurrentMerkleTreeAccountSize,
-} from "@solana/spl-account-compression";
+
+import { Client, cacheExchange, fetchExchange } from "@urql/core";
 
 import {
   HplCharacter,
   HplCharacterModel,
-  createCreateNewCharactersTreeInstruction,
   createNewCharacterModelOperation,
   createWrapAssetOperation,
   fetchHeliusAssets,
   createUnwrapAssetOperation,
   createCreateNewCharactersTreeOperation,
 } from "../packages/hpl-character-manager";
+import createEdgeClient from "@honeycomb-protocol/edge-client/client";
 
 jest.setTimeout(200000);
 
 describe("Character Manager", () => {
   const totalNfts = 1;
   const totalcNfts = 1;
+
+  const client = createEdgeClient(
+    new Client({
+      url: "http://localhost:4001",
+      exchanges: [cacheExchange, fetchExchange],
+    })
+  );
 
   let adminHC: Honeycomb;
   let userHC: Honeycomb;
@@ -41,7 +39,6 @@ describe("Character Manager", () => {
   let merkleTree: web3.PublicKey;
   let characterModelAddress: web3.PublicKey;
   let characterModel: HplCharacterModel;
-  let character: HplCharacter;
 
   it("Prepare", async () => {
     const honeycombs = await getHoneycombs();
@@ -107,7 +104,7 @@ describe("Character Manager", () => {
       });
     }
 
-    // await new Promise((resolve) => setTimeout(resolve, 30000));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
 
     adminHC.use(
       await HoneycombProject.new(adminHC, {
@@ -116,6 +113,7 @@ describe("Character Manager", () => {
         profileDataConfigs: [],
       })
     );
+    console.log("Project", adminHC.project().address.toString());
     expect(adminHC.project().name).toBe("Project");
   });
 
@@ -173,7 +171,7 @@ describe("Character Manager", () => {
     } catch {
       const [{ signature }] = await (
         await createCreateNewCharactersTreeOperation(adminHC, {
-          project: adminHC.identity().address,
+          project: adminHC.project().address,
           characterModel: characterModelAddress,
           depthSizePair: {
             maxDepth: 3,
@@ -196,72 +194,86 @@ describe("Character Manager", () => {
     );
   });
 
-  it("Wrap NFT to Character", async () => {
+  it("Wrap Assets to Character", async () => {
     const wallet = userHC.identity().address;
 
-    const nfts = await fetchHeliusAssets(userHC.rpcEndpoint, {
+    const assets = await fetchHeliusAssets(userHC.rpcEndpoint, {
       walletAddress: wallet,
       collectionAddress: collection,
-    }).then((nfts) => nfts.filter((n) => !n.frozen && !n.isCompressed));
+    }).then((assets) => assets.filter((n) => !n.frozen));
 
-    if (!nfts.length) throw new Error("No Nfts to wrap");
+    if (!assets.length) throw new Error("No Assets to wrap");
 
-    (
-      await createWrapAssetOperation(userHC, {
-        asset: nfts[0],
-        characterModel,
-      })
-    ).operation.send();
+    const { createWrapAssetsToCharacterTransactions: txResponse } =
+      await client.createWrapAssetsToCharacterTransactions({
+        project: adminHC.project().address.toString(),
+        characterModel: characterModelAddress.toString(),
+        activeCharactersMerkleTree:
+          characterModel.activeCharactersMerkleTree.toString(),
+        wallet: wallet.toString(),
+        mintList: assets.map((n) => n.mint.toString()),
+      });
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const signedTxs = await userHC
+      .identity()
+      .signAllTransactions(
+        txResponse!.transactions.map((tx) =>
+          web3.Transaction.from(base58.decode(tx))
+        )
+      );
 
-    character = (
-      await HplCharacter.fetchWithWallet(
-        userHC.rpcEndpoint,
-        userHC.identity().address
-      )
-    )[0];
+    const { sendBulkTransactions } = await client.sendBulkTransactions({
+      txs: signedTxs.map((tx) => base58.encode(tx.serialize())),
+      blockhash: txResponse!.blockhash,
+      lastValidBlockHeight: txResponse!.lastValidBlockHeight,
+    });
 
-    console.log("Character", character);
+    if (!sendBulkTransactions)
+      throw new Error("Failed to send wrap transactions");
+
+    console.log("Wrap txs", sendBulkTransactions);
   });
 
-  it.skip("Wrap cNFT to Character", async () => {
-    const wallet = userHC.identity().address;
+  it("Unwrap Assets from Character", async () => {
+    const { character } = await client.findCharacters({
+      filters: {
+        owner: userHC.identity().address.toString(),
+      },
+      trees: characterModel.merkleTrees.map((x) => x.toString()),
+    });
 
-    const nfts = await fetchHeliusAssets(userHC.rpcEndpoint, {
-      walletAddress: wallet,
-      collectionAddress: collection,
-    }).then((nfts) => nfts.filter((n) => !n.frozen && n.isCompressed));
+    if (!character?.length) throw new Error("No characters to unwrap");
 
-    if (!nfts.length) throw new Error("No Nfts to wrap");
+    console.log(
+      "Characters",
+      character.map((x) => x!.id)
+    );
 
-    (
-      await createWrapAssetOperation(userHC, {
-        asset: nfts[0],
-        characterModel,
-      })
-    ).operation.send();
+    const { createUnwrapAssetsFromCharacterTransactions: txResponse } =
+      await client.createUnwrapAssetsFromCharacterTransactions({
+        characterIds: character.map((x) => x!.id),
+        project: adminHC.project().address.toString(),
+        characterModel: characterModelAddress.toString(),
+        wallet: userHC.identity().address.toString(),
+      });
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const signedTxs = await userHC
+      .identity()
+      .signAllTransactions(
+        txResponse!.transactions.map((tx) =>
+          web3.Transaction.from(base58.decode(tx))
+        )
+      );
 
-    character = (
-      await HplCharacter.fetchWithWallet(
-        userHC.rpcEndpoint,
-        userHC.identity().address
-      )
-    )[0];
+    const { sendBulkTransactions } = await client.sendBulkTransactions({
+      txs: signedTxs.map((tx) => base58.encode(tx.serialize())),
+      blockhash: txResponse!.blockhash,
+      lastValidBlockHeight: txResponse!.lastValidBlockHeight,
+    });
 
-    console.log("Character", character);
-  });
+    if (!sendBulkTransactions)
+      throw new Error("Failed to send unwrap transactions");
 
-  it.skip("Unwrap NFT from Character", async () => {
-    if (!character) throw new Error("Character not found");
-
-    (
-      await createUnwrapAssetOperation(userHC, {
-        characterModel,
-        character,
-      })
-    ).operation.send();
+    console.log("Unwrap txs", sendBulkTransactions);
   });
 });
