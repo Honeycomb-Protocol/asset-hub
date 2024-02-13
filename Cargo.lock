@@ -1080,7 +1080,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-character-manager"
-version = "0.0.2-beta.10"
+version = "0.0.2-beta.11"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
