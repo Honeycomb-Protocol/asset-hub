@@ -6,11 +6,10 @@ use {
         token::{self, Mint, Token, TokenAccount},
     },
     hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_utils::mpl_token_metadata::{
+    mpl_token_metadata::{
         instruction::{DelegateArgs, RevokeArgs},
         state::{Metadata, TokenMetadataAccount},
     },
-    hpl_utils::Default,
 };
 
 /// Accounts used in init NFT instruction
@@ -81,7 +80,7 @@ pub struct DepositNft<'info> {
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = hpl_utils::mpl_token_metadata::ID)]
+    #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
 
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -158,7 +157,7 @@ pub fn deposit_nft(ctx: Context<DepositNft>) -> Result<()> {
 
     let args: Result<DelegateArgs> = match metadata.token_standard {
         Some(token_standard) => match token_standard {
-            hpl_utils::mpl_token_metadata::state::TokenStandard::ProgrammableNonFungible => {
+            mpl_token_metadata::state::TokenStandard::ProgrammableNonFungible => {
                 Ok(DelegateArgs::StakingV1 {
                     amount: 1,
                     authorization_data: None,
@@ -177,7 +176,7 @@ pub fn deposit_nft(ctx: Context<DepositNft>) -> Result<()> {
     ];
     let character_model_signer = &[&character_model_seeds[..]];
 
-    hpl_utils::delegate(
+    crate::metadata::delegate(
         args.unwrap(),
         None,
         ctx.accounts.character_model.to_account_info(),
@@ -196,7 +195,7 @@ pub fn deposit_nft(ctx: Context<DepositNft>) -> Result<()> {
         None,
     )?;
 
-    hpl_utils::lock(
+    crate::metadata::lock(
         ctx.accounts.character_model.to_account_info(),
         ctx.accounts.nft_mint.to_account_info(),
         ctx.accounts.nft_account.to_account_info(),
@@ -286,7 +285,7 @@ pub struct WithdrawNft<'info> {
 
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = hpl_utils::mpl_token_metadata::ID)]
+    #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
 
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -321,7 +320,7 @@ pub fn withdraw_nft(ctx: Context<WithdrawNft>) -> Result<()> {
 
     let args: Result<RevokeArgs> = match metadata.token_standard {
         Some(token_standard) => match token_standard {
-            hpl_utils::mpl_token_metadata::state::TokenStandard::ProgrammableNonFungible => {
+            mpl_token_metadata::state::TokenStandard::ProgrammableNonFungible => {
                 Ok(RevokeArgs::StakingV1)
             }
             _ => Ok(RevokeArgs::StandardV1),
@@ -337,7 +336,7 @@ pub fn withdraw_nft(ctx: Context<WithdrawNft>) -> Result<()> {
     ];
     let character_model_signer = &[&character_model_seeds[..]];
 
-    hpl_utils::unlock(
+    crate::metadata::unlock(
         ctx.accounts.character_model.to_account_info(),
         ctx.accounts.nft_mint.to_account_info(),
         ctx.accounts.nft_account.to_account_info(),
@@ -354,7 +353,7 @@ pub fn withdraw_nft(ctx: Context<WithdrawNft>) -> Result<()> {
         Some(character_model_signer),
     )?;
 
-    hpl_utils::revoke(
+    crate::metadata::revoke(
         args.unwrap(),
         None,
         ctx.accounts.character_model.to_account_info(),

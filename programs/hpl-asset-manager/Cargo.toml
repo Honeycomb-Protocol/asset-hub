@@ -20,7 +20,10 @@ default = []
 [dependencies]
 anchor-lang = { workspace = true }
 anchor-spl = { workspace = true }
-hpl-macros = { workspace = true }
+hpl-toolkit = { workspace = true, features = [
+  "macros",
+], default-features = false }
+
 hpl-utils = { workspace = true }
 hpl-events = { workspace = true }
 hpl-hive-control = { workspace = true }

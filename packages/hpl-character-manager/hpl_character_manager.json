@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-beta.9",
+  "version": "0.0.2-beta.10",
   "name": "hpl_character_manager",
   "instructions": [
     {
@@ -55,14 +55,6 @@
           "isSigner": false,
           "docs": [
             "HPL Hive Control Program"
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -136,14 +128,6 @@
           "isSigner": false,
           "docs": [
             "The system program."
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -1420,27 +1404,6 @@
           {
             "name": "rewardIdx",
             "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Event",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "CharacterModel",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
           }
         ]
       }

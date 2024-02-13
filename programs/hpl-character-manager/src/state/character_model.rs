@@ -2,8 +2,7 @@ use {
     super::{CharacterSchema, NftWrapCriteria},
     crate::errors::HplCharacterManagerError,
     anchor_lang::prelude::*,
-    hpl_compression::{CompressedSchema, ControlledMerkleTrees, Schema},
-    hpl_utils::traits::*,
+    hpl_toolkit::{compression::ControlledMerkleTrees, schema::*},
 };
 
 /// Game character (particulary NFT) PDA Account
@@ -12,6 +11,7 @@ use {
 ///
 /// Category: nft_state
 #[account]
+#[derive(ToSchema)]
 pub struct CharacterModel {
     pub bump: u8,
 
@@ -31,10 +31,10 @@ pub struct CharacterModel {
     pub merkle_trees: ControlledMerkleTrees,
 }
 
-impl Default for CharacterModel {
-    const LEN: usize = 8 + 200;
+impl CharacterModel {
+    pub const LEN: usize = 8 + 200;
 
-    fn set_defaults(&mut self) {
+    pub fn set_defaults(&mut self) {
         self.bump = 0;
         self.project = Pubkey::default();
         self.config = CharacterConfig::Wrapped(Vec::new());
@@ -45,9 +45,7 @@ impl Default for CharacterModel {
             schema: CharacterSchema::schema(),
         }
     }
-}
 
-impl CharacterModel {
     pub fn get_size(attributes: &Schema, config: &CharacterConfig) -> usize {
         8 + 1
             + 32
@@ -65,7 +63,7 @@ impl CharacterModel {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema)]
 pub enum CharacterConfig {
     Wrapped(Vec<NftWrapCriteria>),
     // ... rest
