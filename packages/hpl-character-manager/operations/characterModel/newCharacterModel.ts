@@ -78,7 +78,6 @@ export async function createNewCharacterModelOperation(
         vault: VAULT,
         systemProgram: web3.SystemProgram.programId,
         hiveControl: HPL_HIVE_CONTROL_PROGRAM,
-        hplEvents: HPL_EVENTS_PROGRAM,
         clock: web3.SYSVAR_CLOCK_PUBKEY,
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       },

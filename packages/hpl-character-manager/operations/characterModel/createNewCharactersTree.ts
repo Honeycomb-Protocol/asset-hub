@@ -92,7 +92,6 @@ export async function createCreateNewCharactersTreeOperation(
           payer: honeycomb.identity().address,
           vault: VAULT,
           systemProgram: web3.SystemProgram.programId,
-          hplEvents: HPL_EVENTS_PROGRAM,
           compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
           logWrapper: SPL_NOOP_PROGRAM_ID,
           clock: web3.SYSVAR_CLOCK_PUBKEY,

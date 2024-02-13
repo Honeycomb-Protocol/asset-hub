@@ -8,7 +8,7 @@ anchor_template = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "https://devnet.helius-rpc.com/?api-key=602a4f6c-b7a1-4d05-ab31-ad267e887f39"
 wallet = "key.json"
 
 [scripts]

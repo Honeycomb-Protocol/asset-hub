@@ -1115,9 +1115,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.2.18"
+version = "0.2.19-beta.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3305e603ad9630c58efb3d103a0761e611a7e1f9e1c2e6d262dfefe04ba7af8"
+checksum = "a7261f4032b630931fd6954421b4a0b1be8e2f5249c59edc9790152267264485"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1176,9 +1176,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-toolkit"
-version = "0.0.3-beta.4"
+version = "0.0.3-beta.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a13a54689edb87e986dc9223236b986c65bd38f76882439f540a3e81fa37feae"
+checksum = "02c6e935889dc7725015eaad6047f4880b444abfba4fa6bb206cf3459baa7daf"
 dependencies = [
  "anchor-lang",
  "hpl-toolkit-attribute-account-schemas-ix-injector",
@@ -1190,15 +1190,16 @@ dependencies = [
  "hpl-toolkit-macro-merkle-tree-apply-fn-deep",
  "hpl-toolkit-macro-merkle-tree-utils",
  "hpl-toolkit-macro-platform-gate",
+ "log",
  "serde_json",
  "spl-account-compression",
 ]
 
 [[package]]
 name = "hpl-toolkit-attribute-account-schemas-ix-injector"
-version = "0.0.1-beta.3"
+version = "0.0.1-beta.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "692acbe1408af461f469a42272bf2f54cf86a8e060e97084d105ad6436f63f63"
+checksum = "521d9425870edfcc6b91cb96b3a739b56d939f85327a88ae8f66712927e8e300"
 dependencies = [
  "convert_case",
  "proc-macro2",
