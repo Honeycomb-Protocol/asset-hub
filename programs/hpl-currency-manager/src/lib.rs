@@ -16,6 +16,9 @@ use {
 };
 
 /// The entry point for the HPL currency manager program.
+#[cfg(not(feature = "cpi"))]
+use hpl_toolkit::schema::*;
+#[cfg_attr(not(feature = "cpi"), account_schemas_ix_injector(Currency HolderAccount))]
 #[program]
 pub mod hpl_currency_manager {
     use super::*;

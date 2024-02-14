@@ -1,9 +1,6 @@
 {
   "version": "0.0.84-beta.2",
   "name": "hpl_currency_manager",
-  "docs": [
-    "The entry point for the HPL currency manager program."
-  ],
   "instructions": [
     {
       "name": "createCurrency",
