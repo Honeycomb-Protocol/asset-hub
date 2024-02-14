@@ -1,3 +1,4 @@
+pub mod burn;
 pub mod token;
 
-pub use token::*;
+pub use {burn::*, token::*};
