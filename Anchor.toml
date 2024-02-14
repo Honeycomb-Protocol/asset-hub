@@ -5,8 +5,8 @@ skip-lint = false
 anchor_template = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [provider]
-cluster = "https://rpc.eboy.dev"
-# cluster = "localnet"
+url = "https://bumpy-concordia-fast-devnet.helius-rpc.com/"
+cluster = "devnet"
 wallet = "key.json"
 
 [scripts]

@@ -7,7 +7,4 @@ pub enum ResourceErrorCode {
 
     #[msg("The amount provided is greater than the amount that is held in the account")]
     InsufficientAmount,
-
-    #[msg("The amount was not provided. for the resipe")]
-    UnProvidedAmount,
 }

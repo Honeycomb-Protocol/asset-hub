@@ -51,11 +51,4 @@ pub mod hpl_resource_manager {
     ) -> Result<()> {
         instructions::unwrap_resource(ctx, args)
     }
-
-    pub fn initilize_recipe(
-        ctx: Context<InitilizeRecipe>,
-        args: InitilizeRecipieArgs,
-    ) -> Result<()> {
-        instructions::initilize_recipe(ctx, args)
-    }
 }

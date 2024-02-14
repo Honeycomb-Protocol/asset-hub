@@ -205,7 +205,6 @@ pub fn burn_resource<'info>(
 ) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
 
-    msg!("verifying leaf");
     // verify the holding account leaf
     verify_leaf(
         args.holding_state.root,
@@ -216,7 +215,6 @@ pub fn burn_resource<'info>(
         ctx.remaining_accounts.to_vec(),
     )?;
 
-    msg!("checking for InsufficientAmount");
     if args.amount > args.holding_state.holding.balance {
         return Err(ResourceErrorCode::InsufficientAmount.into());
     }

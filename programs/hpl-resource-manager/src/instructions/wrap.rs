@@ -5,12 +5,12 @@ use {
     anchor_lang::prelude::*,
     anchor_spl::{
         associated_token::AssociatedToken,
-        token::{close_account, CloseAccount},
-        token_interface::{ TokenAccount, TokenInterface, Mint},
+        token::{Token, TokenAccount, close_account, CloseAccount},
     },
     hpl_compression::{verify_leaf, CompressedData, CompressedDataEvent, ToNode},
     hpl_hive_control::state::Project,
     spl_account_compression::{program::SplAccountCompression, Noop},
+    spl_token_2022::ID as Token2022,
 };
 
 #[derive(Accounts)]
@@ -21,8 +21,9 @@ pub struct WrapResource<'info> {
     #[account(has_one = project, has_one = mint)]
     pub resource: Box<Account<'info, Resource>>,
 
+    /// CHECK: this is not dangerous. we are not reading & writing from it
     #[account(mut, constraint = resource.mint == mint.key())]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
+    pub mint: AccountInfo<'info>,
 
     /// CHECK: this is not dangerous. we are not reading & writing from it
     #[account(mut)]
@@ -33,7 +34,7 @@ pub struct WrapResource<'info> {
         constraint = token_account.owner == owner.key(),
         constraint = token_account.mint == mint.key()
     )]
-    pub token_account: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub token_account: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -45,8 +46,12 @@ pub struct WrapResource<'info> {
 
     pub system_program: Program<'info, System>,
 
+    /// CHECK: this is not dangerous. we are not reading & writing from it
+    #[account(address = Token2022)]
+    pub token22_program: AccountInfo<'info>,
+
     /// SPL TOKEN PROGRAM
-    pub token_program: Interface<'info, TokenInterface>,
+    pub token_program: Program<'info, Token>,
 
     /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
@@ -77,11 +82,10 @@ pub fn wrap_resource<'info>(
         return Err(ResourceErrorCode::InsufficientAmount.into());
     }
 
-    msg!("burning tokens");
      // transfer the amount to the owner
      burn_tokens(
         &ctx.accounts.token_program,
-        &ctx.accounts.mint.to_account_info(),
+        &ctx.accounts.mint,
         &ctx.accounts.token_account.to_account_info(),
         &ctx.accounts.owner.to_account_info(),
         &resource,
@@ -91,7 +95,6 @@ pub fn wrap_resource<'info>(
 
     // close the account if the amount is zero after the burning the desired amount
     if args.amount == ctx.accounts.token_account.amount {
-        msg!("closing account");
         close_account(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -104,7 +107,6 @@ pub fn wrap_resource<'info>(
         )?;
     }
     
-    msg!("verifying leaf");
     // verify the holding account leaf
     verify_leaf(
         args.holding_state.root,
@@ -125,7 +127,6 @@ pub fn wrap_resource<'info>(
         balance: args.holding_state.holding.balance + args.amount,
     };
 
-    msg!("creating event");
     let event = CompressedDataEvent::Leaf {
         slot: ctx.accounts.clock.slot,
         tree_id: ctx.accounts.merkle_tree.key().to_bytes(),
@@ -138,7 +139,6 @@ pub fn wrap_resource<'info>(
     let bump_binding = [resource.bump];
     let signer_seeds = resource.seeds(&bump_binding);
 
-    msg!("updating leaf");
     // update the compressed token account using controlled merkle tree
     hpl_compression::replace_leaf(
         args.holding_state.root,

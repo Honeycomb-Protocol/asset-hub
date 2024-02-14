@@ -366,6 +366,11 @@
           "isSigner": false
         },
         {
+          "name": "token22Program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false,
@@ -454,6 +459,11 @@
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "token22Program",
           "isMut": false,
           "isSigner": false
         },
@@ -686,6 +696,15 @@
           {
             "name": "leafIdx",
             "type": "u32"
+          },
+          {
+            "name": "sourceHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           }
         ]
       }

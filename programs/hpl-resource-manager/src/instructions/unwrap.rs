@@ -3,11 +3,12 @@ use {
     anchor_lang::prelude::*,
     anchor_spl::{
         associated_token::AssociatedToken,
-        token_interface::{Mint, TokenAccount, TokenInterface},
+        token::{Token, TokenAccount},
     },
     hpl_compression::{verify_leaf, CompressedData, CompressedDataEvent, ToNode},
     hpl_hive_control::state::Project,
     spl_account_compression::{program::SplAccountCompression, Noop},
+    spl_token_2022::ID as Token2022,
 };
 
 #[derive(Accounts)]
@@ -18,8 +19,9 @@ pub struct UnWrapResource<'info> {
     #[account(has_one = project, has_one = mint)]
     pub resource: Box<Account<'info, Resource>>,
 
+    /// CHECK: this is not dangerous. we are not reading & writing from it
     #[account(mut, constraint = resource.mint == mint.key())]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
+    pub mint: AccountInfo<'info>,
 
     /// CHECK: this is not dangerous. we are not reading & writing from it
     #[account(mut)]
@@ -31,7 +33,7 @@ pub struct UnWrapResource<'info> {
         associated_token::mint = mint,
         associated_token::authority = owner
     )]
-    pub recipient_account: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub recipient_account: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -43,8 +45,12 @@ pub struct UnWrapResource<'info> {
 
     pub system_program: Program<'info, System>,
 
+    /// CHECK: this is not dangerous. we are not reading & writing from it
+    #[account(address = Token2022)]
+    pub token22_program: AccountInfo<'info>,
+
     /// SPL TOKEN PROGRAM
-    pub token_program: Interface<'info, TokenInterface>,
+    pub token_program: Program<'info, Token>,
 
     /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
@@ -71,7 +77,6 @@ pub fn unwrap_resource<'info>(
     let resource = &mut ctx.accounts.resource;
 
     // verify the holding account leaf
-    msg!("verifying leaf");
     verify_leaf(
         args.holding_state.root,
         args.holding_state.holding.to_compressed().to_node(),
@@ -81,12 +86,10 @@ pub fn unwrap_resource<'info>(
         ctx.remaining_accounts.to_vec(),
     )?;
 
-    msg!("burning resource condition");
     if args.amount > args.holding_state.holding.balance {
         return Err(ResourceErrorCode::InsufficientAmount.into());
     }
 
-    msg!("burning resource");
     let (_leaf_idx, seq) = resource
         .merkle_trees
         .assert_append(ctx.accounts.merkle_tree.to_account_info())?;
@@ -96,7 +99,6 @@ pub fn unwrap_resource<'info>(
         balance: args.holding_state.holding.balance - args.amount,
     };
 
-    msg!("creating event");
     let event = CompressedDataEvent::Leaf {
         slot: ctx.accounts.clock.slot,
         tree_id: ctx.accounts.merkle_tree.key().to_bytes(),
@@ -130,11 +132,10 @@ pub fn unwrap_resource<'info>(
         Some(&[&signer_seeds[..]]),
     )?;
 
-    msg!("minting tokens");
     // transfer the amount to the owner
     mint_tokens(
         &ctx.accounts.token_program,
-        &ctx.accounts.mint.to_account_info(),
+        &ctx.accounts.mint,
         &ctx.accounts.recipient_account.to_account_info(),
         &ctx.accounts.owner.to_account_info(),
         &resource,
