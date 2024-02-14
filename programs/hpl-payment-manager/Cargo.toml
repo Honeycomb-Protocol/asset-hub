@@ -4,7 +4,7 @@ cargo-features = ["workspace-inheritance"]
 name = "hpl-payment-manager"
 description = "Honeycomb protocol library payment manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.6-beta.1"
+version = "0.0.6-beta.2"
 edition = "2021"
 license = "MIT"
 

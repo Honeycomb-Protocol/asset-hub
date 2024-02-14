@@ -141,7 +141,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     currency.set_defaults();
 
     // Set the currency bump using the provided context.
-    currency.bump = ctx.bumps["currency"];
+    currency.bump = ctx.bumps.currency;
 
     // Set the project key and mint key for the currency account.
     currency.project = ctx.accounts.project.key();
@@ -423,7 +423,7 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
     let currency = &mut ctx.accounts.currency;
     currency.set_defaults();
 
-    currency.bump = ctx.bumps["currency"];
+    currency.bump = ctx.bumps.currency;
     currency.project = ctx.accounts.project.key();
     currency.mint = ctx.accounts.mint.key();
     currency.kind = CurrencyKind::Wrapped;

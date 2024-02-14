@@ -71,7 +71,7 @@ pub fn create_payment_structure(
     let payment_structure = &mut ctx.accounts.payment_structure;
     payment_structure.set_defaults();
 
-    payment_structure.bump = ctx.bumps["payment_structure"];
+    payment_structure.bump = ctx.bumps.payment_structure;
     payment_structure.unique_key = ctx.accounts.unique.key();
     payment_structure.payments = args.payments;
 

@@ -81,7 +81,7 @@ pub struct CreateHolderAccount<'info> {
 /// Create a holder account
 pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
-    let bump = ctx.bumps["holder_account"];
+    let bump = ctx.bumps.holder_account;
     let currency = ctx.accounts.currency.key();
     if bump != holder_account.bump || !currency.eq(&holder_account.currency) {
         // Set the bump value for the holder account.
@@ -174,7 +174,7 @@ pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
 
     // Set the bump value for the holder account.
-    holder_account.bump = ctx.bumps["holder_account"];
+    holder_account.bump = ctx.bumps.holder_account;
     holder_account.currency = ctx.accounts.currency.key();
     holder_account.owner = ctx.accounts.owner.key();
     holder_account.token_account = ctx.accounts.token_account.key();

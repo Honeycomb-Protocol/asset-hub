@@ -77,7 +77,7 @@ pub fn start_payment_session(
   let payment_session = &mut ctx.accounts.payment_session;
   payment_session.set_defaults();
 
-  payment_session.bump = ctx.bumps["payment_session"];
+  payment_session.bump = ctx.bumps.payment_session;
   payment_session.payment_structure = ctx.accounts.payment_structure.key();
   payment_session.payer = ctx.accounts.payer.key();
   payment_session.payments_status = Conditional::<bool>::new_mapped(

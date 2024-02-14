@@ -67,7 +67,7 @@ pub fn new_character_model(
     let character_model = &mut ctx.accounts.character_model;
     character_model.set_defaults();
 
-    character_model.bump = ctx.bumps["character_model"];
+    character_model.bump = ctx.bumps.character_model;
     character_model.project = ctx.accounts.project.key();
     character_model.key = ctx.accounts.key.key();
     character_model.config = args.config;

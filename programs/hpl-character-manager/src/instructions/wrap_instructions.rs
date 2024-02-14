@@ -240,7 +240,7 @@ pub fn unwrap_character<'info>(
 
     let asset_custody = &mut ctx.accounts.asset_custody;
     asset_custody.set_defaults();
-    asset_custody.bump = ctx.bumps["asset_custody"];
+    asset_custody.bump = ctx.bumps.asset_custody;
     asset_custody.wallet = ctx.accounts.wallet.key();
 
     Ok(())

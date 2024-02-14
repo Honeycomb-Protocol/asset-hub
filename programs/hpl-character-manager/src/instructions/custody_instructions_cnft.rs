@@ -131,7 +131,7 @@ pub fn deposit_cnft<'info>(
     )?;
 
     let asset_custody = &mut ctx.accounts.asset_custody;
-    asset_custody.bump = ctx.bumps["asset_custody"];
+    asset_custody.bump = ctx.bumps.asset_custody;
     asset_custody.wallet = ctx.accounts.wallet.key();
     asset_custody.character_model = Some(ctx.accounts.character_model.key());
     asset_custody.source = Some(CharacterSource::Wrapped {
