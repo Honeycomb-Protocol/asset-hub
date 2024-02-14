@@ -2,11 +2,12 @@ use anchor_lang::prelude::*;
 
 pub mod errors;
 pub mod instructions;
+pub mod metadata;
 pub mod state;
 pub mod utils;
 
 declare_id!("CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4");
-hpl_macros::platform_gate!();
+hpl_toolkit::platform_gate!();
 
 use {
     instructions::*,

@@ -1,12 +1,6 @@
 use {
-    crate::{
-        errors::ErrorCode,
-        state::*,
-        utils::{Conditional, Event},
-    },
+    crate::{errors::ErrorCode, state::*, utils::Conditional},
     anchor_lang::prelude::*,
-    hpl_events::HplEvents,
-    hpl_utils::traits::Default,
 };
 
 /// Accounts used in create payment structure instruction
@@ -35,14 +29,11 @@ pub struct CreatePaymentStructure<'info> {
     /// Solana System Program
     pub system_program: Program<'info, System>,
 
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
-
     /// Solana Clock Sysvar
     pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct CreatePaymentStructureArgs {
     pub payments: Conditional<Payment>,
 }
@@ -84,13 +75,6 @@ pub fn create_payment_structure(
     payment_structure.unique_key = ctx.accounts.unique.key();
     payment_structure.payments = args.payments;
 
-    Event::new_payment_structure(
-        payment_structure.key(),
-        payment_structure.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
-
     Ok(())
 }
 
@@ -111,9 +95,6 @@ pub struct DeletePaymentStructure<'info> {
 
     /// Solana System Program
     pub system_program: Program<'info, System>,
-
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
 
     /// Solana Clock Sysvar
     pub clock_sysvar: Sysvar<'info, Clock>,
@@ -141,12 +122,6 @@ pub fn delete_payment_structure(ctx: Context<DeletePaymentStructure>) -> Result<
     if ctx.accounts.payment_structure.active_sessions > 0 {
         return Err(ErrorCode::HasActivePaymentSessions.into());
     }
-    Event::delete_payment_structure(
-        ctx.accounts.payment_structure.key(),
-        ctx.accounts.payment_structure.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }

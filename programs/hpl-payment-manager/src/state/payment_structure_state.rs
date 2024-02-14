@@ -1,4 +1,4 @@
-use {crate::utils::Conditional, anchor_lang::prelude::*, hpl_utils::Default};
+use {crate::utils::Conditional, anchor_lang::prelude::*};
 
 /// A Payment structure account defines a single or series of payments required to be made by a user.
 /// PDA: ['payment_structure', unique_key]
@@ -17,12 +17,12 @@ pub struct PaymentStructure {
 }
 
 /// Default implementation for `PaymentStructure`.
-impl Default for PaymentStructure {
+impl PaymentStructure {
     /// The size of the serialized `PaymentStructure` account.
-    const LEN: usize = 8 + 168;
+    pub const LEN: usize = 8 + 168;
 
     /// Sets default values for `PaymentStructure`.
-    fn set_defaults(&mut self) {
+    pub fn set_defaults(&mut self) {
         self.bump = 0;
         self.unique_key = Pubkey::default();
         self.authority = Pubkey::default();
@@ -38,7 +38,7 @@ impl PaymentStructure {
 }
 
 /// The payment required to be accepted from user.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub struct Payment {
     /// Indicates whether this payment should be bbur.
     pub payment_method: PaymentMethod,
@@ -48,7 +48,7 @@ pub struct Payment {
 }
 
 /// The payment method to be used for a specific payment.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub enum PaymentMethod {
     /// Burn the payment asset
     Burn,
@@ -58,7 +58,7 @@ pub enum PaymentMethod {
 }
 
 /// Represents the asset to be accepted as payment.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub enum PaymentKind {
     /// Payment method for NFTs with associated criteria.
     Nft(NftPayment),
@@ -68,7 +68,7 @@ pub enum PaymentKind {
 }
 
 /// Represents criteria for NFT payments.
-#[derive(AnchorSerialize, AnchorDeserialize, Copy, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Copy, Clone, PartialEq)]
 pub enum NftPayment {
     /// The particular NFT mint to be accepted as payment
     Mint(Pubkey),

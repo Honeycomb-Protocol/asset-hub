@@ -1,5 +1,5 @@
 {
-  "version": "0.0.83",
+  "version": "0.0.83-beta.2",
   "name": "hpl_currency_manager",
   "docs": [
     "The entry point for the HPL currency manager program."
@@ -121,14 +121,6 @@
           "isSigner": false,
           "docs": [
             "The Token Program ID."
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -265,14 +257,6 @@
           "isSigner": false,
           "docs": [
             "The token metadata program account."
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -418,14 +402,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
@@ -560,14 +536,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
@@ -699,14 +667,6 @@
           "isSigner": false,
           "docs": [
             "SPL Associated Token program"
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -1713,14 +1673,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "instructionsSysvar",
           "isMut": false,
           "isSigner": false,
@@ -2018,66 +1970,6 @@
       }
     },
     {
-      "name": "Event",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "NewCurrency",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          },
-          {
-            "name": "UpdateCurrency",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          },
-          {
-            "name": "NewHolderAccount",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          },
-          {
-            "name": "UpdateHolderAccount",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
       "name": "HolderStatus",
       "docs": [
         "The status of a holder account."
@@ -2121,6 +2013,6 @@
     "address": "CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
-    "libVersion": "0.28.0"
+    "libVersion": "0.29.0"
   }
 }

@@ -12,7 +12,9 @@ const defaultTypes = [
   "u128",
 ];
 
-const undefinedTypes = ["HashMap", "Node", "Wallets", "ProfileData"];
+const undefinedTypes = ["HashMap", "Node", "Conditional", "DataOrHash"];
+
+const generatedTypes = new Map();
 
 const stringToType = (strType) => {
   let type;
@@ -21,32 +23,94 @@ const stringToType = (strType) => {
     type = strType.toLowerCase();
   } else if (strType.startsWith("Vec<")) {
     type = {
-      vec: stringToType(strType.split("<")[1].slice(0, -1)),
+      vec: stringToType(strType.slice(4, -1)),
     };
   } else if (strType.startsWith("Option<")) {
     type = {
-      option: stringToType(strType.split("<")[1].slice(0, -1)),
-    };
-  } else if (strType.startsWith("HashMap<")) {
-    const [key, mapValue] = strType
-      .replaceAll("HashMap<", "")
-      .slice(0, -1)
-      .split(",");
-    type = {
-      hashMap: [stringToType(key), stringToType(mapValue)],
+      option: stringToType(strType.slice(7, -1)),
     };
   } else if (strType === "Node") {
     type = {
       array: ["u8", 32],
     };
-  } else if (strType === "Wallets") {
+  } else if (strType.startsWith("HashMap<")) {
+    const [key, mapValue] = strType.slice(8, -1).split(",");
     type = {
-      vec: "publicKey",
+      hashMap: [stringToType(key), stringToType(mapValue)],
     };
-  } else if (strType === "ProfileData") {
+  } else if (strType.startsWith("Conditional<")) {
+    const innerType = strType.slice(12, -1);
+    const typeName =
+      "Conditional" + innerType[0].toUpperCase() + innerType.slice(1);
     type = {
-      hashMap: ["string", { vec: "string" }],
+      defined: typeName,
     };
+    generatedTypes.set(typeName, {
+      name: typeName,
+      type: {
+        kind: "enum",
+        variants: [
+          {
+            name: "None",
+          },
+          {
+            name: "Item",
+            fields: [stringToType(innerType)],
+          },
+          {
+            name: "Or",
+            fields: [
+              {
+                vec: {
+                  defined: typeName,
+                },
+              },
+            ],
+          },
+          {
+            name: "And",
+            fields: [
+              {
+                vec: {
+                  defined: typeName,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+  } else if (strType.startsWith("DataOrHash<")) {
+    const innerType = strType.slice(11, -1);
+    const typeName =
+      "DataOrHash" + innerType[0].toUpperCase() + innerType.slice(1);
+    type = {
+      defined: typeName,
+    };
+    generatedTypes.set(typeName, {
+      name: typeName,
+      type: {
+        kind: "enum",
+        variants: [
+          {
+            name: "Data",
+            fields: [
+              {
+                defined: innerType,
+              },
+            ],
+          },
+          {
+            name: "Hash",
+            fields: [
+              {
+                array: ["u8", 32],
+              },
+            ],
+          },
+        ],
+      },
+    });
   } else {
     type = { defined: strType };
   }
@@ -57,7 +121,7 @@ const stringToType = (strType) => {
 const mapType = (type) => {
   if (
     undefinedTypes.includes(type.defined) ||
-    type.defined?.includes("HashMap")
+    !!undefinedTypes.find((t) => type.defined?.includes(t))
   ) {
     type = stringToType(type.defined);
   } else if (type.option) {
@@ -90,25 +154,6 @@ const mapTypes = (type) => {
         });
       return variant;
     });
-  
-  const fixTypes = ["VerifyCharacterArgs"];
-
-  if (fixTypes.includes(type.name)) {
-    type.type.fields.forEach((field) => {
-      if (field.name === "source") {
-        field.type = {
-          defined: "DataOrHashSource"
-        };
-      }
-
-      if (field.name === "usedBy") {
-        field.type = {
-          defined: "DataOrHashUsedBy"
-        };
-      }
-    });
-  }
-
   return type;
 };
 
@@ -129,31 +174,14 @@ const createConfig = (name, programId, customs) => {
       versionRangeFallback: "0.29.0",
     },
     idlHook: (idl) => {
-      customs?.types && idl.types.push(...customs.types);
-      idl.types = idl.types.map(mapTypes);
-
       idl.accounts = idl.accounts.map(mapTypes);
 
-      const dataOrHashIndex = idl.types.findIndex(type => type.name === "DataOrHash");
-      if(dataOrHashIndex >= 0) {
-        const dataOrHashSource = structuredClone(idl.types[dataOrHashIndex]);
-        dataOrHashSource.name = "DataOrHashSource";
-        dataOrHashSource.type.variants.forEach(variant => {
-          if (variant.name === "Data") {
-            variant.fields[0].defined = "CharacterSource";
-          }
-        });
-
-        const dataOrHashUsedBy = structuredClone(idl.types[dataOrHashIndex]);
-        dataOrHashUsedBy.name = "DataOrHashUsedBy";
-        dataOrHashUsedBy.type.variants.forEach(variant => {
-          if (variant.name === "Data") {
-            variant.fields[0].defined = "CharacterUsedBy";
-          }
-        });
-
-        idl.types.splice(dataOrHashIndex, 1, dataOrHashSource, dataOrHashUsedBy);
-      }
+      customs?.types && idl.types.push(...customs.types);
+      idl.types = idl.types.map(mapTypes);
+      idl.types = idl.types.filter(
+        (type) => !undefinedTypes.includes(type.name)
+      );
+      idl.types.push(...Array.from(generatedTypes.values()));
 
       return idl;
     },

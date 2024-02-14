@@ -1,7 +1,6 @@
 use {
     crate::{errors::ErrorCode, utils::Conditional},
     anchor_lang::prelude::*,
-    hpl_utils::Default,
 };
 
 /// A Payment structure account defines a single or series of payments required to be made by a user.
@@ -19,12 +18,12 @@ pub struct PaymentSession {
 }
 
 /// Default implementation for `PaymentSession`.
-impl Default for PaymentSession {
+impl PaymentSession {
     /// The size of the serialized `PaymentSession` account.
-    const LEN: usize = 8 + 104;
+    pub const LEN: usize = 8 + 104;
 
     /// Sets default values for `PaymentSession`.
-    fn set_defaults(&mut self) {
+    pub fn set_defaults(&mut self) {
         self.bump = 0;
     }
 }

@@ -2,7 +2,7 @@
 name = "hpl-asset-assembler"
 description = "Honeycomb protocol library assembler program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.77"
+version = "0.0.78-beta.1"
 edition = "2021"
 license = "MIT"
 
@@ -23,7 +23,5 @@ anchor-spl = { workspace = true }
 hpl-toolkit = { workspace = true, features = [
   "macros",
 ], default-features = false }
-hpl-utils = { workspace = true }
-hpl-events = { workspace = true }
 hpl-hive-control = { workspace = true }
 mpl-token-metadata = { workspace = true }

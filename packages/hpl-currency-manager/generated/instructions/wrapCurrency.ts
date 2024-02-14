@@ -33,7 +33,6 @@ export const wrapCurrencyStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
  * @property [] hiveControl
- * @property [] hplEvents
  * @property [] instructionsSysvar
  * @property [] clockSysvar
  * @category Instructions
@@ -53,7 +52,6 @@ export type WrapCurrencyInstructionAccounts = {
   systemProgram?: web3.PublicKey
   hiveControl: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  hplEvents: web3.PublicKey
   instructionsSysvar: web3.PublicKey
   clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -66,10 +64,8 @@ export const wrapCurrencyInstructionDiscriminator = [
 /**
  * Creates a _WrapCurrency_ instruction.
  *
- * Optional accounts that are not provided will be omitted from the accounts
- * array passed with the instruction.
- * An optional account that is set cannot follow an optional account that is unset.
- * Otherwise an Error is raised.
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @category Instructions
@@ -99,70 +95,62 @@ export function createWrapCurrencyInstruction(
       isWritable: true,
       isSigner: false,
     },
-  ]
-
-  if (accounts.delegateAuthority != null) {
-    keys.push({
-      pubkey: accounts.delegateAuthority,
+    {
+      pubkey: accounts.delegateAuthority ?? programId,
       isWritable: false,
       isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.authority,
-    isWritable: false,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.mintAuthority,
-    isWritable: false,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.freezeAuthority,
-    isWritable: false,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.payer,
-    isWritable: true,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.vault,
-    isWritable: true,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.hiveControl,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.hplEvents,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.instructionsSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.clockSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
+    },
+    {
+      pubkey: accounts.authority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.mintAuthority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.freezeAuthority,
+      isWritable: false,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.payer,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.vault,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.hiveControl,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clockSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+  ]
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

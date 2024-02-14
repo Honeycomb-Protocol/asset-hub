@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-beta.11",
+  "version": "0.0.2-beta.12",
   "name": "hpl_character_manager",
   "instructions": [
     {
@@ -1225,13 +1225,13 @@
           {
             "name": "source",
             "type": {
-              "defined": "DataOrHashSource"
+              "defined": "DataOrHashCharacterSource"
             }
           },
           {
             "name": "usedBy",
             "type": {
-              "defined": "DataOrHashUsedBy"
+              "defined": "DataOrHashCharacterUsedBy"
             }
           }
         ]
@@ -1480,60 +1480,6 @@
       }
     },
     {
-      "name": "DataOrHashSource",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Data",
-            "fields": [
-              {
-                "defined": "CharacterSource"
-              }
-            ]
-          },
-          {
-            "name": "Hash",
-            "fields": [
-              {
-                "array": [
-                  "u8",
-                  32
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "DataOrHashUsedBy",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Data",
-            "fields": [
-              {
-                "defined": "CharacterUsedBy"
-              }
-            ]
-          },
-          {
-            "name": "Hash",
-            "fields": [
-              {
-                "array": [
-                  "u8",
-                  32
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
       "name": "CharacterUsedBy",
       "type": {
         "kind": "enum",
@@ -1745,6 +1691,60 @@
             "type": {
               "defined": "CharacterUsedBy"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataOrHashCharacterSource",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Data",
+            "fields": [
+              {
+                "defined": "CharacterSource"
+              }
+            ]
+          },
+          {
+            "name": "Hash",
+            "fields": [
+              {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataOrHashCharacterUsedBy",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Data",
+            "fields": [
+              {
+                "defined": "CharacterUsedBy"
+              }
+            ]
+          },
+          {
+            "name": "Hash",
+            "fields": [
+              {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            ]
           }
         ]
       }

@@ -1,11 +1,12 @@
 use anchor_lang::prelude::*;
-use hpl_utils::Default;
+use hpl_toolkit::schema::*;
 
 /// A holder is a middle man account between wallet and currency.
 /// It contains detail about the token account that holds the currency
 /// PDA: ['holder', owner, mint]
 /// Category: holder_state
 #[account]
+#[derive(ToSchema)]
 pub struct HolderAccount {
     pub bump: u8,
     /// The currency associated with this account
@@ -21,12 +22,12 @@ pub struct HolderAccount {
 }
 
 /// Default implementation for `HolderAccount`.
-impl Default for HolderAccount {
+impl HolderAccount {
     /// The size of the serialized `HolderAccount` account.
-    const LEN: usize = 8 + 131;
+    pub const LEN: usize = 8 + 131;
 
     /// Sets default values for `HolderAccount`.
-    fn set_defaults(&mut self) {
+    pub fn set_defaults(&mut self) {
         self.bump = 0;
         self.currency = Pubkey::default();
         self.owner = Pubkey::default();
@@ -37,7 +38,7 @@ impl Default for HolderAccount {
 }
 
 /// The status of a holder account.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, ToSchema)]
 pub enum HolderStatus {
     /// The holder is active and can be used to send and receive currency.
     Active,

@@ -8,7 +8,7 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import { Conditionalbool, conditionalboolBeet } from '../types/Conditionalbool'
+import { ConditionalBool, conditionalBoolBeet } from '../types/ConditionalBool'
 
 /**
  * Arguments used to create {@link PaymentSession}
@@ -19,7 +19,7 @@ export type PaymentSessionArgs = {
   bump: number
   paymentStructure: web3.PublicKey
   payer: web3.PublicKey
-  paymentsStatus: Conditionalbool
+  paymentsStatus: ConditionalBool
 }
 
 export const paymentSessionDiscriminator = [54, 26, 27, 179, 52, 57, 56, 21]
@@ -35,7 +35,7 @@ export class PaymentSession implements PaymentSessionArgs {
     readonly bump: number,
     readonly paymentStructure: web3.PublicKey,
     readonly payer: web3.PublicKey,
-    readonly paymentsStatus: Conditionalbool
+    readonly paymentsStatus: ConditionalBool
   ) {}
 
   /**
@@ -178,7 +178,7 @@ export const paymentSessionBeet = new beet.FixableBeetStruct<
     ['bump', beet.u8],
     ['paymentStructure', beetSolana.publicKey],
     ['payer', beetSolana.publicKey],
-    ['paymentsStatus', conditionalboolBeet],
+    ['paymentsStatus', conditionalBoolBeet],
   ],
   PaymentSession.fromArgs,
   'PaymentSession'

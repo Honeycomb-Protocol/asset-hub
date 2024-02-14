@@ -1042,45 +1042,29 @@ dependencies = [
 
 [[package]]
 name = "hpl-asset-assembler"
-version = "0.0.77"
+version = "0.0.78-beta.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-events",
  "hpl-hive-control",
  "hpl-toolkit",
- "hpl-utils",
  "mpl-token-metadata",
 ]
 
 [[package]]
 name = "hpl-asset-manager"
-version = "0.0.77"
+version = "0.0.78-beta.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-events",
  "hpl-hive-control",
  "hpl-toolkit",
- "hpl-utils",
  "mpl-token-metadata",
 ]
 
 [[package]]
-name = "hpl-attribute-event"
-version = "0.1.23"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "872e0b545ceedcb508c12a17f7706898eb147805d0e88fd08ad08b81dc724a86"
-dependencies = [
- "convert_case",
- "proc-macro2",
- "quote",
- "syn 2.0.32",
-]
-
-[[package]]
 name = "hpl-character-manager"
-version = "0.0.2-beta.11"
+version = "0.0.2-beta.12"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1093,31 +1077,20 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.83-beta.1"
+version = "0.0.84-beta.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "hpl-events",
  "hpl-hive-control",
- "hpl-macros",
- "hpl-utils",
-]
-
-[[package]]
-name = "hpl-events"
-version = "0.1.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7e9d40a49bc842daece2866a2668ddd7508482de5119a4d0f2207f381339668"
-dependencies = [
- "anchor-lang",
- "hpl-attribute-event",
+ "hpl-toolkit",
+ "mpl-token-metadata",
 ]
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.2.19-beta.2"
+version = "0.2.19-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e4c931b9a5f7a7b9411208d7dd5eb89b6a48aa9f260a2e2ae27d8d01e218769"
+checksum = "cae2e06c62f611fa6120da2c949da6702b2b308c85d0385de3e28e8a3fa6e260"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1126,51 +1099,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "hpl-macro-add-service"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "871935cd97593c022e144853ba989a9efab33f7752744c43ea42c1ec8c56aeb2"
-dependencies = [
- "convert_case",
- "proc-macro2",
- "quote",
- "syn 2.0.32",
-]
-
-[[package]]
-name = "hpl-macro-platform-gate"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "909ff3c2ff55849e4a0f5f137aeb4da0ed10e28d34aae0048496b2edff3485d0"
-dependencies = [
- "convert_case",
- "proc-macro2",
- "quote",
- "syn 2.0.32",
-]
-
-[[package]]
-name = "hpl-macros"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c6711149f771cae31959af1ce6ef86bde0c4e6625f9528f662fd3825edb33c3"
-dependencies = [
- "hpl-macro-add-service",
- "hpl-macro-platform-gate",
-]
-
-[[package]]
 name = "hpl-payment-manager"
-version = "0.0.5-beta.1"
+version = "0.0.6-beta.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "hpl-currency-manager",
- "hpl-events",
  "hpl-hive-control",
- "hpl-macros",
- "hpl-utils",
+ "hpl-toolkit",
  "mpl-bubblegum",
+ "mpl-token-metadata",
  "spl-account-compression",
 ]
 
@@ -1190,7 +1128,6 @@ dependencies = [
  "hpl-toolkit-macro-merkle-tree-apply-fn-deep",
  "hpl-toolkit-macro-merkle-tree-utils",
  "hpl-toolkit-macro-platform-gate",
- "log",
  "serde_json",
  "spl-account-compression",
 ]
@@ -1297,17 +1234,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.32",
-]
-
-[[package]]
-name = "hpl-utils"
-version = "0.1.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67bc8b56913911b8ae6a50208a057d136e822e3c808c10c91a4d4a462d2b5f79"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "mpl-token-metadata",
 ]
 
 [[package]]
