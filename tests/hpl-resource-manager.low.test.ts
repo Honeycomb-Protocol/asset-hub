@@ -6,17 +6,14 @@ import {
 } from "@honeycomb-protocol/hive-control";
 import { PublicKey } from "@metaplex-foundation/js";
 import {
-  MerkleTree,
   SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
   SPL_NOOP_PROGRAM_ID,
   ValidDepthSizePair,
-  createVerifyLeafIx,
   getConcurrentMerkleTreeAccountSize,
 } from "@solana/spl-account-compression";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import {
   Keypair,
@@ -40,95 +37,52 @@ import {
   resourceManagerPdas,
 } from "../packages/hpl-resource-manager";
 import getHoneycombs from "../scripts/prepare";
-import edgeClient from "@honeycomb-protocol/edge-client";
-import createEdgeClient from "@honeycomb-protocol/edge-client/client";
-import { Client, cacheExchange, fetchExchange } from "@urql/core";
-import { createSparseMerkleTree, holdingInfoHash } from "./parser";
 
 jest.setTimeout(6000000);
 
-const getClient = (rpcUrl = "http://localhost:4000") =>
-  createEdgeClient(
-    new Client({
-      url: rpcUrl,
-      exchanges: [cacheExchange, fetchExchange],
-    })
-  );
-
-async function getCompressedData(leafIdx: number, tree: PublicKey) {
-  const client = getClient();
-
-  const {
-    compressedAccount: [data],
-  } = await client.findCompressedAccounts({
-    leaf: {
-      index: String(leafIdx),
-      tree: tree.toBase58(),
+async function getCompressedData<T = any>(
+  leafIdx: number,
+  tree: PublicKey,
+  rpcUrl: string = process.env.SOLANA_RPC as string
+): Promise<CompressedData<T> | null> {
+  const { result, error } = await fetch(rpcUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  });
-
-  if (!data) return;
-
-  return data;
-}
-
-async function getCompressedAccountsByTree(tree: PublicKey) {
-  const client = getClient();
-
-  const data = await client.findCompressedAccounts({
-    leaf: {
-      tree: tree.toBase58(),
-    },
-  });
-
-  return data.compressedAccount;
-}
-
-async function getCompressedAccountsByHolder(holder: PublicKey) {
-  const client = getClient();
-
-  const data = await client.findCompressedAccounts({
-    parsedData: {
-      holder: "pubkey:" + holder.toBase58(),
-    },
-    identity: {
-      accountName: "Holding",
-      programId: PROGRAM_ID.toBase58(),
-    },
-  });
-
-  return data.compressedAccount;
-}
-
-async function getAssetProof(leafIdx: number, tree: PublicKey) {
-  const client = getClient();
-
-  const data = await client.fetchProofs({
-    leaves: [
-      {
-        index: String(leafIdx),
-        tree: tree.toBase58(),
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: "my-id",
+      method: "getCompressedData",
+      params: {
+        tree: tree.toString(),
+        leafIdx,
       },
-    ],
-  });
+    }),
+  }).then((res) => res.json());
 
-  if (!data.proof.length) return;
+  if (!result) {
+    console.error(error, "Error fetching compressed data");
+    return null;
+  }
 
-  return data.proof[0];
+  return result;
 }
 
 describe("Resource Manager", () => {
   let adminHC: Honeycomb;
-  let project: PublicKey | undefined = new PublicKey(
-    "FkEpfioxFBcy9Wwn5RxJZibByhhEpfvfbo68ezJtdume"
-  );
-  let mint: PublicKey | undefined = new PublicKey(
-    "6ujFRoiDivvjnRYbJSg2TWMJuEZf3QBDFtcNdHG5qiY8"
-  );
-  let merkleTree: PublicKey | undefined = new PublicKey(
-    "CTfap39YohAMXQTrwZunLKLNXFJQoyGhdsuqBX8vHhFb"
-  );
-  const tree = createSparseMerkleTree([], 14);
+  let mint: PublicKey | undefined;
+  // new PublicKey(
+  //   "HpHaXsWoANTo5wrDDEszdWTg6Cru3fMTfhJSimxvxBkG"
+  // );
+  let merkleTree: PublicKey | undefined;
+  // new PublicKey(
+  //   "GWMfiwJh2CjJ25XyYUPS2WAhHPBYmEEHvqYBqqaAH3rw"
+  // );
+  let project: PublicKey | undefined;
+  // new PublicKey(
+  //   "9ZsfHL5X2uXmkLnasH5ucuaWGKtaruHHCxsxREMRMeJj"
+  // );
 
   beforeAll(async () => {
     const honeycombs = await getHoneycombs();
@@ -150,7 +104,7 @@ describe("Resource Manager", () => {
     }
   });
 
-  it.skip("Create Resource", async () => {
+  it("Create Resource", async () => {
     const mintKeypair = new Keypair();
 
     const [resourceAddress] = resourceManagerPdas().resource(
@@ -201,10 +155,11 @@ describe("Resource Manager", () => {
     mint = mintKeypair.publicKey;
   });
 
-  it.skip("Initialize Resource Tree", async () => {
+  it("Initialize Resource Tree", async () => {
     if (!mint) throw new Error("Mint not found");
 
     const merkleTreeKeyPair = new Keypair();
+
     const [resourceAddress] = resourceManagerPdas().resource(
       adminHC.project().address,
       mint,
@@ -219,7 +174,7 @@ describe("Resource Manager", () => {
     const space = getConcurrentMerkleTreeAccountSize(
       depthSizePair.maxDepth,
       depthSizePair.maxBufferSize,
-      10
+      11
     );
 
     const lamports = await adminHC.connection.getMinimumBalanceForRentExemption(
@@ -271,7 +226,7 @@ describe("Resource Manager", () => {
     merkleTree = merkleTreeKeyPair.publicKey;
   });
 
-  it.skip("Mint Resource", async () => {
+  it("Mint Resource", async () => {
     if (!mint || !merkleTree) throw new Error("Mint or Merkle Tree not found");
 
     const [resourceAddress] = resourceManagerPdas().resource(
@@ -311,164 +266,128 @@ describe("Resource Manager", () => {
       commitment: "processed",
     });
 
-    const data = holdingInfoHash({
-      balance: 1000,
-      holder: adminHC.identity().address,
-    });
-    tree.updateLeaf(0, Buffer.from(data));
-
     console.log(signature, "Mint Resource");
   });
 
-  it.skip("FETCH HOLDER ACCOUNTS BY HOLDER", async () => {
-    const resource = await getCompressedAccountsByHolder(
-      adminHC.identity().address
-    );
-    console.log(resource, "PROFF");
-  });
+  // it("fetch compressed data", async () => {
+  //   if (!merkleTree) throw new Error("Mint or Merkle Tree not found");
 
-  it.skip("Burn Resource", async () => {
-    if (!merkleTree || !mint) return Error("Merkel tree OR Mint not provided");
+  //   const data = await getCompressedData(0, merkleTree);
+  //   console.log(data);
+  // });
 
-    const [resourceAddress] = resourceManagerPdas().resource(
-      adminHC.project().address,
-      mint
-    );
+  // it.skip("Burn Resource", async () => {
+  //   const mint = PublicKey.default;
+  //   const merkleTree = PublicKey.default;
+  //   const [resourceAddress] = resourceManagerPdas().resource(
+  //     adminHC.project().address,
+  //     mint
+  //   );
 
-    const resource = (await getCompressedAccountsByTree(merkleTree)).at(-1)!;
-    console.log(resource, "PROFF");
-    const proff = (await getAssetProof(Number(resource.leaf_idx), merkleTree))!;
+  //   const holding_state = await getCompressedData(0, merkleTree);
+  //   if (holding_state) return Error("Holding State not found");
 
-    console.log(proff?.proof, "PROFF");
-    // console.log(resource, "PROFF");
-    // if (!proff || !proff.leaf_index || !proff.root)
-    //   return Error("Proff Data not found");
+  //   // const { root, leaf } = (await holding_state.proof(adminHC.rpcEndpoint))!;
+  //   const ix = createBurnResourceInstruction(
+  //     {
+  //       mint,
+  //       merkleTree,
+  //       resource: resourceAddress,
+  //       payer: adminHC.identity().address,
+  //       owner: adminHC.identity().address,
+  //       project: adminHC.project().address,
+  //       clock: SYSVAR_CLOCK_PUBKEY,
+  //       rentSysvar: SYSVAR_RENT_PUBKEY,
+  //       logWrapper: SPL_NOOP_PROGRAM_ID,
+  //       token22Program: TOKEN_2022_PROGRAM_ID,
+  //       compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+  //     },
+  //     {
+  //       args: {
+  //         amount: 100,
+  //         holdingState: {
+  //           leafIdx: holding_state.leafIdx,
+  //           root: Array.from(root.toBytes()),
+  //           sourceHash: Array.from(holding_state.sourceHash),
+  //           holding: {
+  //             holder: holding_state.owner,
+  //             balance: 100,
+  //           },
+  //         },
+  //       },
+  //     }
+  //   );
 
-    // const proff = tree.getProof(0);
-    const ix = createBurnResourceInstruction(
-      {
-        mint,
-        merkleTree,
-        resource: resourceAddress,
-        payer: adminHC.identity().address,
-        owner: adminHC.identity().address,
-        project: adminHC.project().address,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rentSysvar: SYSVAR_RENT_PUBKEY,
-        logWrapper: SPL_NOOP_PROGRAM_ID,
-        token22Program: TOKEN_2022_PROGRAM_ID,
-        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-        anchorRemainingAccounts: proff.proof.map((e) => ({
-          isSigner: false,
-          isWritable: false,
-          pubkey: new PublicKey(e),
-        })),
-      },
-      {
-        args: {
-          amount: 100,
-          holdingState: {
-            leafIdx: Number(proff.leaf_index),
-            root: Array.from(new PublicKey(proff.root).toBytes()),
-            holding: {
-              holder: new PublicKey(
-                resource.parsed_data.holder.split(":").at(-1)
-              ),
-              balance: resource.parsed_data.balance,
-            },
-          },
-        },
-      }
-    );
+  //   const op = new Operation(
+  //     adminHC,
+  //     [ix],
+  //     [adminHC.identity().signer as KeypairLike]
+  //   );
 
-    const op = new Operation(
-      adminHC,
-      [ix],
-      [adminHC.identity().signer as KeypairLike]
-    );
+  //   const [{ signature }] = await op.send({
+  //     skipPreflight: true,
+  //     commitment: "processed",
+  //   });
 
-    const [{ signature }] = await op.send({
-      skipPreflight: true,
-      commitment: "processed",
-    });
+  //   console.log(signature);
+  // });
 
-    const data = holdingInfoHash({
-      balance: 900,
-      holder: adminHC.identity().address,
-    });
-    tree.updateLeaf(0, Buffer.from(data));
+  // it.skip("Burn Resource", async () => {
+  //   const mint = PublicKey.default;
+  //   const merkleTree = PublicKey.default;
+  //   const [resourceAddress] = resourceManagerPdas().resource(
+  //     adminHC.project().address,
+  //     mint
+  //   );
 
-    console.log(signature, "Burn Resource");
-  });
+  //   const data = await getCompressedData(0, merkleTree);
+  //   if (holding_state) return Error("Holding State not found");
 
-  it("UnWrap Resource", async () => {
-    if (!merkleTree || !mint) return Error("Merkel tree OR Mint not provided");
+  //   const { root, leaf } = holding_state.proof(adminHC.rpcEndpoint);
 
-    const [resourceAddress] = resourceManagerPdas().resource(
-      adminHC.project().address,
-      mint
-    );
+  //   const ix = createUnwrapResourceInstruction(
+  //     {
+  //       mint,
+  //       merkleTree,
+  //       resource: resourceAddress,
+  //       payer: adminHC.identity().address,
+  //       owner: adminHC.identity().address,
+  //       project: adminHC.project().address,
+  //       recipientAccount: adminHC.identity().address,
+  //       clock: SYSVAR_CLOCK_PUBKEY,
+  //       rentSysvar: SYSVAR_RENT_PUBKEY,
+  //       logWrapper: SPL_NOOP_PROGRAM_ID,
+  //       token22Program: TOKEN_2022_PROGRAM_ID,
+  //       compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+  //       associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+  //     },
+  //     {
+  //       args: {
+  //         amount: 100,
+  //         holdingState: {
+  //           leafIdx: holding_state.leafIdx,
+  //           root: Array.from(root.toBytes()),
+  //           sourceHash: Array.from(holding_state.sourceHash),
+  //           holding: {
+  //             holder: holding_state.owner,
+  //             balance: 100,
+  //           },
+  //         },
+  //       },
+  //     }
+  //   );
 
-    const recipientAccount = getAssociatedTokenAddressSync(
-      mint,
-      adminHC.identity().address,
-      false,
-      TOKEN_2022_PROGRAM_ID
-    );
+  //   const op = new Operation(
+  //     adminHC,
+  //     [ix],
+  //     [adminHC.identity().signer as KeypairLike]
+  //   );
 
-    const resource = (await getCompressedAccountsByTree(merkleTree)).at(-1)!;
-    console.log(resource.parsed_data, "PROFF");
-    const proff = (await getAssetProof(Number(resource.leaf_idx), merkleTree))!;
+  //   const [{ signature }] = await op.send({
+  //     skipPreflight: true,
+  //     commitment: "processed",
+  //   });
 
-    const ix = createUnwrapResourceInstruction(
-      {
-        mint,
-        merkleTree,
-        recipientAccount,
-        resource: resourceAddress,
-        project: adminHC.project().address,
-        payer: adminHC.identity().address,
-        owner: adminHC.identity().address,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rentSysvar: SYSVAR_RENT_PUBKEY,
-        logWrapper: SPL_NOOP_PROGRAM_ID,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
-        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        anchorRemainingAccounts: proff.proof.map((e) => ({
-          isSigner: false,
-          isWritable: false,
-          pubkey: new PublicKey(e),
-        })),
-      },
-      {
-        args: {
-          amount: 100,
-          holdingState: {
-            leafIdx: Number(proff.leaf_index),
-            root: Array.from(new PublicKey(proff.root).toBytes()),
-            holding: {
-              holder: new PublicKey(
-                resource.parsed_data.holder.split(":").at(-1)
-              ),
-              balance: resource.parsed_data.balance,
-            },
-          },
-        },
-      }
-    );
-
-    const op = new Operation(
-      adminHC,
-      [ix],
-      [adminHC.identity().signer as KeypairLike]
-    );
-
-    const [{ signature }] = await op.send({
-      skipPreflight: true,
-      commitment: "processed",
-    });
-
-    console.log(signature, "Unwrap Signature");
-  });
+  //   console.log(signature);
+  // });
 });
