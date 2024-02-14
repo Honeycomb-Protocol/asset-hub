@@ -5,7 +5,7 @@ use {
     },
     anchor_lang::prelude::*,
     anchor_spl::{associated_token::AssociatedToken, token::Token},
-    hpl_compression::init_tree,
+    hpl_compression::{init_tree, CompressedDataEvent},
     hpl_hive_control::state::Project,
     hpl_utils::reallocate,
     spl_account_compression::{program::SplAccountCompression, Noop},
@@ -151,6 +151,15 @@ pub fn initilize_resource_tree(
         .merkle_trees
         .merkle_trees
         .push(ctx.accounts.merkle_tree.key());
+
+    msg!("Creating the merkle tree event.");
+    let event = CompressedDataEvent::tree(
+        ctx.accounts.merkle_tree.key(),
+        resource.merkle_trees.schema.clone(),
+        crate::ID,
+        String::from("Holding"),
+    );
+    event.wrap(&ctx.accounts.log_wrapper)?;
 
     msg!("Creating the merkle tree for the resource.");
     // create the merkle tree for the resource

@@ -48,7 +48,6 @@ export const unwrapResourceStruct = new beet.BeetArgsStruct<
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
  * @property [] rentSysvar
- * @property [] token22Program
  * @property [] compressionProgram
  * @property [] logWrapper
  * @property [] clock
@@ -67,7 +66,6 @@ export type UnwrapResourceInstructionAccounts = {
   payer: web3.PublicKey
   rentSysvar: web3.PublicKey
   systemProgram?: web3.PublicKey
-  token22Program: web3.PublicKey
   tokenProgram?: web3.PublicKey
   compressionProgram: web3.PublicKey
   logWrapper: web3.PublicKey
@@ -142,11 +140,6 @@ export function createUnwrapResourceInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.token22Program,
       isWritable: false,
       isSigner: false,
     },
