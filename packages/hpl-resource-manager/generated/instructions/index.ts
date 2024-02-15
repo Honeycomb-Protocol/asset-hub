@@ -1,5 +1,7 @@
 export * from './burnResource'
+export * from './craftRecipe'
 export * from './createResource'
+export * from './initilizeRecipe'
 export * from './initilizeResourceTree'
 export * from './mintResource'
 export * from './unwrapResource'

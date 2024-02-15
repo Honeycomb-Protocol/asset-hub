@@ -73,7 +73,7 @@ pub fn craft_recipe<'info>(
 
     let output_stats = next_craft_recipie(args_iter.next().unwrap(), &mut account_infos);
 
-    // stacking the inputs in a vector
+    // stacking the inputs in an directory for easy access
     let mut resource_map = HashMap::new();
     resource_map.insert(
         ctx.accounts.input_resource_one.key(),
@@ -111,6 +111,7 @@ pub fn craft_recipe<'info>(
         );
     }
 
+    // burning the input resources
     for input in recipe.inputs.iter() {
         if let Some(resource) = resource_map.get_mut(&input.resource) {
             use_burn_resource(

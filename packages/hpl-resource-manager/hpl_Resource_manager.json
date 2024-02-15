@@ -510,9 +510,226 @@
           }
         }
       ]
+    },
+    {
+      "name": "craftRecipe",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipe",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "outputResource",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inputResourceOne",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputResourceTwo",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "inputResourceThree",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "inputResourceFour",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": "CraftRecipieArg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initilizeRecipe",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "key",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipe",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "SPL TOKEN PROGRAM"
+          ]
+        },
+        {
+          "name": "outputResource",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "inputResourceOne",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputResourceTwo",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "inputResourceThree",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "inputResourceFour",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "InitilizeRecipieArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
+    {
+      "name": "Recipe",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "project",
+            "type": "publicKey"
+          },
+          {
+            "name": "key",
+            "type": "publicKey"
+          },
+          {
+            "name": "xp",
+            "type": {
+              "defined": "XpPair"
+            }
+          },
+          {
+            "name": "output",
+            "type": {
+              "defined": "ResourceAmountPair"
+            }
+          },
+          {
+            "name": "inputs",
+            "type": {
+              "vec": {
+                "defined": "ResourceAmountPair"
+              }
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "Resource",
       "type": {
@@ -560,6 +777,24 @@
   ],
   "types": [
     {
+      "name": "CraftRecipieArg",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holdingState",
+            "type": {
+              "defined": "HoldingAccountArgs"
+            }
+          },
+          {
+            "name": "proofSize",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "MintResourceArgs",
       "type": {
         "kind": "struct",
@@ -593,6 +828,26 @@
           {
             "name": "amount",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitilizeRecipieArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amounts",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "xp",
+            "type": {
+              "defined": "XpPair"
+            }
           }
         ]
       }
@@ -705,6 +960,38 @@
                 32
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResourceAmountPair",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "resource",
+            "type": "publicKey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "XpPair",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "label",
+            "type": "string"
+          },
+          {
+            "name": "increament",
+            "type": "u64"
           }
         ]
       }
@@ -961,8 +1248,13 @@
     },
     {
       "code": 6001,
+      "name": "ResourceNotFound",
+      "msg": "The resource provided is not found"
+    },
+    {
+      "code": 6002,
       "name": "InsufficientAmount",
-      "msg": "The amount provided is greater than the amount that is held in the account"
+      "msg": "The amount provided is insufficient"
     }
   ],
   "metadata": {

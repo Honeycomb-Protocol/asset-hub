@@ -35,25 +35,46 @@ createErrorFromNameLookup.set(
 )
 
 /**
- * InsufficientAmount: 'The amount provided is greater than the amount that is held in the account'
+ * ResourceNotFound: 'The resource provided is not found'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class ResourceNotFoundError extends Error {
+  readonly code: number = 0x1771
+  readonly name: string = 'ResourceNotFound'
+  constructor() {
+    super('The resource provided is not found')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, ResourceNotFoundError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1771, () => new ResourceNotFoundError())
+createErrorFromNameLookup.set(
+  'ResourceNotFound',
+  () => new ResourceNotFoundError()
+)
+
+/**
+ * InsufficientAmount: 'The amount provided is insufficient'
  *
  * @category Errors
  * @category generated
  */
 export class InsufficientAmountError extends Error {
-  readonly code: number = 0x1771
+  readonly code: number = 0x1772
   readonly name: string = 'InsufficientAmount'
   constructor() {
-    super(
-      'The amount provided is greater than the amount that is held in the account'
-    )
+    super('The amount provided is insufficient')
     if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, InsufficientAmountError)
     }
   }
 }
 
-createErrorFromCodeLookup.set(0x1771, () => new InsufficientAmountError())
+createErrorFromCodeLookup.set(0x1772, () => new InsufficientAmountError())
 createErrorFromNameLookup.set(
   'InsufficientAmount',
   () => new InsufficientAmountError()
