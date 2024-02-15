@@ -11,7 +11,6 @@ export type HoldingAccountArgs = {
   holding: Holding
   root: number[] /* size: 32 */
   leafIdx: number
-  sourceHash: number[] /* size: 32 */
 }
 
 /**
@@ -24,7 +23,6 @@ export const holdingAccountArgsBeet =
       ['holding', holdingBeet],
       ['root', beet.uniformFixedSizeArray(beet.u8, 32)],
       ['leafIdx', beet.u32],
-      ['sourceHash', beet.uniformFixedSizeArray(beet.u8, 32)],
     ],
     'HoldingAccountArgs'
   )
