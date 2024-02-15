@@ -53,6 +53,17 @@ export class ResourceManagerPdaClient extends PdaClient {
       programId
     );
   }
+
+  recipe(
+    project: PublicKey,
+    key: PublicKey,
+    programId = this.defaultProgramId
+  ) {
+    return PdaModule.findProgramAddressSyncWithSeeds(
+      [Buffer.from("recipie"), project.toBuffer(), key.toBuffer()],
+      programId
+    );
+  }
 }
 /**
  * Factory function to create a new instance of the ResourceManagerPdaClient.
