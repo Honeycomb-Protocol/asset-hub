@@ -51,4 +51,18 @@ pub mod hpl_resource_manager {
     ) -> Result<()> {
         instructions::unwrap_resource(ctx, args)
     }
+
+    pub fn craft_recipe<'info>(
+        ctx: Context<'_, '_, '_, 'info, CraftRecipe<'info>>,
+        args: Vec<CraftRecipieArg>,
+    ) -> Result<()> {
+        instructions::craft_recipe(ctx, args)
+    }
+
+    pub fn initilize_recipe(
+        ctx: Context<InitilizeRecipe>,
+        args: InitilizeRecipieArgs,
+    ) -> Result<()> {
+        instructions::initilize_recipe(ctx, args)
+    }
 }

@@ -4,6 +4,8 @@ use anchor_lang::prelude::*;
 pub struct Recipe {
     pub bump: u8,
 
+    pub project: Pubkey,
+
     pub key: Pubkey,
 
     pub xp: XpPair,
@@ -13,7 +15,7 @@ pub struct Recipe {
     pub inputs: Vec<ResourceAmountPair>,
 }
 impl Recipe {
-    pub const LEN: usize = 8 + 1 + 32 + 32 + 40;
+    pub const LEN: usize = 8 + 1 + 32 + 32 + 32 + 40;
 
     pub fn get_len(len: usize) -> usize {
         Self::LEN + len * 40
