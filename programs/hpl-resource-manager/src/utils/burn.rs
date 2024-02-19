@@ -1,7 +1,7 @@
 use {
     crate::{errors::ResourceErrorCode, Holding, HoldingAccountArgs, Resource},
     anchor_lang::prelude::*,
-    hpl_compression::{verify_leaf, CompressedData, CompressedDataEvent, ToNode},
+    hpl_compression::{CompressedData, CompressedDataEvent, ToNode},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -15,20 +15,13 @@ pub fn use_burn_resource<'info>(
     holding_state: &HoldingAccountArgs,
     amount: u64,
 ) -> Result<()> {
-    msg!("verifying leaf");
-
-    // verify the holding account leaf
-    verify_leaf(
-        holding_state.root,
-        holding_state.holding.to_compressed().to_node(),
-        holding_state.leaf_idx,
-        &merkle_tree,
-        &compression_program,
-        remaining_accounts.to_owned(),
-    )?;
-
     msg!("checking for InsufficientAmount");
     if amount > holding_state.holding.balance {
+        msg!(
+            "InsufficientAmount {:?} {:?}",
+            amount,
+            holding_state.holding.balance
+        );
         return Err(ResourceErrorCode::InsufficientAmount.into());
     }
 

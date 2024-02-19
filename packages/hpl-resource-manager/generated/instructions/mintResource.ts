@@ -87,7 +87,7 @@ export const mintResourceInstructionDiscriminator = [
 export function createMintResourceInstruction(
   accounts: MintResourceInstructionAccounts,
   args: MintResourceInstructionArgs,
-  programId = new web3.PublicKey('6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ')
+  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
 ) {
   const [data] = mintResourceStruct.serialize({
     instructionDiscriminator: mintResourceInstructionDiscriminator,

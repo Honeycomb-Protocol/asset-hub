@@ -1,7 +1,7 @@
 use {
     crate::{Holding, MintResourceArgs, Resource},
     anchor_lang::prelude::*,
-    hpl_compression::{verify_leaf, CompressedData, CompressedDataEvent, ToNode},
+    hpl_compression::{CompressedData, CompressedDataEvent, ToNode},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -22,15 +22,6 @@ pub fn use_mint_resource<'info>(
         .assert_append(merkle_tree.to_account_info())?;
 
     if let Some(holding_state) = args.holding_state {
-        verify_leaf(
-            holding_state.root,
-            holding_state.holding.to_compressed().to_node(),
-            holding_state.leaf_idx,
-            &merkle_tree.to_account_info(),
-            &compression_program,
-            remaining_accounts.to_owned(),
-        )?;
-
         let bump_binding = [resource.bump];
         let signer_seeds = resource.seeds(&bump_binding);
         let new_holding_state = Holding {
@@ -93,6 +84,8 @@ pub fn use_mint_resource<'info>(
             Some(&[&signer_seeds[..]]),
         )?;
     }
+
+    msg!("Minted {:?} Resources", args.amount);
 
     Ok(())
 }

@@ -1,12 +1,9 @@
 use {
     crate::Resource,
     anchor_lang::prelude::*,
-    core::slice,
+    anchor_spl::token_interface::spl_token_2022::extension::StateWithExtensions,
     spl_token_2022::{
-        extension::{
-            metadata_pointer::{self, MetadataPointer},
-            BaseStateWithExtensions, ExtensionType, StateWithExtensionsMut,
-        },
+        extension::ExtensionType,
         instruction::{
             burn, initialize_mint2, initialize_mint_close_authority, initialize_permanent_delegate,
             mint_to,
@@ -21,7 +18,7 @@ use {
     },
     spl_token_metadata_interface::{
         instruction::{initialize, update_field},
-        state::{Field, TokenMetadata},
+        state::Field,
     },
     std::ops::Deref,
 };
@@ -271,18 +268,10 @@ pub fn update_metadata_for_mint<'info>(
     Ok(())
 }
 
-pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) -> Result<TokenMetadata> {
+pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) {
     let data = mint.try_borrow_data().unwrap();
     let slice = data.deref().to_vec();
-    // let mint_account_with_extensions =
-    //     StateWithExtensionsMut::<Mint>::unpack_uninitialized(&mut data.to_vec()[..])?;
-
-    // let t = mint_account_with_extensions.get_extension_types();
-
-    let mint_size = 170 as usize;
-    let mint_data = TokenMetadata::deserialize(&mut &slice[mint_size..])?;
-
-    Ok(mint_data)
+    let mint = StateWithExtensions::<Mint>::unpack(&slice);
 }
 
 pub fn update_compressed_supply<'info>(

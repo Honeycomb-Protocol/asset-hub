@@ -5,9 +5,8 @@ skip-lint = false
 anchor_template = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [provider]
-url = "https://bumpy-concordia-fast-devnet.helius-rpc.com/"
-cluster = "devnet"
+cluster = "https://rpc.magicblock.app/devnet/ "
 wallet = "key.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn test"

@@ -1,0 +1,67 @@
+{
+  "lookupTableAddress": "3W9MQdrPcLYNWhQxcHnNEMG1DcUVjMNJJbWxQ6EBToVx",
+  "project": "6XHgu6E2d4BEktogfNto3xAK2YBL9LejVtRcWp23UpcN",
+  "recipe": "DkYgiN357VDbV3ccnNHEoQ9McS5CjEiwzcQ6QjVcw8AT",
+  "resources": [
+    {
+      "label": "outputResource",
+      "resource": "BTgeusVrq4sip7o281dkJSWZQHY6qi8HL9MNdnkGPmr6",
+      "mint": "5a6bny1C8rQVGSXCEdbYTja7ttqcBmZ5UUfbg1ZzTY5k",
+      "tree": "ENB98LSAganddMK9uxbokHuXFUoPNmweWLR1sYWmhcik",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceOne",
+      "resource": "Fypud3Yq627XLTPkyTNB8Pf1C7WUwUwHmcAW34Pn7Cdj",
+      "mint": "461i3Mf2i3HpMnQtxPFofpSMqNg2YLsg1qsEfgqo5hpF",
+      "tree": "HxMhthvXeoDQBbwLL7HoadMRBgm4LSegW2WMfonr2dra",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceTwo",
+      "resource": "BttCgvxSPXD9r1EyjhZ1zeRBS7HRAJWJy8V4YuLgF7ss",
+      "mint": "4WFymgy1omKgTyxXXsezT4aAzv2F7yhyKH4nh8VERgHC",
+      "tree": "8ciuuwbLyGp7mfhFFzHjNwLfJsWuSHNVFihwr6ifCaka",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceThree",
+      "resource": "449wCnDnrQqExQaLZm4g6rzwnmTU6JR78zF5mPjJfRrN",
+      "mint": "5srY2UmYA1stCcGZ2Lc55AWRDUY9tXbC64u4XGp2Vix4",
+      "tree": "H6xYPjrkVNud5j3KfCAfWyELxfExqVAwAggcg2ZZoUR",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceFour",
+      "resource": "98uKPvsuVCUccanmLPGB9kNwhX1SS7sJ3Vu9CPHNLnfH",
+      "mint": "4d2N4YYr5m127udXHTe4GM4V1kgsVEkxAZD3PKzPDAoA",
+      "tree": "4vkgXXiDfzzR5D8PxJHLFN3hH8AxAsiVVvCwmsvmSug4",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    }
+  ]
+}

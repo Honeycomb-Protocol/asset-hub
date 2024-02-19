@@ -60,7 +60,7 @@ export class ResourceManagerPdaClient extends PdaClient {
     programId = this.defaultProgramId
   ) {
     return PdaModule.findProgramAddressSyncWithSeeds(
-      [Buffer.from("recipie"), project.toBuffer(), key.toBuffer()],
+      [Buffer.from("recipe"), project.toBuffer(), key.toBuffer()],
       programId
     );
   }

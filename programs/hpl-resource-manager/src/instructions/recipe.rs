@@ -70,6 +70,7 @@ pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipieArg
     msg!("creating recipe account...");
 
     recipe.set_defaults();
+    recipe.project = ctx.accounts.project.key();
     recipe.bump = ctx.bumps["recipe"];
     recipe.key = ctx.accounts.key.key();
     recipe.xp = args.xp;

@@ -89,7 +89,7 @@ export const burnResourceInstructionDiscriminator = [
 export function createBurnResourceInstruction(
   accounts: BurnResourceInstructionAccounts,
   args: BurnResourceInstructionArgs,
-  programId = new web3.PublicKey('6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ')
+  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
 ) {
   const [data] = burnResourceStruct.serialize({
     instructionDiscriminator: burnResourceInstructionDiscriminator,

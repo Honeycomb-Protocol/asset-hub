@@ -92,7 +92,7 @@ export const initilizeRecipeInstructionDiscriminator = [
 export function createInitilizeRecipeInstruction(
   accounts: InitilizeRecipeInstructionAccounts,
   args: InitilizeRecipeInstructionArgs,
-  programId = new web3.PublicKey('6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ')
+  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
 ) {
   const [data] = initilizeRecipeStruct.serialize({
     instructionDiscriminator: initilizeRecipeInstructionDiscriminator,

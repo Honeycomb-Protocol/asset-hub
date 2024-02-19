@@ -23,6 +23,7 @@ impl Recipe {
 
     pub fn set_defaults(&mut self) {
         self.bump = 0;
+        self.project = Pubkey::default();
         self.key = Pubkey::default();
         self.inputs = Vec::new();
         self.xp = XpPair {

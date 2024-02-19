@@ -85,7 +85,7 @@ export const initilizeResourceTreeInstructionDiscriminator = [
 export function createInitilizeResourceTreeInstruction(
   accounts: InitilizeResourceTreeInstructionAccounts,
   args: InitilizeResourceTreeInstructionArgs,
-  programId = new web3.PublicKey('6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ')
+  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
 ) {
   const [data] = initilizeResourceTreeStruct.serialize({
     instructionDiscriminator: initilizeResourceTreeInstructionDiscriminator,

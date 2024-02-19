@@ -25,7 +25,7 @@ pub struct Resource {
 pub enum ResourseKind {
     Fungible,
 
-    NonFungible { characterstics: Schema },
+    NonFungible { characterstics: Schema  },
 }
 
 impl Resource {

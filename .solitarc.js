@@ -406,7 +406,7 @@ const configs = {
   ),
   "resource-manager": createConfig(
     "resource-manager",
-    "6ARwjKsMY2P3eLEWhdoU5czNezw3Qg6jEfbmLTVQqrPQ",
+    "4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y",
     {
       types: [
         {

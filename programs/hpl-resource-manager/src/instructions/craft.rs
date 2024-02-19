@@ -38,19 +38,19 @@ pub struct CraftRecipe<'info> {
     pub compression_program: Program<'info, SplAccountCompression>,
 
     #[account(mut, has_one = project)]
-    pub output_resource: Account<'info, Resource>,
+    pub output_resource: Box<Account<'info, Resource>>,
 
     #[account(has_one = project)]
-    pub input_resource_one: Account<'info, Resource>,
+    pub input_resource_one: Box<Account<'info, Resource>>,
 
     #[account(has_one = project)]
-    pub input_resource_two: Option<Account<'info, Resource>>,
+    pub input_resource_two: Option<Box<Account<'info, Resource>>>,
 
     #[account(has_one = project)]
-    pub input_resource_three: Option<Account<'info, Resource>>,
+    pub input_resource_three: Option<Box<Account<'info, Resource>>>,
 
     #[account(has_one = project)]
-    pub input_resource_four: Option<Account<'info, Resource>>,
+    pub input_resource_four: Option<Box<Account<'info, Resource>>>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -67,46 +67,69 @@ pub fn craft_recipe<'info>(
     let recipe = &mut ctx.accounts.recipe;
     let mut args_iter = args.into_iter();
 
-    // remaining accounts
-    let mut account_infos: std::slice::Iter<'_, AccountInfo<'info>> =
-        ctx.remaining_accounts.into_iter();
-
-    let output_stats = next_craft_recipie(args_iter.next().unwrap(), &mut account_infos);
+    msg!("output");
+    let mut pointer: usize = 0;
+    let output_stats: (HoldingAccountArgs, AccountInfo<'_>, Vec<AccountInfo<'_>>) =
+        next_craft_recipie(
+            args_iter.next().unwrap(),
+            &ctx.remaining_accounts.to_vec(),
+            &mut pointer,
+        );
 
     // stacking the inputs in an directory for easy access
+    msg!("resource 1");
     let mut resource_map = HashMap::new();
     resource_map.insert(
         ctx.accounts.input_resource_one.key(),
         (
             &mut ctx.accounts.input_resource_one,
-            next_craft_recipie(args_iter.next().unwrap(), &mut account_infos),
+            next_craft_recipie(
+                args_iter.next().unwrap(),
+                &ctx.remaining_accounts.to_vec(),
+                &mut pointer,
+            ),
         ),
     );
 
     if let Some(input_resource_two) = &mut ctx.accounts.input_resource_two {
+        msg!("resource 2");
         resource_map.insert(
             input_resource_two.key(),
             (
                 input_resource_two,
-                next_craft_recipie(args_iter.next().unwrap(), &mut account_infos),
+                next_craft_recipie(
+                    args_iter.next().unwrap(),
+                    &ctx.remaining_accounts.to_vec(),
+                    &mut pointer,
+                ),
             ),
         );
     }
     if let Some(input_resource_three) = &mut ctx.accounts.input_resource_three {
+        msg!("resource 3");
         resource_map.insert(
             input_resource_three.key(),
             (
                 input_resource_three,
-                next_craft_recipie(args_iter.next().unwrap(), &mut account_infos),
+                next_craft_recipie(
+                    args_iter.next().unwrap(),
+                    &ctx.remaining_accounts.to_vec(),
+                    &mut pointer,
+                ),
             ),
         );
     }
     if let Some(input_resource_four) = &mut ctx.accounts.input_resource_four {
+        msg!("resource 5");
         resource_map.insert(
             input_resource_four.key(),
             (
                 input_resource_four,
-                next_craft_recipie(args_iter.next().unwrap(), &mut account_infos),
+                next_craft_recipie(
+                    args_iter.next().unwrap(),
+                    &ctx.remaining_accounts.to_vec(),
+                    &mut pointer,
+                ),
             ),
         );
     }
@@ -114,9 +137,10 @@ pub fn craft_recipe<'info>(
     // burning the input resources
     for input in recipe.inputs.iter() {
         if let Some(resource) = resource_map.get_mut(&input.resource) {
+            msg!("burning the input resources {:?}", resource.1 .1.key());
             use_burn_resource(
                 &mut resource.0,
-                resource.1 .1,
+                &resource.1 .1,
                 &resource.1 .2,
                 &ctx.accounts.clock,
                 &ctx.accounts.log_wrapper,
@@ -129,10 +153,11 @@ pub fn craft_recipe<'info>(
         }
     }
 
+    msg!("minting the output resources");
     // minting the output resource
     use_mint_resource(
         &mut ctx.accounts.output_resource,
-        output_stats.1,
+        &output_stats.1,
         &ctx.accounts.authority,
         output_stats.2,
         &ctx.accounts.clock.to_owned(),
@@ -151,14 +176,29 @@ pub fn craft_recipe<'info>(
 
 pub fn next_craft_recipie<'a, 'info>(
     recipe: CraftRecipieArg,
-    remaining_accounts: &mut std::slice::Iter<'a, AccountInfo<'info>>,
+    remaining_accounts: &'a Vec<AccountInfo<'info>>,
+    previous_pointer: &'a mut usize,
 ) -> (
     HoldingAccountArgs,
-    &'a AccountInfo<'info>,
+    AccountInfo<'info>,
     Vec<AccountInfo<'info>>,
 ) {
-    let tree = remaining_accounts.next().unwrap();
-    let infos = remaining_accounts.take(recipe.proof_size as usize).cloned();
+    if *previous_pointer >= remaining_accounts.len() {
+        msg!("remaining account length {:?}", remaining_accounts.len());
+        panic!("not enough accounts to craft the recipe");
+    }
 
-    (recipe.holding_state, tree, infos.collect())
+    let ponter = *previous_pointer + recipe.proof_size as usize;
+    let accounts = remaining_accounts[*previous_pointer..ponter].to_vec();
+    msg!("proof size: {}", recipe.proof_size);
+    msg!("previous pointer: {}", *previous_pointer);
+
+    // update the pointer
+    *previous_pointer += recipe.proof_size as usize;
+
+    (
+        recipe.holding_state,
+        accounts[0].to_owned(),
+        accounts[1..].to_vec(),
+    )
 }
