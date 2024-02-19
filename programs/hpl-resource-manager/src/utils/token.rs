@@ -35,6 +35,7 @@ pub enum ExtensionInitializationParams {
         authority: Option<Pubkey>,
         metadata_address: Option<Pubkey>,
     },
+    
 }
 impl ExtensionInitializationParams {
     pub fn extension(&self) -> ExtensionType {
