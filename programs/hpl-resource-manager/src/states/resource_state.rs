@@ -24,8 +24,8 @@ pub struct Resource {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum ResourseKind {
     Fungible,
-
-    NonFungible { characterstics: Schema  },
+    INF { characterstics: Schema },
+    NonFungible,
 }
 
 impl Resource {

@@ -18,7 +18,8 @@ import { Schema, schemaBeet } from './Schema'
  */
 export type ResourseKindRecord = {
   Fungible: void /* scalar variant */
-  NonFungible: { characterstics: Schema }
+  INF: { characterstics: Schema }
+  NonFungible: void /* scalar variant */
 }
 
 /**
@@ -37,6 +38,9 @@ export type ResourseKind = beet.DataEnumKeyAsKind<ResourseKindRecord>
 export const isResourseKindFungible = (
   x: ResourseKind
 ): x is ResourseKind & { __kind: 'Fungible' } => x.__kind === 'Fungible'
+export const isResourseKindINF = (
+  x: ResourseKind
+): x is ResourseKind & { __kind: 'INF' } => x.__kind === 'INF'
 export const isResourseKindNonFungible = (
   x: ResourseKind
 ): x is ResourseKind & { __kind: 'NonFungible' } => x.__kind === 'NonFungible'
@@ -49,10 +53,11 @@ export const resourseKindBeet = beet.dataEnum<ResourseKindRecord>([
   ['Fungible', beet.unit],
 
   [
-    'NonFungible',
-    new beet.FixableBeetArgsStruct<ResourseKindRecord['NonFungible']>(
+    'INF',
+    new beet.FixableBeetArgsStruct<ResourseKindRecord['INF']>(
       [['characterstics', schemaBeet]],
-      'ResourseKindRecord["NonFungible"]'
+      'ResourseKindRecord["INF"]'
     ),
   ],
+  ['NonFungible', beet.unit],
 ]) as beet.FixableBeet<ResourseKind, ResourseKind>

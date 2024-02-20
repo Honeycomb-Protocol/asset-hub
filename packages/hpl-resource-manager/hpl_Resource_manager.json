@@ -1008,7 +1008,7 @@
             "name": "Fungible"
           },
           {
-            "name": "NonFungible",
+            "name": "INF",
             "fields": [
               {
                 "name": "characterstics",
@@ -1017,6 +1017,9 @@
                 }
               }
             ]
+          },
+          {
+            "name": "NonFungible"
           }
         ]
       }

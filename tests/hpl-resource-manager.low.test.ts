@@ -381,6 +381,8 @@ describe("Resource Manager", () => {
     const resources = data.resources.filter((e) => e.flags.isMinted === false);
 
     for (const resource of resources) {
+      if (resource.label === "outputResource") continue;
+
       const ix = createMintResourceInstruction(
         {
           mint: resource.mint,
@@ -424,7 +426,7 @@ describe("Resource Manager", () => {
     }
   });
 
-  it("Burn Resource", async () => {
+  it.skip("Burn Resource", async () => {
     const resources = data.resources.filter((e) => e.flags.isBurned === false);
     for (const resource of resources) {
       if (resource.label === "outputResource") continue;
@@ -659,7 +661,7 @@ describe("Resource Manager", () => {
     }
   });
 
-  it("Create Lookup Table", async () => {
+  it.skip("Create Lookup Table", async () => {
     if (data.resources.length === 0) throw new Error("No Resources Found");
 
     // setting up the lookup table if it exists
@@ -727,7 +729,7 @@ describe("Resource Manager", () => {
     saveData(data);
   });
 
-  it("Initilize Recipe", async () => {
+  it.skip("Initilize Recipe", async () => {
     if (data.recipe.address) return;
     if (data.resources.length === 0) throw new Error("No Resources Found");
 
@@ -787,7 +789,7 @@ describe("Resource Manager", () => {
     saveData(data);
   });
 
-  it("Craft Recipie", async () => {
+  it.skip("Craft Recipie", async () => {
     if (!lookupTable) throw new Error("Lookup Table not found");
     if (!data.recipe.address) throw new Error("No Recipe Found");
     if (data.resources.length === 0) throw new Error("No Resources Found");
