@@ -9,11 +9,11 @@ pub fn use_mint_resource<'info>(
     resource: &mut Account<'info, Resource>,
     merkle_tree: &AccountInfo<'info>,
     owner: &AccountInfo<'info>,
-    remaining_accounts: Vec<AccountInfo<'info>>,
+    remaining_accounts: &[AccountInfo<'info>],
     clock: &Sysvar<'info, Clock>,
     log_wrapper: &Program<'info, Noop>,
     compression_program: &Program<'info, SplAccountCompression>,
-    args: MintResourceArgs,
+    args: &MintResourceArgs,
 ) -> Result<()> {
     msg!("verifying leaf");
 
@@ -21,7 +21,7 @@ pub fn use_mint_resource<'info>(
         .merkle_trees
         .assert_append(merkle_tree.to_account_info())?;
 
-    if let Some(holding_state) = args.holding_state {
+    if let Some(holding_state) = &args.holding_state {
         let bump_binding = [resource.bump];
         let signer_seeds = resource.seeds(&bump_binding);
         let new_holding_state = Holding {
@@ -48,7 +48,7 @@ pub fn use_mint_resource<'info>(
             &merkle_tree,
             &compression_program,
             &log_wrapper,
-            remaining_accounts.to_owned(),
+            remaining_accounts.to_vec(),
             Some(&[&signer_seeds[..]]),
         )?;
     } else {

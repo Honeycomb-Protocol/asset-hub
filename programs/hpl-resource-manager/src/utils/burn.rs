@@ -8,15 +8,15 @@ use {
 pub fn use_burn_resource<'info>(
     resource: &mut Account<'info, Resource>,
     merkle_tree: &AccountInfo<'info>,
-    remaining_accounts: &Vec<AccountInfo<'info>>,
+    remaining_accounts: &[AccountInfo<'info>],
     clock: &Sysvar<'info, Clock>,
     log_wrapper: &Program<'info, Noop>,
     compression_program: &Program<'info, SplAccountCompression>,
-    holding_state: &HoldingAccountArgs,
-    amount: u64,
+    holding_state: HoldingAccountArgs,
+    amount: &u64,
 ) -> Result<()> {
     msg!("checking for InsufficientAmount");
-    if amount > holding_state.holding.balance {
+    if *amount > holding_state.holding.balance {
         msg!(
             "InsufficientAmount {:?} {:?}",
             amount,
@@ -63,7 +63,7 @@ pub fn use_burn_resource<'info>(
         &merkle_tree,
         &compression_program,
         &log_wrapper,
-        remaining_accounts.to_owned(),
+        remaining_accounts.to_vec(),
         Some(&[&signer_seeds[..]]),
     )?;
 
