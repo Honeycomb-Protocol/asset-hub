@@ -84,7 +84,6 @@ pub fn wrap_resource<'info>(
         &ctx.accounts.mint.to_account_info(),
         &ctx.accounts.token_account.to_account_info(),
         &ctx.accounts.owner.to_account_info(),
-        &resource,
         args.amount,
     )?;
 

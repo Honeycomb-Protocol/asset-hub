@@ -67,20 +67,22 @@ pub fn mint_resource<'info>(
         resource,
         &ctx.accounts.merkle_tree,
         &ctx.accounts.owner,
-        ctx.remaining_accounts.to_vec(),
+        ctx.remaining_accounts,
         &ctx.accounts.clock.to_owned(),
         &ctx.accounts.log_wrapper.to_owned(),
         &ctx.accounts.compression_program.to_owned(),
-        args,
+        &args,
     )?;
 
     msg!("Minting the token");
+
     // update compress supply in mint's metadata
     // update_compressed_supply(
     //     ctx.accounts.token22_program.to_account_info(),
     //     ctx.accounts.mint.to_account_info(),
     //     &resource,
     //     args.amount,
+    //     false,
     // )?;
 
     Ok(())
@@ -144,22 +146,15 @@ pub fn burn_resource<'info>(
     use_burn_resource(
         resource,
         &ctx.accounts.merkle_tree,
-        &ctx.remaining_accounts.to_vec(),
+        &ctx.remaining_accounts,
         &ctx.accounts.clock.to_owned(),
         &ctx.accounts.log_wrapper.to_owned(),
         &ctx.accounts.compression_program.to_owned(),
-        &args.holding_state,
-        args.amount,
+        args.holding_state,
+        &args.amount,
     )?;
 
-    msg!("Minting the token");
-    // update compress supply in mint's metadata
-    // update_compressed_supply(
-    //     ctx.accounts.token22_program.to_account_info(),
-    //     ctx.accounts.mint.to_account_info(),
-    //     &resource,
-    //     args.amount,
-    // )?;
+    msg!("Token Burned");
 
     Ok(())
 }
