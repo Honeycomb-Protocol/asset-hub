@@ -1,9 +1,8 @@
 use {
     crate::Resource,
     anchor_lang::prelude::*,
-    anchor_spl::token_interface::spl_token_2022::extension::StateWithExtensions,
     spl_token_2022::{
-        extension::ExtensionType,
+        extension::{metadata_pointer, ExtensionType},
         instruction::{
             burn, initialize_mint2, initialize_mint_close_authority, initialize_permanent_delegate,
             mint_to,
@@ -16,10 +15,7 @@ use {
         },
         state::Mint,
     },
-    spl_token_metadata_interface::{
-        instruction::{initialize, update_field},
-        state::Field,
-    },
+    spl_token_metadata_interface::instruction::initialize,
     std::ops::Deref,
 };
 
@@ -35,7 +31,6 @@ pub enum ExtensionInitializationParams {
         authority: Option<Pubkey>,
         metadata_address: Option<Pubkey>,
     },
-    
 }
 impl ExtensionInitializationParams {
     pub fn extension(&self) -> ExtensionType {
@@ -194,127 +189,134 @@ pub fn create_metadata_for_mint<'info>(
     Ok(())
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct ResourceMetadataUpdateArgs {
-    pub name: Option<String>,
-    pub symbol: Option<String>,
-    pub uri: Option<String>,
-    pub field: Option<String>,
-    pub value: Option<String>,
-}
+// #[derive(AnchorSerialize, AnchorDeserialize)]
+// pub struct ResourceMetadataUpdateArgs {
+//     pub name: Option<String>,
+//     pub symbol: Option<String>,
+//     pub uri: Option<String>,
+//     pub field: Option<String>,
+//     pub value: Option<String>,
+// }
 
-pub fn update_metadata_for_mint<'info>(
-    token22_program: AccountInfo<'info>,
-    mint: AccountInfo<'info>,
-    resource: &Account<'info, Resource>,
-    metadata: ResourceMetadataUpdateArgs,
-) -> Result<()> {
-    let mut instructions: Vec<Instruction> = vec![];
-    if let Some(name) = metadata.name {
-        instructions.push(update_field(
-            &token22_program.key(),
-            &mint.key(),
-            &resource.key(),
-            Field::Name,
-            name,
-        ));
-    }
+// pub fn update_metadata_for_mint<'info>(
+//     token22_program: AccountInfo<'info>,
+//     mint: AccountInfo<'info>,
+//     resource: &Account<'info, Resource>,
+//     metadata: ResourceMetadataUpdateArgs,
+// ) -> Result<()> {
+//     let mut instructions: Vec<Instruction> = vec![];
+//     if let Some(name) = metadata.name {
+//         instructions.push(update_field(
+//             &token22_program.key(),
+//             &mint.key(),
+//             &resource.key(),
+//             Field::Name,
+//             name,
+//         ));
+//     }
 
-    if let Some(symbol) = metadata.symbol {
-        instructions.push(update_field(
-            &token22_program.key(),
-            &mint.key(),
-            &resource.key(),
-            Field::Symbol,
-            symbol,
-        ));
-    }
+//     if let Some(symbol) = metadata.symbol {
+//         instructions.push(update_field(
+//             &token22_program.key(),
+//             &mint.key(),
+//             &resource.key(),
+//             Field::Symbol,
+//             symbol,
+//         ));
+//     }
 
-    if let Some(uri) = metadata.uri {
-        instructions.push(update_field(
-            &token22_program.key(),
-            &mint.key(),
-            &resource.key(),
-            Field::Uri,
-            uri,
-        ));
-    }
+//     if let Some(uri) = metadata.uri {
+//         instructions.push(update_field(
+//             &token22_program.key(),
+//             &mint.key(),
+//             &resource.key(),
+//             Field::Uri,
+//             uri,
+//         ));
+//     }
 
-    if let Some(field) = metadata.field {
-        if let Some(value) = metadata.value {
-            instructions.push(update_field(
-                &token22_program.key(),
-                &mint.key(),
-                &resource.key(),
-                Field::Key(field),
-                value,
-            ));
-        }
-    }
+//     if let Some(field) = metadata.field {
+//         if let Some(value) = metadata.value {
+//             instructions.push(update_field(
+//                 &token22_program.key(),
+//                 &mint.key(),
+//                 &resource.key(),
+//                 Field::Key(field),
+//                 value,
+//             ));
+//         }
+//     }
 
-    for instruction in instructions {
-        msg!("Updating metadata account");
-        invoke_signed(
-            &instruction,
-            &[
-                mint.to_owned(),
-                resource.to_account_info(),
-                mint.to_owned(),
-                resource.to_account_info(),
-            ],
-            &[&resource.seeds(&[resource.bump])[..]],
-        )?;
-    }
+//     for instruction in instructions {
+//         msg!("Updating metadata account");
+//         invoke_signed(
+//             &instruction,
+//             &[
+//                 mint.to_owned(),
+//                 resource.to_account_info(),
+//                 mint.to_owned(),
+//                 resource.to_account_info(),
+//             ],
+//             &[&resource.seeds(&[resource.bump])[..]],
+//         )?;
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
-pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) {
-    let data = mint.try_borrow_data().unwrap();
-    let slice = data.deref().to_vec();
-    let mint = StateWithExtensions::<Mint>::unpack(&slice);
-}
+// pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) -> Result<TokenMetadata> {
+//     let buffer = mint.try_borrow_data()?;
+//     let mint = StateWithExtensions::<Mint>::unpack(&buffer)?;
 
-pub fn update_compressed_supply<'info>(
-    token22_program: AccountInfo<'info>,
-    mint: AccountInfo<'info>,
-    resource: &Account<'info, Resource>,
-    amount: u64,
-) -> Result<()> {
-    let resource_metadata = get_mint_metadata(mint.to_account_info()).unwrap();
+//     mint.get_variable_len_extension::<TokenMetadata>()
+//         .map_err(|err| err.into())
+// }
 
-    let mut new_supply = 0;
+// pub fn update_compressed_supply<'info>(
+//     token22_program: AccountInfo<'info>,
+//     mint: AccountInfo<'info>,
+//     resource: &Account<'info, Resource>,
+//     amount: u64,
+//     is_burning: bool,
+// ) -> Result<()> {
+//     let resource_metadata = get_mint_metadata(mint.to_account_info())?;
+//     let mut supply = 0;
 
-    if resource_metadata.additional_metadata.len() > 0 {
-        new_supply = resource_metadata
-            .additional_metadata
-            .iter()
-            .find_map(|(key, value)| {
-                if key == "compressed_supply" {
-                    Some(value.parse::<u64>().unwrap())
-                } else {
-                    None
-                }
-            })
-            .unwrap();
-    }
+//     if resource_metadata.additional_metadata.len() > 0 {
+//         supply = resource_metadata
+//             .additional_metadata
+//             .iter()
+//             .find_map(|(key, value)| {
+//                 if key == "compressed_supply" {
+//                     Some(value.parse::<u64>().unwrap())
+//                 } else {
+//                     None
+//                 }
+//             })
+//             .unwrap();
+//     }
 
-    // updateing the compressed supply from mint's metadata
-    update_metadata_for_mint(
-        token22_program.to_account_info(),
-        mint.to_account_info(),
-        &resource,
-        ResourceMetadataUpdateArgs {
-            field: Some("compressed_supply".to_string()),
-            value: Some((new_supply + amount).to_string()),
-            name: None,
-            symbol: None,
-            uri: None,
-        },
-    )?;
+//     if is_burning {
+//         supply -= amount;
+//     } else {
+//         supply += amount;
+//     }
+//     // updateing the compressed supply from mint's metadata
+//     update_metadata_for_mint(
+//         token22_program.to_account_info(),
+//         mint.to_account_info(),
+//         &resource,
+//         ResourceMetadataUpdateArgs {
+//             field: Some("compressed_supply".to_string()),
+//             value: Some(supply.to_string()),
+//             name: None,
+//             symbol: None,
+//             uri: None,
+//         },
+//     )?;
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 pub fn mint_tokens<'info>(
     token_program_id: &AccountInfo<'info>,
@@ -354,7 +356,6 @@ pub fn burn_tokens<'info>(
     mint: &AccountInfo<'info>,
     token_account: &AccountInfo<'info>,
     receiver: &AccountInfo<'info>,
-    resource: &Account<'info, Resource>,
     amount: u64,
 ) -> Result<()> {
     let burn_instruction = burn(
