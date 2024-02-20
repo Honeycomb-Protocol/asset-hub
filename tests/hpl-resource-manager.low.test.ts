@@ -138,7 +138,10 @@ interface Resource {
 interface TestData {
   lookupTableAddress: PublicKey | undefined;
   project: PublicKey | undefined;
-  recipe: PublicKey | undefined;
+  recipe: {
+    address: PublicKey | undefined;
+    isCrafted: boolean;
+  };
   resources: Resource[];
 }
 
@@ -153,7 +156,11 @@ const fetchData = (): TestData => {
         fileData?.lookupTableAddress &&
         new PublicKey(fileData.lookupTableAddress),
       project: fileData?.project && new PublicKey(fileData.project),
-      recipe: fileData?.recipe && new PublicKey(fileData.recipe),
+      recipe: {
+        address:
+          fileData?.recipe.address && new PublicKey(fileData.recipe.address),
+        isCrafted: fileData.recipe.isCrafted,
+      },
       resources: fileData.resources.map((e: Resource) => ({
         ...e,
         resource: new PublicKey(e.resource),
@@ -165,9 +172,18 @@ const fetchData = (): TestData => {
 
   return {
     lookupTableAddress: undefined,
-    recipe: undefined,
+    recipe: {
+      address: undefined,
+      isCrafted: false,
+    },
     project: undefined,
     resources: [],
+    flags: {
+      isMinted: false,
+      isBurned: false,
+      isWrapped: false,
+      isUnWrapped: false,
+    },
   } as TestData;
 };
 
@@ -408,9 +424,10 @@ describe("Resource Manager", () => {
     }
   });
 
-  it.skip("Burn Resource", async () => {
+  it("Burn Resource", async () => {
     const resources = data.resources.filter((e) => e.flags.isBurned === false);
     for (const resource of resources) {
+      if (resource.label === "outputResource") continue;
       const _resource = (await getCompressedAccountsByTree(resource.tree)).at(
         -1
       )!;
@@ -440,7 +457,7 @@ describe("Resource Manager", () => {
         },
         {
           args: {
-            amount: 100,
+            amount: 500,
             holdingState: {
               leafIdx: Number(proff.leaf_index),
               root: Array.from(new PublicKey(proff.root).toBytes()),
@@ -711,7 +728,7 @@ describe("Resource Manager", () => {
   });
 
   it("Initilize Recipe", async () => {
-    if (data.recipe) return;
+    if (data.recipe.address) return;
     if (data.resources.length === 0) throw new Error("No Resources Found");
 
     const key = Keypair.generate();
@@ -744,7 +761,7 @@ describe("Resource Manager", () => {
     // instructions
     const ix = createInitilizeRecipeInstruction(accounts, {
       args: {
-        amounts: [100, 100, 100],
+        amounts: data.resources.map((e) => 100),
         xp: {
           label: "XP",
           increament: 100,
@@ -764,7 +781,7 @@ describe("Resource Manager", () => {
     });
 
     console.log(signature, "Initilize Recipe");
-    data.recipe = recipeAddress;
+    data.recipe.address = recipeAddress;
 
     // saving the data to the file
     saveData(data);
@@ -772,12 +789,13 @@ describe("Resource Manager", () => {
 
   it("Craft Recipie", async () => {
     if (!lookupTable) throw new Error("Lookup Table not found");
-    if (!data.recipe) throw new Error("No Recipe Found");
+    if (!data.recipe.address) throw new Error("No Recipe Found");
     if (data.resources.length === 0) throw new Error("No Resources Found");
+    if (data.recipe.isCrafted) return;
 
     /// preparing the accounts for recipe
     const ixAccounts: CraftRecipeInstructionAccounts = {
-      recipe: data.recipe,
+      recipe: data.recipe.address,
       outputResource: PublicKey.default,
       inputResourceOne: PublicKey.default,
       inputResourceTwo: undefined,
@@ -812,6 +830,7 @@ describe("Resource Manager", () => {
       ))!;
       const proffs = accountProff.proof.slice(0, 2);
 
+      // console.log(compressedAccount.parsed_data, resource.label, "PROFFS");
       // appending proffs & tree into the remaining accounts
       ixAccounts.anchorRemainingAccounts?.push(
         ...[
@@ -867,7 +886,12 @@ describe("Resource Manager", () => {
         return e;
       });
 
-    console.log(confirmResponse, "Craft Recipe");
     console.log(signature, "Craft Recipe");
+
+    // setting the flag to true
+    data.recipe.isCrafted = true;
+
+    // saving the data to the file
+    saveData(data);
   });
 });

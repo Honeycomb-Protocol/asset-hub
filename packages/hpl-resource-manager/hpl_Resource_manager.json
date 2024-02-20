@@ -774,7 +774,9 @@
           {
             "name": "holdingState",
             "type": {
-              "defined": "HoldingAccountArgs"
+              "option": {
+                "defined": "HoldingAccountArgs"
+              }
             }
           },
           {
@@ -993,44 +995,6 @@
           {
             "name": "uri",
             "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ResourceMetadataUpdateArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "symbol",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "uri",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "field",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "value",
-            "type": {
-              "option": "string"
-            }
           }
         ]
       }

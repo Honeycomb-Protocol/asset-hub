@@ -11,7 +11,7 @@ import {
   holdingAccountArgsBeet,
 } from './HoldingAccountArgs'
 export type CraftRecipieArg = {
-  holdingState: HoldingAccountArgs
+  holdingState: beet.COption<HoldingAccountArgs>
   proofSize: number
 }
 
@@ -19,10 +19,11 @@ export type CraftRecipieArg = {
  * @category userTypes
  * @category generated
  */
-export const craftRecipieArgBeet = new beet.BeetArgsStruct<CraftRecipieArg>(
-  [
-    ['holdingState', holdingAccountArgsBeet],
-    ['proofSize', beet.u8],
-  ],
-  'CraftRecipieArg'
-)
+export const craftRecipieArgBeet =
+  new beet.FixableBeetArgsStruct<CraftRecipieArg>(
+    [
+      ['holdingState', beet.coption(holdingAccountArgsBeet)],
+      ['proofSize', beet.u8],
+    ],
+    'CraftRecipieArg'
+  )
