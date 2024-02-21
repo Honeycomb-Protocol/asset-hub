@@ -12,7 +12,6 @@ import {
 } from "../generated";
 import { ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { HplCurrency } from "../HplCurrency";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**
  * Represents the arguments for creating a "Create Holder Account" operation.
@@ -90,7 +89,6 @@ export async function createCreateHolderAccountOperation(
             vault: VAULT,
             hiveControl: HPL_HIVE_CONTROL_PROGRAM,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-            hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           },
@@ -113,7 +111,6 @@ export async function createCreateHolderAccountOperation(
             vault: VAULT,
             hiveControl: HPL_HIVE_CONTROL_PROGRAM,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-            hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           },

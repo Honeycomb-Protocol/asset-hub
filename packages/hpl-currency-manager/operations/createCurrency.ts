@@ -14,7 +14,6 @@ import {
   PROGRAM_ID,
 } from "../generated";
 import { METADATA_PROGRAM_ID, metadataPda } from "../utils";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**
  * Represents the arguments for creating a "Create Currency" operation.
@@ -113,7 +112,6 @@ export async function createCreateCurrencyOperation(
             vault: VAULT,
             hiveControl: HPL_HIVE_CONTROL_PROGRAM,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-            hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           },
           programId
@@ -132,7 +130,6 @@ export async function createCreateCurrencyOperation(
             hiveControl: HPL_HIVE_CONTROL_PROGRAM,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             tokenMetadataProgram: METADATA_PROGRAM_ID,
-            hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           },
           {

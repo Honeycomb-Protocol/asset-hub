@@ -4,7 +4,6 @@ import {
   createDeletePaymentStructureInstruction,
   PROGRAM_ID,
 } from "../../generated";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**
  * Represents the arguments for creating a "Delete Payment Structure" operation.
@@ -29,7 +28,6 @@ export async function createDeletePaymentStructureOperation(
         paymentStructure: args.paymentStructure,
         authority: honeycomb.identity().address,
         benificiary: honeycomb.identity().address,
-        hplEvents: HPL_EVENTS_PROGRAM,
         clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
       },
       programId

@@ -4,7 +4,6 @@ import {
   createCreateNewCharactersTreeInstruction,
   PROGRAM_ID,
 } from "../../generated";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import {
   SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
   SPL_NOOP_PROGRAM_ID,

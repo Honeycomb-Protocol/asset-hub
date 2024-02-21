@@ -5,7 +5,6 @@ import {
   createMakeNftPaymentInstruction,
   PROGRAM_ID,
 } from "../../generated";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import {
   AssetProof,
   AvailableNft,
@@ -83,7 +82,6 @@ export async function createMakeNftPaymentOperation(
             payer,
             bubblegumProgram: BUBBLEGUM_PROGRAM_ID,
             compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-            hplEvents: HPL_EVENTS_PROGRAM,
             logWrapper: SPL_NOOP_PROGRAM_ID,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
             anchorRemainingAccounts: proof.proof.map((p) => ({
@@ -153,7 +151,6 @@ export async function createMakeNftPaymentOperation(
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             authorizationRules,
             authorizationRulesProgram,
-            hplEvents: HPL_EVENTS_PROGRAM,
             clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
           },
