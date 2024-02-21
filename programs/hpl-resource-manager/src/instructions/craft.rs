@@ -5,7 +5,7 @@ use {
         HoldingAccountArgs, MintResourceArgs, Recipe, Resource,
     },
     anchor_lang::prelude::*,
-    anchor_spl::token::Token,
+    anchor_spl::token_2022::Token2022,
     hpl_hive_control::state::Project,
     spl_account_compression::{program::SplAccountCompression, Noop},
     std::collections::HashMap,
@@ -29,7 +29,7 @@ pub struct CraftRecipe<'info> {
 
     pub system_program: Program<'info, System>,
 
-    pub token_program: Program<'info, Token>,
+    pub token_program: Program<'info, Token2022>,
 
     pub clock: Sysvar<'info, Clock>,
 
