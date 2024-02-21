@@ -15,6 +15,7 @@ use {
         },
         state::Mint,
     },
+    spl_token_group_interface::instruction::{initialize_group, initialize_member},
     spl_token_metadata_interface::{
         instruction::{initialize, update_field},
         state::Field,
@@ -420,6 +421,58 @@ pub fn burn_tokens<'info>(
         ],
     )
     .unwrap();
+
+    Ok(())
+}
+
+pub fn init_collection<'info>(
+    token_program: &AccountInfo<'info>,
+    mint: AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
+    max_size: u32,
+) -> Result<()> {
+    let instruction = initialize_group(
+        &token_program.key(),
+        &mint.key(),
+        &mint.key(),
+        &resource.key(),
+        Some(resource.key()),
+        max_size,
+    );
+
+    invoke(
+        &instruction,
+        &[mint.to_account_info(), mint, resource.to_account_info()],
+    )?;
+
+    Ok(())
+}
+
+pub fn init_collection_mint<'info>(
+    token_program: &AccountInfo<'info>,
+    collection: AccountInfo<'info>,
+    mint: AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
+) -> Result<()> {
+    let instruction = initialize_member(
+        &token_program.key(),
+        &mint.key(),
+        &mint.key(),
+        &resource.key(),
+        &collection.key(),
+        &resource.key(),
+    );
+
+    invoke(
+        &instruction,
+        &[
+            mint.to_account_info(),
+            mint,
+            resource.to_account_info(),
+            collection.to_account_info(),
+            resource.to_account_info(),
+        ],
+    )?;
 
     Ok(())
 }
