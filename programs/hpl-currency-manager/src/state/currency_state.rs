@@ -1,11 +1,11 @@
-use {anchor_lang::prelude::*, hpl_utils::Default};
+use {anchor_lang::prelude::*, hpl_toolkit::schema::*};
 
 /// A currency is a project associated spl token.
 /// It is used as in-game utility currency.
 /// PDA: ['currency', mint]
 /// Category: currency_state
 #[account]
-#[derive(Debug)]
+#[derive(ToSchema)]
 pub struct Currency {
     pub bump: u8,
 
@@ -23,12 +23,12 @@ pub struct Currency {
 }
 
 /// Default implementation for `Currency`.
-impl Default for Currency {
+impl Currency {
     /// The size of the serialized `Currency` account.
-    const LEN: usize = 8 + 80;
+    pub const LEN: usize = 8 + 80;
 
     /// Sets default values for `Currency`.
-    fn set_defaults(&mut self) {
+    pub fn set_defaults(&mut self) {
         self.bump = 0;
         self.project = Pubkey::default();
         self.mint = Pubkey::default();
@@ -39,7 +39,7 @@ impl Default for Currency {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema)]
 pub enum TxHook {
     /// No hook
     User,
@@ -57,7 +57,7 @@ pub enum TxHook {
 /// The type of currency.
 /// Custodial currencies are held by the program for the user.
 /// NonCustodial currencies are transfered to holders wallet.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, ToSchema)]
 pub enum CurrencyKind {
     /// Represents a permissioned currency, further specified by `PermissionedCurrencyKind`.
     Permissioned { kind: PermissionedCurrencyKind },
@@ -66,7 +66,7 @@ pub enum CurrencyKind {
 }
 
 /// The sub-type of permissioned currency.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, ToSchema)]
 pub enum PermissionedCurrencyKind {
     /// Represents a non-custodial permissioned currency.
     NonCustodial,

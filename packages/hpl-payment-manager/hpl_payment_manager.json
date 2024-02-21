@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6-beta.2",
   "name": "hpl_payment_manager",
   "instructions": [
     {
@@ -40,14 +40,6 @@
           "isSigner": false,
           "docs": [
             "Solana System Program"
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -104,14 +96,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
@@ -155,14 +139,6 @@
           "isSigner": false,
           "docs": [
             "Solana System Program"
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -311,14 +287,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
@@ -462,14 +430,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "authorizationRulesProgram",
           "isMut": false,
           "isSigner": false,
@@ -593,14 +553,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "logWrapper",
           "isMut": false,
           "isSigner": false,
@@ -654,14 +606,6 @@
           ]
         },
         {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
-          ]
-        },
-        {
           "name": "clockSysvar",
           "isMut": false,
           "isSigner": false,
@@ -708,7 +652,7 @@
               "Payments conditional status"
             ],
             "type": {
-              "defined": "Conditionalbool"
+              "defined": "ConditionalBool"
             }
           }
         ]
@@ -926,83 +870,7 @@
       }
     },
     {
-      "name": "Event",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "NewPaymentStructure",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          },
-          {
-            "name": "DeletePaymentStructure",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          },
-          {
-            "name": "NewPaymentSession",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          },
-          {
-            "name": "MakePayment",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          },
-          {
-            "name": "ClosePaymentSession",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "Conditionalbool",
-      "docs": [
-        "Represents payment information with support for nested conditions."
-      ],
+      "name": "ConditionalBool",
       "type": {
         "kind": "enum",
         "variants": [
@@ -1020,7 +888,7 @@
             "fields": [
               {
                 "vec": {
-                  "defined": "Conditionalbool"
+                  "defined": "ConditionalBool"
                 }
               }
             ]
@@ -1030,7 +898,7 @@
             "fields": [
               {
                 "vec": {
-                  "defined": "Conditionalbool"
+                  "defined": "ConditionalBool"
                 }
               }
             ]
@@ -1040,9 +908,6 @@
     },
     {
       "name": "ConditionalPayment",
-      "docs": [
-        "Represents payment information with support for nested conditions."
-      ],
       "type": {
         "kind": "enum",
         "variants": [
@@ -1147,6 +1012,6 @@
     "address": "Pay9ZxrVRXjt9Da8qpwqq4yBRvvrfx3STWnKK4FstPr",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
-    "libVersion": "0.28.0"
+    "libVersion": "0.29.0"
   }
 }

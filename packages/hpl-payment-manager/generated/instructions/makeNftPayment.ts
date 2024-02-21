@@ -49,7 +49,6 @@ export const makeNftPaymentStruct = new beet.FixableBeetArgsStruct<
  * @property [] beneficiary (optional)
  * @property [_writable_, **signer**] payer
  * @property [] associatedTokenProgram
- * @property [] hplEvents
  * @property [] authorizationRulesProgram (optional)
  * @property [] authorizationRules (optional)
  * @property [] clockSysvar
@@ -73,7 +72,6 @@ export type MakeNftPaymentInstructionAccounts = {
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   associatedTokenProgram: web3.PublicKey
-  hplEvents: web3.PublicKey
   authorizationRulesProgram?: web3.PublicKey
   authorizationRules?: web3.PublicKey
   clockSysvar: web3.PublicKey
@@ -88,10 +86,8 @@ export const makeNftPaymentInstructionDiscriminator = [
 /**
  * Creates a _MakeNftPayment_ instruction.
  *
- * Optional accounts that are not provided will be omitted from the accounts
- * array passed with the instruction.
- * An optional account that is set cannot follow an optional account that is unset.
- * Otherwise an Error is raised.
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
@@ -135,144 +131,72 @@ export function createMakeNftPaymentInstruction(
       isWritable: true,
       isSigner: false,
     },
+    {
+      pubkey: accounts.nftEdition ?? programId,
+      isWritable: accounts.nftEdition != null,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.nftTokenRecord ?? programId,
+      isWritable: accounts.nftTokenRecord != null,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.depositAccount ?? programId,
+      isWritable: accounts.depositAccount != null,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.depositTokenRecord ?? programId,
+      isWritable: accounts.depositTokenRecord != null,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.beneficiary ?? programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.payer,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.associatedTokenProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.authorizationRulesProgram ?? programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.authorizationRules ?? programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clockSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
   ]
-
-  if (accounts.nftEdition != null) {
-    keys.push({
-      pubkey: accounts.nftEdition,
-      isWritable: true,
-      isSigner: false,
-    })
-  }
-  if (accounts.nftTokenRecord != null) {
-    if (accounts.nftEdition == null) {
-      throw new Error(
-        "When providing 'nftTokenRecord' then 'accounts.nftEdition' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.nftTokenRecord,
-      isWritable: true,
-      isSigner: false,
-    })
-  }
-  if (accounts.depositAccount != null) {
-    if (accounts.nftEdition == null || accounts.nftTokenRecord == null) {
-      throw new Error(
-        "When providing 'depositAccount' then 'accounts.nftEdition', 'accounts.nftTokenRecord' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.depositAccount,
-      isWritable: true,
-      isSigner: false,
-    })
-  }
-  if (accounts.depositTokenRecord != null) {
-    if (
-      accounts.nftEdition == null ||
-      accounts.nftTokenRecord == null ||
-      accounts.depositAccount == null
-    ) {
-      throw new Error(
-        "When providing 'depositTokenRecord' then 'accounts.nftEdition', 'accounts.nftTokenRecord', 'accounts.depositAccount' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.depositTokenRecord,
-      isWritable: true,
-      isSigner: false,
-    })
-  }
-  if (accounts.beneficiary != null) {
-    if (
-      accounts.nftEdition == null ||
-      accounts.nftTokenRecord == null ||
-      accounts.depositAccount == null ||
-      accounts.depositTokenRecord == null
-    ) {
-      throw new Error(
-        "When providing 'beneficiary' then 'accounts.nftEdition', 'accounts.nftTokenRecord', 'accounts.depositAccount', 'accounts.depositTokenRecord' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.beneficiary,
-      isWritable: false,
-      isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.payer,
-    isWritable: true,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.associatedTokenProgram,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.hplEvents,
-    isWritable: false,
-    isSigner: false,
-  })
-  if (accounts.authorizationRulesProgram != null) {
-    if (
-      accounts.nftEdition == null ||
-      accounts.nftTokenRecord == null ||
-      accounts.depositAccount == null ||
-      accounts.depositTokenRecord == null ||
-      accounts.beneficiary == null
-    ) {
-      throw new Error(
-        "When providing 'authorizationRulesProgram' then 'accounts.nftEdition', 'accounts.nftTokenRecord', 'accounts.depositAccount', 'accounts.depositTokenRecord', 'accounts.beneficiary' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.authorizationRulesProgram,
-      isWritable: false,
-      isSigner: false,
-    })
-  }
-  if (accounts.authorizationRules != null) {
-    if (
-      accounts.nftEdition == null ||
-      accounts.nftTokenRecord == null ||
-      accounts.depositAccount == null ||
-      accounts.depositTokenRecord == null ||
-      accounts.beneficiary == null ||
-      accounts.authorizationRulesProgram == null
-    ) {
-      throw new Error(
-        "When providing 'authorizationRules' then 'accounts.nftEdition', 'accounts.nftTokenRecord', 'accounts.depositAccount', 'accounts.depositTokenRecord', 'accounts.beneficiary', 'accounts.authorizationRulesProgram' need(s) to be provided as well."
-      )
-    }
-    keys.push({
-      pubkey: accounts.authorizationRules,
-      isWritable: false,
-      isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.clockSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.instructionsSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

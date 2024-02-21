@@ -25,7 +25,6 @@ export const closePaymentSessionStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] paymentStructure
  * @property [_writable_] paymentSession
  * @property [_writable_, **signer**] payer
- * @property [] hplEvents
  * @property [] clockSysvar
  * @category Instructions
  * @category ClosePaymentSession
@@ -35,7 +34,6 @@ export type ClosePaymentSessionInstructionAccounts = {
   paymentStructure: web3.PublicKey
   paymentSession: web3.PublicKey
   payer: web3.PublicKey
-  hplEvents: web3.PublicKey
   clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -74,11 +72,6 @@ export function createClosePaymentSessionInstruction(
       pubkey: accounts.payer,
       isWritable: true,
       isSigner: true,
-    },
-    {
-      pubkey: accounts.hplEvents,
-      isWritable: false,
-      isSigner: false,
     },
     {
       pubkey: accounts.clockSysvar,

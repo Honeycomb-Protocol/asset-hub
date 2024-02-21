@@ -43,7 +43,6 @@ export const createPaymentStructureStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_] paymentStructure
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
- * @property [] hplEvents
  * @property [] clockSysvar
  * @category Instructions
  * @category CreatePaymentStructure
@@ -55,7 +54,6 @@ export type CreatePaymentStructureInstructionAccounts = {
   authority: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
-  hplEvents: web3.PublicKey
   clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -106,11 +104,6 @@ export function createCreatePaymentStructureInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.hplEvents,
       isWritable: false,
       isSigner: false,
     },

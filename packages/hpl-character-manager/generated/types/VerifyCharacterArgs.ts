@@ -6,13 +6,19 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-import { DataOrHashSource, dataOrHashSourceBeet } from './DataOrHashSource'
-import { DataOrHashUsedBy, dataOrHashUsedByBeet } from './DataOrHashUsedBy'
+import {
+  DataOrHashCharacterSource,
+  dataOrHashCharacterSourceBeet,
+} from './DataOrHashCharacterSource'
+import {
+  DataOrHashCharacterUsedBy,
+  dataOrHashCharacterUsedByBeet,
+} from './DataOrHashCharacterUsedBy'
 export type VerifyCharacterArgs = {
   root: number[] /* size: 32 */
   leafIdx: number
-  source: DataOrHashSource
-  usedBy: DataOrHashUsedBy
+  source: DataOrHashCharacterSource
+  usedBy: DataOrHashCharacterUsedBy
 }
 
 /**
@@ -24,8 +30,8 @@ export const verifyCharacterArgsBeet =
     [
       ['root', beet.uniformFixedSizeArray(beet.u8, 32)],
       ['leafIdx', beet.u32],
-      ['source', dataOrHashSourceBeet],
-      ['usedBy', dataOrHashUsedByBeet],
+      ['source', dataOrHashCharacterSourceBeet],
+      ['usedBy', dataOrHashCharacterUsedByBeet],
     ],
     'VerifyCharacterArgs'
   )

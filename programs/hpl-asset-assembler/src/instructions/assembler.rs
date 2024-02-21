@@ -1,13 +1,12 @@
 use {
+    crate::metadata::create_nft,
     crate::state::{Assembler, AssemblingAction, Creator, TokenStandard},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, Token},
-    hpl_events::HplEvents,
     hpl_hive_control::{
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
     },
-    hpl_utils::create_nft,
     mpl_token_metadata::state::AssetData,
 };
 
@@ -78,9 +77,6 @@ pub struct CreateAssembler<'info> {
     /// METAPLEX TOKEN METADATA PROGRAM
     /// CHECK: This is not dangerous because we don't read or write from this account
     pub token_metadata_program: AccountInfo<'info>,
-
-    /// HIVE CONTROL PROGRAM
-    pub hpl_events: Program<'info, HplEvents>,
 
     /// SYSVAR CLOCK
     pub clock_sysvar: Sysvar<'info, Clock>,

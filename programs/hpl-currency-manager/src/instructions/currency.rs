@@ -2,19 +2,17 @@ use {
     crate::{errors::ErrorCode, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{self, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
-    hpl_events::HplEvents,
     hpl_hive_control::{
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
     },
-    hpl_utils::mpl_token_metadata::{
+    mpl_token_metadata::{
         instruction::{
             CollectionDetailsToggle, CollectionToggle, CreateArgs, RuleSetToggle, UpdateArgs,
             UsesToggle,
         },
         state::{AssetData, Data, Metadata, TokenMetadataAccount},
     },
-    hpl_utils::traits::Default,
 };
 
 /// Accounts used in create currency instruction
@@ -76,15 +74,12 @@ pub struct CreateCurrency<'info> {
 
     /// The Token Metadata Program ID.
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = hpl_utils::mpl_token_metadata::ID)]
+    #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
 
     /// The Token Program ID.
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
-
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -95,7 +90,7 @@ pub struct CreateCurrency<'info> {
     pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct CreateCurrencyArgs {
     /// The name of the currency.
     pub name: String,
@@ -146,7 +141,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     currency.set_defaults();
 
     // Set the currency bump using the provided context.
-    currency.bump = ctx.bumps["currency"];
+    currency.bump = ctx.bumps.currency;
 
     // Set the project key and mint key for the currency account.
     currency.project = ctx.accounts.project.key();
@@ -167,8 +162,8 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
     ];
     let currency_signer = &[&currency_seeds[..]];
 
-    // Create the currency metadata using hpl_utils::metadata::create function.
-    hpl_utils::metadata::create(
+    // Create the currency metadata using metadata::create function.
+    crate::metadata::create(
         CreateArgs::V1 {
             asset_data: AssetData {
                 name: args.name,
@@ -178,7 +173,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
                 creators: None,
                 primary_sale_happened: false,
                 is_mutable: true,
-                token_standard: hpl_utils::mpl_token_metadata::state::TokenStandard::Fungible,
+                token_standard: mpl_token_metadata::state::TokenStandard::Fungible,
                 collection: None,
                 uses: None,
                 collection_details: None,
@@ -199,16 +194,7 @@ pub fn create_currency(ctx: Context<CreateCurrency>, args: CreateCurrencyArgs) -
         ctx.accounts.instructions_sysvar.to_account_info(),
         ctx.accounts.token_program.to_account_info(),
         Some(currency_signer),
-    )?;
-
-    Event::new_currency(
-        currency.key(),
-        currency.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
     )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
-
-    Ok(())
 }
 
 /// Accounts used in update currency instruction
@@ -255,11 +241,8 @@ pub struct UpdateCurrency<'info> {
 
     /// The token metadata program account.
     /// CHECK: This is not dangerous because we don't read or write from this account
-    #[account(address = hpl_utils::mpl_token_metadata::ID)]
+    #[account(address = mpl_token_metadata::ID)]
     pub token_metadata_program: AccountInfo<'info>,
-
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
 
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
@@ -271,7 +254,7 @@ pub struct UpdateCurrency<'info> {
 }
 
 /// Arguments for updating a currency.
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct UpdateCurrencyArgs {
     /// [Option] The updated name of the currency. If `Some`, the name will be updated.
     pub name: Option<String>,
@@ -320,7 +303,7 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
     let currency_signer = &[&currency_seeds[..]];
 
     // Update the metadata based on the provided arguments
-    hpl_utils::metadata::update(
+    crate::metadata::update(
         UpdateArgs::V1 {
             new_update_authority: None,
             data: Some(Data {
@@ -350,15 +333,7 @@ pub fn update_currency(ctx: Context<UpdateCurrency>, args: UpdateCurrencyArgs) -
         None,
         None,
         Some(currency_signer),
-    )?;
-
-    Event::update_currency(
-        ctx.accounts.currency.key(),
-        ctx.accounts.currency.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
     )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
-    Ok(())
 }
 
 /// Accounts used in the instruction to wrap a currency into an associated NFT (non-fungible token).
@@ -420,9 +395,6 @@ pub struct WrapCurrency<'info> {
     #[account(address = token::ID)]
     pub token_program: Program<'info, Token>,
 
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
-
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
@@ -451,7 +423,7 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
     let currency = &mut ctx.accounts.currency;
     currency.set_defaults();
 
-    currency.bump = ctx.bumps["currency"];
+    currency.bump = ctx.bumps.currency;
     currency.project = ctx.accounts.project.key();
     currency.mint = ctx.accounts.mint.key();
     currency.kind = CurrencyKind::Wrapped;
@@ -478,17 +450,7 @@ pub fn wrap_currency(ctx: Context<WrapCurrency>) -> Result<()> {
         ),
         token::spl_token::instruction::AuthorityType::FreezeAccount,
         Some(currency.key()),
-    )?;
-
-    Event::new_currency(
-        currency.key(),
-        currency.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
     )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
-
-    // Return Ok to indicate the successful completion of the wrapping process.
-    Ok(())
 }
 
 /// Mint currency to a holder account.
@@ -684,8 +646,5 @@ pub fn fund_account(ctx: Context<FundAccount>, amount: u64) -> Result<()> {
             },
         ),
         amount,
-    )?;
-
-    // Return Ok to indicate the successful completion of the funding operation.
-    Ok(())
+    )
 }

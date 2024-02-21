@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use hpl_utils::metadata::mpl_token_metadata::state::ToAccountMeta;
+use mpl_token_metadata::state::ToAccountMeta;
 
 #[derive(Clone)]
 pub struct MplBubblegum;

@@ -2,11 +2,12 @@ use anchor_lang::prelude::*;
 
 pub mod errors;
 pub mod instructions;
+pub mod metadata;
 pub mod state;
 pub mod utils;
 
 declare_id!("CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4");
-hpl_macros::platform_gate!();
+hpl_toolkit::platform_gate!();
 
 use {
     instructions::*,
@@ -15,6 +16,9 @@ use {
 };
 
 /// The entry point for the HPL currency manager program.
+#[cfg(not(feature = "cpi"))]
+use hpl_toolkit::schema::*;
+#[cfg_attr(not(feature = "cpi"), account_schemas_ix_injector(Currency HolderAccount))]
 #[program]
 pub mod hpl_currency_manager {
     use super::*;

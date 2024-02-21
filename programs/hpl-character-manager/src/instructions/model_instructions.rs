@@ -1,10 +1,9 @@
 use {
-    crate::{events::Event, state::*},
+    crate::state::*,
     anchor_lang::prelude::*,
-    hpl_compression::{CompressedDataEvent, Schema},
-    hpl_events::HplEvents,
     hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_utils::{reallocate, traits::Default},
+    hpl_toolkit::reallocate,
+    hpl_toolkit::{CompressedDataEvent, Schema},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -45,9 +44,6 @@ pub struct NewCharacterModel<'info> {
     /// HPL Hive Control Program
     pub hive_control: Program<'info, HplHiveControl>,
 
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
-
     /// NATIVE CLOCK SYSVAR
     pub clock: Sysvar<'info, Clock>,
 
@@ -71,18 +67,11 @@ pub fn new_character_model(
     let character_model = &mut ctx.accounts.character_model;
     character_model.set_defaults();
 
-    character_model.bump = ctx.bumps["character_model"];
+    character_model.bump = ctx.bumps.character_model;
     character_model.project = ctx.accounts.project.key();
     character_model.key = ctx.accounts.key.key();
     character_model.config = args.config;
     character_model.attributes = args.attributes;
-
-    Event::character_model(
-        character_model.key(),
-        character_model.try_to_vec().unwrap(),
-        &ctx.accounts.clock,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }
@@ -112,9 +101,6 @@ pub struct CreateNewCharactersTree<'info> {
 
     /// The system program.
     pub system_program: Program<'info, System>,
-
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
 
     /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
@@ -175,7 +161,7 @@ pub fn create_new_characters_tree(
     ];
     let character_model_signer = &[&character_model_seeds[..]];
 
-    hpl_compression::init_tree(
+    hpl_toolkit::init_tree(
         args.max_depth,
         args.max_buffer_size,
         &character_model.to_account_info(),
@@ -184,13 +170,6 @@ pub fn create_new_characters_tree(
         &ctx.accounts.log_wrapper,
         Some(character_model_signer),
     )?;
-
-    Event::character_model(
-        character_model.key(),
-        character_model.try_to_vec().unwrap(),
-        &ctx.accounts.clock,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }

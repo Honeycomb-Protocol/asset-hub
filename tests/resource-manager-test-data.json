@@ -1,0 +1,72 @@
+{
+  "recipe": { "isCrafted": false },
+  "project": "2iDq2iEbNBKNjURcZqEMy6CP7QZemboKrssWkoEHbm1K",
+  "resources": [
+    {
+      "label": "outputResource",
+      "resource": "C677tMwjTPMyWnVQz6vrK8p2ux1AoekhtNRbQoVinWMv",
+      "mint": "4SDgGFFtmHwTCQUU2tzFDC7b7NGgeHCaW6qHPmqDSy2b",
+      "tree": "9m6d9tdetjvw5bLhyB5WVdnwLSEpzxWD3zGUFJ1zJDXm",
+      "flags": {
+        "isMinted": false,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceOne",
+      "resource": "5uK1EnrAgZyU3NXSDeNbrP6yiiN9FQCpCYvPJftkaLUZ",
+      "mint": "GfMpkPootYfMuHE5VXMSdFMNt2Wmjsv8x5hx2o6Mo5X",
+      "tree": "6fVstFmTSdGXyauBjVVBg9xJLxvMYVP5fHt8AskfhMcJ",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceTwo",
+      "resource": "7begxsGtmxC4rEMrPejc3ULMmGSyobsutYkGbpjtdYeL",
+      "mint": "5csT4Kr7kPkYCmQ8uyJeAHVLSRHmxUzegXgKTVKV8kBX",
+      "tree": "8MQBxHQypTPzKrRwb1B1mAyCfjq8wrowKWiQa31CvvW7",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceThree",
+      "resource": "J9nLP5XLRM3cYudXFcA4khJKt3EKCvJbhNv55r5ZrCBA",
+      "mint": "4ihFdGvzaUQ2FWJLxMpKMQNZqeVu8HmS2mWxfosaSovY",
+      "tree": "H6H9FM4YoiMt9DPhh8PnTSH5uUghErR71iZpSWEwqxDf",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    },
+    {
+      "label": "inputResourceFour",
+      "resource": "DXh3Em2NQFPRruqz1MwZePQQBsA2VoRZofcXPyKxhoMz",
+      "mint": "GeJWqyRbJY8ZfwQeJeWDPPdKZxu3AVnUiXeFqFgaeKFF",
+      "tree": "ENDrxR4VeFrHmuKHuUr7CaNGwX6D1TBoHD1ma2CRkSR9",
+      "flags": {
+        "isMinted": true,
+        "isBurned": false,
+        "isWrapped": false,
+        "isUnWrapped": false
+      }
+    }
+  ],
+  "flags": {
+    "isMinted": false,
+    "isBurned": false,
+    "isWrapped": false,
+    "isUnWrapped": false
+  }
+}

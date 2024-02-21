@@ -17,7 +17,7 @@ use {
         program::HplHiveControl,
         state::{DelegateAuthority, Project},
     },
-    hpl_utils::{self, reallocate, BpfWriter},
+    hpl_toolkit::utils::{reallocate, BpfWriter},
     mpl_token_metadata::{
         self,
         instruction::{
@@ -149,7 +149,7 @@ pub fn create_nft(ctx: Context<CreateNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    hpl_utils::create_nft(
+    crate::metadata::create_nft(
         AssetData {
             name: nft.name.clone(),
             symbol: nft.symbol.clone(),
@@ -417,7 +417,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
             ];
             let assembler_signer = &[&assembler_seeds[..]];
 
-            hpl_utils::delegate(
+            crate::metadata::delegate(
                 DelegateArgs::StakingV1 {
                     amount: 1 * 10u64.pow(token_mint.decimals.into()),
                     authorization_data: None,
@@ -439,7 +439,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
                 None,
             )?;
 
-            hpl_utils::lock(
+            crate::metadata::lock(
                 assembler.to_account_info(),
                 ctx.accounts.token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
@@ -458,7 +458,7 @@ pub fn add_block(ctx: Context<AddBlock>) -> Result<()> {
         }
         AssemblingAction::TakeCustody => {
             if let Some(deposit_account) = &ctx.accounts.deposit_account {
-                hpl_utils::transfer(
+                crate::metadata::transfer(
                     1 * 10u64.pow(token_mint.decimals.into()),
                     ctx.accounts.token_account.to_account_info(),
                     ctx.accounts.authority.to_account_info(),
@@ -678,7 +678,7 @@ pub fn mint_nft(ctx: Context<MintNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    hpl_utils::mint(
+    crate::metadata::mint(
         MintArgs::V1 {
             amount: 1,
             authorization_data: None,
@@ -812,7 +812,7 @@ pub fn burn_nft(ctx: Context<BurnNFT>) -> Result<()> {
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    hpl_utils::update(
+    crate::metadata::update(
         UpdateArgs::V1 {
             new_update_authority: None,
             data: Some(metadata.data),
@@ -1004,7 +1004,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
             return Err(ErrorCode::NFTNotBurnable.into());
         }
         AssemblingAction::Freeze => {
-            hpl_utils::unlock(
+            crate::metadata::unlock(
                 assembler.to_account_info(),
                 token_mint.to_account_info(),
                 ctx.accounts.token_account.to_account_info(),
@@ -1021,7 +1021,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 Some(assembler_signer),
             )?;
 
-            hpl_utils::revoke(
+            crate::metadata::revoke(
                 RevokeArgs::StakingV1,
                 None,
                 assembler.to_account_info(),
@@ -1045,7 +1045,7 @@ pub fn remove_block(ctx: Context<RemoveBlock>) -> Result<()> {
                 return Err(ErrorCode::DepositAccountNotProvided.into());
             }
             let deposit_account = &ctx.accounts.deposit_account.clone().unwrap();
-            hpl_utils::transfer(
+            crate::metadata::transfer(
                 1 * 10u64.pow(token_mint.decimals.into()),
                 deposit_account.to_account_info(),
                 assembler.to_account_info(),
@@ -1196,7 +1196,7 @@ pub fn set_nft_generated(ctx: Context<SetNFTGenerated>, args: SetNFTGeneratedArg
         ];
         let assembler_signer = &[&assembler_seeds[..]];
 
-        hpl_utils::update(
+        crate::metadata::update(
             UpdateArgs::V1 {
                 new_update_authority: None,
                 data: Some(metadata.data),
@@ -1306,7 +1306,7 @@ pub fn update_metadata(ctx: Context<UpdateMetadata>, args: UpdateMetadataArgs) -
     ];
     let assembler_signer = &[&assembler_seeds[..]];
 
-    hpl_utils::update(
+    crate::metadata::update(
         UpdateArgs::V1 {
             new_update_authority: None,
             data: Some(Data {

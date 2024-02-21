@@ -2,19 +2,20 @@ use anchor_lang::prelude::*;
 
 pub mod errors;
 pub mod instructions;
+pub mod metadata;
 pub mod states;
 
 use instructions::*;
 
 declare_id!("7cJdKSjPtZqiGV4CFAGtbhhpf5CsYjbkbEkLKcXfHLYd");
-hpl_macros::platform_gate!();
+hpl_toolkit::platform_gate!();
 
 #[program]
 pub mod hpl_asset_manager {
     use super::*;
 
     pub fn create_asset_manager(ctx: Context<CreateAssetManager>) -> Result<()> {
-        hpl_macros::add_service!(hpl_hive_control::state::Service::AssetManager {
+        hpl_toolkit::add_service!(hpl_hive_control::state::Service::AssetManager {
             asset_manager_id: ctx.accounts.asset_manager.key(),
         });
 

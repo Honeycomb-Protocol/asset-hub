@@ -50,7 +50,6 @@ export const makeCnftPaymentStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_, **signer**] payer
  * @property [_writable_] bubblegumProgram
  * @property [] compressionProgram
- * @property [] hplEvents
  * @property [] logWrapper
  * @property [] clockSysvar
  * @category Instructions
@@ -70,7 +69,6 @@ export type MakeCnftPaymentInstructionAccounts = {
   systemProgram?: web3.PublicKey
   bubblegumProgram: web3.PublicKey
   compressionProgram: web3.PublicKey
-  hplEvents: web3.PublicKey
   logWrapper: web3.PublicKey
   clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -83,10 +81,8 @@ export const makeCnftPaymentInstructionDiscriminator = [
 /**
  * Creates a _MakeCnftPayment_ instruction.
  *
- * Optional accounts that are not provided will be omitted from the accounts
- * array passed with the instruction.
- * An optional account that is set cannot follow an optional account that is unset.
- * Otherwise an Error is raised.
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
@@ -140,50 +136,42 @@ export function createMakeCnftPaymentInstruction(
       isWritable: false,
       isSigner: false,
     },
-  ]
-
-  if (accounts.beneficiary != null) {
-    keys.push({
-      pubkey: accounts.beneficiary,
+    {
+      pubkey: accounts.beneficiary ?? programId,
       isWritable: false,
       isSigner: false,
-    })
-  }
-  keys.push({
-    pubkey: accounts.payer,
-    isWritable: true,
-    isSigner: true,
-  })
-  keys.push({
-    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.bubblegumProgram,
-    isWritable: true,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.compressionProgram,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.hplEvents,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.logWrapper,
-    isWritable: false,
-    isSigner: false,
-  })
-  keys.push({
-    pubkey: accounts.clockSysvar,
-    isWritable: false,
-    isSigner: false,
-  })
+    },
+    {
+      pubkey: accounts.payer,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.bubblegumProgram,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.compressionProgram,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.logWrapper,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clockSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+  ]
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

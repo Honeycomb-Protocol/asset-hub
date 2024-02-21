@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-beta.9",
+  "version": "0.0.2-beta.13",
   "name": "hpl_character_manager",
   "instructions": [
     {
@@ -55,14 +55,6 @@
           "isSigner": false,
           "docs": [
             "HPL Hive Control Program"
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -136,14 +128,6 @@
           "isSigner": false,
           "docs": [
             "The system program."
-          ]
-        },
-        {
-          "name": "hplEvents",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "HPL Events Program"
           ]
         },
         {
@@ -1241,13 +1225,13 @@
           {
             "name": "source",
             "type": {
-              "defined": "DataOrHashSource"
+              "defined": "DataOrHashCharacterSource"
             }
           },
           {
             "name": "usedBy",
             "type": {
-              "defined": "DataOrHashUsedBy"
+              "defined": "DataOrHashCharacterUsedBy"
             }
           }
         ]
@@ -1425,27 +1409,6 @@
       }
     },
     {
-      "name": "Event",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "CharacterModel",
-            "fields": [
-              {
-                "name": "address",
-                "type": "publicKey"
-              },
-              {
-                "name": "state",
-                "type": "bytes"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
       "name": "CharacterConfig",
       "type": {
         "kind": "enum",
@@ -1511,60 +1474,6 @@
             "name": "MerkleTree",
             "fields": [
               "publicKey"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "DataOrHashSource",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Data",
-            "fields": [
-              {
-                "defined": "CharacterSource"
-              }
-            ]
-          },
-          {
-            "name": "Hash",
-            "fields": [
-              {
-                "array": [
-                  "u8",
-                  32
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "DataOrHashUsedBy",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Data",
-            "fields": [
-              {
-                "defined": "CharacterUsedBy"
-              }
-            ]
-          },
-          {
-            "name": "Hash",
-            "fields": [
-              {
-                "array": [
-                  "u8",
-                  32
-                ]
-              }
             ]
           }
         ]
@@ -1782,6 +1691,60 @@
             "type": {
               "defined": "CharacterUsedBy"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataOrHashCharacterSource",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Data",
+            "fields": [
+              {
+                "defined": "CharacterSource"
+              }
+            ]
+          },
+          {
+            "name": "Hash",
+            "fields": [
+              {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataOrHashCharacterUsedBy",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Data",
+            "fields": [
+              {
+                "defined": "CharacterUsedBy"
+              }
+            ]
+          },
+          {
+            "name": "Hash",
+            "fields": [
+              {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            ]
           }
         ]
       }

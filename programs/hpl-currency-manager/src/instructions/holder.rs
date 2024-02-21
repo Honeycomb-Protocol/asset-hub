@@ -5,9 +5,7 @@ use {
         associated_token::AssociatedToken,
         token::{self, Approve, Burn, Mint, Revoke, Token, TokenAccount, Transfer},
     },
-    hpl_events::HplEvents,
     hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_utils::traits::Default,
 };
 
 /// Accounts used in create create holder_account instruction
@@ -71,9 +69,6 @@ pub struct CreateHolderAccount<'info> {
     /// SPL Associated Token program
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
-
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
@@ -86,7 +81,7 @@ pub struct CreateHolderAccount<'info> {
 /// Create a holder account
 pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
-    let bump = ctx.bumps["holder_account"];
+    let bump = ctx.bumps.holder_account;
     let currency = ctx.accounts.currency.key();
     if bump != holder_account.bump || !currency.eq(&holder_account.currency) {
         // Set the bump value for the holder account.
@@ -98,12 +93,6 @@ pub fn create_holder_account(ctx: Context<CreateHolderAccount>) -> Result<()> {
         // Set the creation timestamp for the holder account.
         holder_account.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
         msg!("holder_account created_at: {}", holder_account.created_at);
-        Event::new_holder_account(
-            holder_account.key(),
-            holder_account.try_to_vec().unwrap(),
-            &ctx.accounts.clock_sysvar,
-        )
-        .emit(ctx.accounts.hpl_events.to_account_info())?;
     } else {
         msg!(
             "holder_account was already created_at: {}",
@@ -171,9 +160,6 @@ pub struct WrapHolderAccount<'info> {
     /// SPL Associated Token program
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
-
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
@@ -188,20 +174,13 @@ pub fn wrap_holder_account(ctx: Context<WrapHolderAccount>) -> Result<()> {
     let holder_account = &mut ctx.accounts.holder_account;
 
     // Set the bump value for the holder account.
-    holder_account.bump = ctx.bumps["holder_account"];
+    holder_account.bump = ctx.bumps.holder_account;
     holder_account.currency = ctx.accounts.currency.key();
     holder_account.owner = ctx.accounts.owner.key();
     holder_account.token_account = ctx.accounts.token_account.key();
 
     // Set the creation timestamp for the holder account.
     holder_account.created_at = ctx.accounts.clock_sysvar.unix_timestamp;
-
-    Event::new_holder_account(
-        holder_account.key(),
-        holder_account.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }
@@ -238,7 +217,7 @@ pub fn fix_holder_account(ctx: Context<FixHolderAccount>) -> Result<()> {
     {
         panic!("Invalid Auth")
     }
-    msg!("{:?}", ctx.accounts.currency.tx_hook);
+    // msg!("{:?}", ctx.accounts.currency.tx_hook);
     Ok(())
 }
 
@@ -674,9 +653,6 @@ pub struct SetHolderStatus<'info> {
     /// HIVE CONTROL PROGRAM
     pub hive_control: Program<'info, HplHiveControl>,
 
-    /// HPL Events Program
-    pub hpl_events: Program<'info, HplEvents>,
-
     /// The Instructions System Variable Account.
     /// CHECK: This is not dangerous because we don't read or write from this account
     #[account(address = anchor_lang::solana_program::sysvar::instructions::ID)]
@@ -699,13 +675,6 @@ pub fn set_holder_status(ctx: Context<SetHolderStatus>, status: HolderStatus) ->
     }
 
     holder_account.status = status;
-
-    Event::update_holder_account(
-        holder_account.key(),
-        holder_account.try_to_vec().unwrap(),
-        &ctx.accounts.clock_sysvar,
-    )
-    .emit(ctx.accounts.hpl_events.to_account_info())?;
 
     Ok(())
 }

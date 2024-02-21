@@ -1,17 +1,19 @@
 use anchor_lang::prelude::*;
 
 mod bubblegum;
+mod metadata;
 
 pub mod errors;
-pub mod events;
 pub mod instructions;
 pub mod state;
 
 use instructions::*;
 
 declare_id!("ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg");
-hpl_macros::platform_gate!();
 
+#[cfg(not(feature = "cpi"))]
+use hpl_toolkit::schema::*;
+#[cfg_attr(not(feature = "cpi"), account_schemas_ix_injector(CharacterModel AssetCustody))]
 #[program]
 pub mod hpl_character_manager {
     use super::*;

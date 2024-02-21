@@ -4,7 +4,7 @@ cargo-features = ["workspace-inheritance"]
 name = "hpl-payment-manager"
 description = "Honeycomb protocol library payment manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.5-beta.1"
+version = "0.0.6-beta.2"
 edition = "2021"
 license = "MIT"
 
@@ -22,10 +22,11 @@ default = []
 [dependencies]
 anchor-lang = { workspace = true }
 anchor-spl = { workspace = true }
-hpl-macros = { workspace = true }
-hpl-utils = { workspace = true }
-hpl-events = { workspace = true }
+hpl-toolkit = { workspace = true, features = [
+  "macros",
+], default-features = false }
 hpl-hive-control = { workspace = true }
 hpl-currency-manager = { workspace = true }
+mpl-token-metadata = { workspace = true }
 mpl-bubblegum = { workspace = true }
 spl-account-compression = { workspace = true }

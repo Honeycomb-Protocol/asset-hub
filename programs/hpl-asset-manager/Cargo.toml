@@ -2,7 +2,7 @@
 name = "hpl-asset-manager"
 description = "Honeycomb protocol library asset manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.77"
+version = "0.0.78-beta.1"
 edition = "2021"
 license = "MIT"
 
@@ -20,8 +20,8 @@ default = []
 [dependencies]
 anchor-lang = { workspace = true }
 anchor-spl = { workspace = true }
-hpl-macros = { workspace = true }
-hpl-utils = { workspace = true }
-hpl-events = { workspace = true }
+hpl-toolkit = { workspace = true, features = [
+  "macros",
+], default-features = false }
 hpl-hive-control = { workspace = true }
 mpl-token-metadata = { workspace = true }

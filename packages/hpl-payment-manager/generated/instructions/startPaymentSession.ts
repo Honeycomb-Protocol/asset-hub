@@ -25,7 +25,6 @@ export const startPaymentSessionStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] paymentStructure
  * @property [_writable_] paymentSession
  * @property [_writable_, **signer**] payer
- * @property [] hplEvents
  * @property [] clockSysvar
  * @category Instructions
  * @category StartPaymentSession
@@ -36,7 +35,6 @@ export type StartPaymentSessionInstructionAccounts = {
   paymentSession: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
-  hplEvents: web3.PublicKey
   clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -78,11 +76,6 @@ export function createStartPaymentSessionInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.hplEvents,
       isWritable: false,
       isSigner: false,
     },

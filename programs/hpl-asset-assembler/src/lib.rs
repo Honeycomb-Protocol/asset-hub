@@ -2,12 +2,13 @@ use anchor_lang::prelude::*;
 
 pub mod errors;
 pub mod instructions;
+pub mod metadata;
 pub mod state;
 
 use instructions::*;
 use state::*;
 
-hpl_macros::platform_gate!();
+hpl_toolkit::platform_gate!();
 
 declare_id!("Gq1333CkB2sGernk72TKfDVLnHj9LjmeijFujM2ULxJz");
 
@@ -19,7 +20,7 @@ pub mod hpl_asset_assembler {
         ctx: Context<CreateAssembler>,
         args: CreateAssemblerArgs,
     ) -> Result<()> {
-        hpl_macros::add_service!(hpl_hive_control::state::Service::Assembler {
+        hpl_toolkit::add_service!(hpl_hive_control::state::Service::Assembler {
             assembler_id: ctx.accounts.assembler.key(),
         });
         instructions::create_assembler(ctx, args)

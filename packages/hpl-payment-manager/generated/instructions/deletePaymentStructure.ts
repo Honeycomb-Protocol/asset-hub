@@ -25,7 +25,6 @@ export const deletePaymentStructureStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] paymentStructure
  * @property [_writable_] benificiary
  * @property [**signer**] authority
- * @property [] hplEvents
  * @property [] clockSysvar
  * @category Instructions
  * @category DeletePaymentStructure
@@ -36,7 +35,6 @@ export type DeletePaymentStructureInstructionAccounts = {
   benificiary: web3.PublicKey
   authority: web3.PublicKey
   systemProgram?: web3.PublicKey
-  hplEvents: web3.PublicKey
   clockSysvar: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -78,11 +76,6 @@ export function createDeletePaymentStructureInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.hplEvents,
       isWritable: false,
       isSigner: false,
     },

@@ -45,7 +45,6 @@ export const createNewCharactersTreeStruct = new beet.BeetArgsStruct<
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [_writable_] vault
- * @property [] hplEvents
  * @property [] compressionProgram
  * @property [] logWrapper
  * @property [] clock
@@ -63,7 +62,6 @@ export type CreateNewCharactersTreeInstructionAccounts = {
   payer: web3.PublicKey
   vault: web3.PublicKey
   systemProgram?: web3.PublicKey
-  hplEvents: web3.PublicKey
   compressionProgram: web3.PublicKey
   logWrapper: web3.PublicKey
   clock: web3.PublicKey
@@ -128,11 +126,6 @@ export function createCreateNewCharactersTreeInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.hplEvents,
       isWritable: false,
       isSigner: false,
     },

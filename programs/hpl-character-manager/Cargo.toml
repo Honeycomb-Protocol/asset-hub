@@ -4,7 +4,7 @@ cargo-features = ["workspace-inheritance"]
 name = "hpl-character-manager"
 description = "Honeycomb protocol library asset manager program"
 author = ['Sultan Nadeem <sultanndilaram@gmail.com>']
-version = "0.0.2-beta.9"
+version = "0.0.2-beta.13"
 edition = "2021"
 license = "MIT"
 
@@ -22,10 +22,8 @@ default = []
 [dependencies]
 anchor-lang = { workspace = true }
 anchor-spl = { workspace = true }
-hpl-macros = { workspace = true }
-hpl-utils = { workspace = true }
-hpl-events = { workspace = true }
-hpl-compression = { workspace = true }
+hpl-toolkit = { workspace = true, features = ["full"] }
 hpl-hive-control = { workspace = true }
 mpl-bubblegum = { workspace = true }
+mpl-token-metadata = { workspace = true }
 spl-account-compression = { workspace = true }

@@ -1,18 +1,15 @@
-use anchor_lang::solana_program::program::invoke;
-use hpl_utils::metadata::mpl_token_metadata::state::ToAccountMeta;
-
 use {
   crate::{
       state::*,
       errors::ErrorCode,
-      utils::{Conditional, Event},
+      utils::Conditional,
   },
-  anchor_lang::prelude::*,
+  anchor_lang::{prelude::*, solana_program::program::invoke},
   anchor_spl::{
     token::{Token, Mint, TokenAccount},
     associated_token::AssociatedToken
   },
-  hpl_utils::mpl_token_metadata::{instruction::BurnArgs, state::{Metadata, TokenMetadataAccount}},
+  mpl_token_metadata::{instruction::BurnArgs, state::{Metadata, TokenMetadataAccount, ToAccountMeta}},
   hpl_hive_control::{
     program::HplHiveControl,
     state::Project
@@ -24,8 +21,6 @@ use {
   },
   mpl_bubblegum::ID as MPL_BUBBLEGUM_ID,
   spl_account_compression::{program::SplAccountCompression, Noop},
-  hpl_events::HplEvents,
-  hpl_utils::traits::Default,
 };
 
 /// Accounts used in create payment session instruction
@@ -53,9 +48,6 @@ pub struct StartPaymentSession<'info> {
 
   /// Solana System Program
   pub system_program: Program<'info, System>,
-
-  /// HPL Events Program
-  pub hpl_events: Program<'info, HplEvents>,
 
   /// Solana Clock Sysvar
   pub clock_sysvar: Sysvar<'info, Clock>,
@@ -85,22 +77,15 @@ pub fn start_payment_session(
   let payment_session = &mut ctx.accounts.payment_session;
   payment_session.set_defaults();
 
-  payment_session.bump = ctx.bumps["payment_session"];
+  payment_session.bump = ctx.bumps.payment_session;
   payment_session.payment_structure = ctx.accounts.payment_structure.key();
   payment_session.payer = ctx.accounts.payer.key();
   payment_session.payments_status = Conditional::<bool>::new_mapped(
     &ctx.accounts.payment_structure.payments,
     &|_payment| false, 
-);
+  );
 
-ctx.accounts.payment_structure.active_sessions += 1;
-
-  Event::new_payment_session(
-      payment_session.key(),
-      payment_session.try_to_vec().unwrap(),
-      &ctx.accounts.clock_sysvar,
-  )
-  .emit(ctx.accounts.hpl_events.to_account_info())?;
+  ctx.accounts.payment_structure.active_sessions += 1;
 
   Ok(())
 }
@@ -169,9 +154,6 @@ pub struct MakeHplCurrencyPayment<'info> {
   /// HPL Currency Manager Program
   pub hpl_currency_manager: Program<'info, HplCurrencyManager>,
 
-  /// HPL Events Program
-  pub hpl_events: Program<'info, HplEvents>,
-
   /// Solana Clock Sysvar
   pub clock_sysvar: Sysvar<'info, Clock>,
 
@@ -181,7 +163,7 @@ pub struct MakeHplCurrencyPayment<'info> {
   pub instructions_sysvar: AccountInfo<'info>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct MakePaymentArgs {
   pub path: Vec<u8>
 }
@@ -285,13 +267,6 @@ pub fn make_hpl_currency_payment(
 
   *payment_status = true;
 
-  Event::make_payment(
-      payment_session.key(),
-      payment_session.try_to_vec().unwrap(),
-      &ctx.accounts.clock_sysvar,
-  )
-  .emit(ctx.accounts.hpl_events.to_account_info())?;
-
   Ok(())
 }
 
@@ -353,9 +328,6 @@ pub struct MakeNftPayment<'info> {
 
   /// ASSOCIATED TOKEN PROGRAM
   pub associated_token_program: Program<'info, AssociatedToken>,
-
-  /// HPL Events Program
-  pub hpl_events: Program<'info, HplEvents>,
 
   /// CHECK: This is not dangerous because we don't read or write from this account
   pub authorization_rules_program: Option<AccountInfo<'info>>,
@@ -460,7 +432,7 @@ pub fn make_nft_payment(
 
   match payment.payment_method {
     PaymentMethod::Burn => {
-      hpl_utils::burn(
+      crate::metadata::burn(
         BurnArgs::V1 { amount },
         ctx.accounts.payer.to_account_info(),
         None,
@@ -486,7 +458,7 @@ pub fn make_nft_payment(
         return Err(ErrorCode::InvalidBeneficiary.into());
       }
 
-      hpl_utils::transfer(
+      crate::metadata::transfer(
         amount,
         ctx.accounts.nft_account.to_account_info(),
         ctx.accounts.payer.to_account_info(),
@@ -512,13 +484,6 @@ pub fn make_nft_payment(
 
   
   *payment_status = true;
-
-  Event::make_payment(
-      payment_session.key(),
-      payment_session.try_to_vec().unwrap(),
-      &ctx.accounts.clock_sysvar,
-  )
-  .emit(ctx.accounts.hpl_events.to_account_info())?;
 
   Ok(())
 }
@@ -569,9 +534,6 @@ pub struct MakeCNftPayment<'info> {
   /// SPL Compression Program
   pub compression_program: Program<'info, SplAccountCompression>,
 
-  /// HPL Events Program
-  pub hpl_events: Program<'info, HplEvents>,
-
   /// SPL NOOP Program
   pub log_wrapper: Program<'info, Noop>,
 
@@ -579,7 +541,7 @@ pub struct MakeCNftPayment<'info> {
   pub clock_sysvar: Sysvar<'info, Clock>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct MakeCnftPaymentArgs {
   pub path: Vec<u8>,
   pub nonce: u64,
@@ -658,13 +620,6 @@ pub fn make_cnft_payment<'info>(
 
   *payment_status = true;
 
-  Event::make_payment(
-      payment_session.key(),
-      payment_session.try_to_vec().unwrap(),
-      &ctx.accounts.clock_sysvar,
-  )
-  .emit(ctx.accounts.hpl_events.to_account_info())?;
-
   Ok(())
 }
 
@@ -682,9 +637,6 @@ pub struct ClosePaymentSession<'info> {
   /// The payer wallet
   #[account(mut)]
   pub payer: Signer<'info>,
-
-  /// HPL Events Program
-  pub hpl_events: Program<'info, HplEvents>,
 
   /// Solana Clock Sysvar
   pub clock_sysvar: Sysvar<'info, Clock>,
@@ -716,13 +668,6 @@ pub fn close_payment_session(
   payment_session.eval_status()?;
 
   ctx.accounts.payment_structure.active_sessions -= 1;
-
-  Event::close_payment_session(
-      payment_session.key(),
-      payment_session.try_to_vec().unwrap(),
-      &ctx.accounts.clock_sysvar,
-  )
-  .emit(ctx.accounts.hpl_events.to_account_info())?;
 
   Ok(())
 }

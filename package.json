@@ -35,7 +35,7 @@
     "publishall": "node ./scripts/publishall.js"
   },
   "dependencies": {
-    "@honeycomb-protocol/edge-client": "^0.0.4-beta.3",
+    "@honeycomb-protocol/edge-client": "^0.0.4-beta.4",
     "@honeycomb-protocol/events": "^0.1.21",
     "@honeycomb-protocol/hive-control": "^0.2.16",
     "@metaplex-foundation/js": "^0.19.5",
