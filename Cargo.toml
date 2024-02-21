@@ -20,8 +20,8 @@ codegen-units = 1
 [workspace.dependencies]
 anchor-lang = { version = "0.29.0" }
 anchor-spl = "0.29.0"
-hpl-toolkit = { version = "0.0.3-beta.9" }
-hpl-hive-control = { version = "0.2.19-beta.4", features = ["cpi"] }
+hpl-toolkit = { version = "0.0.3-beta.10" }
+hpl-hive-control = { version = "0.2.19-beta.5", features = ["cpi"] }
 hpl-currency-manager = { version = "0.0.84-beta.2", path = "programs/hpl-currency-manager", features = [
   "cpi",
 ] }
