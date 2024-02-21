@@ -1,5 +1,5 @@
 [workspace]
-members = ["programs/*"]
+members = ["programs/hpl-resource-manager"]
 
 [workspace.package]
 authors = ["Sultan Nadeem <sultanndilaram@gmail.com>"]
@@ -22,7 +22,6 @@ hpl-currency-manager = { version = "0.0.84-beta.2", path = "programs/hpl-currenc
   "cpi",
 ] }
 mpl-bubblegum = { version = "1.1.0" }
-mpl-token-metadata = { version = "=1.13.2", features = ["no-entrypoint"] }
 spl-account-compression = { version = "0.3.0", features = ["cpi"] }
 spl-token-2022 = { version = "2.0.1" }
 spl-token-metadata-interface = { version = "0.2.0" }
