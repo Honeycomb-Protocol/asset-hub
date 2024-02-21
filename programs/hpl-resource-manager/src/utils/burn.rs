@@ -1,7 +1,7 @@
 use {
     crate::{errors::ResourceErrorCode, Holding, HoldingAccountArgs, Resource},
     anchor_lang::prelude::*,
-    hpl_compression::{CompressedData, CompressedDataEvent, ToNode},
+    hpl_toolkit::compression::{CompressedData, CompressedDataEvent, ToNode},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -54,7 +54,7 @@ pub fn use_burn_resource<'info>(
     let signer_seeds = resource.seeds(&bump_binding);
 
     // update the compressed token account using controlled merkle tree
-    hpl_compression::replace_leaf(
+    hpl_toolkit::compression::replace_leaf(
         holding_state.root,
         holding_state.holding.to_compressed().to_node(),
         new_leaf,

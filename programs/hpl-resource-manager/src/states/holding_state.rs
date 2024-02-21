@@ -1,9 +1,6 @@
 use {
     anchor_lang::{prelude::*, solana_program::keccak},
-    hpl_compression::{
-        compressed_account, CompressedData, CompressedSchema, Schema, SchemaValue, ToNode,
-    },
-    spl_account_compression::Node,
+    hpl_toolkit::{compression::*, schema::*},
     std::collections::HashMap,
 };
 

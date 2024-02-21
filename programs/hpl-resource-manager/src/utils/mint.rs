@@ -1,7 +1,7 @@
 use {
     crate::{Holding, MintResourceArgs, Resource},
     anchor_lang::prelude::*,
-    hpl_compression::{CompressedData, CompressedDataEvent, ToNode},
+    hpl_toolkit::compression::{CompressedData, CompressedDataEvent, ToNode},
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -39,7 +39,7 @@ pub fn use_mint_resource<'info>(
         event.wrap(&log_wrapper)?;
 
         // update the compressed token account using controlled merkle tree
-        hpl_compression::replace_leaf(
+        hpl_toolkit::compression::replace_leaf(
             holding_state.root,
             holding_state.holding.to_compressed().to_node(),
             new_holding_state.to_compressed().to_node(),
@@ -75,7 +75,7 @@ pub fn use_mint_resource<'info>(
         let bump_binding = [resource.bump];
         let signer_seeds = resource.seeds(&bump_binding);
 
-        hpl_compression::append_leaf(
+        hpl_toolkit::compression::append_leaf(
             compressed_holding.to_node(),
             &resource.to_account_info(),
             &merkle_tree,

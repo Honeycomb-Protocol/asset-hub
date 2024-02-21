@@ -1,8 +1,8 @@
 use {
-    crate::Resource,
+    crate::{Resource, ResourseKind},
     anchor_lang::prelude::*,
     spl_token_2022::{
-        extension::{metadata_pointer, ExtensionType},
+        extension::{group_pointer, metadata_pointer, ExtensionType},
         instruction::{
             burn, initialize_mint2, initialize_mint_close_authority, initialize_permanent_delegate,
             mint_to,
@@ -15,7 +15,10 @@ use {
         },
         state::Mint,
     },
-    spl_token_metadata_interface::instruction::initialize,
+    spl_token_metadata_interface::{
+        instruction::{initialize, update_field},
+        state::Field,
+    },
     std::ops::Deref,
 };
 
@@ -31,6 +34,14 @@ pub enum ExtensionInitializationParams {
         authority: Option<Pubkey>,
         metadata_address: Option<Pubkey>,
     },
+    GroupPointer {
+        authority: Option<Pubkey>,
+        group_address: Option<Pubkey>,
+    },
+    // GroupMemberPointer {
+    //     authority: Option<Pubkey>,
+    //     member_address: Option<Pubkey>,
+    // },
 }
 impl ExtensionInitializationParams {
     pub fn extension(&self) -> ExtensionType {
@@ -38,6 +49,8 @@ impl ExtensionInitializationParams {
             Self::MintCloseAuthority { .. } => ExtensionType::MintCloseAuthority,
             Self::PermanentDelegate { .. } => ExtensionType::PermanentDelegate,
             Self::MetadataPointer { .. } => ExtensionType::MetadataPointer,
+            Self::GroupPointer { .. } => ExtensionType::GroupPointer,
+            // Self::GroupMemberPointer { .. } => ExtensionType::GroupMemberPointer,
         }
     }
 
@@ -63,6 +76,27 @@ impl ExtensionInitializationParams {
                 metadata_address,
             )
             .map_err(Into::into),
+
+            Self::GroupPointer {
+                authority,
+                group_address,
+            } => group_pointer::instruction::initialize(
+                token_program_id,
+                mint,
+                authority,
+                group_address,
+            )
+            .map_err(Into::into),
+            // Self::GroupMemberPointer {
+            //     authority,
+            //     member_address,
+            // } => group_member_pointer::instruction::initialize(
+            //     token_program_id,
+            //     mint,
+            //     authority,
+            //     member_address,
+            // )
+            // .map_err(Into::into),
         }
     }
 }
@@ -75,8 +109,9 @@ pub fn create_mint_with_extensions<'info>(
     token22_program: &AccountInfo<'info>,
     decimals: u8,
     metadata: &ResourceMetadataArgs,
+    kind: &ResourseKind,
 ) -> Result<Mint> {
-    let extension_initialization_params = vec![
+    let mut extension_initialization_params = vec![
         ExtensionInitializationParams::MintCloseAuthority {
             close_authority: Some(resource.key()),
         },
@@ -89,28 +124,37 @@ pub fn create_mint_with_extensions<'info>(
         },
     ];
 
+    // if the resource is an NFT, add the group pointer extension
+    if matches!(kind, ResourseKind::INF { characterstics: _ }) {
+        extension_initialization_params.push(ExtensionInitializationParams::GroupPointer {
+            authority: Some(resource.key()),
+            group_address: Some(mint.key()),
+        });
+    }
+
     let extension_types = extension_initialization_params
         .iter()
         .map(|e| e.extension())
         .collect::<Vec<_>>();
 
-    let space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
+    let mut space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
+
+    // calculate the space required for the metadata
+    space += 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len();
+
+    // calculate the space required for the INF characterstics
+    if let ResourseKind::INF { characterstics } = kind {
+        space += characterstics
+            .iter()
+            .map(|(key, value)| key.len() + value.len())
+            .sum::<usize>();
+    }
 
     // signature seeds for the mint authority
     let account_instruction = create_account(
         &payer.key(),
         &mint.key(),
-        rent_sysvar.minimum_balance(
-            space
-                + 68
-                + 12
-                + metadata.name.len()
-                + metadata.symbol.len()
-                + metadata.uri.len()
-                + 8
-                + 32
-                + 32, // funding the account with extra space for metadata
-        ),
+        rent_sysvar.minimum_balance(space),
         space as u64,
         &token22_program.key(),
     );
@@ -189,80 +233,77 @@ pub fn create_metadata_for_mint<'info>(
     Ok(())
 }
 
-// #[derive(AnchorSerialize, AnchorDeserialize)]
-// pub struct ResourceMetadataUpdateArgs {
-//     pub name: Option<String>,
-//     pub symbol: Option<String>,
-//     pub uri: Option<String>,
-//     pub field: Option<String>,
-//     pub value: Option<String>,
-// }
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct ResourceMetadataUpdateArgs {
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub uri: Option<String>,
+    pub additional_metadata: Vec<(String, String)>,
+}
 
-// pub fn update_metadata_for_mint<'info>(
-//     token22_program: AccountInfo<'info>,
-//     mint: AccountInfo<'info>,
-//     resource: &Account<'info, Resource>,
-//     metadata: ResourceMetadataUpdateArgs,
-// ) -> Result<()> {
-//     let mut instructions: Vec<Instruction> = vec![];
-//     if let Some(name) = metadata.name {
-//         instructions.push(update_field(
-//             &token22_program.key(),
-//             &mint.key(),
-//             &resource.key(),
-//             Field::Name,
-//             name,
-//         ));
-//     }
+pub fn update_metadata_for_mint<'info>(
+    token22_program: AccountInfo<'info>,
+    mint: AccountInfo<'info>,
+    resource: &Account<'info, Resource>,
+    metadata: ResourceMetadataUpdateArgs,
+) -> Result<()> {
+    let mut instructions: Vec<Instruction> = vec![];
+    if let Some(name) = metadata.name {
+        instructions.push(update_field(
+            &token22_program.key(),
+            &mint.key(),
+            &resource.key(),
+            Field::Name,
+            name,
+        ));
+    }
 
-//     if let Some(symbol) = metadata.symbol {
-//         instructions.push(update_field(
-//             &token22_program.key(),
-//             &mint.key(),
-//             &resource.key(),
-//             Field::Symbol,
-//             symbol,
-//         ));
-//     }
+    if let Some(symbol) = metadata.symbol {
+        instructions.push(update_field(
+            &token22_program.key(),
+            &mint.key(),
+            &resource.key(),
+            Field::Symbol,
+            symbol,
+        ));
+    }
 
-//     if let Some(uri) = metadata.uri {
-//         instructions.push(update_field(
-//             &token22_program.key(),
-//             &mint.key(),
-//             &resource.key(),
-//             Field::Uri,
-//             uri,
-//         ));
-//     }
+    if let Some(uri) = metadata.uri {
+        instructions.push(update_field(
+            &token22_program.key(),
+            &mint.key(),
+            &resource.key(),
+            Field::Uri,
+            uri,
+        ));
+    }
 
-//     if let Some(field) = metadata.field {
-//         if let Some(value) = metadata.value {
-//             instructions.push(update_field(
-//                 &token22_program.key(),
-//                 &mint.key(),
-//                 &resource.key(),
-//                 Field::Key(field),
-//                 value,
-//             ));
-//         }
-//     }
+    for (key, value) in metadata.additional_metadata {
+        instructions.push(update_field(
+            &token22_program.key(),
+            &mint.key(),
+            &resource.key(),
+            Field::Key(key),
+            value,
+        ));
+    }
 
-//     for instruction in instructions {
-//         msg!("Updating metadata account");
-//         invoke_signed(
-//             &instruction,
-//             &[
-//                 mint.to_owned(),
-//                 resource.to_account_info(),
-//                 mint.to_owned(),
-//                 resource.to_account_info(),
-//             ],
-//             &[&resource.seeds(&[resource.bump])[..]],
-//         )?;
-//     }
+    for instruction in instructions {
+        msg!("Updating metadata account");
+        invoke_signed(
+            &instruction,
+            &[
+                mint.to_owned(),
+                resource.to_account_info(),
+                mint.to_owned(),
+                resource.to_account_info(),
+            ],
+            &[&resource.seeds(&[resource.bump])[..]],
+        )?;
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 // pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) -> Result<TokenMetadata> {
 //     let buffer = mint.try_borrow_data()?;

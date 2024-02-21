@@ -1,6 +1,6 @@
 use {
     anchor_lang::prelude::*,
-    hpl_compression::{CompressedSchema, ControlledMerkleTrees, Schema},
+    hpl_toolkit::{compression::ControlledMerkleTrees, schema::*},
 };
 
 #[account]
@@ -24,7 +24,9 @@ pub struct Resource {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum ResourseKind {
     Fungible,
-    INF { characterstics: Schema },
+    INF {
+        characterstics: Vec<(String, String)>,
+    },
     NonFungible,
 }
 

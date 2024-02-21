@@ -4,10 +4,9 @@ use {
         HoldingAccountArgs, Resource,
     },
     anchor_lang::prelude::*,
-    anchor_spl::token::Token,
+    anchor_spl::token_2022::Token2022,
     hpl_hive_control::state::Project,
     spl_account_compression::{program::SplAccountCompression, Noop},
-    spl_token_2022::ID as Token2022,
 };
 
 #[derive(Accounts)]
@@ -34,20 +33,12 @@ pub struct MintResource<'info> {
 
     pub system_program: Program<'info, System>,
 
-    /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account(address = Token2022)]
-    pub token22_program: AccountInfo<'info>,
+    pub token_program: Program<'info, Token2022>,
 
-    /// SPL TOKEN PROGRAM
-    pub token_program: Program<'info, Token>,
-
-    /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
 
-    /// SPL Noop program.
     pub log_wrapper: Program<'info, Noop>,
 
-    // SYSVAR CLOCK
     pub clock: Sysvar<'info, Clock>,
 }
 
@@ -75,15 +66,6 @@ pub fn mint_resource<'info>(
     )?;
 
     msg!("Minting the token");
-
-    // update compress supply in mint's metadata
-    // update_compressed_supply(
-    //     ctx.accounts.token22_program.to_account_info(),
-    //     ctx.accounts.mint.to_account_info(),
-    //     &resource,
-    //     args.amount,
-    //     false,
-    // )?;
 
     Ok(())
 }
@@ -114,20 +96,12 @@ pub struct BurnResource<'info> {
 
     pub system_program: Program<'info, System>,
 
-    /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account(address = Token2022)]
-    pub token22_program: AccountInfo<'info>,
+    pub token_program: Program<'info, Token2022>,
 
-    /// SPL TOKEN PROGRAM
-    pub token_program: Program<'info, Token>,
-
-    /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
 
-    /// SPL Noop program.
     pub log_wrapper: Program<'info, Noop>,
 
-    // SYSVAR CLOCK
     pub clock: Sysvar<'info, Clock>,
 }
 

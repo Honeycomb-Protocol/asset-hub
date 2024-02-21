@@ -1,15 +1,16 @@
 use {
     crate::{
-        utils::{create_metadata_for_mint, create_mint_with_extensions, ResourceMetadataArgs},
+        utils::{
+            create_metadata_for_mint, create_mint_with_extensions, update_metadata_for_mint,
+            ResourceMetadataArgs, ResourceMetadataUpdateArgs,
+        },
         Resource, ResourseKind,
     },
     anchor_lang::prelude::*,
-    anchor_spl::{associated_token::AssociatedToken, token::Token},
-    hpl_compression::init_tree,
+    anchor_spl::token_interface::Token2022,
     hpl_hive_control::state::Project,
-    hpl_utils::reallocate,
+    hpl_toolkit::{compression::init_tree, reallocate},
     spl_account_compression::{program::SplAccountCompression, Noop},
-    spl_token_2022::ID as Token2022,
 };
 
 #[derive(Accounts)]
@@ -40,15 +41,7 @@ pub struct CreateResource<'info> {
 
     pub rent_sysvar: Sysvar<'info, Rent>,
 
-    /// CHECK: this is not dangerous. we are not reading & writing from it
-    #[account(address = Token2022)]
-    pub token22_program: AccountInfo<'info>,
-
-    /// SPL TOKEN PROGRAM
-    pub token_program: Program<'info, Token>,
-
-    /// ASSOCIATED TOKEN PROGRAM
-    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -61,31 +54,47 @@ pub struct CreateResourceArgs {
 pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
 
-    // create resource account
-    resource.set_defaults();
-    resource.bump = ctx.bumps["resource"];
-    resource.project = ctx.accounts.project.key();
-    resource.mint = ctx.accounts.mint.key();
-    resource.kind = args.kind;
-
     // create the mint account with the extensions
     create_mint_with_extensions(
         &resource,
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.mint.to_account_info(),
         &ctx.accounts.rent_sysvar,
-        &ctx.accounts.token22_program.to_account_info(),
+        &ctx.accounts.token_program.to_account_info(),
         args.decimals,
         &args.metadata,
+        &args.kind,
     )?;
 
     // create the metadata account for the mint
     create_metadata_for_mint(
-        ctx.accounts.token22_program.to_account_info(),
+        ctx.accounts.token_program.to_account_info(),
         ctx.accounts.mint.to_account_info(),
         &resource,
         args.metadata,
     )?;
+
+    // update the metadata account for the mint with the characterstics
+    if let ResourseKind::INF { characterstics } = args.kind.to_owned() {
+        update_metadata_for_mint(
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.mint.to_account_info(),
+            &resource,
+            ResourceMetadataUpdateArgs {
+                name: None,
+                symbol: None,
+                uri: None,
+                additional_metadata: characterstics,
+            },
+        )?;
+    }
+
+    // create resource account
+    resource.set_defaults();
+    resource.bump = ctx.bumps.resource;
+    resource.project = ctx.accounts.project.key();
+    resource.mint = ctx.accounts.mint.key();
+    resource.kind = args.kind;
 
     Ok(())
 }
@@ -112,7 +121,7 @@ pub struct InitilizeResourceTree<'info> {
     pub system_program: Program<'info, System>,
 
     /// SPL TOKEN PROGRAM
-    pub token_program: Program<'info, Token>,
+    pub token_program: Program<'info, Token2022>,
 
     /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,

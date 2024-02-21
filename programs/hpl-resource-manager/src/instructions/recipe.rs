@@ -1,7 +1,7 @@
 use {
     crate::{Recipe, Resource, ResourceAmountPair, XpPair},
     anchor_lang::prelude::*,
-    anchor_spl::token::Token,
+    anchor_spl::token_2022::Token2022,
     hpl_hive_control::state::Project,
 };
 
@@ -38,8 +38,7 @@ pub struct InitilizeRecipe<'info> {
 
     pub system_program: Program<'info, System>,
 
-    /// SPL TOKEN PROGRAM
-    pub token_program: Program<'info, Token>,
+    pub token_program: Program<'info, Token2022>,
 
     #[account(mut, has_one = project)]
     pub output_resource: Box<Account<'info, Resource>>,
@@ -70,8 +69,8 @@ pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipieArg
     msg!("creating recipe account...");
 
     recipe.set_defaults();
+    recipe.bump = ctx.bumps.recipe;
     recipe.project = ctx.accounts.project.key();
-    recipe.bump = ctx.bumps["recipe"];
     recipe.key = ctx.accounts.key.key();
     recipe.xp = args.xp;
 

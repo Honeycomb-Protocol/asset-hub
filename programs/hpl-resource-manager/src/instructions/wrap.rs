@@ -1,16 +1,9 @@
 use {
     crate::{
         errors::ResourceErrorCode, utils::burn_tokens, Holding, HoldingAccountArgs, Resource,
-    },
-    anchor_lang::prelude::*,
-    anchor_spl::{
-        associated_token::AssociatedToken,
-        token::{close_account, CloseAccount},
-        token_interface::{ TokenAccount, TokenInterface, Mint},
-    },
-    hpl_compression::{verify_leaf, CompressedData, CompressedDataEvent, ToNode},
-    hpl_hive_control::state::Project,
-    spl_account_compression::{program::SplAccountCompression, Noop},
+    }, anchor_lang::prelude::*, anchor_spl::{
+        associated_token::AssociatedToken, token::{close_account, CloseAccount}, token_2022::Token2022, token_interface::{ Mint, TokenAccount}
+    }, hpl_hive_control::state::Project, hpl_toolkit::compression::{verify_leaf, CompressedData, CompressedDataEvent, ToNode}, spl_account_compression::{program::SplAccountCompression, Noop}
 };
 
 #[derive(Accounts)]
@@ -45,16 +38,12 @@ pub struct WrapResource<'info> {
 
     pub system_program: Program<'info, System>,
 
-    /// SPL TOKEN PROGRAM
-    pub token_program: Interface<'info, TokenInterface>,
+    pub token_program: Program<'info, Token2022>,
 
-    /// SPL Compression program.
     pub compression_program: Program<'info, SplAccountCompression>,
 
-    /// SPL Noop program.
     pub log_wrapper: Program<'info, Noop>,
 
-    // SYSVAR CLOCK
     pub clock: Sysvar<'info, Clock>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -139,7 +128,7 @@ pub fn wrap_resource<'info>(
 
     msg!("updating leaf");
     // update the compressed token account using controlled merkle tree
-    hpl_compression::replace_leaf(
+    hpl_toolkit::compression::replace_leaf(
         args.holding_state.root,
         args.holding_state.holding.to_compressed().to_node(),
         new_holding_state.to_compressed().to_node(),
