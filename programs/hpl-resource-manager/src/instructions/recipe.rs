@@ -17,7 +17,7 @@ pub struct InitilizeRecipe<'info> {
 
     #[account(
         init,
-        space = Recipe::get_len(args.amounts.len()),
+        space = Recipe::get_len(args.amounts.len(), args.output_characterstics),
         seeds = [
             b"recipe".as_ref(),
             project.key().as_ref(),
@@ -60,6 +60,7 @@ pub struct InitilizeRecipe<'info> {
 pub struct InitilizeRecipieArgs {
     pub amounts: Vec<u64>,
     pub xp: XpPair,
+    pub output_characterstics: Vec<(String, String)>,
 }
 
 pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipieArgs) -> Result<()> {
@@ -73,6 +74,7 @@ pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipieArg
     recipe.project = ctx.accounts.project.key();
     recipe.key = ctx.accounts.key.key();
     recipe.xp = args.xp;
+    recipe.output_characterstics = args.output_characterstics;
 
     // setting recipie's output
     recipe.output = ResourceAmountPair {
@@ -85,6 +87,7 @@ pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipieArg
         amount: *args.amounts.get(1).unwrap_or(&0),
         resource: ctx.accounts.input_resource_one.key(),
     });
+
     if let Some(input_resource_two) = &ctx.accounts.input_resource_two {
         recipe.inputs.push(ResourceAmountPair {
             amount: *args.amounts.get(2).unwrap_or(&0),
