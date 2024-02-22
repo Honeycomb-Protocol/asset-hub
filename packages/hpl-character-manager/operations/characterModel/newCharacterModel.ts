@@ -10,7 +10,6 @@ import {
   NewCharacterModelArgs,
   PROGRAM_ID,
 } from "../../generated";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**
  * Represents the arguments for creating a "Create Currency" operation.

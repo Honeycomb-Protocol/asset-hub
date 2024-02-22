@@ -1,8 +1,8 @@
 import { Conditional } from "./Conditional";
-import { ConditionalPayment, Conditionalbool, Payment } from "..";
+import { ConditionalPayment, ConditionalBool, Payment } from "..";
 
 export class HplConditionalPaymentStatuses extends Conditional<Boolean> {
-  constructor(readonly solita: Conditionalbool, path: number[] = []) {
+  constructor(readonly solita: ConditionalBool, path: number[] = []) {
     super("None", null, path);
     if (solita.__kind === "None")
       throw new Error("Invalid conditional payment");
