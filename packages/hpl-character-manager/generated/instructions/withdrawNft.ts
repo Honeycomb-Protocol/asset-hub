@@ -84,7 +84,7 @@ export const withdrawNftInstructionDiscriminator = [
  */
 export function createWithdrawNftInstruction(
   accounts: WithdrawNftInstructionAccounts,
-  programId = new web3.PublicKey('ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg')
+  programId = new web3.PublicKey('4AZpzJtYZCu9yWrnK1D5W23VXHLgN1GPkL8h8CfaGBTW')
 ) {
   const [data] = withdrawNftStruct.serialize({
     instructionDiscriminator: withdrawNftInstructionDiscriminator,

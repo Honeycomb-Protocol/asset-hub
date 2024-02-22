@@ -101,7 +101,7 @@ export class CharacterModel implements CharacterModelArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg'
+      '4AZpzJtYZCu9yWrnK1D5W23VXHLgN1GPkL8h8CfaGBTW'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, characterModelBeet)

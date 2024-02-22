@@ -1003,11 +1003,11 @@
           "isSigner": false
         },
         {
-          "name": "user",
+          "name": "owner",
           "isMut": true,
           "isSigner": true,
           "docs": [
-            "The service that's currently using the character"
+            "The user who owns the character"
           ]
         },
         {
@@ -1788,7 +1788,7 @@
     }
   ],
   "metadata": {
-    "address": "ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg",
+    "address": "4AZpzJtYZCu9yWrnK1D5W23VXHLgN1GPkL8h8CfaGBTW",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
     "libVersion": "0.29.0"

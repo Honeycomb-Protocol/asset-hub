@@ -199,7 +199,8 @@ const configs = {
   ),
   "character-manager": createConfig(
     "character-manager",
-    "ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg",
+    // "ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg",
+    "4AZpzJtYZCu9yWrnK1D5W23VXHLgN1GPkL8h8CfaGBTW",
     {
       types: [
         {

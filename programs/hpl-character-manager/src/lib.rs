@@ -9,7 +9,8 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg");
+// declare_id!("ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg");
+declare_id!("4AZpzJtYZCu9yWrnK1D5W23VXHLgN1GPkL8h8CfaGBTW");
 
 #[cfg(not(feature = "cpi"))]
 use hpl_toolkit::schema::*;

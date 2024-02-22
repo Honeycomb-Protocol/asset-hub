@@ -91,7 +91,7 @@ export const withdrawCnftInstructionDiscriminator = [
 export function createWithdrawCnftInstruction(
   accounts: WithdrawCnftInstructionAccounts,
   args: WithdrawCnftInstructionArgs,
-  programId = new web3.PublicKey('ChRCtrG7X5kb9YncA4wuyD68DXXL8Szt3zBCCGiioBTg')
+  programId = new web3.PublicKey('4AZpzJtYZCu9yWrnK1D5W23VXHLgN1GPkL8h8CfaGBTW')
 ) {
   const [data] = withdrawCnftStruct.serialize({
     instructionDiscriminator: withdrawCnftInstructionDiscriminator,
