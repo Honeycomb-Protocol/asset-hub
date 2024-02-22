@@ -1046,7 +1046,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-character-manager"
-version = "0.0.2-beta.14"
+version = "0.0.2-beta.15"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1059,7 +1059,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-currency-manager"
-version = "0.0.84-beta.3"
+version = "0.0.84-beta.4"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1070,9 +1070,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-hive-control"
-version = "0.2.19-beta.5"
+version = "0.2.19-beta.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd97ae7cf8c6259508a75abcae6aa873f91d9df955347ba48b2e956f148e801f"
+checksum = "25307175d5c3ab00f2f58d398219d428825f2ec701db7ab6c32b736cd0b94eef"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1082,7 +1082,7 @@ dependencies = [
 
 [[package]]
 name = "hpl-payment-manager"
-version = "0.0.6-beta.3"
+version = "0.0.6-beta.4"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1096,9 +1096,9 @@ dependencies = [
 
 [[package]]
 name = "hpl-toolkit"
-version = "0.0.3-beta.10"
+version = "0.0.3-beta.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7197cefcf429ac06dc77fb8d2089566ddbe425ab146dc9e120998ca409a0363"
+checksum = "6d6a4cd04c06e6a16f7a168cbd98d890c4171ce0b38331541cbfe449f57e49b1"
 dependencies = [
  "anchor-lang",
  "hpl-toolkit-attribute-account-schemas-ix-injector",
