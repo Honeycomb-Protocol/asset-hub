@@ -6,6 +6,7 @@ use {
     anchor_lang::prelude::*,
     anchor_spl::token_2022::Token2022,
     hpl_hive_control::state::Project,
+    hpl_toolkit::HashMap,
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
 
@@ -43,9 +44,16 @@ pub struct MintResource<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct MintResourceArgs {
-    pub holding_state: Option<HoldingAccountArgs>,
-    pub amount: u64,
+pub enum MintResourceArgs {
+    Fungible {
+        holding_state: Option<HoldingAccountArgs>,
+        amount: u64,
+    },
+
+    INF {
+        holding_state: Option<HoldingAccountArgs>,
+        characteristics: HashMap<String, String>,
+    },
 }
 
 pub fn mint_resource<'info>(
@@ -54,6 +62,7 @@ pub fn mint_resource<'info>(
 ) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
 
+    // mint the resource for fungible tokens
     use_mint_resource(
         resource,
         &ctx.accounts.merkle_tree,
@@ -106,9 +115,15 @@ pub struct BurnResource<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct BurnResourceArgs {
-    pub holding_state: HoldingAccountArgs,
-    pub amount: u64,
+pub enum BurnResourceArgs {
+    Fungible {
+        holding_state: HoldingAccountArgs,
+        amount: u64,
+    },
+
+    INF {
+        holding_state: HoldingAccountArgs,
+    },
 }
 
 pub fn burn_resource<'info>(
@@ -120,12 +135,11 @@ pub fn burn_resource<'info>(
     use_burn_resource(
         resource,
         &ctx.accounts.merkle_tree,
-        &ctx.remaining_accounts,
+        ctx.remaining_accounts,
         &ctx.accounts.clock.to_owned(),
         &ctx.accounts.log_wrapper.to_owned(),
         &ctx.accounts.compression_program.to_owned(),
-        args.holding_state,
-        &args.amount,
+        &args,
     )?;
 
     msg!("Token Burned");
