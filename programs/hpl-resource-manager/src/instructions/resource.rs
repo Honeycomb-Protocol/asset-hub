@@ -1,8 +1,8 @@
 use {
     crate::{
         utils::{
-            create_metadata_for_mint, create_mint_with_extensions, update_metadata_for_mint,
-            ResourceMetadataArgs, ResourceMetadataUpdateArgs,
+            create_metadata_for_mint, create_mint_with_extensions, init_collection,
+            ResourceMetadataArgs,
         },
         Resource, ResourseKind,
     },
@@ -48,53 +48,54 @@ pub struct CreateResource<'info> {
 pub struct CreateResourceArgs {
     pub kind: ResourseKind,
     pub metadata: ResourceMetadataArgs,
-    pub decimals: u8,
 }
 
 pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
+    let token_program = &ctx.accounts.token_program.to_account_info();
 
-    // create the mint account with the extensions
-    create_mint_with_extensions(
-        &resource,
-        ctx.accounts.payer.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-        &ctx.accounts.rent_sysvar,
-        &ctx.accounts.token_program.to_account_info(),
-        args.decimals,
-        &args.metadata,
-        &args.kind,
-    )?;
-
-    // create the metadata account for the mint
-    create_metadata_for_mint(
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.mint.to_account_info(),
-        &resource,
-        args.metadata,
-    )?;
-
-    // update the metadata account for the mint with the characterstics
-    if let ResourseKind::INF { characterstics } = args.kind.to_owned() {
-        update_metadata_for_mint(
-            ctx.accounts.token_program.to_account_info(),
-            ctx.accounts.mint.to_account_info(),
-            &resource,
-            ResourceMetadataUpdateArgs {
-                name: None,
-                symbol: None,
-                uri: None,
-                additional_metadata: characterstics,
-            },
-        )?;
-    }
+    let decimals = match &args.kind {
+        ResourseKind::Fungible { decimals } => *decimals,
+        _ => 0,
+    };
 
     // create resource account
     resource.set_defaults();
     resource.bump = ctx.bumps.resource;
     resource.project = ctx.accounts.project.key();
     resource.mint = ctx.accounts.mint.key();
-    resource.kind = args.kind;
+    resource.kind = args.kind.to_owned();
+
+    // create the mint account with the extensions
+    create_mint_with_extensions(
+        &resource,
+        &ctx.accounts.payer.to_account_info(),
+        &ctx.accounts.mint.to_account_info(),
+        &ctx.accounts.rent_sysvar,
+        &token_program,
+        decimals,
+        &args.metadata,
+        &args.kind,
+    )?;
+
+    // create the metadata account for the mint
+    create_metadata_for_mint(
+        token_program,
+        ctx.accounts.mint.to_account_info(),
+        &resource,
+        args.metadata,
+    )?;
+
+    if let ResourseKind::INF { supply, .. } = &args.kind {
+        msg!("Creating the group account for the mint.");
+        // create the metadata account for the mint
+        init_collection(
+            &token_program,
+            ctx.accounts.mint.to_account_info(),
+            &resource,
+            *supply,
+        )?;
+    }
 
     Ok(())
 }

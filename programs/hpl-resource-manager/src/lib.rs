@@ -7,7 +7,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use states::*;
 
-declare_id!("4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y");
+declare_id!("ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2");
 
 #[program]
 pub mod hpl_resource_manager {
@@ -38,12 +38,12 @@ pub mod hpl_resource_manager {
         instructions::burn_resource(ctx, args)
     }
 
-    pub fn wrap_resource<'info>(
-        ctx: Context<'_, '_, '_, 'info, WrapResource<'info>>,
-        args: WrapResourceArgs,
-    ) -> Result<()> {
-        instructions::wrap_resource(ctx, args)
-    }
+    // pub fn wrap_resource<'info>(
+    //     ctx: Context<'_, '_, '_, 'info, WrapResource<'info>>,
+    //     args: WrapResourceArgs,
+    // ) -> Result<()> {
+    //     instructions::wrap_resource(ctx, args)
+    // }
 
     pub fn unwrap_resource<'info>(
         ctx: Context<'_, '_, '_, 'info, UnWrapResource<'info>>,
