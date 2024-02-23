@@ -10,4 +10,10 @@ pub enum ResourceErrorCode {
 
     #[msg("The amount provided is insufficient")]
     InsufficientAmount,
+
+    #[msg("The characteristics provided do not match the recipe")]
+    CharacteristicsMismatch,
+
+    #[msg("The holding state provided is invalid")]
+    InvalidHoldingState,
 }
