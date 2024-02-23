@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use hpl_toolkit::HashMap;
 
 #[account]
 pub struct Recipe {
@@ -14,16 +15,18 @@ pub struct Recipe {
 
     pub inputs: Vec<ResourceAmountPair>,
 
-    pub output_characterstics: Vec<(String, String)>,
+    pub output_characteristics: HashMap<String, String>,
 }
+
 impl Recipe {
     pub const LEN: usize = 8 + 1 + 32 + 32 + 32 + 40;
 
-    pub fn get_len(input_len: usize, cac_len: Vec<(String, String)>) -> usize {
+    pub fn get_len(input_len: usize, cac_len: HashMap<String, String>) -> usize {
         // adding the space for the bump, project, key, xp, output
         let mut space = Self::LEN + input_len * 40;
 
-        // adding the space for the characterstics
+        // adding the space for the characteristics
+        space += 4;
         for (label, value) in cac_len {
             space += label.len() + value.len();
         }

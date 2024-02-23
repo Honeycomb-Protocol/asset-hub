@@ -17,17 +17,8 @@ pub struct Resource {
     /// token account trees
     pub merkle_trees: ControlledMerkleTrees,
 
-    // the characterstics of this resource
+    // the characteristics of this resource
     pub kind: ResourseKind,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub enum ResourseKind {
-    Fungible,
-    INF {
-        characterstics: Vec<(String, String)>,
-    },
-    NonFungible,
 }
 
 impl Resource {
@@ -44,7 +35,7 @@ impl Resource {
         self.bump = 0;
         self.project = Pubkey::default();
         self.mint = Pubkey::default();
-        self.kind = ResourseKind::Fungible;
+        self.kind = ResourseKind::Fungible { decimals: 0 };
         self.merkle_trees = ControlledMerkleTrees {
             active: 0,
             merkle_trees: Vec::new(),
@@ -61,5 +52,41 @@ impl Resource {
         ];
 
         resource_signer_seeds
+    }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub enum ResourseKind {
+    Fungible {
+        decimals: u8,
+    },
+
+    INF {
+        characteristics: Vec<String>,
+        supply: u32,
+    },
+
+    NonFungible,
+}
+
+impl ResourseKind {
+    pub fn match_characteristics(&self, array: &HashMap<String, String>) -> bool {
+        if let ResourseKind::INF {
+            characteristics,
+            supply: _,
+        } = self
+        {
+            for key in characteristics {
+                for (label, _) in array {
+                    if key != label {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

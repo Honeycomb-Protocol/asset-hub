@@ -1,17 +1,61 @@
 use {
     anchor_lang::{prelude::*, solana_program::keccak},
-    hpl_toolkit::{compression::*, schema::*},
+    hpl_toolkit::{compression::*, schema::*, ToNode, ToSchema},
     std::collections::HashMap,
 };
 
 /// Resource holding state
 #[compressed_account()]
-pub struct Holding {
-    // the holder of this holding
-    pub holder: Pubkey,
+pub enum Holding {
+    Fungible {
+        holder: Pubkey,
+        balance: u64,
+    },
 
-    // the resource this holding is associated with
-    pub balance: u64,
+    INF {
+        holder: NonFungibleHolding,
+        characteristics: HashMap<String, String>,
+    },
+}
+
+impl Holding {
+    pub fn get_balance(&self) -> u64 {
+        match self {
+            Holding::Fungible { balance, .. } => *balance,
+            Holding::INF { holder, .. } => match holder {
+                NonFungibleHolding::Eject { .. } => 0,
+                NonFungibleHolding::Holder(_) => 1,
+            },
+        }
+    }
+
+    pub fn get_holder(&self) -> Pubkey {
+        match self {
+            Holding::Fungible { holder, .. } => *holder,
+            Holding::INF { holder, .. } => match holder {
+                NonFungibleHolding::Eject { holder, .. } => *holder,
+                NonFungibleHolding::Holder(holder) => *holder,
+            },
+        }
+    }
+
+    pub fn get_characteristics(&self) -> Vec<(String, String)> {
+        match self {
+            Holding::Fungible { .. } => vec![],
+            Holding::INF {
+                characteristics, ..
+            } => characteristics
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect(),
+        }
+    }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema, ToNode)]
+pub enum NonFungibleHolding {
+    Holder(Pubkey),
+    Eject { mint: Pubkey, holder: Pubkey },
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
