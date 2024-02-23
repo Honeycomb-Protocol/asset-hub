@@ -1,8 +1,11 @@
 use {
-    crate::{Recipe, Resource, ResourceAmountPair, XpPair},
+    crate::{
+        errors::ResourceErrorCode, Recipe, Resource, ResourceAmountPair, ResourseKind, XpPair,
+    },
     anchor_lang::prelude::*,
     anchor_spl::token_2022::Token2022,
     hpl_hive_control::state::Project,
+    hpl_toolkit::HashMap,
 };
 
 #[derive(Accounts)]
@@ -17,7 +20,7 @@ pub struct InitilizeRecipe<'info> {
 
     #[account(
         init,
-        space = Recipe::get_len(args.amounts.len(), args.output_characterstics),
+        space = Recipe::get_len(args.amounts.len(), args.output_characteristics),
         seeds = [
             b"recipe".as_ref(),
             project.key().as_ref(),
@@ -58,9 +61,9 @@ pub struct InitilizeRecipe<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InitilizeRecipieArgs {
-    pub amounts: Vec<u64>,
     pub xp: XpPair,
-    pub output_characterstics: Vec<(String, String)>,
+    pub amounts: Vec<u64>,
+    pub output_characteristics: HashMap<String, String>,
 }
 
 pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipieArgs) -> Result<()> {
@@ -69,12 +72,23 @@ pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipieArg
     // verify the holding account leaf
     msg!("creating recipe account...");
 
+    let kind = &ctx.accounts.output_resource.kind;
+    if let ResourseKind::INF {
+        characteristics: _,
+        supply: _,
+    } = kind
+    {
+        if kind.match_characteristics(&args.output_characteristics) {
+            return Err(ResourceErrorCode::CharacteristicsMismatch.into());
+        }
+    }
+
     recipe.set_defaults();
     recipe.bump = ctx.bumps.recipe;
     recipe.project = ctx.accounts.project.key();
     recipe.key = ctx.accounts.key.key();
     recipe.xp = args.xp;
-    recipe.output_characterstics = args.output_characterstics;
+    recipe.output_characteristics = args.output_characteristics;
 
     // setting recipie's output
     recipe.output = ResourceAmountPair {
