@@ -2,7 +2,7 @@ use {
     crate::{
         errors::ResourceErrorCode,
         utils::{use_burn_resource, use_mint_resource},
-        HoldingAccountArgs, MintResourceArgs, Recipe, Resource,
+        BurnResourceArgs, HoldingAccountArgs, MintResourceArgs, Recipe, Resource, ResourseKind,
     },
     anchor_lang::prelude::*,
     anchor_spl::token_2022::Token2022,
@@ -66,8 +66,6 @@ pub fn craft_recipe<'info>(
     let recipe = &mut ctx.accounts.recipe;
     let mut args_iter = args.into_iter();
 
-    msg!("output");
-
     // cursor for the remaining accounts to be used in the recipie
     let mut pointer: usize = 0;
     let point = &mut pointer;
@@ -121,6 +119,23 @@ pub fn craft_recipe<'info>(
     for input in recipe.inputs.iter() {
         if let Some(resource) = resource_map.get_mut(&input.resource) {
             msg!("burning the input resources {:?}", resource.1 .1.key());
+
+            let holding_state = resource.1 .0.to_owned().unwrap();
+            let args = match resource.0.kind {
+                ResourseKind::Fungible { .. } => BurnResourceArgs::Fungible {
+                    holding_state: holding_state,
+                    amount: input.amount,
+                },
+
+                ResourseKind::INF { .. } => BurnResourceArgs::INF {
+                    holding_state: holding_state,
+                },
+
+                ResourseKind::NonFungible => BurnResourceArgs::INF {
+                    holding_state: holding_state,
+                },
+            };
+
             use_burn_resource(
                 &mut resource.0,
                 &resource.1 .1,
@@ -128,16 +143,30 @@ pub fn craft_recipe<'info>(
                 &ctx.accounts.clock,
                 &ctx.accounts.log_wrapper,
                 &ctx.accounts.compression_program,
-                resource.1 .0.to_owned().unwrap(),
-                &input.amount,
+                &args,
             )?;
         } else {
             return Err(ResourceErrorCode::ResourceNotFound.into());
         }
     }
 
-    msg!("minting the output resources");
-    // minting the output resource
+    let args = match &ctx.accounts.output_resource.kind {
+        ResourseKind::Fungible { .. } => MintResourceArgs::Fungible {
+            holding_state: output_stats.0,
+            amount: recipe.output.amount,
+        },
+
+        ResourseKind::INF { .. } => MintResourceArgs::INF {
+            holding_state: output_stats.0,
+            characteristics: recipe.output_characteristics.to_owned(),
+        },
+
+        ResourseKind::NonFungible => MintResourceArgs::INF {
+            holding_state: output_stats.0,
+            characteristics: recipe.output_characteristics.to_owned(),
+        },
+    };
+
     use_mint_resource(
         &mut ctx.accounts.output_resource,
         &output_stats.1,
@@ -146,10 +175,7 @@ pub fn craft_recipe<'info>(
         &ctx.accounts.clock,
         &ctx.accounts.log_wrapper,
         &ctx.accounts.compression_program,
-        &MintResourceArgs {
-            amount: recipe.output.amount,
-            holding_state: output_stats.0,
-        },
+        &args,
     )?;
 
     msg!("recipie crafted");
