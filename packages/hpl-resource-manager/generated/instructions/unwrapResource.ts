@@ -26,7 +26,7 @@ export type UnwrapResourceInstructionArgs = {
  * @category UnwrapResource
  * @category generated
  */
-export const unwrapResourceStruct = new beet.BeetArgsStruct<
+export const unwrapResourceStruct = new beet.FixableBeetArgsStruct<
   UnwrapResourceInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
@@ -42,8 +42,9 @@ export const unwrapResourceStruct = new beet.BeetArgsStruct<
  *
  * @property [] project
  * @property [] resource
- * @property [_writable_] mint
+ * @property [] group (optional)
  * @property [_writable_] merkleTree
+ * @property [_writable_] mint
  * @property [_writable_] recipientAccount
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
@@ -59,8 +60,9 @@ export const unwrapResourceStruct = new beet.BeetArgsStruct<
 export type UnwrapResourceInstructionAccounts = {
   project: web3.PublicKey
   resource: web3.PublicKey
-  mint: web3.PublicKey
+  group?: web3.PublicKey
   merkleTree: web3.PublicKey
+  mint: web3.PublicKey
   recipientAccount: web3.PublicKey
   owner: web3.PublicKey
   payer: web3.PublicKey
@@ -81,6 +83,9 @@ export const unwrapResourceInstructionDiscriminator = [
 /**
  * Creates a _UnwrapResource_ instruction.
  *
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
+ *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
@@ -91,7 +96,7 @@ export const unwrapResourceInstructionDiscriminator = [
 export function createUnwrapResourceInstruction(
   accounts: UnwrapResourceInstructionAccounts,
   args: UnwrapResourceInstructionArgs,
-  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
+  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
 ) {
   const [data] = unwrapResourceStruct.serialize({
     instructionDiscriminator: unwrapResourceInstructionDiscriminator,
@@ -109,12 +114,17 @@ export function createUnwrapResourceInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.mint,
-      isWritable: true,
+      pubkey: accounts.group ?? programId,
+      isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.merkleTree,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.mint,
       isWritable: true,
       isSigner: false,
     },

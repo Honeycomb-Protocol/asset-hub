@@ -10,20 +10,74 @@ import {
   HoldingAccountArgs,
   holdingAccountArgsBeet,
 } from './HoldingAccountArgs'
-export type UnWrapResourceArgs = {
-  holdingState: HoldingAccountArgs
-  amount: beet.bignum
+import {
+  ResourceMetadataArgs,
+  resourceMetadataArgsBeet,
+} from './ResourceMetadataArgs'
+/**
+ * This type is used to derive the {@link UnWrapResourceArgs} type as well as the de/serializer.
+ * However don't refer to it in your code but use the {@link UnWrapResourceArgs} type instead.
+ *
+ * @category userTypes
+ * @category enums
+ * @category generated
+ * @private
+ */
+export type UnWrapResourceArgsRecord = {
+  Fungible: { holdingState: HoldingAccountArgs; amount: beet.bignum }
+  INF: {
+    holdingState: HoldingAccountArgs
+    metadata: ResourceMetadataArgs
+    characteristics: Map<string, string>
+  }
 }
+
+/**
+ * Union type respresenting the UnWrapResourceArgs data enum defined in Rust.
+ *
+ * NOTE: that it includes a `__kind` property which allows to narrow types in
+ * switch/if statements.
+ * Additionally `isUnWrapResourceArgs*` type guards are exposed below to narrow to a specific variant.
+ *
+ * @category userTypes
+ * @category enums
+ * @category generated
+ */
+export type UnWrapResourceArgs =
+  beet.DataEnumKeyAsKind<UnWrapResourceArgsRecord>
+
+export const isUnWrapResourceArgsFungible = (
+  x: UnWrapResourceArgs
+): x is UnWrapResourceArgs & { __kind: 'Fungible' } => x.__kind === 'Fungible'
+export const isUnWrapResourceArgsINF = (
+  x: UnWrapResourceArgs
+): x is UnWrapResourceArgs & { __kind: 'INF' } => x.__kind === 'INF'
 
 /**
  * @category userTypes
  * @category generated
  */
-export const unWrapResourceArgsBeet =
-  new beet.BeetArgsStruct<UnWrapResourceArgs>(
-    [
-      ['holdingState', holdingAccountArgsBeet],
-      ['amount', beet.u64],
-    ],
-    'UnWrapResourceArgs'
-  )
+export const unWrapResourceArgsBeet = beet.dataEnum<UnWrapResourceArgsRecord>([
+  [
+    'Fungible',
+    new beet.FixableBeetArgsStruct<UnWrapResourceArgsRecord['Fungible']>(
+      [
+        ['holdingState', holdingAccountArgsBeet],
+        ['amount', beet.u64],
+      ],
+      'UnWrapResourceArgsRecord["Fungible"]'
+    ),
+  ],
+
+  [
+    'INF',
+    new beet.FixableBeetArgsStruct<UnWrapResourceArgsRecord['INF']>(
+      [
+        ['holdingState', holdingAccountArgsBeet],
+        ['metadata', resourceMetadataArgsBeet],
+        ['characteristics', beet.map(beet.utf8String, beet.utf8String)],
+      ],
+      'UnWrapResourceArgsRecord["INF"]'
+    ),
+  ],
+]) as beet.FixableBeet<UnWrapResourceArgs, UnWrapResourceArgs>

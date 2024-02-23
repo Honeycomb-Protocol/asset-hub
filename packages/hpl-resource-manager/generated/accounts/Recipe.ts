@@ -26,6 +26,7 @@ export type RecipeArgs = {
   xp: XpPair
   output: ResourceAmountPair
   inputs: ResourceAmountPair[]
+  outputCharacteristics: Map<string, string>
 }
 
 export const recipeDiscriminator = [10, 162, 156, 100, 56, 193, 205, 77]
@@ -43,7 +44,8 @@ export class Recipe implements RecipeArgs {
     readonly key: web3.PublicKey,
     readonly xp: XpPair,
     readonly output: ResourceAmountPair,
-    readonly inputs: ResourceAmountPair[]
+    readonly inputs: ResourceAmountPair[],
+    readonly outputCharacteristics: Map<string, string>
   ) {}
 
   /**
@@ -56,7 +58,8 @@ export class Recipe implements RecipeArgs {
       args.key,
       args.xp,
       args.output,
-      args.inputs
+      args.inputs,
+      args.outputCharacteristics
     )
   }
 
@@ -100,7 +103,7 @@ export class Recipe implements RecipeArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      '4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y'
+      'ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, recipeBeet)
@@ -171,6 +174,7 @@ export class Recipe implements RecipeArgs {
       xp: this.xp,
       output: this.output,
       inputs: this.inputs,
+      outputCharacteristics: this.outputCharacteristics,
     }
   }
 }
@@ -193,6 +197,7 @@ export const recipeBeet = new beet.FixableBeetStruct<
     ['xp', xpPairBeet],
     ['output', resourceAmountPairBeet],
     ['inputs', beet.array(resourceAmountPairBeet)],
+    ['outputCharacteristics', beet.map(beet.utf8String, beet.utf8String)],
   ],
   Recipe.fromArgs,
   'Recipe'

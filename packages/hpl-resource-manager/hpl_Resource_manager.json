@@ -41,25 +41,9 @@
           "isSigner": false
         },
         {
-          "name": "token22Program",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL TOKEN PROGRAM"
-          ]
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "ASSOCIATED TOKEN PROGRAM"
-          ]
+          "isSigner": false
         }
       ],
       "args": [
@@ -187,33 +171,19 @@
           "isSigner": false
         },
         {
-          "name": "token22Program",
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL TOKEN PROGRAM"
-          ]
-        },
-        {
           "name": "compressionProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Compression program."
-          ]
+          "isSigner": false
         },
         {
           "name": "logWrapper",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Noop program."
-          ]
+          "isSigner": false
         },
         {
           "name": "clock",
@@ -274,33 +244,19 @@
           "isSigner": false
         },
         {
-          "name": "token22Program",
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL TOKEN PROGRAM"
-          ]
-        },
-        {
           "name": "compressionProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Compression program."
-          ]
+          "isSigner": false
         },
         {
           "name": "logWrapper",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Noop program."
-          ]
+          "isSigner": false
         },
         {
           "name": "clock",
@@ -313,98 +269,6 @@
           "name": "args",
           "type": {
             "defined": "BurnResourceArgs"
-          }
-        }
-      ]
-    },
-    {
-      "name": "wrapResource",
-      "accounts": [
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "resource",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "merkleTree",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "rentSysvar",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL TOKEN PROGRAM"
-          ]
-        },
-        {
-          "name": "compressionProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Compression program."
-          ]
-        },
-        {
-          "name": "logWrapper",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Noop program."
-          ]
-        },
-        {
-          "name": "clock",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": "WrapResourceArgs"
           }
         }
       ]
@@ -423,12 +287,18 @@
           "isSigner": false
         },
         {
-          "name": "mint",
+          "name": "group",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "merkleTree",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "merkleTree",
+          "name": "mint",
           "isMut": true,
           "isSigner": false
         },
@@ -460,26 +330,17 @@
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL TOKEN PROGRAM"
-          ]
+          "isSigner": false
         },
         {
           "name": "compressionProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Compression program."
-          ]
+          "isSigner": false
         },
         {
           "name": "logWrapper",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Noop program."
-          ]
+          "isSigner": false
         },
         {
           "name": "clock",
@@ -635,10 +496,7 @@
         {
           "name": "tokenProgram",
           "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL TOKEN PROGRAM"
-          ]
+          "isSigner": false
         },
         {
           "name": "outputResource",
@@ -716,6 +574,15 @@
                 "defined": "ResourceAmountPair"
               }
             }
+          },
+          {
+            "name": "outputCharacteristics",
+            "type": {
+              "hashMap": [
+                "string",
+                "string"
+              ]
+            }
           }
         ]
       }
@@ -787,48 +654,16 @@
       }
     },
     {
-      "name": "MintResourceArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "holdingState",
-            "type": {
-              "option": {
-                "defined": "HoldingAccountArgs"
-              }
-            }
-          },
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "BurnResourceArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "holdingState",
-            "type": {
-              "defined": "HoldingAccountArgs"
-            }
-          },
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
       "name": "InitilizeRecipieArgs",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "xp",
+            "type": {
+              "defined": "XpPair"
+            }
+          },
           {
             "name": "amounts",
             "type": {
@@ -836,9 +671,12 @@
             }
           },
           {
-            "name": "xp",
+            "name": "outputCharacteristics",
             "type": {
-              "defined": "XpPair"
+              "hashMap": [
+                "string",
+                "string"
+              ]
             }
           }
         ]
@@ -860,10 +698,6 @@
             "type": {
               "defined": "ResourceMetadataArgs"
             }
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
           }
         ]
       }
@@ -880,42 +714,6 @@
           {
             "name": "maxBufferSize",
             "type": "u32"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UnWrapResourceArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "holdingState",
-            "type": {
-              "defined": "HoldingAccountArgs"
-            }
-          },
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "WrapResourceArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "holdingState",
-            "type": {
-              "defined": "HoldingAccountArgs"
-            }
-          },
-          {
-            "name": "amount",
-            "type": "u64"
           }
         ]
       }
@@ -1000,21 +798,301 @@
       }
     },
     {
-      "name": "ResourseKind",
+      "name": "ResourceMetadataUpdateArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "symbol",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "uri",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "additionalMetadata",
+            "type": {
+              "hashMap": [
+                "string",
+                "string"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintResourceArgs",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Fungible"
+            "name": "Fungible",
+            "fields": [
+              {
+                "name": "holdingState",
+                "type": {
+                  "option": {
+                    "defined": "HoldingAccountArgs"
+                  }
+                }
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
           },
           {
             "name": "INF",
             "fields": [
               {
-                "name": "characterstics",
+                "name": "holdingState",
                 "type": {
-                  "defined": "Schema"
+                  "option": {
+                    "defined": "HoldingAccountArgs"
+                  }
                 }
+              },
+              {
+                "name": "characteristics",
+                "type": {
+                  "hashMap": [
+                    "string",
+                    "string"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "BurnResourceArgs",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fungible",
+            "fields": [
+              {
+                "name": "holdingState",
+                "type": {
+                  "defined": "HoldingAccountArgs"
+                }
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "INF",
+            "fields": [
+              {
+                "name": "holdingState",
+                "type": {
+                  "defined": "HoldingAccountArgs"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnWrapResourceArgs",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fungible",
+            "fields": [
+              {
+                "name": "holdingState",
+                "type": {
+                  "defined": "HoldingAccountArgs"
+                }
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "INF",
+            "fields": [
+              {
+                "name": "holdingState",
+                "type": {
+                  "defined": "HoldingAccountArgs"
+                }
+              },
+              {
+                "name": "metadata",
+                "type": {
+                  "defined": "ResourceMetadataArgs"
+                }
+              },
+              {
+                "name": "characteristics",
+                "type": {
+                  "hashMap": [
+                    "string",
+                    "string"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "WrapResourceArgs",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fungible",
+            "fields": [
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "holdingState",
+                "type": {
+                  "defined": "HoldingAccountArgs"
+                }
+              }
+            ]
+          },
+          {
+            "name": "INF",
+            "fields": [
+              {
+                "name": "holdingState",
+                "type": {
+                  "defined": "HoldingAccountArgs"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Holding",
+      "docs": [
+        "Resource holding state"
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fungible",
+            "fields": [
+              {
+                "name": "holder",
+                "type": "publicKey"
+              },
+              {
+                "name": "balance",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "INF",
+            "fields": [
+              {
+                "name": "holder",
+                "type": {
+                  "defined": "NonFungibleHolding"
+                }
+              },
+              {
+                "name": "characteristics",
+                "type": {
+                  "hashMap": [
+                    "string",
+                    "string"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "NonFungibleHolding",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Holder",
+            "fields": [
+              "publicKey"
+            ]
+          },
+          {
+            "name": "Eject",
+            "fields": [
+              {
+                "name": "mint",
+                "type": "publicKey"
+              },
+              {
+                "name": "holder",
+                "type": "publicKey"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResourseKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fungible",
+            "fields": [
+              {
+                "name": "decimals",
+                "type": "u8"
+              }
+            ]
+          },
+          {
+            "name": "INF",
+            "fields": [
+              {
+                "name": "characteristics",
+                "type": {
+                  "vec": "string"
+                }
+              },
+              {
+                "name": "supply",
+                "type": "u32"
               }
             ]
           },
@@ -1060,6 +1138,40 @@
               },
               {
                 "name": "metadataAddress",
+                "type": {
+                  "option": "publicKey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "GroupPointer",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "publicKey"
+                }
+              },
+              {
+                "name": "groupAddress",
+                "type": {
+                  "option": "publicKey"
+                }
+              }
+            ]
+          },
+          {
+            "name": "GroupMemberPointer",
+            "fields": [
+              {
+                "name": "authority",
+                "type": {
+                  "option": "publicKey"
+                }
+              },
+              {
+                "name": "memberAddress",
                 "type": {
                   "option": "publicKey"
                 }
@@ -1173,16 +1285,44 @@
     },
     {
       "name": "Holding",
+      "docs": [
+        "Resource holding state"
+      ],
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "holder",
-            "type": "publicKey"
+            "name": "Fungible",
+            "fields": [
+              {
+                "name": "holder",
+                "type": "publicKey"
+              },
+              {
+                "name": "balance",
+                "type": "u64"
+              }
+            ]
           },
           {
-            "name": "balance",
-            "type": "u64"
+            "name": "INF",
+            "fields": [
+              {
+                "name": "holder",
+                "type": {
+                  "defined": "NonFungibleHolding"
+                }
+              },
+              {
+                "name": "characteristics",
+                "type": {
+                  "hashMap": [
+                    "string",
+                    "string"
+                  ]
+                }
+              }
+            ]
           }
         ]
       }
@@ -1203,10 +1343,20 @@
       "code": 6002,
       "name": "InsufficientAmount",
       "msg": "The amount provided is insufficient"
+    },
+    {
+      "code": 6003,
+      "name": "CharacteristicsMismatch",
+      "msg": "The characteristics provided do not match the recipe"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidHoldingState",
+      "msg": "The holding state provided is invalid"
     }
   ],
   "metadata": {
-    "address": "4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y",
+    "address": "ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
     "libVersion": "0.29.0"

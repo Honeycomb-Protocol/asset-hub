@@ -25,5 +25,5 @@ anchor-spl = { workspace = true }
 hpl-toolkit = { workspace = true, features = ["full"] }
 hpl-hive-control = { workspace = true }
 mpl-bubblegum = { workspace = true }
-mpl-token-metadata = { workspace = true }
+mpl-token-metadata = { version = "0.1.0" }
 spl-account-compression = { workspace = true }

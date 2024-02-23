@@ -81,6 +81,52 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * CharacteristicsMismatch: 'The characteristics provided do not match the recipe'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class CharacteristicsMismatchError extends Error {
+  readonly code: number = 0x1773
+  readonly name: string = 'CharacteristicsMismatch'
+  constructor() {
+    super('The characteristics provided do not match the recipe')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, CharacteristicsMismatchError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1773, () => new CharacteristicsMismatchError())
+createErrorFromNameLookup.set(
+  'CharacteristicsMismatch',
+  () => new CharacteristicsMismatchError()
+)
+
+/**
+ * InvalidHoldingState: 'The holding state provided is invalid'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class InvalidHoldingStateError extends Error {
+  readonly code: number = 0x1774
+  readonly name: string = 'InvalidHoldingState'
+  constructor() {
+    super('The holding state provided is invalid')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, InvalidHoldingStateError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1774, () => new InvalidHoldingStateError())
+createErrorFromNameLookup.set(
+  'InvalidHoldingState',
+  () => new InvalidHoldingStateError()
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

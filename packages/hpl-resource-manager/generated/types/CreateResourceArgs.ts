@@ -14,7 +14,6 @@ import {
 export type CreateResourceArgs = {
   kind: ResourseKind
   metadata: ResourceMetadataArgs
-  decimals: number
 }
 
 /**
@@ -26,7 +25,6 @@ export const createResourceArgsBeet =
     [
       ['kind', resourseKindBeet],
       ['metadata', resourceMetadataArgsBeet],
-      ['decimals', beet.u8],
     ],
     'CreateResourceArgs'
   )

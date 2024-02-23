@@ -26,7 +26,7 @@ export type BurnResourceInstructionArgs = {
  * @category BurnResource
  * @category generated
  */
-export const burnResourceStruct = new beet.BeetArgsStruct<
+export const burnResourceStruct = new beet.FixableBeetArgsStruct<
   BurnResourceInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
@@ -47,7 +47,6 @@ export const burnResourceStruct = new beet.BeetArgsStruct<
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
  * @property [] rentSysvar
- * @property [] token22Program
  * @property [] compressionProgram
  * @property [] logWrapper
  * @property [] clock
@@ -64,7 +63,6 @@ export type BurnResourceInstructionAccounts = {
   payer: web3.PublicKey
   rentSysvar: web3.PublicKey
   systemProgram?: web3.PublicKey
-  token22Program: web3.PublicKey
   tokenProgram?: web3.PublicKey
   compressionProgram: web3.PublicKey
   logWrapper: web3.PublicKey
@@ -89,7 +87,7 @@ export const burnResourceInstructionDiscriminator = [
 export function createBurnResourceInstruction(
   accounts: BurnResourceInstructionAccounts,
   args: BurnResourceInstructionArgs,
-  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
+  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
 ) {
   const [data] = burnResourceStruct.serialize({
     instructionDiscriminator: burnResourceInstructionDiscriminator,
@@ -133,11 +131,6 @@ export function createBurnResourceInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.token22Program,
       isWritable: false,
       isSigner: false,
     },

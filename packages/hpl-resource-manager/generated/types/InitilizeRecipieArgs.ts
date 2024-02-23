@@ -8,8 +8,9 @@
 import * as beet from '@metaplex-foundation/beet'
 import { XpPair, xpPairBeet } from './XpPair'
 export type InitilizeRecipieArgs = {
-  amounts: beet.bignum[]
   xp: XpPair
+  amounts: beet.bignum[]
+  outputCharacteristics: Map<string, string>
 }
 
 /**
@@ -19,8 +20,9 @@ export type InitilizeRecipieArgs = {
 export const initilizeRecipieArgsBeet =
   new beet.FixableBeetArgsStruct<InitilizeRecipieArgs>(
     [
-      ['amounts', beet.array(beet.u64)],
       ['xp', xpPairBeet],
+      ['amounts', beet.array(beet.u64)],
+      ['outputCharacteristics', beet.map(beet.utf8String, beet.utf8String)],
     ],
     'InitilizeRecipieArgs'
   )

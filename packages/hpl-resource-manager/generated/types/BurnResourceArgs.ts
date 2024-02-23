@@ -10,19 +10,61 @@ import {
   HoldingAccountArgs,
   holdingAccountArgsBeet,
 } from './HoldingAccountArgs'
-export type BurnResourceArgs = {
-  holdingState: HoldingAccountArgs
-  amount: beet.bignum
+/**
+ * This type is used to derive the {@link BurnResourceArgs} type as well as the de/serializer.
+ * However don't refer to it in your code but use the {@link BurnResourceArgs} type instead.
+ *
+ * @category userTypes
+ * @category enums
+ * @category generated
+ * @private
+ */
+export type BurnResourceArgsRecord = {
+  Fungible: { holdingState: HoldingAccountArgs; amount: beet.bignum }
+  INF: { holdingState: HoldingAccountArgs }
 }
+
+/**
+ * Union type respresenting the BurnResourceArgs data enum defined in Rust.
+ *
+ * NOTE: that it includes a `__kind` property which allows to narrow types in
+ * switch/if statements.
+ * Additionally `isBurnResourceArgs*` type guards are exposed below to narrow to a specific variant.
+ *
+ * @category userTypes
+ * @category enums
+ * @category generated
+ */
+export type BurnResourceArgs = beet.DataEnumKeyAsKind<BurnResourceArgsRecord>
+
+export const isBurnResourceArgsFungible = (
+  x: BurnResourceArgs
+): x is BurnResourceArgs & { __kind: 'Fungible' } => x.__kind === 'Fungible'
+export const isBurnResourceArgsINF = (
+  x: BurnResourceArgs
+): x is BurnResourceArgs & { __kind: 'INF' } => x.__kind === 'INF'
 
 /**
  * @category userTypes
  * @category generated
  */
-export const burnResourceArgsBeet = new beet.BeetArgsStruct<BurnResourceArgs>(
+export const burnResourceArgsBeet = beet.dataEnum<BurnResourceArgsRecord>([
   [
-    ['holdingState', holdingAccountArgsBeet],
-    ['amount', beet.u64],
+    'Fungible',
+    new beet.FixableBeetArgsStruct<BurnResourceArgsRecord['Fungible']>(
+      [
+        ['holdingState', holdingAccountArgsBeet],
+        ['amount', beet.u64],
+      ],
+      'BurnResourceArgsRecord["Fungible"]'
+    ),
   ],
-  'BurnResourceArgs'
-)
+
+  [
+    'INF',
+    new beet.FixableBeetArgsStruct<BurnResourceArgsRecord['INF']>(
+      [['holdingState', holdingAccountArgsBeet]],
+      'BurnResourceArgsRecord["INF"]'
+    ),
+  ],
+]) as beet.FixableBeet<BurnResourceArgs, BurnResourceArgs>

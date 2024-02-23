@@ -97,7 +97,7 @@ export class Resource implements ResourceArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      '4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y'
+      'ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, resourceBeet)

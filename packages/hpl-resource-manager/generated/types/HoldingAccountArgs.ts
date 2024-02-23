@@ -18,7 +18,7 @@ export type HoldingAccountArgs = {
  * @category generated
  */
 export const holdingAccountArgsBeet =
-  new beet.BeetArgsStruct<HoldingAccountArgs>(
+  new beet.FixableBeetArgsStruct<HoldingAccountArgs>(
     [
       ['holding', holdingBeet],
       ['root', beet.uniformFixedSizeArray(beet.u8, 32)],

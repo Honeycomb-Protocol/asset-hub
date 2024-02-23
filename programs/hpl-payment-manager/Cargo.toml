@@ -27,6 +27,6 @@ hpl-toolkit = { workspace = true, features = [
 ], default-features = false }
 hpl-hive-control = { workspace = true }
 hpl-currency-manager = { workspace = true }
-mpl-token-metadata = { workspace = true }
+mpl-token-metadata = { version = "0.1.0" }
 mpl-bubblegum = { workspace = true }
 spl-account-compression = { workspace = true }

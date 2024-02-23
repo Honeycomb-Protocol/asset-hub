@@ -46,7 +46,6 @@ export const mintResourceStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_] merkleTree
  * @property [_writable_, **signer**] owner
  * @property [_writable_, **signer**] payer
- * @property [] token22Program
  * @property [] compressionProgram
  * @property [] logWrapper
  * @property [] clock
@@ -62,7 +61,6 @@ export type MintResourceInstructionAccounts = {
   owner: web3.PublicKey
   payer: web3.PublicKey
   systemProgram?: web3.PublicKey
-  token22Program: web3.PublicKey
   tokenProgram?: web3.PublicKey
   compressionProgram: web3.PublicKey
   logWrapper: web3.PublicKey
@@ -87,7 +85,7 @@ export const mintResourceInstructionDiscriminator = [
 export function createMintResourceInstruction(
   accounts: MintResourceInstructionAccounts,
   args: MintResourceInstructionArgs,
-  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
+  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
 ) {
   const [data] = mintResourceStruct.serialize({
     instructionDiscriminator: mintResourceInstructionDiscriminator,
@@ -126,11 +124,6 @@ export function createMintResourceInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.token22Program,
       isWritable: false,
       isSigner: false,
     },

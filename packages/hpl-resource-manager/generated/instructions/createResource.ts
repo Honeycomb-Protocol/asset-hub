@@ -46,8 +46,6 @@ export const createResourceStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_, **signer**] payer
  * @property [_writable_, **signer**] mint
  * @property [] rentSysvar
- * @property [] token22Program
- * @property [] associatedTokenProgram
  * @category Instructions
  * @category CreateResource
  * @category generated
@@ -60,9 +58,7 @@ export type CreateResourceInstructionAccounts = {
   mint: web3.PublicKey
   systemProgram?: web3.PublicKey
   rentSysvar: web3.PublicKey
-  token22Program: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  associatedTokenProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -83,7 +79,7 @@ export const createResourceInstructionDiscriminator = [
 export function createCreateResourceInstruction(
   accounts: CreateResourceInstructionAccounts,
   args: CreateResourceInstructionArgs,
-  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
+  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
 ) {
   const [data] = createResourceStruct.serialize({
     instructionDiscriminator: createResourceInstructionDiscriminator,
@@ -126,17 +122,7 @@ export function createCreateResourceInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.token22Program,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.associatedTokenProgram,
       isWritable: false,
       isSigner: false,
     },

@@ -6,7 +6,6 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-import { Schema, schemaBeet } from './Schema'
 /**
  * This type is used to derive the {@link ResourseKind} type as well as the de/serializer.
  * However don't refer to it in your code but use the {@link ResourseKind} type instead.
@@ -17,8 +16,8 @@ import { Schema, schemaBeet } from './Schema'
  * @private
  */
 export type ResourseKindRecord = {
-  Fungible: void /* scalar variant */
-  INF: { characterstics: Schema }
+  Fungible: { decimals: number }
+  INF: { characteristics: string[]; supply: number }
   NonFungible: void /* scalar variant */
 }
 
@@ -50,12 +49,21 @@ export const isResourseKindNonFungible = (
  * @category generated
  */
 export const resourseKindBeet = beet.dataEnum<ResourseKindRecord>([
-  ['Fungible', beet.unit],
+  [
+    'Fungible',
+    new beet.BeetArgsStruct<ResourseKindRecord['Fungible']>(
+      [['decimals', beet.u8]],
+      'ResourseKindRecord["Fungible"]'
+    ),
+  ],
 
   [
     'INF',
     new beet.FixableBeetArgsStruct<ResourseKindRecord['INF']>(
-      [['characterstics', schemaBeet]],
+      [
+        ['characteristics', beet.array(beet.utf8String)],
+        ['supply', beet.u32],
+      ],
       'ResourseKindRecord["INF"]'
     ),
   ],

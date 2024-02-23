@@ -24,6 +24,14 @@ export type ExtensionInitializationParamsRecord = {
     authority: beet.COption<web3.PublicKey>
     metadataAddress: beet.COption<web3.PublicKey>
   }
+  GroupPointer: {
+    authority: beet.COption<web3.PublicKey>
+    groupAddress: beet.COption<web3.PublicKey>
+  }
+  GroupMemberPointer: {
+    authority: beet.COption<web3.PublicKey>
+    memberAddress: beet.COption<web3.PublicKey>
+  }
 }
 
 /**
@@ -52,6 +60,14 @@ export const isExtensionInitializationParamsMetadataPointer = (
   x: ExtensionInitializationParams
 ): x is ExtensionInitializationParams & { __kind: 'MetadataPointer' } =>
   x.__kind === 'MetadataPointer'
+export const isExtensionInitializationParamsGroupPointer = (
+  x: ExtensionInitializationParams
+): x is ExtensionInitializationParams & { __kind: 'GroupPointer' } =>
+  x.__kind === 'GroupPointer'
+export const isExtensionInitializationParamsGroupMemberPointer = (
+  x: ExtensionInitializationParams
+): x is ExtensionInitializationParams & { __kind: 'GroupMemberPointer' } =>
+  x.__kind === 'GroupMemberPointer'
 
 /**
  * @category userTypes
@@ -89,6 +105,32 @@ export const extensionInitializationParamsBeet =
           ['metadataAddress', beet.coption(beetSolana.publicKey)],
         ],
         'ExtensionInitializationParamsRecord["MetadataPointer"]'
+      ),
+    ],
+
+    [
+      'GroupPointer',
+      new beet.FixableBeetArgsStruct<
+        ExtensionInitializationParamsRecord['GroupPointer']
+      >(
+        [
+          ['authority', beet.coption(beetSolana.publicKey)],
+          ['groupAddress', beet.coption(beetSolana.publicKey)],
+        ],
+        'ExtensionInitializationParamsRecord["GroupPointer"]'
+      ),
+    ],
+
+    [
+      'GroupMemberPointer',
+      new beet.FixableBeetArgsStruct<
+        ExtensionInitializationParamsRecord['GroupMemberPointer']
+      >(
+        [
+          ['authority', beet.coption(beetSolana.publicKey)],
+          ['memberAddress', beet.coption(beetSolana.publicKey)],
+        ],
+        'ExtensionInitializationParamsRecord["GroupMemberPointer"]'
       ),
     ],
   ]) as beet.FixableBeet<

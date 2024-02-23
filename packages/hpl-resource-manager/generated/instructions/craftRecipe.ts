@@ -93,7 +93,7 @@ export const craftRecipeInstructionDiscriminator = [
 export function createCraftRecipeInstruction(
   accounts: CraftRecipeInstructionAccounts,
   args: CraftRecipeInstructionArgs,
-  programId = new web3.PublicKey('4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y')
+  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
 ) {
   const [data] = craftRecipeStruct.serialize({
     instructionDiscriminator: craftRecipeInstructionDiscriminator,

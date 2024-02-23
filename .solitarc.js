@@ -397,7 +397,7 @@ const configs = {
   ),
   "resource-manager": createConfig(
     "resource-manager",
-    "4tJgAkjtSk6vFPtcXZeNybMsjrqRyWxKfPdeGu8bmh6y",
+    "ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2",
     {
       types: [
         {
@@ -504,16 +504,39 @@ const configs = {
         },
         {
           name: "Holding",
+          docs: ["Resource holding state"],
           type: {
-            kind: "struct",
-            fields: [
+            kind: "enum",
+            variants: [
               {
-                name: "holder",
-                type: "publicKey",
+                name: "Fungible",
+                fields: [
+                  {
+                    name: "holder",
+                    type: "publicKey",
+                  },
+                  {
+                    name: "balance",
+                    type: "u64",
+                  },
+                ],
               },
               {
-                name: "balance",
-                type: "u64",
+                name: "INF",
+                fields: [
+                  {
+                    name: "holder",
+                    type: {
+                      defined: "NonFungibleHolding",
+                    },
+                  },
+                  {
+                    name: "characteristics",
+                    type: {
+                      hashMap: ["string", "string"],
+                    },
+                  },
+                ],
               },
             ],
           },
