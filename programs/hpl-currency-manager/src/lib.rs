@@ -6,7 +6,8 @@ pub mod metadata;
 pub mod state;
 pub mod utils;
 
-declare_id!("CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4");
+// declare_id!("CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4");
+declare_id!("Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER");
 hpl_toolkit::platform_gate!();
 
 use {

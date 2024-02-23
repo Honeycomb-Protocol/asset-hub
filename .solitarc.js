@@ -334,7 +334,8 @@ const configs = {
   ),
   "currency-manager": createConfig(
     "currency-manager",
-    "CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4"
+    // "CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4",
+    "Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER",
   ),
   "payment-manager": createConfig(
     "payment-manager",
