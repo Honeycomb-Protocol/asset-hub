@@ -1003,11 +1003,11 @@
           "isSigner": false
         },
         {
-          "name": "user",
-          "isMut": true,
-          "isSigner": true,
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false,
           "docs": [
-            "The service that's currently using the character"
+            "The wallet that owns the character"
           ]
         },
         {

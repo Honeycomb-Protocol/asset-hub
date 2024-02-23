@@ -150,9 +150,9 @@ pub struct VerifyCharacter<'info> {
     #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
-    /// The user who owns the character
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    /// The wallet that owns the character
+    /// CHECK: This is safe
+    pub owner: AccountInfo<'info>,
 
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,

@@ -42,7 +42,7 @@ export const verifyCharacterStruct = new beet.FixableBeetArgsStruct<
  * @property [] project
  * @property [] characterModel
  * @property [_writable_] merkleTree
- * @property [_writable_, **signer**] user
+ * @property [] owner
  * @property [] hiveControl
  * @property [] compressionProgram
  * @property [] logWrapper
@@ -55,7 +55,7 @@ export type VerifyCharacterInstructionAccounts = {
   project: web3.PublicKey
   characterModel: web3.PublicKey
   merkleTree: web3.PublicKey
-  user: web3.PublicKey
+  owner: web3.PublicKey
   systemProgram?: web3.PublicKey
   hiveControl: web3.PublicKey
   compressionProgram: web3.PublicKey
@@ -104,9 +104,9 @@ export function createVerifyCharacterInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.user,
-      isWritable: true,
-      isSigner: true,
+      pubkey: accounts.owner,
+      isWritable: false,
+      isSigner: false,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
