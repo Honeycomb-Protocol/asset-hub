@@ -1,8 +1,9 @@
 use {
     crate::{Resource, ResourseKind},
     anchor_lang::prelude::*,
+    hpl_toolkit::HashMap,
     spl_token_2022::{
-        extension::{group_pointer, metadata_pointer, ExtensionType},
+        extension::{group_member_pointer, group_pointer, metadata_pointer, ExtensionType},
         instruction::{
             burn, initialize_mint2, initialize_mint_close_authority, initialize_permanent_delegate,
             mint_to,
@@ -15,7 +16,6 @@ use {
         },
         state::Mint,
     },
-    spl_token_group_interface::instruction::{initialize_group, initialize_member},
     spl_token_metadata_interface::{
         instruction::{initialize, update_field},
         state::Field,
@@ -39,10 +39,10 @@ pub enum ExtensionInitializationParams {
         authority: Option<Pubkey>,
         group_address: Option<Pubkey>,
     },
-    // GroupMemberPointer {
-    //     authority: Option<Pubkey>,
-    //     member_address: Option<Pubkey>,
-    // },
+    GroupMemberPointer {
+        authority: Option<Pubkey>,
+        member_address: Option<Pubkey>,
+    },
 }
 impl ExtensionInitializationParams {
     pub fn extension(&self) -> ExtensionType {
@@ -51,7 +51,7 @@ impl ExtensionInitializationParams {
             Self::PermanentDelegate { .. } => ExtensionType::PermanentDelegate,
             Self::MetadataPointer { .. } => ExtensionType::MetadataPointer,
             Self::GroupPointer { .. } => ExtensionType::GroupPointer,
-            // Self::GroupMemberPointer { .. } => ExtensionType::GroupMemberPointer,
+            Self::GroupMemberPointer { .. } => ExtensionType::GroupMemberPointer,
         }
     }
 
@@ -88,24 +88,25 @@ impl ExtensionInitializationParams {
                 group_address,
             )
             .map_err(Into::into),
-            // Self::GroupMemberPointer {
-            //     authority,
-            //     member_address,
-            // } => group_member_pointer::instruction::initialize(
-            //     token_program_id,
-            //     mint,
-            //     authority,
-            //     member_address,
-            // )
-            // .map_err(Into::into),
+
+            Self::GroupMemberPointer {
+                authority,
+                member_address,
+            } => group_member_pointer::instruction::initialize(
+                token_program_id,
+                mint,
+                authority,
+                member_address,
+            )
+            .map_err(Into::into),
         }
     }
 }
 
 pub fn create_mint_with_extensions<'info>(
     resource: &Account<'info, Resource>,
-    payer: AccountInfo<'info>,
-    mint: AccountInfo<'info>,
+    payer: &AccountInfo<'info>,
+    mint: &AccountInfo<'info>,
     rent_sysvar: &Rent,
     token22_program: &AccountInfo<'info>,
     decimals: u8,
@@ -126,7 +127,13 @@ pub fn create_mint_with_extensions<'info>(
     ];
 
     // if the resource is an NFT, add the group pointer extension
-    if matches!(kind, ResourseKind::INF { characterstics: _ }) {
+    if matches!(
+        kind,
+        ResourseKind::INF {
+            characteristics: _,
+            supply: _
+        }
+    ) {
         extension_initialization_params.push(ExtensionInitializationParams::GroupPointer {
             authority: Some(resource.key()),
             group_address: Some(mint.key()),
@@ -138,16 +145,21 @@ pub fn create_mint_with_extensions<'info>(
         .map(|e| e.extension())
         .collect::<Vec<_>>();
 
-    let mut space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
+    let account_space = ExtensionType::try_calculate_account_len::<Mint>(&extension_types).unwrap();
 
+    let mut space = account_space;
     // calculate the space required for the metadata
-    space += 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len();
+    space += 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len() + 4;
 
-    // calculate the space required for the INF characterstics
-    if let ResourseKind::INF { characterstics } = kind {
-        space += characterstics
+    // calculate the space required for the INF characteristics
+    if let ResourseKind::INF {
+        characteristics,
+        supply: _,
+    } = kind
+    {
+        space += characteristics
             .iter()
-            .map(|(key, value)| key.len() + value.len())
+            .map(|key| key.len() + 32)
             .sum::<usize>();
     }
 
@@ -156,14 +168,17 @@ pub fn create_mint_with_extensions<'info>(
         &payer.key(),
         &mint.key(),
         rent_sysvar.minimum_balance(space),
-        space as u64,
+        account_space as u64,
         &token22_program.key(),
     );
 
     msg!("Creating mint account");
 
     // invoking the mint account creation with the signer seeds
-    invoke(&account_instruction, &[payer, mint.to_owned()])?;
+    invoke(
+        &account_instruction,
+        &[payer.to_account_info(), mint.to_owned()],
+    )?;
 
     for params in extension_initialization_params {
         let instruction = params
@@ -171,6 +186,7 @@ pub fn create_mint_with_extensions<'info>(
             .unwrap();
 
         msg!("Creating mint extension account");
+
         // invoking the extensions instructions with the signer seeds
         invoke(&instruction, &[mint.to_owned()])?;
     }
@@ -184,7 +200,7 @@ pub fn create_mint_with_extensions<'info>(
     )?;
 
     // invoking the mint account creation with the signer seeds
-    invoke(&mint_instruction, &[mint.to_owned()])?;
+    invoke(&mint_instruction, &[mint.to_account_info()])?;
     msg!("Mint account created");
 
     let data = mint.try_borrow_data().unwrap();
@@ -194,14 +210,14 @@ pub fn create_mint_with_extensions<'info>(
     Ok(mint_data)
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct ResourceMetadataArgs {
     pub name: String,
     pub symbol: String,
     pub uri: String,
 }
 pub fn create_metadata_for_mint<'info>(
-    token22_program: AccountInfo<'info>,
+    token22_program: &AccountInfo<'info>,
     mint: AccountInfo<'info>,
     resource: &Account<'info, Resource>,
     metadata: ResourceMetadataArgs,
@@ -239,7 +255,7 @@ pub struct ResourceMetadataUpdateArgs {
     pub name: Option<String>,
     pub symbol: Option<String>,
     pub uri: Option<String>,
-    pub additional_metadata: Vec<(String, String)>,
+    pub additional_metadata: HashMap<String, String>,
 }
 
 pub fn update_metadata_for_mint<'info>(
@@ -364,7 +380,6 @@ pub fn mint_tokens<'info>(
     token_program_id: &AccountInfo<'info>,
     mint: &AccountInfo<'info>,
     token_account: &AccountInfo<'info>,
-    receiver: &AccountInfo<'info>,
     resource: &Account<'info, Resource>,
     amount: u64,
 ) -> Result<()> {
@@ -372,23 +387,22 @@ pub fn mint_tokens<'info>(
         &token_program_id.key(),
         &mint.key(),
         &token_account.key(),
-        &receiver.key(),
-        &[&receiver.key()],
+        &resource.key(),
+        &[&resource.key()],
         amount,
     )
     .unwrap();
 
     msg!("Minting to account");
-    invoke(
+    invoke_signed(
         &mint_to_instruction,
         &[
             mint.to_owned(),
             token_account.to_owned(),
-            receiver.to_owned(),
             resource.to_account_info(),
         ],
-    )
-    .unwrap();
+        &[&resource.seeds(&[resource.bump])[..]],
+    )?;
 
     Ok(())
 }
@@ -431,7 +445,7 @@ pub fn init_collection<'info>(
     resource: &Account<'info, Resource>,
     max_size: u32,
 ) -> Result<()> {
-    let instruction = initialize_group(
+    let instruction = spl_token_group_interface::instruction::initialize_group(
         &token_program.key(),
         &mint.key(),
         &mint.key(),
@@ -440,9 +454,10 @@ pub fn init_collection<'info>(
         max_size,
     );
 
-    invoke(
+    invoke_signed(
         &instruction,
         &[mint.to_account_info(), mint, resource.to_account_info()],
+        &[&resource.seeds(&[resource.bump])[..]],
     )?;
 
     Ok(())
@@ -450,11 +465,11 @@ pub fn init_collection<'info>(
 
 pub fn init_collection_mint<'info>(
     token_program: &AccountInfo<'info>,
-    collection: AccountInfo<'info>,
-    mint: AccountInfo<'info>,
+    collection: &AccountInfo<'info>,
+    mint: &AccountInfo<'info>,
     resource: &Account<'info, Resource>,
 ) -> Result<()> {
-    let instruction = initialize_member(
+    let instruction = spl_token_group_interface::instruction::initialize_member(
         &token_program.key(),
         &mint.key(),
         &mint.key(),
@@ -463,15 +478,16 @@ pub fn init_collection_mint<'info>(
         &resource.key(),
     );
 
-    invoke(
+    invoke_signed(
         &instruction,
         &[
             mint.to_account_info(),
-            mint,
+            mint.to_account_info(),
             resource.to_account_info(),
             collection.to_account_info(),
             resource.to_account_info(),
         ],
+        &[&resource.seeds(&[resource.bump])[..]],
     )?;
 
     Ok(())
