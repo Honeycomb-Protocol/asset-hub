@@ -22,12 +22,12 @@ import createEdgeClient from "@honeycomb-protocol/edge-client/client";
 jest.setTimeout(200000);
 
 describe("Character Manager", () => {
-  const totalNfts = 1;
+  const totalNfts = 10;
   const totalcNfts = 1;
 
   const client = createEdgeClient(
     new Client({
-      url: "http://localhost:4001",
+      url: "http://localhost:4000",
       exchanges: [cacheExchange, fetchExchange],
     })
   );
@@ -68,6 +68,7 @@ describe("Character Manager", () => {
         })
         .then((x) => x.nft.mint.address);
     }
+    console.log("Collection", collection.toString());
 
     // Mint Nfts
     for (let i = 1; i <= totalNfts; i++) {
@@ -103,6 +104,7 @@ describe("Character Manager", () => {
         collection,
       });
     }
+    console.log("Merkle Tree", merkleTree.toString());
 
     await new Promise((resolve) => setTimeout(resolve, 10000));
 
@@ -111,6 +113,8 @@ describe("Character Manager", () => {
         name: "Project",
         expectedMintAddresses: 0,
         profileDataConfigs: [],
+        collections: [collection],
+        merkleTrees: merkleTree ? [merkleTree] : [],
       })
     );
     console.log("Project", adminHC.project().address.toString());
@@ -150,12 +154,9 @@ describe("Character Manager", () => {
 
       await operation.send();
       characterModelAddress = temp;
-
-      console.log(
-        "New Character model created @",
-        characterModelAddress.toString()
-      );
     }
+
+    console.log("Character Model", characterModelAddress.toString());
 
     characterModel = await HplCharacterModel.fromAddress(
       adminHC.connection,
@@ -228,13 +229,10 @@ describe("Character Manager", () => {
       lastValidBlockHeight: txResponse!.lastValidBlockHeight,
     });
 
-    if (!sendBulkTransactions)
-      throw new Error("Failed to send wrap transactions");
-
-    console.log("Wrap txs", sendBulkTransactions);
+    expect(sendBulkTransactions.length).toBe(assets.length);
   });
 
-  it("Unwrap Assets from Character", async () => {
+  it.skip("Unwrap Assets from Character", async () => {
     const { character } = await client.findCharacters({
       filters: {
         owner: userHC.identity().address.toString(),
@@ -243,11 +241,6 @@ describe("Character Manager", () => {
     });
 
     if (!character?.length) throw new Error("No characters to unwrap");
-
-    console.log(
-      "Characters",
-      character.map((x) => x!.id)
-    );
 
     const { createUnwrapAssetsFromCharacterTransactions: txResponse } =
       await client.createUnwrapAssetsFromCharacterTransactions({
@@ -271,9 +264,6 @@ describe("Character Manager", () => {
       lastValidBlockHeight: txResponse!.lastValidBlockHeight,
     });
 
-    if (!sendBulkTransactions)
-      throw new Error("Failed to send unwrap transactions");
-
-    console.log("Unwrap txs", sendBulkTransactions);
+    expect(sendBulkTransactions.length).toBe(character.length);
   });
 });

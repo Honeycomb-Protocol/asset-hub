@@ -7,57 +7,57 @@
 
 import * as beet from "@metaplex-foundation/beet";
 /**
- * This type is used to derive the {@link Conditionalbool} type as well as the de/serializer.
- * However don't refer to it in your code but use the {@link Conditionalbool} type instead.
+ * This type is used to derive the {@link ConditionalBool} type as well as the de/serializer.
+ * However don't refer to it in your code but use the {@link ConditionalBool} type instead.
  *
  * @category userTypes
  * @category enums
  * @category generated
  * @private
  */
-export type ConditionalboolRecord = {
+export type ConditionalBoolRecord = {
   None: void /* scalar variant */;
   Item: { fields: [boolean] };
-  Or: { fields: [Conditionalbool[]] };
-  And: { fields: [Conditionalbool[]] };
+  Or: { fields: [ConditionalBool[]] };
+  And: { fields: [ConditionalBool[]] };
 };
 
 /**
- * Union type respresenting the Conditionalbool data enum defined in Rust.
+ * Union type respresenting the ConditionalBool data enum defined in Rust.
  *
  * NOTE: that it includes a `__kind` property which allows to narrow types in
  * switch/if statements.
- * Additionally `isConditionalbool*` type guards are exposed below to narrow to a specific variant.
+ * Additionally `isConditionalBool*` type guards are exposed below to narrow to a specific variant.
  *
  * @category userTypes
  * @category enums
  * @category generated
  */
-export type Conditionalbool = beet.DataEnumKeyAsKind<ConditionalboolRecord>;
+export type ConditionalBool = beet.DataEnumKeyAsKind<ConditionalBoolRecord>;
 
-export const isConditionalboolNone = (
-  x: Conditionalbool
-): x is Conditionalbool & { __kind: "None" } => x.__kind === "None";
-export const isConditionalboolItem = (
-  x: Conditionalbool
-): x is Conditionalbool & { __kind: "Item" } => x.__kind === "Item";
-export const isConditionalboolOr = (
-  x: Conditionalbool
-): x is Conditionalbool & { __kind: "Or" } => x.__kind === "Or";
-export const isConditionalboolAnd = (
-  x: Conditionalbool
-): x is Conditionalbool & { __kind: "And" } => x.__kind === "And";
+export const isConditionalBoolNone = (
+  x: ConditionalBool
+): x is ConditionalBool & { __kind: "None" } => x.__kind === "None";
+export const isConditionalBoolItem = (
+  x: ConditionalBool
+): x is ConditionalBool & { __kind: "Item" } => x.__kind === "Item";
+export const isConditionalBoolOr = (
+  x: ConditionalBool
+): x is ConditionalBool & { __kind: "Or" } => x.__kind === "Or";
+export const isConditionalBoolAnd = (
+  x: ConditionalBool
+): x is ConditionalBool & { __kind: "And" } => x.__kind === "And";
 
 const variants: beet.DataEnumBeet<
-  ConditionalboolRecord,
-  keyof ConditionalboolRecord
+  ConditionalBoolRecord,
+  keyof ConditionalBoolRecord
 >[] = [
   ["None", beet.unit],
   [
     "Item",
-    new beet.BeetArgsStruct<ConditionalboolRecord["Item"]>(
+    new beet.BeetArgsStruct<ConditionalBoolRecord["Item"]>(
       [["fields", beet.fixedSizeTuple([beet.bool])]],
-      'ConditionalboolRecord["Item"]'
+      'ConditionalBoolRecord["Item"]'
     ),
   ],
 ];
@@ -66,23 +66,23 @@ const variants: beet.DataEnumBeet<
  * @category userTypes
  * @category generated
  */
-export const conditionalboolBeet = beet.dataEnum<ConditionalboolRecord>(
+export const conditionalBoolBeet = beet.dataEnum<ConditionalBoolRecord>(
   variants
-) as beet.FixableBeet<Conditionalbool, Conditionalbool>;
+) as beet.FixableBeet<ConditionalBool, ConditionalBool>;
 
 variants.push(
   [
     "Or",
-    new beet.FixableBeetArgsStruct<ConditionalboolRecord["Or"]>(
-      [["fields", beet.tuple([beet.array(conditionalboolBeet)])]],
-      'ConditionalboolRecord["Or"]'
+    new beet.FixableBeetArgsStruct<ConditionalBoolRecord["Or"]>(
+      [["fields", beet.tuple([beet.array(conditionalBoolBeet)])]],
+      'ConditionalBoolRecord["Or"]'
     ),
   ],
   [
     "And",
-    new beet.FixableBeetArgsStruct<ConditionalboolRecord["And"]>(
-      [["fields", beet.tuple([beet.array(conditionalboolBeet)])]],
-      'ConditionalboolRecord["And"]'
+    new beet.FixableBeetArgsStruct<ConditionalBoolRecord["And"]>(
+      [["fields", beet.tuple([beet.array(conditionalBoolBeet)])]],
+      'ConditionalBoolRecord["And"]'
     ),
   ]
 );

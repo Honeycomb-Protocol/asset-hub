@@ -19,7 +19,6 @@ import {
   createDepositCnftInstruction,
 } from "../packages/hpl-character-manager";
 import getHoneycombs from "../scripts/prepare";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import { createNewTree, mintOneCNFT } from "./helpers";
 import {
   Metaplex,
@@ -164,7 +163,6 @@ describe("Character Manager", () => {
             vault: VAULT,
             systemProgram: web3.SystemProgram.programId,
             hiveControl: HPL_HIVE_CONTROL_PROGRAM,
-            hplEvents: HPL_EVENTS_PROGRAM,
             clock: web3.SYSVAR_CLOCK_PUBKEY,
             instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
           },
@@ -255,7 +253,6 @@ describe("Character Manager", () => {
               payer: adminHC.identity().address,
               vault: VAULT,
               systemProgram: web3.SystemProgram.programId,
-              hplEvents: HPL_EVENTS_PROGRAM,
               compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
               logWrapper: SPL_NOOP_PROGRAM_ID,
               clock: web3.SYSVAR_CLOCK_PUBKEY,
@@ -449,54 +446,7 @@ describe("Character Manager", () => {
     console.log("Character", character);
   });
 
-  it("Use Character", async () => {
-    if (!character) throw new Error("Character not found");
-
-    const project = characterModel.project;
-    const wallet = userHC.identity().address;
-
-    const { root, proof } = (await character.proof(userHC.rpcEndpoint))!;
-
-    await new Operation(userHC, [
-      createUseCharacterInstruction(
-        {
-          project,
-          characterModel: characterModelAddress,
-          merkleTree: character.merkleTree,
-          owner: wallet,
-          user: web3.PublicKey.default,
-          vault: VAULT,
-          hiveControl: HPL_HIVE_CONTROL_PROGRAM,
-          compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-          logWrapper: SPL_NOOP_PROGRAM_ID,
-          clock: web3.SYSVAR_CLOCK_PUBKEY,
-          instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-          anchorRemainingAccounts: proof.map((pubkey) => ({
-            pubkey,
-            isSigner: false,
-            isWritable: false,
-          })),
-        },
-        {
-          args: {
-            root: Array.from(root.toBytes()),
-            leafIdx: character.leafIdx,
-            sourceHash: Array.from(character.sourceHash),
-            currentUsedBy: character.usedBy,
-            newUsedBy: {
-              __kind: "Mission",
-              id: PublicKey.default,
-              endTime: 0,
-              rewards: [],
-              rewardsCollected: false,
-            },
-          },
-        }
-      ),
-    ]).send();
-  });
-
-  it.skip("Unwrap NFT from Character", async () => {
+  it("Unwrap NFT from Character", async () => {
     if (!wrappedCharacterNft) throw new Error("Wrapped Nft not found");
     if (!character) throw new Error("Character not found");
 

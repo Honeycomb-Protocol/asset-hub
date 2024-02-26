@@ -1,6 +1,6 @@
 {
   "name": "@honeycomb-protocol/payment-manager",
-  "version": "0.0.4",
+  "version": "0.0.5-beta.1",
   "private": false,
   "peerDependencies": {
     "@solana/spl-token": "^0.3.8",

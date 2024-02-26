@@ -11,7 +11,6 @@ import {
   PROGRAM_ID,
 } from "../generated";
 import { HplHolderAccount } from "../HplHolderAccount";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 
 /**
  * Represents the arguments for creating a "Set Holder Status" operation.
@@ -61,7 +60,6 @@ export async function createSetHolderStatusOperation(
         vault: VAULT,
         hiveControl: HPL_HIVE_CONTROL_PROGRAM,
         instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-        hplEvents: HPL_EVENTS_PROGRAM,
         clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
       },
       {

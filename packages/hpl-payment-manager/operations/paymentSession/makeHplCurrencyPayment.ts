@@ -9,7 +9,6 @@ import {
   createMakeHplCurrencyPaymentInstruction,
   PROGRAM_ID,
 } from "../../generated";
-import { HPL_EVENTS_PROGRAM } from "@honeycomb-protocol/events";
 import { HplPayment, HplPaymentStructure } from "../..";
 import {
   HPL_CURRENCY_MANAGER_PROGRAM,
@@ -103,7 +102,6 @@ export async function createMakeHplCurrencyPaymentOperation(
           payer,
           hiveControl: HPL_HIVE_CONTROL_PROGRAM,
           hplCurrencyManager: HPL_CURRENCY_MANAGER_PROGRAM,
-          hplEvents: HPL_EVENTS_PROGRAM,
           clockSysvar: web3.SYSVAR_CLOCK_PUBKEY,
           instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         },

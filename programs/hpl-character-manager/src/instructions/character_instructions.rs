@@ -150,9 +150,9 @@ pub struct VerifyCharacter<'info> {
     #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
-    /// The service that's currently using the character
-    #[account(mut)]
-    pub user: Signer<'info>,
+    /// The wallet that owns the character
+    /// CHECK: This is safe
+    pub owner: AccountInfo<'info>,
 
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
@@ -199,7 +199,7 @@ pub fn verify_character<'info>(
     };
 
     let character_compressed = CharacterSchemaCompressed {
-        owner: ctx.accounts.user.key(),
+        owner: ctx.accounts.owner.key(),
         source: source_hash,
         used_by: used_by_hash,
     };
