@@ -1,0 +1,10 @@
+{
+  "name": "@honeycomb-protocol/resource-manager",
+  "version": "0.0.1-beta-1",
+  "private": false,
+  "peerDependencies": {
+    "@solana/spl-token": "^0.3.8",
+    "@solana/web3.js": "^1.87.1",
+    "@honeycomb-protocol/hive-control": "^0.2.6"
+  }
+}
