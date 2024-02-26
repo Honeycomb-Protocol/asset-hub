@@ -88,7 +88,7 @@ export const mintCurrencyInstructionDiscriminator = [
 export function createMintCurrencyInstruction(
   accounts: MintCurrencyInstructionAccounts,
   args: MintCurrencyInstructionArgs,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = mintCurrencyStruct.serialize({
     instructionDiscriminator: mintCurrencyInstructionDiscriminator,

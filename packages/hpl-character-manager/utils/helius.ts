@@ -207,6 +207,7 @@ export async function fetchHeliusAssets(
           },
         }),
       }).then((r) => r.json());
+
       assetList.push(...result.items);
       if (result.total !== 1000) {
         page = 0;

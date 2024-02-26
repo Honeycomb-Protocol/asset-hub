@@ -96,7 +96,7 @@ export class HolderAccount implements HolderAccountArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4'
+      'Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, holderAccountBeet)

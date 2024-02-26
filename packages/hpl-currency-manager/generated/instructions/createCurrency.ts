@@ -94,7 +94,7 @@ export const createCurrencyInstructionDiscriminator = [
 export function createCreateCurrencyInstruction(
   accounts: CreateCurrencyInstructionAccounts,
   args: CreateCurrencyInstructionArgs,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = createCurrencyStruct.serialize({
     instructionDiscriminator: createCurrencyInstructionDiscriminator,

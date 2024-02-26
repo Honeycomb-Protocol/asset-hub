@@ -148,7 +148,7 @@ export class HplCharacter {
           __kind: offchainData.source.params.criteria.__kind,
           fields: [
             new PublicKey(
-              offchainData.source.params.criteria.params.replace("pubkey:", "")
+              offchainData.source.params.criteria.params["0"].replace("pubkey:", "")
             ),
           ],
         },

@@ -83,7 +83,7 @@ export const burnCurrencyInstructionDiscriminator = [
 export function createBurnCurrencyInstruction(
   accounts: BurnCurrencyInstructionAccounts,
   args: BurnCurrencyInstructionArgs,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = burnCurrencyStruct.serialize({
     instructionDiscriminator: burnCurrencyInstructionDiscriminator,

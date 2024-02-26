@@ -85,7 +85,7 @@ export const fundAccountInstructionDiscriminator = [
 export function createFundAccountInstruction(
   accounts: FundAccountInstructionAccounts,
   args: FundAccountInstructionArgs,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = fundAccountStruct.serialize({
     instructionDiscriminator: fundAccountInstructionDiscriminator,

@@ -74,7 +74,7 @@ export const wrapCurrencyInstructionDiscriminator = [
  */
 export function createWrapCurrencyInstruction(
   accounts: WrapCurrencyInstructionAccounts,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = wrapCurrencyStruct.serialize({
     instructionDiscriminator: wrapCurrencyInstructionDiscriminator,

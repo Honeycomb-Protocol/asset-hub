@@ -82,7 +82,7 @@ export const setHolderStatusInstructionDiscriminator = [
 export function createSetHolderStatusInstruction(
   accounts: SetHolderStatusInstructionAccounts,
   args: SetHolderStatusInstructionArgs,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = setHolderStatusStruct.serialize({
     instructionDiscriminator: setHolderStatusInstructionDiscriminator,

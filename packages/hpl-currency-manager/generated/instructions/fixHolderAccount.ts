@@ -56,7 +56,7 @@ export const fixHolderAccountInstructionDiscriminator = [
  */
 export function createFixHolderAccountInstruction(
   accounts: FixHolderAccountInstructionAccounts,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = fixHolderAccountStruct.serialize({
     instructionDiscriminator: fixHolderAccountInstructionDiscriminator,

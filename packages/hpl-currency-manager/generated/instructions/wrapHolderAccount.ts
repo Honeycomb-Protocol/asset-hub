@@ -71,7 +71,7 @@ export const wrapHolderAccountInstructionDiscriminator = [
  */
 export function createWrapHolderAccountInstruction(
   accounts: WrapHolderAccountInstructionAccounts,
-  programId = new web3.PublicKey('CrncyaGmZfWvpxRcpHEkSrqeeyQsdn4MAedo9KuARAc4')
+  programId = new web3.PublicKey('Eo29f5874SZDf827Fyr9HThcsF5GWkDCH9UyYsPwqXER')
 ) {
   const [data] = wrapHolderAccountStruct.serialize({
     instructionDiscriminator: wrapHolderAccountInstructionDiscriminator,
