@@ -44,7 +44,6 @@ import {
   createInitilizeRecipeInstruction,
   createInitilizeResourceTreeInstruction,
   createMintResourceInstruction,
-  createUnwrapResourceInstruction,
   resourceManagerPdas,
 } from "../packages/hpl-resource-manager";
 import getHoneycombs from "../scripts/prepare";
@@ -267,7 +266,7 @@ describe("Resource Manager", () => {
     it("Create Resources", async () => {
       if (data.fungible.resources.length > 0) return;
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < 5; i++) {
         const mintKeypair = new Keypair();
         const [resourceAddress] = resourceManagerPdas().resource(
           adminHC.project().address,
@@ -537,178 +536,7 @@ describe("Resource Manager", () => {
       }
     });
 
-    it("UnWrap Resource", async () => {
-      const resources = data.fungible.resources.filter(
-        (e) => e.flags.isUnWrapped === false
-      );
-
-      for (const resource of resources) {
-        const recipientAccount = getAssociatedTokenAddressSync(
-          resource.mint,
-          adminHC.identity().address,
-          false,
-          TOKEN_2022_PROGRAM_ID
-        );
-
-        const resourceAccount = (
-          await getCompressedAccountsByTree(resource.tree)
-        ).at(-1)!;
-
-        const proff = (await getAssetProof(
-          Number(resourceAccount.leaf_idx),
-          resource.tree
-        ))!;
-
-        console.log(resourceAccount.parsed_data, "RESOURCE ACCOUNT");
-
-        const ix = createUnwrapResourceInstruction(
-          {
-            mint: resource.mint,
-            merkleTree: resource.tree,
-            recipientAccount,
-            resource: resource.resource,
-            project: adminHC.project().address,
-            payer: adminHC.identity().address,
-            owner: adminHC.identity().address,
-            clock: SYSVAR_CLOCK_PUBKEY,
-            rentSysvar: SYSVAR_RENT_PUBKEY,
-            logWrapper: SPL_NOOP_PROGRAM_ID,
-            tokenProgram: TOKEN_2022_PROGRAM_ID,
-            compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            anchorRemainingAccounts: proff.proof.map((e) => ({
-              isSigner: false,
-              isWritable: false,
-              pubkey: new PublicKey(e),
-            })),
-          },
-          {
-            args: {
-              __kind: "Fungible",
-              amount: 100 ** 9,
-              holdingState: {
-                leafIdx: Number(proff.leaf_index),
-                root: Array.from(new PublicKey(proff.root).toBytes()),
-                holding: {
-                  __kind: resourceAccount.parsed_data.__kind,
-                  holder: new PublicKey(
-                    resourceAccount.parsed_data.params.holder.split(":").at(-1)
-                  ),
-                  balance: resourceAccount.parsed_data.params.balance,
-                },
-              },
-            },
-          }
-        );
-
-        const op = new Operation(
-          adminHC,
-          [ix],
-          [adminHC.identity().signer as KeypairLike]
-        );
-
-        const [{ signature }] = await op.send({
-          skipPreflight: true,
-          commitment: "processed",
-        });
-
-        console.log(signature, "Unwrap Signature");
-
-        // setting the flag to true
-        data.fungible.resources.find((e) =>
-          e.resource.equals(resource.resource)
-        )!.flags.isUnWrapped = true;
-
-        // saving the data to the file
-        saveData(data);
-      }
-    });
-
-    // it.skip("Wrap Resource", async () => {
-    //   const resources = data.fungible.resources.filter(
-    //     (e) => e.flags.isWrapped === false
-    //   );
-
-    //   for (const resource of resources) {
-    //     const recipientAccount = getAssociatedTokenAddressSync(
-    //       resource.mint,
-    //       adminHC.identity().address,
-    //       false,
-    //       TOKEN_2022_PROGRAM_ID
-    //     );
-
-    //     const resourceAccount = (
-    //       await getCompressedAccountsByTree(resource.tree)
-    //     ).at(-1)!;
-    //     const proff = (await getAssetProof(
-    //       Number(resourceAccount.leaf_idx),
-    //       resource.tree
-    //     ))!;
-
-    //     const ix = createWrapResourceInstruction(
-    //       {
-    //         mint: resource.mint,
-    //         merkleTree: resource.tree,
-    //         tokenAccount: recipientAccount,
-    //         resource: resource.resource,
-    //         project: adminHC.project().address,
-    //         payer: adminHC.identity().address,
-    //         owner: adminHC.identity().address,
-    //         clock: SYSVAR_CLOCK_PUBKEY,
-    //         rentSysvar: SYSVAR_RENT_PUBKEY,
-    //         logWrapper: SPL_NOOP_PROGRAM_ID,
-    //         tokenProgram: TOKEN_2022_PROGRAM_ID,
-    //         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-    //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-    //         anchorRemainingAccounts: proff.proof.map((e) => ({
-    //           isSigner: false,
-    //           isWritable: false,
-    //           pubkey: new PublicKey(e),
-    //         })),
-    //       },
-    //       {
-    //         args: {
-    //           __kind: "Fungible",
-    //           amount: 100 ** 9,
-    //           holdingState: {
-    //             leafIdx: Number(proff.leaf_index),
-    //             root: Array.from(new PublicKey(proff.root).toBytes()),
-    //             holding: {
-    //               __kind: resourceAccount.parsed_data.__kind,
-    //               holder: new PublicKey(
-    //                 resourceAccount.parsed_data.params.holder.split(":").at(-1)
-    //               ),
-    //               balance: resourceAccount.parsed_data.params.balance,
-    //             },
-    //           },
-    //         },
-    //       }
-    //     );
-
-    //     const op = new Operation(
-    //       adminHC,
-    //       [ix],
-    //       [adminHC.identity().signer as KeypairLike]
-    //     );
-
-    //     const [{ signature }] = await op.send({
-    //       skipPreflight: true,
-    //       commitment: "processed",
-    //     });
-
-    //     console.log(signature, "Unwrap Signature");
-
-    //     // setting the flag to true
-    //     data.fungible.resources.find((e) =>
-    //       e.resource.equals(resource.resource)
-    //     )!.flags.isWrapped = true;
-
-    //     // saving the data to the file
-    //     saveData(data);
-    //   }
-    // });
-
-    it.skip("Create Lookup Table", async () => {
+    it("Create Lookup Table", async () => {
       if (data.fungible.resources.length === 0)
         throw new Error("No Resources Found");
 
@@ -776,7 +604,7 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it.skip("Initilize Recipe", async () => {
+    it("Initilize Recipe", async () => {
       if (data.fungible.recipe.address) return;
       if (data.fungible.resources.length === 0)
         throw new Error("No Resources Found");
@@ -839,7 +667,7 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it.skip("Craft Recipie", async () => {
+    it("Craft Recipie", async () => {
       if (!lookupTable) throw new Error("Lookup Table not found");
       if (!data.fungible.recipe.address) throw new Error("No Recipe Found");
       if (data.fungible.resources.length === 0)
@@ -949,6 +777,177 @@ describe("Resource Manager", () => {
       // saving the data to the file
       saveData(data);
     });
+
+    // it("UnWrap Resource", async () => {
+    //   const resources = data.fungible.resources.filter(
+    //     (e) => e.flags.isUnWrapped === false
+    //   );
+
+    //   for (const resource of resources) {
+    //     const recipientAccount = getAssociatedTokenAddressSync(
+    //       resource.mint,
+    //       adminHC.identity().address,
+    //       false,
+    //       TOKEN_2022_PROGRAM_ID
+    //     );
+
+    //     const resourceAccount = (
+    //       await getCompressedAccountsByTree(resource.tree)
+    //     ).at(-1)!;
+
+    //     const proff = (await getAssetProof(
+    //       Number(resourceAccount.leaf_idx),
+    //       resource.tree
+    //     ))!;
+
+    //     console.log(resourceAccount.parsed_data, "RESOURCE ACCOUNT");
+
+    //     const ix = createUnwrapResourceInstruction(
+    //       {
+    //         mint: resource.mint,
+    //         merkleTree: resource.tree,
+    //         recipientAccount,
+    //         resource: resource.resource,
+    //         project: adminHC.project().address,
+    //         payer: adminHC.identity().address,
+    //         owner: adminHC.identity().address,
+    //         clock: SYSVAR_CLOCK_PUBKEY,
+    //         rentSysvar: SYSVAR_RENT_PUBKEY,
+    //         logWrapper: SPL_NOOP_PROGRAM_ID,
+    //         tokenProgram: TOKEN_2022_PROGRAM_ID,
+    //         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+    //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+    //         anchorRemainingAccounts: proff.proof.map((e) => ({
+    //           isSigner: false,
+    //           isWritable: false,
+    //           pubkey: new PublicKey(e),
+    //         })),
+    //       },
+    //       {
+    //         args: {
+    //           __kind: "Fungible",
+    //           amount: 100 ** 9,
+    //           holdingState: {
+    //             leafIdx: Number(proff.leaf_index),
+    //             root: Array.from(new PublicKey(proff.root).toBytes()),
+    //             holding: {
+    //               __kind: resourceAccount.parsed_data.__kind,
+    //               holder: new PublicKey(
+    //                 resourceAccount.parsed_data.params.holder.split(":").at(-1)
+    //               ),
+    //               balance: resourceAccount.parsed_data.params.balance,
+    //             },
+    //           },
+    //         },
+    //       }
+    //     );
+
+    //     const op = new Operation(
+    //       adminHC,
+    //       [ix],
+    //       [adminHC.identity().signer as KeypairLike]
+    //     );
+
+    //     const [{ signature }] = await op.send({
+    //       skipPreflight: true,
+    //       commitment: "processed",
+    //     });
+
+    //     console.log(signature, "Unwrap Signature");
+
+    //     // setting the flag to true
+    //     data.fungible.resources.find((e) =>
+    //       e.resource.equals(resource.resource)
+    //     )!.flags.isUnWrapped = true;
+
+    //     // saving the data to the file
+    //     saveData(data);
+    //   }
+    // });
+
+    // it.skip("Wrap Resource", async () => {
+    //   const resources = data.fungible.resources.filter(
+    //     (e) => e.flags.isWrapped === false
+    //   );
+
+    //   for (const resource of resources) {
+    //     const recipientAccount = getAssociatedTokenAddressSync(
+    //       resource.mint,
+    //       adminHC.identity().address,
+    //       false,
+    //       TOKEN_2022_PROGRAM_ID
+    //     );
+
+    //     const resourceAccount = (
+    //       await getCompressedAccountsByTree(resource.tree)
+    //     ).at(-1)!;
+    //     const proff = (await getAssetProof(
+    //       Number(resourceAccount.leaf_idx),
+    //       resource.tree
+    //     ))!;
+
+    //     const ix = createWrapResourceInstruction(
+    //       {
+    //         mint: resource.mint,
+    //         merkleTree: resource.tree,
+    //         tokenAccount: recipientAccount,
+    //         resource: resource.resource,
+    //         project: adminHC.project().address,
+    //         payer: adminHC.identity().address,
+    //         owner: adminHC.identity().address,
+    //         clock: SYSVAR_CLOCK_PUBKEY,
+    //         rentSysvar: SYSVAR_RENT_PUBKEY,
+    //         logWrapper: SPL_NOOP_PROGRAM_ID,
+    //         tokenProgram: TOKEN_2022_PROGRAM_ID,
+    //         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+    //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+    //         anchorRemainingAccounts: proff.proof.map((e) => ({
+    //           isSigner: false,
+    //           isWritable: false,
+    //           pubkey: new PublicKey(e),
+    //         })),
+    //       },
+    //       {
+    //         args: {
+    //           __kind: "Fungible",
+    //           amount: 100 ** 9,
+    //           holdingState: {
+    //             leafIdx: Number(proff.leaf_index),
+    //             root: Array.from(new PublicKey(proff.root).toBytes()),
+    //             holding: {
+    //               __kind: resourceAccount.parsed_data.__kind,
+    //               holder: new PublicKey(
+    //                 resourceAccount.parsed_data.params.holder.split(":").at(-1)
+    //               ),
+    //               balance: resourceAccount.parsed_data.params.balance,
+    //             },
+    //           },
+    //         },
+    //       }
+    //     );
+
+    //     const op = new Operation(
+    //       adminHC,
+    //       [ix],
+    //       [adminHC.identity().signer as KeypairLike]
+    //     );
+
+    //     const [{ signature }] = await op.send({
+    //       skipPreflight: true,
+    //       commitment: "processed",
+    //     });
+
+    //     console.log(signature, "Unwrap Signature");
+
+    //     // setting the flag to true
+    //     data.fungible.resources.find((e) =>
+    //       e.resource.equals(resource.resource)
+    //     )!.flags.isWrapped = true;
+
+    //     // saving the data to the file
+    //     saveData(data);
+    //   }
+    // });
   });
 
   describe.skip("Non Funglible Resources ", () => {
@@ -1229,91 +1228,91 @@ describe("Resource Manager", () => {
       }
     });
 
-    it.skip("UnWrap Resource", async () => {
-      const resources = data.nonFungible.resources.filter(
-        (e) => e.flags.isUnWrapped === false
-      );
+    // it.skip("UnWrap Resource", async () => {
+    //   const resources = data.nonFungible.resources.filter(
+    //     (e) => e.flags.isUnWrapped === false
+    //   );
 
-      for (const resource of resources) {
-        const recipientAccount = getAssociatedTokenAddressSync(
-          resource.mint,
-          adminHC.identity().address,
-          false,
-          TOKEN_2022_PROGRAM_ID
-        );
+    //   for (const resource of resources) {
+    //     const recipientAccount = getAssociatedTokenAddressSync(
+    //       resource.mint,
+    //       adminHC.identity().address,
+    //       false,
+    //       TOKEN_2022_PROGRAM_ID
+    //     );
 
-        const resourceAccount = (
-          await getCompressedAccountsByTree(resource.tree)
-        ).at(-1)!;
+    //     const resourceAccount = (
+    //       await getCompressedAccountsByTree(resource.tree)
+    //     ).at(-1)!;
 
-        const proff = (await getAssetProof(
-          Number(resourceAccount.leaf_idx),
-          resource.tree
-        ))!;
+    //     const proff = (await getAssetProof(
+    //       Number(resourceAccount.leaf_idx),
+    //       resource.tree
+    //     ))!;
 
-        const ix = createUnwrapResourceInstruction(
-          {
-            mint: resource.mint,
-            merkleTree: resource.tree,
-            recipientAccount,
-            group: PublicKey.default,
-            resource: resource.resource,
-            project: adminHC.project().address,
-            payer: adminHC.identity().address,
-            owner: adminHC.identity().address,
-            clock: SYSVAR_CLOCK_PUBKEY,
-            rentSysvar: SYSVAR_RENT_PUBKEY,
-            logWrapper: SPL_NOOP_PROGRAM_ID,
-            tokenProgram: TOKEN_2022_PROGRAM_ID,
-            compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            anchorRemainingAccounts: proff.proof.map((e) => ({
-              isSigner: false,
-              isWritable: false,
-              pubkey: new PublicKey(e),
-            })),
-          },
-          {
-            args: {
-              __kind: "Fungible",
-              amount: 100,
-              holdingState: {
-                leafIdx: Number(proff.leaf_index),
-                root: Array.from(new PublicKey(proff.root).toBytes()),
-                holding: {
-                  __kind: resourceAccount.parsed_data.__kind,
-                  holder: new PublicKey(
-                    resourceAccount.parsed_data.params.holder.split(":").at(-1)
-                  ),
-                  balance: resourceAccount.parsed_data.params.balance,
-                },
-              },
-            },
-          }
-        );
+    //     const ix = createUnwrapResourceInstruction(
+    //       {
+    //         mint: resource.mint,
+    //         merkleTree: resource.tree,
+    //         recipientAccount,
+    //         group: PublicKey.default,
+    //         resource: resource.resource,
+    //         project: adminHC.project().address,
+    //         payer: adminHC.identity().address,
+    //         owner: adminHC.identity().address,
+    //         clock: SYSVAR_CLOCK_PUBKEY,
+    //         rentSysvar: SYSVAR_RENT_PUBKEY,
+    //         logWrapper: SPL_NOOP_PROGRAM_ID,
+    //         tokenProgram: TOKEN_2022_PROGRAM_ID,
+    //         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+    //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+    //         anchorRemainingAccounts: proff.proof.map((e) => ({
+    //           isSigner: false,
+    //           isWritable: false,
+    //           pubkey: new PublicKey(e),
+    //         })),
+    //       },
+    //       {
+    //         args: {
+    //           __kind: "Fungible",
+    //           amount: 100,
+    //           holdingState: {
+    //             leafIdx: Number(proff.leaf_index),
+    //             root: Array.from(new PublicKey(proff.root).toBytes()),
+    //             holding: {
+    //               __kind: resourceAccount.parsed_data.__kind,
+    //               holder: new PublicKey(
+    //                 resourceAccount.parsed_data.params.holder.split(":").at(-1)
+    //               ),
+    //               balance: resourceAccount.parsed_data.params.balance,
+    //             },
+    //           },
+    //         },
+    //       }
+    //     );
 
-        const op = new Operation(
-          adminHC,
-          [ix],
-          [adminHC.identity().signer as KeypairLike]
-        );
+    //     const op = new Operation(
+    //       adminHC,
+    //       [ix],
+    //       [adminHC.identity().signer as KeypairLike]
+    //     );
 
-        const [{ signature }] = await op.send({
-          skipPreflight: true,
-          commitment: "processed",
-        });
+    //     const [{ signature }] = await op.send({
+    //       skipPreflight: true,
+    //       commitment: "processed",
+    //     });
 
-        console.log(signature, "Unwrap Signature");
+    //     console.log(signature, "Unwrap Signature");
 
-        // setting the flag to true
-        data.nonFungible.resources.find((e) =>
-          e.resource.equals(resource.resource)
-        )!.flags.isUnWrapped = true;
+    //     // setting the flag to true
+    //     data.nonFungible.resources.find((e) =>
+    //       e.resource.equals(resource.resource)
+    //     )!.flags.isUnWrapped = true;
 
-        // saving the data to the file
-        saveData(data);
-      }
-    });
+    //     // saving the data to the file
+    //     saveData(data);
+    //   }
+    // });
 
     // it.skip("Wrap Resource", async () => {
     //   const resources = data.nonFungible.resources.filter(

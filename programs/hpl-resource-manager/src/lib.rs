@@ -45,12 +45,12 @@ pub mod hpl_resource_manager {
     //     instructions::wrap_resource(ctx, args)
     // }
 
-    pub fn unwrap_resource<'info>(
-        ctx: Context<'_, '_, '_, 'info, UnWrapResource<'info>>,
-        args: UnWrapResourceArgs,
-    ) -> Result<()> {
-        instructions::unwrap_resource(ctx, args)
-    }
+    // pub fn unwrap_resource<'info>(
+    //     ctx: Context<'_, '_, '_, 'info, UnWrapResource<'info>>,
+    //     args: UnWrapResourceArgs,
+    // ) -> Result<()> {
+    //     instructions::unwrap_resource(ctx, args)
+    // }
 
     pub fn craft_recipe<'info>(
         ctx: Context<'_, '_, '_, 'info, CraftRecipe<'info>>,
