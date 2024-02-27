@@ -5,7 +5,7 @@ use {
             create_metadata_for_mint, init_collection_mint, mint_tokens,
             ExtensionInitializationParams, ResourceMetadataArgs,
         },
-        Holding, HoldingAccountArgs, NonFungibleHolding, Resource,
+        Holding, HoldingAccountArgs, NonFungibleHolder, Resource,
     },
     anchor_lang::prelude::*,
     anchor_spl::{
@@ -258,10 +258,10 @@ pub fn wrap_non_fungible_resource<'info>(
             .assert_append(merkle_tree.to_account_info())?;
 
         let new_holding_state;
-        if let NonFungibleHolding::Holder(holder) = holder {
+        if let NonFungibleHolder::Holder(holder) = holder {
             new_holding_state = Holding::INF {
                 characteristics: characteristics.to_owned(),
-                holder: NonFungibleHolding::Eject {
+                holder: NonFungibleHolder::Eject {
                     mint: mint.key(),
                     holder: *holder,
                 },
