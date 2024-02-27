@@ -40,15 +40,12 @@ export type CharacterOffchainData = {
         __kind: "Mission";
         params: {
           id: string;
-          requirement: {
-            __kind: "Time";
-            endTime: number;
-          };
           rewards: {
             delta: number;
             rewardIdx: number;
           }[];
-          rewardsCollected: boolean;
+          rewards_collected: boolean;
+          end_time: number;
         };
       }
     | {
@@ -137,6 +134,8 @@ export class HplCharacter {
   public static parseOffchainToSchema(
     offchainData: CharacterOffchainData
   ): CharacterSchema {
+    console.log("Offchain data:", JSON.stringify(offchainData));
+
     return {
       owner: new PublicKey(offchainData.owner.replace("pubkey:", "")),
       source: {
@@ -173,9 +172,9 @@ export class HplCharacter {
               id: new PublicKey(
                 offchainData.used_by.params.id.replace("pubkey:", "")
               ),
-              endTime: offchainData.used_by.params.requirement.endTime,
+              endTime: offchainData.used_by.params.end_time,
               rewards: offchainData.used_by.params.rewards,
-              rewardsCollected: offchainData.used_by.params.rewardsCollected,
+              rewardsCollected: offchainData.used_by.params.rewards_collected,
             }
           : "Guild" === offchainData.used_by.__kind
           ? {
