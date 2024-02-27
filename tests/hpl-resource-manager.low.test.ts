@@ -34,7 +34,7 @@ import { Client, cacheExchange, fetchExchange } from "@urql/core";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import {
   CraftRecipeInstructionAccounts,
-  CraftRecipieArg,
+  CraftRecipeArg,
   InitilizeRecipeInstructionAccounts,
   PROGRAM_ID,
   createBurnResourceInstruction,
@@ -688,7 +688,7 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it("Craft Recipie", async () => {
+    it("Craft Recipe", async () => {
       if (!lookupTable) throw new Error("Lookup Table not found");
       if (!data.fungible.recipe.address) throw new Error("No Recipe Found");
       if (data.fungible.resources.length === 0)
@@ -715,7 +715,7 @@ describe("Resource Manager", () => {
         anchorRemainingAccounts: [],
       };
 
-      const args: CraftRecipieArg[] = [];
+      const args: CraftRecipeArg[] = [];
       for (const resource of data.fungible.resources) {
         if (resource.label === "inputResourceThree") break;
 
@@ -1548,7 +1548,7 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it.skip("Craft Recipie", async () => {
+    it.skip("Craft Recipe", async () => {
       if (!lookupTable) throw new Error("Lookup Table not found");
       if (!data.nonFungible.recipe.address) throw new Error("No Recipe Found");
       if (data.nonFungible.resources.length === 0)
@@ -1575,7 +1575,7 @@ describe("Resource Manager", () => {
         anchorRemainingAccounts: [],
       };
 
-      const args: CraftRecipieArg[] = [];
+      const args: CraftRecipeArg[] = [];
       for (const resource of data.nonFungible.resources) {
         if (resource.label === "inputResourceThree") break;
 

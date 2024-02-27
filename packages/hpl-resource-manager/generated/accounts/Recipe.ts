@@ -103,7 +103,7 @@ export class Recipe implements RecipeArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2'
+      'Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, recipeBeet)

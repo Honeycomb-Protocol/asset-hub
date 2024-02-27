@@ -6,7 +6,7 @@ use {
     },
     anchor_lang::prelude::*,
     anchor_spl::token_2022::Token2022,
-    hpl_hive_control::state::Project,
+    hpl_hive_control::state::{Project, User},
     spl_account_compression::{program::SplAccountCompression, Noop},
     std::collections::HashMap,
 };
@@ -19,7 +19,13 @@ pub struct CraftRecipe<'info> {
     #[account(mut, has_one = project)]
     pub recipe: Box<Account<'info, Recipe>>,
 
-    #[account(mut)]
+    pub user: Box<Account<'info, User>>,
+
+    /// CHECK: This is safe
+    #[account(constraint = user.wallets.contains(wallet.key))]
+    pub wallet: AccountInfo<'info>,
+
+    #[account(constraint = user.is_authority(authority.key))]
     pub authority: Signer<'info>,
 
     #[account(mut)]
@@ -54,24 +60,24 @@ pub struct CraftRecipe<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct CraftRecipieArg {
+pub struct CraftRecipeArg {
     pub holding_state: Option<HoldingAccountArgs>,
     pub proof_size: u8, // proof size + 1 = account in remaining accounts
 }
 
 pub fn craft_recipe<'info>(
     ctx: Context<'_, '_, '_, 'info, CraftRecipe<'info>>,
-    args: Vec<CraftRecipieArg>,
+    args: Vec<CraftRecipeArg>,
 ) -> Result<()> {
     let recipe = &mut ctx.accounts.recipe;
     let mut args_iter = args.into_iter();
 
-    // cursor for the remaining accounts to be used in the recipie
+    // cursor for the remaining accounts to be used in the recipe
     let mut pointer: usize = 0;
     let point = &mut pointer;
 
     let remaining_accounts = ctx.remaining_accounts;
-    let output_stats = next_craft_recipie(args_iter.next().unwrap(), remaining_accounts, point);
+    let output_stats = next_craft_recipe(args_iter.next().unwrap(), remaining_accounts, point);
 
     // stacking the inputs in an directory for easy access
     msg!("resource 1");
@@ -80,7 +86,7 @@ pub fn craft_recipe<'info>(
         ctx.accounts.input_resource_one.key(),
         (
             &mut ctx.accounts.input_resource_one,
-            next_craft_recipie(args_iter.next().unwrap(), remaining_accounts, point),
+            next_craft_recipe(args_iter.next().unwrap(), remaining_accounts, point),
         ),
     );
 
@@ -90,7 +96,7 @@ pub fn craft_recipe<'info>(
             input_resource_two.key(),
             (
                 input_resource_two,
-                next_craft_recipie(args_iter.next().unwrap(), remaining_accounts, point),
+                next_craft_recipe(args_iter.next().unwrap(), remaining_accounts, point),
             ),
         );
     }
@@ -100,7 +106,7 @@ pub fn craft_recipe<'info>(
             input_resource_three.key(),
             (
                 input_resource_three,
-                next_craft_recipie(args_iter.next().unwrap(), remaining_accounts, point),
+                next_craft_recipe(args_iter.next().unwrap(), remaining_accounts, point),
             ),
         );
     }
@@ -110,7 +116,7 @@ pub fn craft_recipe<'info>(
             input_resource_four.key(),
             (
                 input_resource_four,
-                next_craft_recipie(args_iter.next().unwrap(), remaining_accounts, point),
+                next_craft_recipe(args_iter.next().unwrap(), remaining_accounts, point),
             ),
         );
     }
@@ -170,7 +176,7 @@ pub fn craft_recipe<'info>(
     use_mint_resource(
         &mut ctx.accounts.output_resource,
         &output_stats.1,
-        &ctx.accounts.authority,
+        &ctx.accounts.wallet,
         output_stats.2,
         &ctx.accounts.clock,
         &ctx.accounts.log_wrapper,
@@ -178,13 +184,13 @@ pub fn craft_recipe<'info>(
         &args,
     )?;
 
-    msg!("recipie crafted");
+    msg!("recipe crafted");
 
     Ok(())
 }
 
-pub fn next_craft_recipie<'a, 'info>(
-    recipe: CraftRecipieArg,
+pub fn next_craft_recipe<'a, 'info>(
+    recipe: CraftRecipeArg,
     remaining_accounts: &'a [AccountInfo<'info>],
     previous_pointer: &mut usize,
 ) -> (

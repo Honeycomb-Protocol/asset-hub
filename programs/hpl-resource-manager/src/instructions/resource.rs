@@ -16,7 +16,6 @@ use {
 #[derive(Accounts)]
 #[instruction(args: CreateResourceArgs)]
 pub struct CreateResource<'info> {
-    #[account()]
     pub project: Box<Account<'info, Project>>,
 
     #[account(
@@ -28,8 +27,7 @@ pub struct CreateResource<'info> {
     )]
     pub resource: Box<Account<'info, Resource>>,
 
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    pub authority: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -102,14 +100,12 @@ pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -
 
 #[derive(Accounts)]
 pub struct InitilizeResourceTree<'info> {
-    #[account()]
     pub project: Box<Account<'info, Project>>,
 
     #[account(mut, has_one = project)]
     pub resource: Box<Account<'info, Resource>>,
 
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    pub authority: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,

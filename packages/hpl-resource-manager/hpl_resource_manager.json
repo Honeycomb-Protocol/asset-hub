@@ -16,8 +16,8 @@
           "isSigner": false
         },
         {
-          "name": "owner",
-          "isMut": true,
+          "name": "authority",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -69,8 +69,8 @@
           "isSigner": false
         },
         {
-          "name": "owner",
-          "isMut": true,
+          "name": "authority",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -157,7 +157,12 @@
         },
         {
           "name": "owner",
-          "isMut": true,
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -225,7 +230,12 @@
         },
         {
           "name": "owner",
-          "isMut": true,
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -287,8 +297,18 @@
           "isSigner": false
         },
         {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "wallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -360,7 +380,7 @@
           "name": "args",
           "type": {
             "vec": {
-              "defined": "CraftRecipieArg"
+              "defined": "CraftRecipeArg"
             }
           }
         }
@@ -386,7 +406,7 @@
         },
         {
           "name": "authority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -442,7 +462,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "InitilizeRecipieArgs"
+            "defined": "InitilizeRecipeArgs"
           }
         }
       ]
@@ -545,7 +565,7 @@
   ],
   "types": [
     {
-      "name": "CraftRecipieArg",
+      "name": "CraftRecipeArg",
       "type": {
         "kind": "struct",
         "fields": [
@@ -565,7 +585,7 @@
       }
     },
     {
-      "name": "InitilizeRecipieArgs",
+      "name": "InitilizeRecipeArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1267,7 +1287,7 @@
     }
   ],
   "metadata": {
-    "address": "ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2",
+    "address": "Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s",
     "origin": "anchor",
     "binaryVersion": "0.29.0",
     "libVersion": "0.29.0"

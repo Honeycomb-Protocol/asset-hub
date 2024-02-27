@@ -7,7 +7,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use states::*;
 
-declare_id!("ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2");
+declare_id!("Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s");
 
 #[program]
 pub mod hpl_resource_manager {
@@ -54,14 +54,14 @@ pub mod hpl_resource_manager {
 
     pub fn craft_recipe<'info>(
         ctx: Context<'_, '_, '_, 'info, CraftRecipe<'info>>,
-        args: Vec<CraftRecipieArg>,
+        args: Vec<CraftRecipeArg>,
     ) -> Result<()> {
         instructions::craft_recipe(ctx, args)
     }
 
     pub fn initilize_recipe(
         ctx: Context<InitilizeRecipe>,
-        args: InitilizeRecipieArgs,
+        args: InitilizeRecipeArgs,
     ) -> Result<()> {
         instructions::initilize_recipe(ctx, args)
     }

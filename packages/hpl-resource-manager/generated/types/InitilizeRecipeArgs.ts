@@ -7,7 +7,7 @@
 
 import * as beet from '@metaplex-foundation/beet'
 import { XpPair, xpPairBeet } from './XpPair'
-export type InitilizeRecipieArgs = {
+export type InitilizeRecipeArgs = {
   xp: XpPair
   amounts: beet.bignum[]
   outputCharacteristics: Map<string, string>
@@ -17,12 +17,12 @@ export type InitilizeRecipieArgs = {
  * @category userTypes
  * @category generated
  */
-export const initilizeRecipieArgsBeet =
-  new beet.FixableBeetArgsStruct<InitilizeRecipieArgs>(
+export const initilizeRecipeArgsBeet =
+  new beet.FixableBeetArgsStruct<InitilizeRecipeArgs>(
     [
       ['xp', xpPairBeet],
       ['amounts', beet.array(beet.u64)],
       ['outputCharacteristics', beet.map(beet.utf8String, beet.utf8String)],
     ],
-    'InitilizeRecipieArgs'
+    'InitilizeRecipeArgs'
   )

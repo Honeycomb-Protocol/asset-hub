@@ -42,7 +42,7 @@ export const createResourceStruct = new beet.FixableBeetArgsStruct<
  *
  * @property [] project
  * @property [_writable_] resource
- * @property [_writable_, **signer**] owner
+ * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [_writable_, **signer**] mint
  * @property [] rentSysvar
@@ -53,7 +53,7 @@ export const createResourceStruct = new beet.FixableBeetArgsStruct<
 export type CreateResourceInstructionAccounts = {
   project: web3.PublicKey
   resource: web3.PublicKey
-  owner: web3.PublicKey
+  authority: web3.PublicKey
   payer: web3.PublicKey
   mint: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -79,7 +79,7 @@ export const createResourceInstructionDiscriminator = [
 export function createCreateResourceInstruction(
   accounts: CreateResourceInstructionAccounts,
   args: CreateResourceInstructionArgs,
-  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
+  programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
   const [data] = createResourceStruct.serialize({
     instructionDiscriminator: createResourceInstructionDiscriminator,
@@ -97,8 +97,8 @@ export function createCreateResourceInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.owner,
-      isWritable: true,
+      pubkey: accounts.authority,
+      isWritable: false,
       isSigner: true,
     },
     {

@@ -26,8 +26,10 @@ pub struct MintResource<'info> {
     #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    /// CHECK: This is safe
+    pub owner: AccountInfo<'info>,
+
+    pub authority: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -95,8 +97,10 @@ pub struct BurnResource<'info> {
     #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    /// CHECK: This is safe
+    pub owner: AccountInfo<'info>,
+
+    pub authority: Signer<'info>,
 
     #[account(mut)]
     pub payer: Signer<'info>,

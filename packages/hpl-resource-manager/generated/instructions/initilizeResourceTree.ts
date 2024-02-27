@@ -42,7 +42,7 @@ export const initilizeResourceTreeStruct = new beet.BeetArgsStruct<
  *
  * @property [] project
  * @property [_writable_] resource
- * @property [_writable_, **signer**] owner
+ * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [_writable_, **signer**] merkleTree
  * @property [] rentSysvar
@@ -56,7 +56,7 @@ export const initilizeResourceTreeStruct = new beet.BeetArgsStruct<
 export type InitilizeResourceTreeInstructionAccounts = {
   project: web3.PublicKey
   resource: web3.PublicKey
-  owner: web3.PublicKey
+  authority: web3.PublicKey
   payer: web3.PublicKey
   merkleTree: web3.PublicKey
   rentSysvar: web3.PublicKey
@@ -85,7 +85,7 @@ export const initilizeResourceTreeInstructionDiscriminator = [
 export function createInitilizeResourceTreeInstruction(
   accounts: InitilizeResourceTreeInstructionAccounts,
   args: InitilizeResourceTreeInstructionArgs,
-  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
+  programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
   const [data] = initilizeResourceTreeStruct.serialize({
     instructionDiscriminator: initilizeResourceTreeInstructionDiscriminator,
@@ -103,8 +103,8 @@ export function createInitilizeResourceTreeInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.owner,
-      isWritable: true,
+      pubkey: accounts.authority,
+      isWritable: false,
       isSigner: true,
     },
     {

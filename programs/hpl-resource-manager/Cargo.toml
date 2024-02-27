@@ -2,7 +2,7 @@
 name = "hpl-resource-manager"
 description = "Honeycomb protocol library resource manager program"
 author = ['ShayanHussainSB <shayanhussain48@gmail.com>']
-version = "0.0.5"
+version = "0.0.1-beta.1"
 edition = "2021"
 license = "MIT"
 

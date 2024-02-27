@@ -9,9 +9,9 @@ import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  InitilizeRecipieArgs,
-  initilizeRecipieArgsBeet,
-} from '../types/InitilizeRecipieArgs'
+  InitilizeRecipeArgs,
+  initilizeRecipeArgsBeet,
+} from '../types/InitilizeRecipeArgs'
 
 /**
  * @category Instructions
@@ -19,7 +19,7 @@ import {
  * @category generated
  */
 export type InitilizeRecipeInstructionArgs = {
-  args: InitilizeRecipieArgs
+  args: InitilizeRecipeArgs
 }
 /**
  * @category Instructions
@@ -33,7 +33,7 @@ export const initilizeRecipeStruct = new beet.FixableBeetArgsStruct<
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', initilizeRecipieArgsBeet],
+    ['args', initilizeRecipeArgsBeet],
   ],
   'InitilizeRecipeInstructionArgs'
 )
@@ -43,7 +43,7 @@ export const initilizeRecipeStruct = new beet.FixableBeetArgsStruct<
  * @property [] project
  * @property [] key
  * @property [_writable_] recipe
- * @property [_writable_, **signer**] authority
+ * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [] rentSysvar
  * @property [_writable_] outputResource
@@ -92,7 +92,7 @@ export const initilizeRecipeInstructionDiscriminator = [
 export function createInitilizeRecipeInstruction(
   accounts: InitilizeRecipeInstructionAccounts,
   args: InitilizeRecipeInstructionArgs,
-  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
+  programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
   const [data] = initilizeRecipeStruct.serialize({
     instructionDiscriminator: initilizeRecipeInstructionDiscriminator,
@@ -116,7 +116,7 @@ export function createInitilizeRecipeInstruction(
     },
     {
       pubkey: accounts.authority,
-      isWritable: true,
+      isWritable: false,
       isSigner: true,
     },
     {

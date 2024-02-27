@@ -8,7 +8,7 @@
 import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
-import { CraftRecipieArg, craftRecipieArgBeet } from '../types/CraftRecipieArg'
+import { CraftRecipeArg, craftRecipeArgBeet } from '../types/CraftRecipeArg'
 
 /**
  * @category Instructions
@@ -16,7 +16,7 @@ import { CraftRecipieArg, craftRecipieArgBeet } from '../types/CraftRecipieArg'
  * @category generated
  */
 export type CraftRecipeInstructionArgs = {
-  args: CraftRecipieArg[]
+  args: CraftRecipeArg[]
 }
 /**
  * @category Instructions
@@ -30,7 +30,7 @@ export const craftRecipeStruct = new beet.FixableBeetArgsStruct<
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', beet.array(craftRecipieArgBeet)],
+    ['args', beet.array(craftRecipeArgBeet)],
   ],
   'CraftRecipeInstructionArgs'
 )
@@ -39,7 +39,9 @@ export const craftRecipeStruct = new beet.FixableBeetArgsStruct<
  *
  * @property [] project
  * @property [_writable_] recipe
- * @property [_writable_, **signer**] authority
+ * @property [] user
+ * @property [] wallet
+ * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [] rentSysvar
  * @property [] clock
@@ -57,6 +59,8 @@ export const craftRecipeStruct = new beet.FixableBeetArgsStruct<
 export type CraftRecipeInstructionAccounts = {
   project: web3.PublicKey
   recipe: web3.PublicKey
+  user: web3.PublicKey
+  wallet: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
   rentSysvar: web3.PublicKey
@@ -93,7 +97,7 @@ export const craftRecipeInstructionDiscriminator = [
 export function createCraftRecipeInstruction(
   accounts: CraftRecipeInstructionAccounts,
   args: CraftRecipeInstructionArgs,
-  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
+  programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
   const [data] = craftRecipeStruct.serialize({
     instructionDiscriminator: craftRecipeInstructionDiscriminator,
@@ -111,8 +115,18 @@ export function createCraftRecipeInstruction(
       isSigner: false,
     },
     {
+      pubkey: accounts.user,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.wallet,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.authority,
-      isWritable: true,
+      isWritable: false,
       isSigner: true,
     },
     {

@@ -44,7 +44,8 @@ export const burnResourceStruct = new beet.FixableBeetArgsStruct<
  * @property [] resource
  * @property [_writable_] mint
  * @property [_writable_] merkleTree
- * @property [_writable_, **signer**] owner
+ * @property [] owner
+ * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
  * @property [] rentSysvar
  * @property [] compressionProgram
@@ -60,6 +61,7 @@ export type BurnResourceInstructionAccounts = {
   mint: web3.PublicKey
   merkleTree: web3.PublicKey
   owner: web3.PublicKey
+  authority: web3.PublicKey
   payer: web3.PublicKey
   rentSysvar: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -87,7 +89,7 @@ export const burnResourceInstructionDiscriminator = [
 export function createBurnResourceInstruction(
   accounts: BurnResourceInstructionAccounts,
   args: BurnResourceInstructionArgs,
-  programId = new web3.PublicKey('ATQfyuSouoFHW393YFYeojfBcsPD6KpM4cVCzSwkguT2')
+  programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
   const [data] = burnResourceStruct.serialize({
     instructionDiscriminator: burnResourceInstructionDiscriminator,
@@ -116,7 +118,12 @@ export function createBurnResourceInstruction(
     },
     {
       pubkey: accounts.owner,
-      isWritable: true,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.authority,
+      isWritable: false,
       isSigner: true,
     },
     {
