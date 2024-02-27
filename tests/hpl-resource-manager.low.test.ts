@@ -18,7 +18,6 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import {
   AddressLookupTableAccount,
@@ -44,7 +43,6 @@ import {
   createInitilizeRecipeInstruction,
   createInitilizeResourceTreeInstruction,
   createMintResourceInstruction,
-  resourceManagerPdas,
 } from "../packages/hpl-resource-manager";
 import getHoneycombs from "../scripts/prepare";
 
@@ -57,6 +55,29 @@ const getClient = (rpcUrl = "https://edge.eboy.dev") =>
       exchanges: [cacheExchange, fetchExchange],
     })
   );
+
+/** UTILS */
+export const resourcePda = (
+  project: PublicKey,
+  mint: PublicKey,
+  programId = PROGRAM_ID
+) => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("resource"), project.toBuffer(), mint.toBuffer()],
+    programId
+  );
+};
+
+export const recipePda = (
+  project: PublicKey,
+  key: PublicKey,
+  programId = PROGRAM_ID
+) => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("recipe"), project.toBuffer(), key.toBuffer()],
+    programId
+  );
+};
 
 async function getCompressedData(leafIdx: number, tree: PublicKey) {
   const client = getClient();
@@ -268,7 +289,7 @@ describe("Resource Manager", () => {
 
       for (let i = 0; i < 5; i++) {
         const mintKeypair = new Keypair();
-        const [resourceAddress] = resourceManagerPdas().resource(
+        const [resourceAddress] = resourcePda(
           adminHC.project().address,
           mintKeypair.publicKey,
           PROGRAM_ID
@@ -610,7 +631,7 @@ describe("Resource Manager", () => {
         throw new Error("No Resources Found");
 
       const key = Keypair.generate();
-      const [recipeAddress] = resourceManagerPdas().recipe(
+      const [recipeAddress] = recipePda(
         adminHC.project().address,
         key.publicKey
       );
@@ -962,7 +983,7 @@ describe("Resource Manager", () => {
 
       for (let i = 0; i < 1; i++) {
         const mintKeypair = new Keypair();
-        const [resourceAddress] = resourceManagerPdas().resource(
+        const [resourceAddress] = resourcePda(
           adminHC.project().address,
           mintKeypair.publicKey,
           PROGRAM_ID
@@ -1470,7 +1491,7 @@ describe("Resource Manager", () => {
         throw new Error("No Resources Found");
 
       const key = Keypair.generate();
-      const [recipeAddress] = resourceManagerPdas().recipe(
+      const [recipeAddress] = recipePda(
         adminHC.project().address,
         key.publicKey
       );
