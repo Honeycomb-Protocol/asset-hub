@@ -3,6 +3,7 @@ use {
     hpl_toolkit::{compression::ControlledMerkleTrees, schema::*},
 };
 
+#[derive(ToSchema)]
 #[account]
 pub struct Resource {
     /// Bump seed for the PDA
@@ -55,7 +56,7 @@ impl Resource {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema)]
 pub enum ResourseKind {
     Fungible {
         decimals: u8,

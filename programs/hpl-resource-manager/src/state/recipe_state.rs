@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
-use hpl_toolkit::HashMap;
+use hpl_toolkit::schema::*;
 
+#[derive(ToSchema)]
 #[account]
 pub struct Recipe {
     pub bump: u8,
@@ -50,14 +51,14 @@ impl Recipe {
     }
 }
 
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Copy)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Copy, ToSchema)]
 pub struct ResourceAmountPair {
     pub resource: Pubkey,
 
     pub amount: u64,
 }
 
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, ToSchema)]
 pub struct XpPair {
     pub label: String,
 

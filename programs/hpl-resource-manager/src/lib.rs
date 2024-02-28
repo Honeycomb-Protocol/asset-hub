@@ -1,14 +1,17 @@
 mod errors;
 mod instructions;
-mod states;
+mod state;
 mod utils;
 
 use anchor_lang::prelude::*;
 use instructions::*;
-use states::*;
+use state::*;
 
 declare_id!("Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s");
 
+#[cfg(not(feature = "cpi"))]
+use hpl_toolkit::schema::*;
+#[cfg_attr(not(feature = "cpi"), account_schemas_ix_injector(Resource Recipe))]
 #[program]
 pub mod hpl_resource_manager {
     use super::*;

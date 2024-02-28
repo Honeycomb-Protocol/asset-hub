@@ -5,7 +5,7 @@ skip-lint = false
 anchor_template = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [provider]
-cluster = "https://rpc.magicblock.app/devnet/ "
+cluster = "devnet"
 wallet = "key.json"
 
 [scripts]
