@@ -527,7 +527,7 @@ const configs = {
                   {
                     name: "holder",
                     type: {
-                      defined: "NonFungibleHolding",
+                      defined: "NonFungibleHolder",
                     },
                   },
                   {

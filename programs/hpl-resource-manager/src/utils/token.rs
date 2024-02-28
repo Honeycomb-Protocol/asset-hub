@@ -1,5 +1,5 @@
 use {
-    crate::{Resource, ResourseKind},
+    crate::{Resource, ResourceKind},
     anchor_lang::prelude::*,
     hpl_toolkit::HashMap,
     spl_token_2022::{
@@ -111,7 +111,7 @@ pub fn create_mint_with_extensions<'info>(
     token22_program: &AccountInfo<'info>,
     decimals: u8,
     metadata: &ResourceMetadataArgs,
-    kind: &ResourseKind,
+    kind: &ResourceKind,
 ) -> Result<Mint> {
     let mut extension_initialization_params = vec![
         ExtensionInitializationParams::MintCloseAuthority {
@@ -129,7 +129,7 @@ pub fn create_mint_with_extensions<'info>(
     // if the resource is an NFT, add the group pointer extension
     if matches!(
         kind,
-        ResourseKind::INF {
+        ResourceKind::INF {
             characteristics: _,
             supply: _
         }
@@ -152,7 +152,7 @@ pub fn create_mint_with_extensions<'info>(
     space += 68 + 12 + metadata.name.len() + metadata.symbol.len() + metadata.uri.len() + 4;
 
     // calculate the space required for the INF characteristics
-    if let ResourseKind::INF {
+    if let ResourceKind::INF {
         characteristics,
         supply: _,
     } = kind

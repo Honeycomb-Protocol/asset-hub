@@ -556,7 +556,7 @@
           {
             "name": "kind",
             "type": {
-              "defined": "ResourseKind"
+              "defined": "ResourceKind"
             }
           }
         ]
@@ -621,7 +621,7 @@
           {
             "name": "kind",
             "type": {
-              "defined": "ResourseKind"
+              "defined": "ResourceKind"
             }
           },
           {
@@ -954,7 +954,7 @@
               {
                 "name": "holder",
                 "type": {
-                  "defined": "NonFungibleHolding"
+                  "defined": "NonFungibleHolder"
                 }
               },
               {
@@ -972,7 +972,7 @@
       }
     },
     {
-      "name": "NonFungibleHolding",
+      "name": "NonFungibleHolder",
       "type": {
         "kind": "enum",
         "variants": [
@@ -999,7 +999,7 @@
       }
     },
     {
-      "name": "ResourseKind",
+      "name": "ResourceKind",
       "type": {
         "kind": "enum",
         "variants": [
@@ -1241,7 +1241,7 @@
               {
                 "name": "holder",
                 "type": {
-                  "defined": "NonFungibleHolding"
+                  "defined": "NonFungibleHolder"
                 }
               },
               {

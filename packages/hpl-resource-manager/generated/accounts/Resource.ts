@@ -12,7 +12,7 @@ import {
   ControlledMerkleTrees,
   controlledMerkleTreesBeet,
 } from '../types/ControlledMerkleTrees'
-import { ResourseKind, resourseKindBeet } from '../types/ResourseKind'
+import { ResourceKind, resourceKindBeet } from '../types/ResourceKind'
 
 /**
  * Arguments used to create {@link Resource}
@@ -24,7 +24,7 @@ export type ResourceArgs = {
   project: web3.PublicKey
   mint: web3.PublicKey
   merkleTrees: ControlledMerkleTrees
-  kind: ResourseKind
+  kind: ResourceKind
 }
 
 export const resourceDiscriminator = [10, 160, 2, 1, 42, 207, 51, 212]
@@ -41,7 +41,7 @@ export class Resource implements ResourceArgs {
     readonly project: web3.PublicKey,
     readonly mint: web3.PublicKey,
     readonly merkleTrees: ControlledMerkleTrees,
-    readonly kind: ResourseKind
+    readonly kind: ResourceKind
   ) {}
 
   /**
@@ -187,7 +187,7 @@ export const resourceBeet = new beet.FixableBeetStruct<
     ['project', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
     ['merkleTrees', controlledMerkleTreesBeet],
-    ['kind', resourseKindBeet],
+    ['kind', resourceKindBeet],
   ],
   Resource.fromArgs,
   'Resource'

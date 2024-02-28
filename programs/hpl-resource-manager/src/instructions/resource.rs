@@ -4,7 +4,7 @@ use {
             create_metadata_for_mint, create_mint_with_extensions, init_collection,
             ResourceMetadataArgs,
         },
-        Resource, ResourseKind,
+        Resource, ResourceKind,
     },
     anchor_lang::prelude::*,
     anchor_spl::token_interface::Token2022,
@@ -44,7 +44,7 @@ pub struct CreateResource<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct CreateResourceArgs {
-    pub kind: ResourseKind,
+    pub kind: ResourceKind,
     pub metadata: ResourceMetadataArgs,
 }
 
@@ -53,7 +53,7 @@ pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -
     let token_program = &ctx.accounts.token_program.to_account_info();
 
     let decimals = match &args.kind {
-        ResourseKind::Fungible { decimals } => *decimals,
+        ResourceKind::Fungible { decimals } => *decimals,
         _ => 0,
     };
 
@@ -84,7 +84,7 @@ pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -
         args.metadata,
     )?;
 
-    if let ResourseKind::INF { supply, .. } = &args.kind {
+    if let ResourceKind::INF { supply, .. } = &args.kind {
         msg!("Creating the group account for the mint.");
         // create the metadata account for the mint
         init_collection(

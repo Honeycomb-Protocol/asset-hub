@@ -2,7 +2,7 @@ use {
     crate::{
         errors::ResourceErrorCode,
         utils::{use_burn_resource, use_mint_resource},
-        BurnResourceArgs, HoldingAccountArgs, MintResourceArgs, Recipe, Resource, ResourseKind,
+        BurnResourceArgs, HoldingAccountArgs, MintResourceArgs, Recipe, Resource, ResourceKind,
     },
     anchor_lang::prelude::*,
     anchor_spl::token_2022::Token2022,
@@ -128,16 +128,16 @@ pub fn craft_recipe<'info>(
 
             let holding_state = resource.1 .0.to_owned().unwrap();
             let args = match resource.0.kind {
-                ResourseKind::Fungible { .. } => BurnResourceArgs::Fungible {
+                ResourceKind::Fungible { .. } => BurnResourceArgs::Fungible {
                     holding_state: holding_state,
                     amount: input.amount,
                 },
 
-                ResourseKind::INF { .. } => BurnResourceArgs::INF {
+                ResourceKind::INF { .. } => BurnResourceArgs::INF {
                     holding_state: holding_state,
                 },
 
-                ResourseKind::NonFungible => BurnResourceArgs::INF {
+                ResourceKind::NonFungible => BurnResourceArgs::INF {
                     holding_state: holding_state,
                 },
             };
@@ -157,17 +157,17 @@ pub fn craft_recipe<'info>(
     }
 
     let args = match &ctx.accounts.output_resource.kind {
-        ResourseKind::Fungible { .. } => MintResourceArgs::Fungible {
+        ResourceKind::Fungible { .. } => MintResourceArgs::Fungible {
             holding_state: output_stats.0,
             amount: recipe.output.amount,
         },
 
-        ResourseKind::INF { .. } => MintResourceArgs::INF {
+        ResourceKind::INF { .. } => MintResourceArgs::INF {
             holding_state: output_stats.0,
             characteristics: recipe.output_characteristics.to_owned(),
         },
 
-        ResourseKind::NonFungible => MintResourceArgs::INF {
+        ResourceKind::NonFungible => MintResourceArgs::INF {
             holding_state: output_stats.0,
             characteristics: recipe.output_characteristics.to_owned(),
         },

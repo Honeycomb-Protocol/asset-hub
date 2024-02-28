@@ -1,6 +1,6 @@
 use {
     crate::{
-        errors::ResourceErrorCode, Recipe, Resource, ResourceAmountPair, ResourseKind, XpPair,
+        errors::ResourceErrorCode, Recipe, Resource, ResourceAmountPair, ResourceKind, XpPair,
     },
     anchor_lang::prelude::*,
     anchor_spl::token_2022::Token2022,
@@ -72,7 +72,7 @@ pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipeArgs
     msg!("creating recipe account...");
 
     let kind = &ctx.accounts.output_resource.kind;
-    if let ResourseKind::INF {
+    if let ResourceKind::INF {
         characteristics: _,
         supply: _,
     } = kind

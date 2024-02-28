@@ -19,13 +19,13 @@ pub struct Resource {
     pub merkle_trees: ControlledMerkleTrees,
 
     // the characteristics of this resource
-    pub kind: ResourseKind,
+    pub kind: ResourceKind,
 }
 
 impl Resource {
     pub const LEN: usize = 8 + 1 + 32 + 32 + 1 + 4;
 
-    pub fn get_size(kind: &ResourseKind) -> usize {
+    pub fn get_size(kind: &ResourceKind) -> usize {
         let mut size = Self::LEN;
         size += kind.try_to_vec().unwrap().len();
         size += super::Holding::schema().size_for_borsh();
@@ -36,7 +36,7 @@ impl Resource {
         self.bump = 0;
         self.project = Pubkey::default();
         self.mint = Pubkey::default();
-        self.kind = ResourseKind::Fungible { decimals: 0 };
+        self.kind = ResourceKind::Fungible { decimals: 0 };
         self.merkle_trees = ControlledMerkleTrees {
             active: 0,
             merkle_trees: Vec::new(),
@@ -57,7 +57,7 @@ impl Resource {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema)]
-pub enum ResourseKind {
+pub enum ResourceKind {
     Fungible {
         decimals: u8,
     },
@@ -70,9 +70,9 @@ pub enum ResourseKind {
     NonFungible,
 }
 
-impl ResourseKind {
+impl ResourceKind {
     pub fn match_characteristics(&self, array: &HashMap<String, String>) -> bool {
-        if let ResourseKind::INF {
+        if let ResourceKind::INF {
             characteristics,
             supply: _,
         } = self

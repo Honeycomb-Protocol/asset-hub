@@ -8,10 +8,7 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import {
-  NonFungibleHolding,
-  nonFungibleHoldingBeet,
-} from './NonFungibleHolding'
+import { NonFungibleHolder, nonFungibleHolderBeet } from './NonFungibleHolder'
 /**
  * This type is used to derive the {@link Holding} type as well as the de/serializer.
  * However don't refer to it in your code but use the {@link Holding} type instead.
@@ -23,7 +20,7 @@ import {
  */
 export type HoldingRecord = {
   Fungible: { holder: web3.PublicKey; balance: beet.bignum }
-  INF: { holder: NonFungibleHolding; characteristics: Map<string, string> }
+  INF: { holder: NonFungibleHolder; characteristics: Map<string, string> }
 }
 
 /**
@@ -65,7 +62,7 @@ export const holdingBeet = beet.dataEnum<HoldingRecord>([
     'INF',
     new beet.FixableBeetArgsStruct<HoldingRecord['INF']>(
       [
-        ['holder', nonFungibleHoldingBeet],
+        ['holder', nonFungibleHolderBeet],
         ['characteristics', beet.map(beet.utf8String, beet.utf8String)],
       ],
       'HoldingRecord["INF"]'

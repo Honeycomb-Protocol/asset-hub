@@ -6,13 +6,13 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-import { ResourseKind, resourseKindBeet } from './ResourseKind'
+import { ResourceKind, resourceKindBeet } from './ResourceKind'
 import {
   ResourceMetadataArgs,
   resourceMetadataArgsBeet,
 } from './ResourceMetadataArgs'
 export type CreateResourceArgs = {
-  kind: ResourseKind
+  kind: ResourceKind
   metadata: ResourceMetadataArgs
 }
 
@@ -23,7 +23,7 @@ export type CreateResourceArgs = {
 export const createResourceArgsBeet =
   new beet.FixableBeetArgsStruct<CreateResourceArgs>(
     [
-      ['kind', resourseKindBeet],
+      ['kind', resourceKindBeet],
       ['metadata', resourceMetadataArgsBeet],
     ],
     'CreateResourceArgs'
