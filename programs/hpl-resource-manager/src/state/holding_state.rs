@@ -13,7 +13,7 @@ pub enum Holding {
     },
 
     INF {
-        holder: NonFungibleHolding,
+        holder: NonFungibleHolder,
         characteristics: HashMap<String, String>,
     },
 }
@@ -23,8 +23,8 @@ impl Holding {
         match self {
             Holding::Fungible { balance, .. } => *balance,
             Holding::INF { holder, .. } => match holder {
-                NonFungibleHolding::Eject { .. } => 0,
-                NonFungibleHolding::Holder(_) => 1,
+                NonFungibleHolder::Eject { .. } => 0,
+                NonFungibleHolder::Holder(_) => 1,
             },
         }
     }
@@ -33,8 +33,8 @@ impl Holding {
         match self {
             Holding::Fungible { holder, .. } => *holder,
             Holding::INF { holder, .. } => match holder {
-                NonFungibleHolding::Eject { holder, .. } => *holder,
-                NonFungibleHolding::Holder(holder) => *holder,
+                NonFungibleHolder::Eject { holder, .. } => *holder,
+                NonFungibleHolder::Holder(holder) => *holder,
             },
         }
     }
@@ -53,7 +53,7 @@ impl Holding {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema, ToNode)]
-pub enum NonFungibleHolding {
+pub enum NonFungibleHolder {
     Holder(Pubkey),
     Eject { mint: Pubkey, holder: Pubkey },
 }

@@ -1,7 +1,7 @@
 use {
     crate::{
         errors::ResourceErrorCode, Holding, HoldingAccountArgs, MintResourceArgs,
-        NonFungibleHolding, Resource,
+        NonFungibleHolder, Resource,
     },
     anchor_lang::prelude::*,
     hpl_toolkit::{
@@ -78,7 +78,7 @@ pub fn mint_non_fungible_resource<'info>(
 
     msg!("Minting Non Fungible Resource");
     let holding_account = Holding::INF {
-        holder: NonFungibleHolding::Holder(owner.key()),
+        holder: NonFungibleHolder::Holder(owner.key()),
         characteristics: characteristics.into_iter().collect(),
     };
 
