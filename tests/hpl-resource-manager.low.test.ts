@@ -440,13 +440,13 @@ describe("Resource Manager", () => {
       for (const resource of resources) {
         const ix = createMintResourceInstruction(
           {
-            project: adminHC.project().address,
             mint: resource.mint,
             merkleTree: resource.tree,
             resource: resource.resource,
-            owner: adminHC.identity().address,
             authority: adminHC.identity().address,
             payer: adminHC.identity().address,
+            owner: adminHC.identity().address,
+            project: adminHC.project().address,
             clock: SYSVAR_CLOCK_PUBKEY,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
             logWrapper: SPL_NOOP_PROGRAM_ID,
@@ -483,7 +483,7 @@ describe("Resource Manager", () => {
       }
     });
 
-    it.skip("Burn Resource", async () => {
+    it("Burn Resource", async () => {
       const resources = data.fungible.resources.filter(
         (e) => e.flags.isBurned === false
       );
@@ -491,6 +491,8 @@ describe("Resource Manager", () => {
         const _resource = (await getCompressedAccountsByTree(resource.tree)).at(
           -1
         )!;
+
+        console.log(_resource, "_resource");
 
         const proff = (await getAssetProof(
           Number(_resource.leaf_idx),
@@ -502,9 +504,9 @@ describe("Resource Manager", () => {
             mint: resource.mint,
             merkleTree: resource.tree,
             resource: resource.resource,
-            authority: adminHC.identity().address,
-            owner: adminHC.identity().address,
             payer: adminHC.identity().address,
+            owner: adminHC.identity().address,
+            authority: adminHC.identity().address,
             project: adminHC.project().address,
             clock: SYSVAR_CLOCK_PUBKEY,
             rentSysvar: SYSVAR_RENT_PUBKEY,
@@ -690,7 +692,7 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it("Craft Recipe", async () => {
+    it("Craft Recipie", async () => {
       if (!lookupTable) throw new Error("Lookup Table not found");
       if (!data.fungible.recipe.address) throw new Error("No Recipe Found");
       if (data.fungible.resources.length === 0)
@@ -706,6 +708,8 @@ describe("Resource Manager", () => {
         inputResourceFour: undefined,
         inputResourceThree: undefined,
         payer: adminHC.identity().address,
+        user: adminHC.identity().address,
+        wallet: adminHC.identity().address,
         project: adminHC.project().address,
         authority: adminHC.identity().address,
         clock: SYSVAR_CLOCK_PUBKEY,
