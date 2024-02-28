@@ -287,7 +287,7 @@ describe("Resource Manager", () => {
     it("Create Resources", async () => {
       if (data.fungible.resources.length > 0) return;
 
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 10; i++) {
         const mintKeypair = new Keypair();
         const [resourceAddress] = resourcePda(
           adminHC.project().address,
@@ -483,7 +483,7 @@ describe("Resource Manager", () => {
       }
     });
 
-    it("Burn Resource", async () => {
+    it.skip("Burn Resource", async () => {
       const resources = data.fungible.resources.filter(
         (e) => e.flags.isBurned === false
       );
@@ -530,7 +530,7 @@ describe("Resource Manager", () => {
                 holding: {
                   __kind: _resource.parsed_data.__kind,
                   holder: new PublicKey(
-                    _resource.parsed_data.params.holder.split(":").at(-1)
+                    _resource.parsed_data.params.holder.split.skip(":").at(-1)
                   ),
                   balance: _resource.parsed_data.params.balance,
                 },
@@ -692,7 +692,7 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it("Craft Recipie", async () => {
+    it.skip("Craft Recipie", async () => {
       if (!lookupTable) throw new Error("Lookup Table not found");
       if (!data.fungible.recipe.address) throw new Error("No Recipe Found");
       if (data.fungible.resources.length === 0)

@@ -1,23 +1,20 @@
-import base58 from "bs58";
-import * as web3 from "@solana/web3.js";
 import { Honeycomb, HoneycombProject } from "@honeycomb-protocol/hive-control";
-import getHoneycombs from "../scripts/prepare";
-import { createNewTree, mintOneCNFT } from "./helpers";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
+import * as web3 from "@solana/web3.js";
+import base58 from "bs58";
+import getHoneycombs from "../scripts/prepare";
+import { createNewTree, mintOneCNFT } from "./helpers";
 
 import { Client, cacheExchange, fetchExchange } from "@urql/core";
 
-import {
-  HplCharacter,
-  HplCharacterModel,
-  createNewCharacterModelOperation,
-  createWrapAssetOperation,
-  fetchHeliusAssets,
-  createUnwrapAssetOperation,
-  createCreateNewCharactersTreeOperation,
-} from "../packages/hpl-character-manager";
 import createEdgeClient from "@honeycomb-protocol/edge-client/client";
+import {
+  HplCharacterModel,
+  createCreateNewCharactersTreeOperation,
+  createNewCharacterModelOperation,
+  fetchHeliusAssets,
+} from "../packages/hpl-character-manager";
 
 jest.setTimeout(200000);
 
