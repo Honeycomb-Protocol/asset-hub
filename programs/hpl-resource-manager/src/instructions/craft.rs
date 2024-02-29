@@ -124,7 +124,7 @@ pub fn craft_recipe<'info>(
     // burning the input resources
     for input in recipe.inputs.iter() {
         if let Some(resource) = resource_map.get_mut(&input.resource) {
-            msg!("burning the input resources {:?}", resource.1 .1.key());
+            msg!("burning the input resources {:?}", resource.0.key());
 
             let holding_state = resource.1 .0.to_owned().unwrap();
             let args = match resource.0.kind {
