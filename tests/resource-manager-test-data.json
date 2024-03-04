@@ -1,0 +1,13 @@
+{
+  "project": "7ZicXvpLyK7atrYKX2EV7XuSFCTec9Y5YFh57NiUevYT",
+  "fungible": {
+    "lookupTableAddress": null,
+    "recipe": { "address": null, "isCrafted": false },
+    "resources": []
+  },
+  "nonFungible": {
+    "lookupTableAddress": null,
+    "recipe": { "address": null, "isCrafted": false },
+    "resources": []
+  }
+}

@@ -545,6 +545,12 @@
             "type": "publicKey"
           },
           {
+            "name": "metadata",
+            "type": {
+              "defined": "ResourceMetadataArgs"
+            }
+          },
+          {
             "name": "merkleTrees",
             "docs": [
               "token account trees"

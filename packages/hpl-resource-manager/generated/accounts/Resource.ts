@@ -9,6 +9,10 @@ import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
 import {
+  ResourceMetadataArgs,
+  resourceMetadataArgsBeet,
+} from '../types/ResourceMetadataArgs'
+import {
   ControlledMerkleTrees,
   controlledMerkleTreesBeet,
 } from '../types/ControlledMerkleTrees'
@@ -23,6 +27,7 @@ export type ResourceArgs = {
   bump: number
   project: web3.PublicKey
   mint: web3.PublicKey
+  metadata: ResourceMetadataArgs
   merkleTrees: ControlledMerkleTrees
   kind: ResourceKind
 }
@@ -40,6 +45,7 @@ export class Resource implements ResourceArgs {
     readonly bump: number,
     readonly project: web3.PublicKey,
     readonly mint: web3.PublicKey,
+    readonly metadata: ResourceMetadataArgs,
     readonly merkleTrees: ControlledMerkleTrees,
     readonly kind: ResourceKind
   ) {}
@@ -52,6 +58,7 @@ export class Resource implements ResourceArgs {
       args.bump,
       args.project,
       args.mint,
+      args.metadata,
       args.merkleTrees,
       args.kind
     )
@@ -165,6 +172,7 @@ export class Resource implements ResourceArgs {
       bump: this.bump,
       project: this.project.toBase58(),
       mint: this.mint.toBase58(),
+      metadata: this.metadata,
       merkleTrees: this.merkleTrees,
       kind: this.kind.__kind,
     }
@@ -186,6 +194,7 @@ export const resourceBeet = new beet.FixableBeetStruct<
     ['bump', beet.u8],
     ['project', beetSolana.publicKey],
     ['mint', beetSolana.publicKey],
+    ['metadata', resourceMetadataArgsBeet],
     ['merkleTrees', controlledMerkleTreesBeet],
     ['kind', resourceKindBeet],
   ],

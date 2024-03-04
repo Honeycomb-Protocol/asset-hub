@@ -6,7 +6,7 @@ anchor_template = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [provider]
 cluster = "devnet"
-wallet = "key.json"
+wallet = "authority.json"
 
 [scripts]
 test = "yarn test"
