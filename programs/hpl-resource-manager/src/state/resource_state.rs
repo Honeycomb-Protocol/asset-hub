@@ -1,4 +1,5 @@
 use {
+    crate::utils::ResourceMetadataArgs,
     anchor_lang::prelude::*,
     hpl_toolkit::{compression::ControlledMerkleTrees, schema::*},
 };
@@ -15,6 +16,8 @@ pub struct Resource {
     /// The mint of this resource
     pub mint: Pubkey,
 
+    pub metadata: ResourceMetadataArgs,
+
     /// token account trees
     pub merkle_trees: ControlledMerkleTrees,
 
@@ -25,10 +28,11 @@ pub struct Resource {
 impl Resource {
     pub const LEN: usize = 8 + 1 + 32 + 32 + 1 + 4;
 
-    pub fn get_size(kind: &ResourceKind) -> usize {
+    pub fn get_size(kind: &ResourceKind, metadata: &ResourceMetadataArgs) -> usize {
         let mut size = Self::LEN;
         size += kind.try_to_vec().unwrap().len();
         size += super::Holding::schema().size_for_borsh();
+        size += metadata.try_to_vec().unwrap().len();
         size
     }
 
@@ -36,6 +40,11 @@ impl Resource {
         self.bump = 0;
         self.project = Pubkey::default();
         self.mint = Pubkey::default();
+        self.metadata = ResourceMetadataArgs {
+            name: "".to_string(),
+            symbol: "".to_string(),
+            uri: "".to_string(),
+        };
         self.kind = ResourceKind::Fungible { decimals: 0 };
         self.merkle_trees = ControlledMerkleTrees {
             active: 0,

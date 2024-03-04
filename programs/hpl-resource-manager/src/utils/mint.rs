@@ -132,6 +132,11 @@ pub fn mint_fungible_resource<'info>(
 
         let new_holding_state;
         if let Holding::Fungible { holder, balance } = holding_state.holding {
+            msg!(
+                "Minting with the holding state current balance {:?} and amount {:?}",
+                balance,
+                amount
+            );
             new_holding_state = Holding::Fungible {
                 holder: holder,
                 balance: balance + amount,
@@ -163,13 +168,13 @@ pub fn mint_fungible_resource<'info>(
             Some(&[&signer_seeds[..]]),
         )?;
     } else {
-        msg!("Minting without the holding state");
+        msg!("Minting without the holding state {:?}", amount);
+
         let holding_account = Holding::Fungible {
             holder: owner.key.to_owned(),
             balance: *amount,
         };
 
-        msg!("Event Stream ");
         // event
         let event = CompressedDataEvent::Leaf {
             slot: clock.slot,
@@ -180,7 +185,6 @@ pub fn mint_fungible_resource<'info>(
         };
         event.wrap(&log_wrapper)?;
 
-        msg!("Compressing the holding account");
         // create the compressed token account using controlled merkle tree
         let compressed_holding = holding_account.to_compressed();
         let bump_binding = [resource.bump];

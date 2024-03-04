@@ -22,7 +22,7 @@ pub struct CreateResource<'info> {
         init,
         payer = payer,
         seeds = [b"resource".as_ref(), project.key().as_ref(), mint.key().as_ref()],
-        space = Resource::get_size(&args.kind),
+        space = Resource::get_size(&args.kind, &args.metadata),
         bump,
     )]
     pub resource: Box<Account<'info, Resource>>,
@@ -60,6 +60,7 @@ pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -
     // create resource account
     resource.set_defaults();
     resource.bump = ctx.bumps.resource;
+    resource.metadata = args.metadata.to_owned();
     resource.project = ctx.accounts.project.key();
     resource.mint = ctx.accounts.mint.key();
     resource.kind = args.kind.to_owned();

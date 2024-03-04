@@ -1,7 +1,7 @@
 use {
     crate::{Resource, ResourceKind},
     anchor_lang::prelude::*,
-    hpl_toolkit::HashMap,
+    hpl_toolkit::{schema::*, HashMap},
     spl_token_2022::{
         extension::{group_member_pointer, group_pointer, metadata_pointer, ExtensionType},
         instruction::{
@@ -210,7 +210,7 @@ pub fn create_mint_with_extensions<'info>(
     Ok(mint_data)
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, ToSchema)]
 pub struct ResourceMetadataArgs {
     pub name: String,
     pub symbol: String,
