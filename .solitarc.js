@@ -541,6 +541,53 @@ const configs = {
             ],
           },
         },
+        {
+          name: "PlatformData",
+          type: {
+            kind: "struct",
+            fields: [
+              {
+                name: "custom",
+                type: {
+                  hashMap: [
+                    "string",
+                    {
+                      vec: "string",
+                    },
+                  ],
+                },
+              },
+              {
+                name: "xp",
+                type: "u64",
+              },
+              {
+                name: "achievements",
+                type: {
+                  vec: "u32",
+                },
+              },
+            ],
+          },
+        },
+        {
+          name: "Wallets",
+          type: {
+            kind: "struct",
+            fields: [
+              {
+                name: "shadow",
+                type: "publicKey",
+              },
+              {
+                name: "wallets",
+                type: {
+                  vec: "publicKey",
+                },
+              },
+            ],
+          },
+        },
       ],
     }
   ),

@@ -16,3 +16,4 @@ deployments.json
 .env
 *keys*
 .cargo
+*json*

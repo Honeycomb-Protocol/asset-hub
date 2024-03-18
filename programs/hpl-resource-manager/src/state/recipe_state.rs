@@ -64,3 +64,9 @@ pub struct XpPair {
 
     pub increament: u64,
 }
+
+#[account]
+pub struct RecipeProof {
+    // compressed user leaf node
+    pub user: [u8; 32],
+}

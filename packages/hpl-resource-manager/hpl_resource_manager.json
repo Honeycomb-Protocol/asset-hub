@@ -284,109 +284,6 @@
       ]
     },
     {
-      "name": "craftRecipe",
-      "accounts": [
-        {
-          "name": "project",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "recipe",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "wallet",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "rentSysvar",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "clock",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "logWrapper",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "compressionProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "outputResource",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "inputResourceOne",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "inputResourceTwo",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "inputResourceThree",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "inputResourceFour",
-          "isMut": false,
-          "isSigner": false,
-          "isOptional": true
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "vec": {
-              "defined": "CraftRecipeArg"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "initilizeRecipe",
       "accounts": [
         {
@@ -466,6 +363,198 @@
           }
         }
       ]
+    },
+    {
+      "name": "craftBurnRecipe",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipe",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipeProof",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputResourceOne",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "inputResourceTwo",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "inputResourceThree",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "inputResourceFour",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CraftBurnRecipeArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "craftMintRecipe",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipe",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipeProof",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "outputResource",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "wallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rentSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "instructionsSysvar",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "vault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "hiveControl",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "HIVE CONTROL PROGRAM"
+          ]
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CraftMintRecipeArgs"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -512,6 +601,23 @@
               "hashMap": [
                 "string",
                 "string"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RecipeProof",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": {
+              "array": [
+                "u8",
+                32
               ]
             }
           }
@@ -571,12 +677,73 @@
   ],
   "types": [
     {
-      "name": "CraftRecipeArg",
+      "name": "CraftMintProfileParams",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "holdingState",
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "leafIdx",
+            "type": "u32"
+          },
+          {
+            "name": "identity",
+            "type": "string"
+          },
+          {
+            "name": "info",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "customData",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "platformData",
+            "type": {
+              "defined": "PlatformData"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CraftMintRecipeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": {
+              "defined": "CraftResourceUserParams"
+            }
+          },
+          {
+            "name": "profile",
+            "type": {
+              "defined": "CraftMintProfileParams"
+            }
+          },
+          {
+            "name": "holding",
             "type": {
               "option": {
                 "defined": "HoldingAccountArgs"
@@ -585,7 +752,92 @@
           },
           {
             "name": "proofSize",
+            "type": {
+              "array": [
+                "u8",
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CraftResourceUserParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "leafIdx",
+            "type": "u32"
+          },
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "infoHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "wallets",
+            "type": {
+              "defined": "Wallets"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CraftBurnHoldingParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "holdingState",
+            "type": {
+              "defined": "HoldingAccountArgs"
+            }
+          },
+          {
+            "name": "proofSize",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CraftBurnRecipeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": {
+              "defined": "CraftResourceUserParams"
+            }
+          },
+          {
+            "name": "holdings",
+            "type": {
+              "vec": {
+                "defined": "CraftBurnHoldingParams"
+              }
+            }
           }
         ]
       }
@@ -1260,6 +1512,53 @@
                 }
               }
             ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlatformData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "custom",
+            "type": {
+              "hashMap": [
+                "string",
+                {
+                  "vec": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "xp",
+            "type": "u64"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "vec": "u32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Wallets",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "shadow",
+            "type": "publicKey"
+          },
+          {
+            "name": "wallets",
+            "type": {
+              "vec": "publicKey"
+            }
           }
         ]
       }

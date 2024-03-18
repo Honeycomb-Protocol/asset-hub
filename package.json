@@ -35,9 +35,9 @@
     "publishall": "node ./scripts/publishall.js"
   },
   "dependencies": {
-    "@honeycomb-protocol/edge-client": "^0.0.4-beta.6",
+    "@honeycomb-protocol/edge-client": "^0.0.6-beta.10",
     "@honeycomb-protocol/events": "^0.1.21",
-    "@honeycomb-protocol/hive-control": "^0.2.16",
+    "@honeycomb-protocol/hive-control": "^0.2.19-beta.4",
     "@metaplex-foundation/js": "^0.19.5",
     "@metaplex-foundation/mpl-bubblegum": "^0.7.0",
     "@metaplex-foundation/mpl-candy-guard": "^0.5.0",
@@ -48,6 +48,7 @@
     "@solana/spl-token": "^0.3.11",
     "@solana/web3.js": "^1.87.1",
     "@urql/core": "^4.2.3",
+    "bs58": "^5.0.0",
     "keccak": "^3.0.4",
     "yargs": "^17.6.2"
   },

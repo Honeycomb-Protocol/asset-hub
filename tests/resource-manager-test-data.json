@@ -1,9 +1,70 @@
 {
-  "project": "7ZicXvpLyK7atrYKX2EV7XuSFCTec9Y5YFh57NiUevYT",
+  "project": "DeizurDufRWcSG7kgGWS8ko4pwjpZD5FGkaxamkQzc3R",
   "fungible": {
     "lookupTableAddress": null,
     "recipe": { "address": null, "isCrafted": false },
-    "resources": []
+    "resources": [
+      {
+        "label": "outputResource",
+        "resource": "FLusytGo3pn6HQWA9vZRDWGW2SHYB49TRLLxyMJ1YQ6w",
+        "mint": "GjmFoaZb9XTnS3RoDQ3vrCFy2c7pTNUp47epc3QKTqf3",
+        "tree": "FE8DBRhGRsXeMGH6ZRQY9T4i5QzcSQ7KmhXsGw67v3HM",
+        "flags": {
+          "isMinted": false,
+          "isBurned": false,
+          "isWrapped": false,
+          "isUnWrapped": false
+        }
+      },
+      {
+        "label": "inputResourceOne",
+        "resource": "7HhnssRGhQScGwJkNvgfkY1LFRwU9Ezkyw5yhHn9csoq",
+        "mint": "BDHAngDSRboGXPafYWSVVcGA4ZodsfE2CquJ9s1hTBwo",
+        "tree": "2hT2bdJvKpzT1MmWQBs2n5zJhnAzi68x49Y9Gd5JmfLb",
+        "flags": {
+          "isMinted": false,
+          "isBurned": false,
+          "isWrapped": false,
+          "isUnWrapped": false
+        }
+      },
+      {
+        "label": "inputResourceTwo",
+        "resource": "24aZ1UEfcNRNFzkCTtuFwxKavM6gZSs3BQ4VPbeqf7Mf",
+        "mint": "GzqhfK98qtw9KxerNNSe2npCeJVkhhXd5ph2q1n5Ds1q",
+        "tree": "61fxQQhQKHheaYgfAkQCoDTYbG8nnLhsiaVYLp3sDFdD",
+        "flags": {
+          "isMinted": false,
+          "isBurned": false,
+          "isWrapped": false,
+          "isUnWrapped": false
+        }
+      },
+      {
+        "label": "inputResourceThree",
+        "resource": "H8MSMPMZodbyHJ88QNjznFdP9ZpJFmBW6ktzZpYVzkfw",
+        "mint": "5bxsKiTcdmX8V7EYeH7ssKwVWSmCHfTQLubpKh7HDJzG",
+        "tree": "6wZM5hUmsBhYpF1B36o7Z9ChvekD79YJjp6w922rToE3",
+        "flags": {
+          "isMinted": false,
+          "isBurned": false,
+          "isWrapped": false,
+          "isUnWrapped": false
+        }
+      },
+      {
+        "label": "inputResourceFour",
+        "resource": "krk4FufwM9sJ3NWAmq8n7xf9tuvugeSS1pLyptK69Bo",
+        "mint": "4oKSw7E4YBdHQ5Y9UvpnKVVF92fzkLW3kJXgLwYpaurw",
+        "tree": "AyynW29nuPP3SkqYQrVMiWXY33ZoQssBpYdMpqu7HUUq",
+        "flags": {
+          "isMinted": false,
+          "isBurned": false,
+          "isWrapped": false,
+          "isUnWrapped": false
+        }
+      }
+    ]
   },
   "nonFungible": {
     "lookupTableAddress": null,

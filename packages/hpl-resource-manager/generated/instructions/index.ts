@@ -1,5 +1,6 @@
 export * from './burnResource'
-export * from './craftRecipe'
+export * from './craftBurnRecipe'
+export * from './craftMintRecipe'
 export * from './createResource'
 export * from './initilizeRecipe'
 export * from './initilizeResourceTree'

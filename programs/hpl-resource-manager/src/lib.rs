@@ -55,17 +55,24 @@ pub mod hpl_resource_manager {
     //     instructions::unwrap_resource(ctx, args)
     // }
 
-    pub fn craft_recipe<'info>(
-        ctx: Context<'_, '_, '_, 'info, CraftRecipe<'info>>,
-        args: Vec<CraftRecipeArg>,
-    ) -> Result<()> {
-        instructions::craft_recipe(ctx, args)
-    }
-
     pub fn initilize_recipe(
         ctx: Context<InitilizeRecipe>,
         args: InitilizeRecipeArgs,
     ) -> Result<()> {
         instructions::initilize_recipe(ctx, args)
+    }
+
+    pub fn craft_burn_recipe<'info>(
+        ctx: Context<'_, '_, '_, 'info, CraftBurnRecipe<'info>>,
+        args: CraftBurnRecipeArgs,
+    ) -> Result<()> {
+        instructions::craft_burn_recipe(ctx, args)
+    }
+
+    pub fn craft_mint_recipe<'info>(
+        ctx: Context<'_, '_, '_, 'info, CraftMintRecipe<'info>>,
+        args: CraftMintRecipeArgs,
+    ) -> Result<()> {
+        instructions::craft_mint_recipe(ctx, args)
     }
 }

@@ -1,10 +1,23 @@
-import createEdgeClient from "@honeycomb-protocol/edge-client/client";
+import base58 from "bs58";
+import createEdgeClient, {
+  Holding,
+  PlatformData,
+  Profile,
+  ProfileInfo,
+  Proof,
+  Transaction,
+  User,
+  UserInfo,
+  Wallets,
+} from "@honeycomb-protocol/edge-client/client";
 import {
+  HPL_HIVE_CONTROL_PROGRAM,
   Honeycomb,
   HoneycombProject,
   KeypairLike,
   METADATA_PROGRAM_ID,
   Operation,
+  VAULT,
   lutModule,
 } from "@honeycomb-protocol/hive-control";
 import { PublicKey } from "@metaplex-foundation/js";
@@ -19,45 +32,42 @@ import {
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import {
-  AddressLookupTableAccount,
-  AddressLookupTableProgram,
-  ComputeBudgetProgram,
-  Keypair,
-  LAMPORTS_PER_SOL,
-  SYSVAR_CLOCK_PUBKEY,
-  SYSVAR_INSTRUCTIONS_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  SystemProgram,
-} from "@solana/web3.js";
+import * as web3 from "@solana/web3.js";
 import { Client, cacheExchange, fetchExchange } from "@urql/core";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
 import {
-  CraftRecipeInstructionAccounts,
-  CraftRecipeArg,
   InitilizeRecipeInstructionAccounts,
   PROGRAM_ID,
   createBurnResourceInstruction,
-  createCraftRecipeInstruction,
+  createCraftBurnRecipeInstruction,
+  createCraftMintRecipeInstruction,
   createCreateResourceInstruction,
   createInitilizeRecipeInstruction,
   createInitilizeResourceTreeInstruction,
   createMintResourceInstruction,
 } from "../packages/hpl-resource-manager";
 import getHoneycombs from "../scripts/prepare";
+import {
+  arrayHash,
+  keccak256Hash,
+  optionHash,
+  stringHash,
+  u32Hash,
+  u64Hash,
+  u8Hash,
+} from "./hash";
 
 jest.setTimeout(6000000);
 
-const getClient = (rpcUrl = "https://edge.eboy.dev") =>
-  createEdgeClient(
-    new Client({
-      url: rpcUrl,
-      exchanges: [cacheExchange, fetchExchange],
-    })
-  );
+const edgeClient = createEdgeClient(
+  new Client({
+    url: "http://localhost:4000",
+    exchanges: [cacheExchange, fetchExchange],
+  })
+);
 
-/** UTILS */
-export const resourcePda = (
+/**  ************************* PDA FUNCTIONS ************************* */
+const resourcePda = (
   project: PublicKey,
   mint: PublicKey,
   programId = PROGRAM_ID
@@ -68,7 +78,7 @@ export const resourcePda = (
   );
 };
 
-export const recipePda = (
+const recipePda = (
   project: PublicKey,
   key: PublicKey,
   programId = PROGRAM_ID
@@ -79,55 +89,77 @@ export const recipePda = (
   );
 };
 
-async function getCompressedData(leafIdx: number, tree: PublicKey) {
-  const client = getClient();
+/**  ************************* HASH FUNCTIONS ************************* */
+const profileHash = (profile: Profile): Buffer =>
+  keccak256Hash([
+    new web3.PublicKey(profile.project).toBuffer(),
+    u64Hash(profile.userId),
+    stringHash(profile.identity),
+    profileInfoHash(profile.info),
+    platformDataHash(profile.platformData),
+    customDataHash(profile.customData),
+  ]);
 
-  const {
-    compressedAccount: [data],
-  } = await client.findCompressedAccounts({
-    leaf: {
-      index: String(leafIdx),
-      tree: tree.toBase58(),
-    },
-  });
+const profileInfoHash = (info: ProfileInfo): Buffer =>
+  keccak256Hash([
+    optionHash(info.name, stringHash),
+    optionHash(info.bio, stringHash),
+    optionHash(info.pfp, stringHash),
+  ]);
 
-  if (!data) return;
+const platformDataHash = (platformData: PlatformData): Buffer =>
+  keccak256Hash([
+    customDataHash(platformData.custom),
+    arrayHash(platformData.achievements, u32Hash),
+    u64Hash(platformData.xp),
+  ]);
 
-  return data;
-}
+const customDataHash = (customData: { [key: string]: string[] }): Buffer =>
+  keccak256Hash(
+    Array.from(Object.entries(customData)).flatMap(([key, value]) => [
+      arrayHash(Array.from(stringHash(key)), u8Hash),
+      arrayHash(Array.from(arrayHash(value, stringHash)), u8Hash),
+    ])
+  );
 
+const walletsHash = (wallets: Wallets): Buffer =>
+  keccak256Hash([
+    new web3.PublicKey(wallets.shadow).toBuffer(),
+    arrayHash(wallets.wallets, (wallet) =>
+      new web3.PublicKey(wallet).toBuffer()
+    ),
+  ]);
+
+const userHash = (user: User): Buffer =>
+  keccak256Hash([
+    u64Hash(user.id),
+    userInfoHash(user.info),
+    walletsHash(user.wallets),
+  ]);
+
+const userInfoHash = (info: UserInfo): Buffer =>
+  keccak256Hash([
+    stringHash(info.username),
+    stringHash(info.name),
+    stringHash(info.bio),
+    stringHash(info.pfp),
+  ]);
+
+/************************ COMPRESSION  ************************* */
 async function getCompressedAccountsByTree(tree: PublicKey) {
-  const client = getClient();
-
-  const data = await client.findCompressedAccounts({
-    leaf: {
-      tree: tree.toBase58(),
-    },
-  });
-
-  return data.compressedAccount;
-}
-
-async function getCompressedAccountsByHolder(holder: PublicKey) {
-  const client = getClient();
-
-  const data = await client.findCompressedAccounts({
-    parsedData: {
-      holder: "pubkey:" + holder.toBase58(),
-    },
-    identity: {
-      accountName: "Holding",
-      programId: PROGRAM_ID.toBase58(),
-    },
+  const data = await edgeClient.findCompressedAccounts({
+    leaves: [
+      {
+        tree: tree.toBase58(),
+      },
+    ],
   });
 
   return data.compressedAccount;
 }
 
 async function getAssetProof(leafIdx: number, tree: PublicKey) {
-  const client = getClient();
-
-  const data = await client.fetchProofs({
+  const data = await edgeClient.fetchProofs({
     leaves: [
       {
         index: String(leafIdx),
@@ -141,6 +173,7 @@ async function getAssetProof(leafIdx: number, tree: PublicKey) {
   return data.proof[0];
 }
 
+/************************ TEST CACHE SCRIPT ************************* */
 interface Resource {
   label: string;
   resource: PublicKey;
@@ -153,8 +186,10 @@ interface Resource {
     isUnWrapped: boolean;
   };
 }
+
 interface TestData {
   project: PublicKey | null;
+  user: User | null;
   fungible: {
     lookupTableAddress: PublicKey | null;
     recipe: {
@@ -174,15 +209,41 @@ interface TestData {
   };
 }
 
+interface ResourcesDirectoryResource {
+  xp_gain: number;
+  level_req: number;
+  sell_price: number;
+  amount: number | null;
+  metadata: {
+    name: string;
+    symbol: string;
+    uri: string;
+  };
+  addresses: {
+    resource: string;
+    mint: string | null;
+    tree: string | null;
+    recipe: string | null;
+  };
+  material:
+    | {
+        symbol: string;
+        resource: string;
+        amount: number;
+      }[]
+    | undefined;
+}
+
 const fetchData = (): TestData => {
   if (existsSync("./tests/resource-manager-test-data.json")) {
     const fileData = JSON.parse(
       readFileSync("./tests/resource-manager-test-data.json").toString()
     ) as TestData;
 
-    const { fungible, nonFungible, project } = fileData;
+    const { fungible, nonFungible, project, user } = fileData;
     return {
       project: project && new PublicKey(project),
+      user: user,
       fungible: {
         lookupTableAddress:
           fungible?.lookupTableAddress &&
@@ -222,6 +283,7 @@ const fetchData = (): TestData => {
 
   return {
     project: null,
+    user: null,
     fungible: {
       lookupTableAddress: null,
       recipe: {
@@ -249,10 +311,53 @@ const saveData = (data: TestData) => {
   );
 };
 
+/************************ END ************************* */
+
+/************************ POPULATION SCRIPT ************************* */
+interface ResourcesDirectory {
+  ores: {
+    [key: string]: ResourcesDirectoryResource;
+  };
+  refine: {
+    [key: string]: ResourcesDirectoryResource;
+  };
+  craft: {
+    [key: string]: ResourcesDirectoryResource;
+  };
+}
+
+let resourceDir: ResourcesDirectory =
+  JSON.parse(readFileSync("./tests/resources.json").toString()) || {};
+
+const tempDir = {
+  ores: {},
+  refine: {},
+  craft: {},
+};
+
+const populateTempDir = (data: ResourcesDirectoryResource) => {
+  const name = data.metadata.name.toLocaleLowerCase();
+  if (name.includes("ore")) {
+    tempDir.ores[data.addresses.resource] = data;
+  } else if (name.includes("refine")) {
+    tempDir.refine[data.addresses.resource] = {
+      ...data,
+      amount: Math.floor(Math.random() * 100),
+    };
+  } else {
+    tempDir.craft[data.addresses.resource] = {
+      ...data,
+      amount: Math.floor(Math.random() * 100),
+    };
+  }
+};
+
+/************************ END ************************* */
+
 describe("Resource Manager", () => {
-  const data: TestData = fetchData();
   let adminHC: Honeycomb;
-  let lookupTable: AddressLookupTableAccount | null;
+  let lookupTable: web3.AddressLookupTableAccount | null;
+  const data: TestData = fetchData();
 
   beforeAll(async () => {
     const honeycombs = await getHoneycombs();
@@ -262,8 +367,6 @@ describe("Resource Manager", () => {
       adminHC.use(
         await HoneycombProject.new(adminHC, {
           name: "Resource Manager",
-          expectedMintAddresses: 0,
-          profileDataConfigs: [],
         })
       );
 
@@ -283,12 +386,464 @@ describe("Resource Manager", () => {
     );
   });
 
+  /** *************************** POPULATION SCRIPTS **************************** */
+
+  describe.skip("Population Scripts", () => {
+    it.skip("RESHAPE DATA", async () => {
+      const data = readdirSync("./tests/resources").flatMap((e) =>
+        readdirSync("./tests/resources/" + e).map((f) =>
+          JSON.parse(
+            readFileSync("./tests/resources/" + e + "/" + f).toString()
+          )
+        )
+      );
+
+      const dir = {
+        ores: {},
+        refine: {},
+        craft: {},
+      };
+      for (const resource of data) {
+        const name = resource.name.toLocaleLowerCase();
+        const reshape: ResourcesDirectoryResource = {
+          addresses: {
+            resource: resource.resource,
+            mint: null,
+            tree: null,
+            recipe: null,
+          },
+          amount: null,
+          material: resource.material,
+          level_req: resource.MinXpReq,
+          xp_gain: resource.XpGain,
+          sell_price: resource.SellPrice,
+          metadata: {
+            name: resource.name,
+            symbol: resource.symbol,
+            uri: resource.uri,
+          },
+        };
+
+        // saving the data to the respective directory
+        if (name.includes("ore")) {
+          dir.ores[resource.resource] = {
+            ...reshape,
+            material: undefined,
+          };
+        } else if (name.includes("refine")) {
+          dir.refine[resource.resource] = {
+            ...reshape,
+            amount: Math.floor(Math.random() * 100),
+            material: reshape.material?.map((e, i) => {
+              if (i > 1) return;
+              return {
+                ...e,
+                resource: data.find((r) => r.symbol === e.symbol)?.resource,
+              };
+            }),
+          };
+        } else {
+          dir.craft[resource.resource] = {
+            ...reshape,
+            amount: Math.floor(Math.random() * 100),
+            material: reshape.material?.map((e, i) => {
+              if (i > 1) return;
+              return {
+                ...e,
+                resource: data.find((r) => r.symbol === e.symbol)?.resource,
+              };
+            }),
+          };
+        }
+      }
+
+      // saving the data to the file
+      writeFileSync("./tests/resources.json", JSON.stringify(dir));
+    });
+
+    it.skip("Populate Resources", async () => {
+      const poulateJson = Object.keys(resourceDir).flatMap((key) =>
+        Object.values(resourceDir[key]).concat()
+      ) as ResourcesDirectoryResource[];
+
+      const batchSize = 15;
+      const batches = Math.ceil(poulateJson.length / batchSize);
+      const signatures: string[] = [];
+
+      for (let i = 0; i < batches; i++) {
+        const batch = poulateJson.slice(i * batchSize, (i + 1) * batchSize);
+
+        console.log("Populating Resources", i, "Batch");
+        const sigs: string[] = await Promise.all(
+          batch.map(async (dt) => {
+            const mintKeypair = new web3.Keypair();
+            const [resourceAddress] = resourcePda(
+              adminHC.project().address,
+              mintKeypair.publicKey,
+              PROGRAM_ID
+            );
+
+            const ix = createCreateResourceInstruction(
+              {
+                mint: mintKeypair.publicKey,
+                resource: resourceAddress,
+                project: adminHC.project().address,
+                authority: adminHC.identity().address,
+                payer: adminHC.identity().address,
+                rentSysvar: web3.SYSVAR_RENT_PUBKEY,
+                tokenProgram: TOKEN_2022_PROGRAM_ID,
+              },
+              {
+                args: {
+                  kind: {
+                    __kind: "Fungible",
+                    decimals: 6,
+                  },
+                  metadata: {
+                    name: dt.metadata.name,
+                    symbol: dt.metadata.symbol,
+                    uri: dt.metadata.uri,
+                  },
+                },
+              }
+            );
+
+            const op = new Operation(
+              adminHC,
+              [ix],
+              [adminHC.identity().signer as KeypairLike, mintKeypair]
+            );
+
+            const [{ signature }] = await op.send({
+              skipPreflight: true,
+              commitment: "processed",
+            });
+
+            // saving the data to the file
+            populateTempDir({
+              ...dt,
+              addresses: {
+                ...dt.addresses,
+                mint: mintKeypair.publicKey.toBase58(),
+                resource: resourceAddress.toBase58(),
+              },
+            });
+
+            return signature;
+          })
+        );
+
+        signatures.push(...sigs);
+      }
+
+      // fixing the material resource addresses
+      const tempData = Object.keys(tempDir).flatMap((key) =>
+        Object.values(tempDir[key]).concat()
+      ) as ResourcesDirectoryResource[];
+
+      for (const resource of tempData) {
+        if (!resource.material) continue;
+
+        for (const material of resource.material) {
+          if (!material || !material.symbol) continue;
+
+          const resourceData = tempData.find(
+            (e) => e.metadata.symbol === material.symbol
+          );
+
+          material.resource = resourceData?.addresses.resource || "";
+        }
+      }
+
+      // saving the data to the file
+      writeFileSync("./tests/resources.json", JSON.stringify(tempDir));
+
+      const length =
+        Object.keys(resourceDir.ores).length +
+        Object.keys(resourceDir.refine).length +
+        Object.keys(resourceDir.craft).length;
+      expect(length).toBe(signatures.length);
+    });
+
+    it.skip("Populate Recipe", async () => {
+      resourceDir = JSON.parse(
+        readFileSync("./tests/resources.json").toString()
+      ) as ResourcesDirectory;
+
+      const poulateJson = Object.keys(resourceDir).flatMap((key) =>
+        Object.values(resourceDir[key]).concat()
+      ) as ResourcesDirectoryResource[];
+
+      const batchSize = 15;
+      const batches = Math.ceil(poulateJson.length / batchSize);
+      const signatures: string[] = [];
+
+      for (let i = 0; i < batches; i++) {
+        const batch = poulateJson.slice(i * batchSize, (i + 1) * batchSize);
+
+        console.log("Populating Recipe", i, "Batch");
+        const sigs = await Promise.all(
+          batch.map(async (dt) => {
+            if (!dt.addresses.resource || !dt.material) return;
+
+            const key = web3.Keypair.generate();
+            const [recipeAddress] = recipePda(
+              adminHC.project().address,
+              key.publicKey
+            );
+
+            /// preparing the accounts for recipe
+            const accounts: InitilizeRecipeInstructionAccounts = {
+              key: key.publicKey,
+              recipe: recipeAddress,
+              outputResource: new PublicKey(dt.addresses.resource),
+              inputResourceOne: PublicKey.default,
+              inputResourceTwo: undefined,
+              inputResourceFour: undefined,
+              inputResourceThree: undefined,
+              payer: adminHC.identity().address,
+              project: adminHC.project().address,
+              authority: adminHC.identity().address,
+              rentSysvar: web3.SYSVAR_RENT_PUBKEY,
+              tokenProgram: TOKEN_2022_PROGRAM_ID,
+            };
+
+            const amounts: number[] = [100];
+            const materials = dt.material;
+            for (let i = 0; i < materials.length; i++) {
+              const resource = new PublicKey(materials[i].resource);
+
+              if (i === 0) {
+                accounts.inputResourceOne = resource;
+                amounts.push(materials[i].amount);
+                continue;
+              }
+
+              if (i === 1) {
+                accounts.inputResourceTwo = resource;
+                amounts.push(materials[i].amount);
+                break;
+              }
+            }
+
+            // instructions
+            const ix = createInitilizeRecipeInstruction(accounts, {
+              args: {
+                outputCharacteristics: new Map(),
+                amounts: amounts,
+                xp: {
+                  label: "XP",
+                  increament: dt.xp_gain,
+                },
+              },
+            });
+
+            const op = new Operation(
+              adminHC,
+              [ix],
+              [adminHC.identity().signer as KeypairLike]
+            );
+
+            const [{ signature }] = await op.send({
+              skipPreflight: true,
+              commitment: "processed",
+            });
+
+            // saving the data to the file
+            dt.addresses.recipe = recipeAddress.toBase58();
+            return signature;
+          })
+        );
+
+        signatures.push(...(sigs.filter((e) => e) as string[]));
+      }
+
+      // saving the data to the file
+      writeFileSync("./tests/resources.json", JSON.stringify(resourceDir));
+    });
+
+    it.skip("Populate Resource Tree", async () => {
+      const poulateJson = Object.keys(resourceDir).flatMap((key) =>
+        Object.values(resourceDir[key]).concat()
+      ) as ResourcesDirectoryResource[];
+
+      const batchSize = 15;
+      const batches = Math.ceil(poulateJson.length / batchSize);
+      const signatures: string[] = [];
+
+      for (let i = 0; i < batches; i++) {
+        const batch = poulateJson.slice(i * batchSize, (i + 1) * batchSize);
+        const sigs: string[] = await Promise.all(
+          batch.map(async (resource) => {
+            if (!resource.addresses.resource) throw new Error("No Resources");
+
+            const merkleTreeKeyPair = new web3.Keypair();
+            const depthSizePair: ValidDepthSizePair = {
+              maxDepth: 14,
+              maxBufferSize: 64,
+            };
+
+            const space = getConcurrentMerkleTreeAccountSize(
+              depthSizePair.maxDepth,
+              depthSizePair.maxBufferSize,
+              12
+            );
+
+            const lamports =
+              await adminHC.connection.getMinimumBalanceForRentExemption(space);
+
+            const accountIx = web3.SystemProgram.createAccount({
+              newAccountPubkey: merkleTreeKeyPair.publicKey,
+              fromPubkey: adminHC.identity().address,
+              space: space,
+              lamports,
+              programId: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+            });
+
+            const ix = createInitilizeResourceTreeInstruction(
+              {
+                merkleTree: merkleTreeKeyPair.publicKey,
+                resource: new PublicKey(resource.addresses.resource),
+                project: adminHC.project().address,
+                payer: adminHC.identity().address,
+                authority: adminHC.identity().address,
+                rentSysvar: web3.SYSVAR_RENT_PUBKEY,
+                tokenProgram: TOKEN_2022_PROGRAM_ID,
+                compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+                logWrapper: SPL_NOOP_PROGRAM_ID,
+                clock: web3.SYSVAR_CLOCK_PUBKEY,
+              },
+              {
+                args: {
+                  maxBufferSize: depthSizePair.maxBufferSize,
+                  maxDepth: depthSizePair.maxDepth,
+                },
+              }
+            );
+
+            const op = new Operation(
+              adminHC,
+              [accountIx, ix],
+              [adminHC.identity().signer as KeypairLike, merkleTreeKeyPair]
+            );
+
+            const [{ signature }] = await op.send({
+              skipPreflight: true,
+              commitment: "processed",
+            });
+
+            // saving the data to the file
+            resource.addresses.tree = merkleTreeKeyPair.publicKey.toBase58();
+
+            return signature;
+          })
+        );
+
+        signatures.push(...(sigs.filter((e) => e) as string[]));
+      }
+
+      // saving the data to the file
+      writeFileSync("./tests/resources.json", JSON.stringify(resourceDir));
+
+      expect(signatures.length).toBe(poulateJson.length);
+    });
+
+    it.skip("Create Lut Address", async () => {
+      const addresses = Object.keys(resourceDir)
+        .flatMap((key) =>
+          Object.values(resourceDir[key]).map((e: any) => [
+            e.addresses.resource,
+            e.addresses.mint,
+            e.addresses.tree,
+            e.addresses.recipe,
+          ])
+        )
+        .flat()
+        .filter((e) => e && e !== "")
+        .map((e) => new PublicKey(e));
+
+      const slot = await adminHC.processedConnection.getSlot();
+      const [lookupTableInstruction, lookupTableAddressPub] =
+        web3.AddressLookupTableProgram.createLookupTable({
+          authority: adminHC.identity().address,
+          payer: adminHC.identity().address,
+          recentSlot: slot,
+        });
+
+      const extendLutInstruction =
+        web3.AddressLookupTableProgram.extendLookupTable({
+          addresses: [
+            adminHC.project().address,
+            TOKEN_PROGRAM_ID,
+            METADATA_PROGRAM_ID,
+            SPL_NOOP_PROGRAM_ID,
+            web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+            web3.SYSVAR_CLOCK_PUBKEY,
+            TOKEN_2022_PROGRAM_ID,
+            web3.SystemProgram.programId,
+          ],
+          lookupTable: lookupTableAddressPub,
+          payer: adminHC.identity().address,
+          authority: adminHC.identity().address,
+        });
+
+      // OPERATIONS FOR LOOK UP TABLE CREATION AND EXTENSION
+      const lutOperations = new Operation(adminHC, [
+        lookupTableInstruction,
+        extendLutInstruction,
+      ]);
+
+      console.log("LOOKUP TABLE", lookupTableAddressPub.toBase58());
+
+      // SEND THE LOOK UP TABLE CREATION AND EXTENSION OPERATIONS
+      const [{ signature }] = await lutOperations.send({
+        skipPreflight: true,
+        commitment: "processed",
+      });
+
+      console.log(signature, "LOOKUP TABLE CREATION & EXTENSION");
+
+      // EXTENDING THE LOOK UP TABLE WITH REPEATATIVE ADDRESSES
+      const batch = 20;
+      const batches = Math.ceil(addresses.length / batch);
+      for (let i = 0; i < batches; i++) {
+        const batchAddresses = addresses.slice(i * batch, (i + 1) * batch);
+
+        const extendLutInstruction =
+          web3.AddressLookupTableProgram.extendLookupTable({
+            addresses: batchAddresses,
+            lookupTable: lookupTableAddressPub,
+            payer: adminHC.identity().address,
+            authority: adminHC.identity().address,
+          });
+
+        // OPERATIONS FOR LOOK UP TABLE CREATION AND EXTENSION
+        const lutOperations = new Operation(adminHC, [
+          lookupTableInstruction,
+          extendLutInstruction,
+        ]);
+
+        // SEND THE LOOK UP TABLE CREATION AND EXTENSION OPERATIONS
+        const [{ signature }] = await lutOperations.send({
+          skipPreflight: true,
+          commitment: "processed",
+        });
+
+        console.log(signature, "Batch Lookup Table", i);
+      }
+    });
+  });
+
+  /** *************************** ACTUAL TEST CASES **************************** */
+
   describe("Funglible Resources ", () => {
     it("Create Resources", async () => {
       if (data.fungible.resources.length > 0) return;
 
-      for (let i = 0; i < 10; i++) {
-        const mintKeypair = new Keypair();
+      for (let i = 0; i < 5; i++) {
+        const mintKeypair = new web3.Keypair();
         const [resourceAddress] = resourcePda(
           adminHC.project().address,
           mintKeypair.publicKey,
@@ -302,7 +857,7 @@ describe("Resource Manager", () => {
             project: adminHC.project().address,
             authority: adminHC.identity().address,
             payer: adminHC.identity().address,
-            rentSysvar: SYSVAR_RENT_PUBKEY,
+            rentSysvar: web3.SYSVAR_RENT_PUBKEY,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
           },
           {
@@ -366,7 +921,7 @@ describe("Resource Manager", () => {
         .filter((e) => e) as Resource[];
 
       for (const resource of resources) {
-        const merkleTreeKeyPair = new Keypair();
+        const merkleTreeKeyPair = new web3.Keypair();
         const depthSizePair: ValidDepthSizePair = {
           maxDepth: 14,
           maxBufferSize: 64,
@@ -381,8 +936,13 @@ describe("Resource Manager", () => {
         const lamports =
           await adminHC.connection.getMinimumBalanceForRentExemption(space);
 
-        console.log(space, " SPACE", lamports / LAMPORTS_PER_SOL, " PRICE");
-        const accountIx = SystemProgram.createAccount({
+        console.log(
+          space,
+          " SPACE",
+          lamports / web3.LAMPORTS_PER_SOL,
+          " PRICE"
+        );
+        const accountIx = web3.SystemProgram.createAccount({
           newAccountPubkey: merkleTreeKeyPair.publicKey,
           fromPubkey: adminHC.identity().address,
           space: space,
@@ -397,11 +957,11 @@ describe("Resource Manager", () => {
             project: adminHC.project().address,
             payer: adminHC.identity().address,
             authority: adminHC.identity().address,
-            rentSysvar: SYSVAR_RENT_PUBKEY,
+            rentSysvar: web3.SYSVAR_RENT_PUBKEY,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
             compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
             logWrapper: SPL_NOOP_PROGRAM_ID,
-            clock: SYSVAR_CLOCK_PUBKEY,
+            clock: web3.SYSVAR_CLOCK_PUBKEY,
           },
           {
             args: {
@@ -447,7 +1007,7 @@ describe("Resource Manager", () => {
             payer: adminHC.identity().address,
             owner: adminHC.identity().address,
             project: adminHC.project().address,
-            clock: SYSVAR_CLOCK_PUBKEY,
+            clock: web3.SYSVAR_CLOCK_PUBKEY,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
             logWrapper: SPL_NOOP_PROGRAM_ID,
             compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
@@ -508,8 +1068,8 @@ describe("Resource Manager", () => {
             owner: adminHC.identity().address,
             authority: adminHC.identity().address,
             project: adminHC.project().address,
-            clock: SYSVAR_CLOCK_PUBKEY,
-            rentSysvar: SYSVAR_RENT_PUBKEY,
+            clock: web3.SYSVAR_CLOCK_PUBKEY,
+            rentSysvar: web3.SYSVAR_RENT_PUBKEY,
             logWrapper: SPL_NOOP_PROGRAM_ID,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
             compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
@@ -561,7 +1121,7 @@ describe("Resource Manager", () => {
       }
     });
 
-    it("Create Lookup Table", async () => {
+    it.skip("Create Lookup Table", async () => {
       if (data.fungible.resources.length === 0)
         throw new Error("No Resources Found");
 
@@ -577,32 +1137,33 @@ describe("Resource Manager", () => {
 
       const slot = await adminHC.processedConnection.getSlot();
       const [lookupTableInstruction, lookupTableAddressPub] =
-        AddressLookupTableProgram.createLookupTable({
+        web3.AddressLookupTableProgram.createLookupTable({
           authority: adminHC.identity().address,
           payer: adminHC.identity().address,
           recentSlot: slot,
         });
 
       // EXTENDING THE LOOK UP TABLE WITH REPEATATIVE ADDRESSES
-      const extendLutInstruction = AddressLookupTableProgram.extendLookupTable({
-        addresses: [
-          ...data.fungible.resources.map((e) => e.resource),
-          ...data.fungible.resources.map((e) => e.tree),
-          adminHC.project().address,
-          TOKEN_PROGRAM_ID,
-          METADATA_PROGRAM_ID,
-          SPL_NOOP_PROGRAM_ID,
-          SYSVAR_INSTRUCTIONS_PUBKEY,
-          SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-          SYSVAR_CLOCK_PUBKEY,
-          TOKEN_2022_PROGRAM_ID,
-          SystemProgram.programId,
-        ],
-        lookupTable: lookupTableAddressPub,
-        payer: adminHC.identity().address,
-        authority: adminHC.identity().address,
-      });
+      const extendLutInstruction =
+        web3.AddressLookupTableProgram.extendLookupTable({
+          addresses: [
+            ...data.fungible.resources.map((e) => e.resource),
+            ...data.fungible.resources.map((e) => e.tree),
+            adminHC.project().address,
+            TOKEN_PROGRAM_ID,
+            METADATA_PROGRAM_ID,
+            SPL_NOOP_PROGRAM_ID,
+            web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+            SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+            web3.SYSVAR_CLOCK_PUBKEY,
+            TOKEN_2022_PROGRAM_ID,
+            web3.SystemProgram.programId,
+          ],
+          lookupTable: lookupTableAddressPub,
+          payer: adminHC.identity().address,
+          authority: adminHC.identity().address,
+        });
 
       // OPERATIONS FOR LOOK UP TABLE CREATION AND EXTENSION
       const lutOperations = new Operation(adminHC, [
@@ -629,12 +1190,12 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it("Initilize Recipe", async () => {
+    it.skip("Initilize Recipe", async () => {
       if (data.fungible.recipe.address) return;
       if (data.fungible.resources.length === 0)
         throw new Error("No Resources Found");
 
-      const key = Keypair.generate();
+      const key = web3.Keypair.generate();
       const [recipeAddress] = recipePda(
         adminHC.project().address,
         key.publicKey
@@ -652,7 +1213,7 @@ describe("Resource Manager", () => {
         payer: adminHC.identity().address,
         project: adminHC.project().address,
         authority: adminHC.identity().address,
-        rentSysvar: SYSVAR_RENT_PUBKEY,
+        rentSysvar: web3.SYSVAR_RENT_PUBKEY,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
       };
 
@@ -692,288 +1253,279 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it.skip("Craft Recipie", async () => {
+    it("Craft Recipe", async () => {
       if (!lookupTable) throw new Error("Lookup Table not found");
       if (!data.fungible.recipe.address) throw new Error("No Recipe Found");
       if (data.fungible.resources.length === 0)
         throw new Error("No Resources Found");
+
       if (data.fungible.recipe.isCrafted) return;
 
-      /// preparing the accounts for recipe
-      const ixAccounts: CraftRecipeInstructionAccounts = {
-        recipe: data.fungible.recipe.address,
-        outputResource: PublicKey.default,
-        inputResourceOne: PublicKey.default,
-        inputResourceTwo: undefined,
-        inputResourceFour: undefined,
-        inputResourceThree: undefined,
-        payer: adminHC.identity().address,
-        user: adminHC.identity().address,
-        wallet: adminHC.identity().address,
-        project: adminHC.project().address,
-        authority: adminHC.identity().address,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rentSysvar: SYSVAR_RENT_PUBKEY,
-        logWrapper: SPL_NOOP_PROGRAM_ID,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
-        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-        anchorRemainingAccounts: [],
-      };
+      // load the user & profile
+      const user = await edgeClient
+        .findUsers({
+          wallets: [String(adminHC.identity().address)],
+        })
+        .then((user) => user.user.at(-1));
+      if (!user) throw new Error("User not found");
 
-      const args: CraftRecipeArg[] = [];
+      const profile = await edgeClient
+        .findProfiles({
+          userIds: [user.id],
+          projects: [adminHC.project().address.toBase58()],
+        })
+        .then(({ profile: [profileT] }) => profileT);
+
+      if (!profile) throw new Error("Profile not found");
+
+      // recipie proof
+      const [recipieProffAddress] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("recipe_proof"),
+          data.fungible.recipe.address.toBuffer(),
+          userHash(user),
+        ],
+        PROGRAM_ID
+      );
+
+      // prepare resources
+      const resources: Record<
+        string,
+        Resource & { proof: Proof; state?: Holding }
+      > = {};
+
       for (const resource of data.fungible.resources) {
-        if (resource.label === "inputResourceThree") break;
+        resources[resource.label] = {
+          ...resource,
+          state: (
+            await edgeClient.findHoldings({
+              holder: adminHC.identity().address.toBase58(),
+              trees: [resource.tree.toBase58()],
+            })
+          )[0],
+          proof: (
+            await edgeClient.fetchProofs({
+              leaves: [
+                {
+                  tree: String(resource.tree),
+                  index: "0",
+                },
+              ],
+            })
+          ).proof[0],
+        };
+      }
 
-        // pushing the resource to the resources array
-        ixAccounts[resource.label] = resource.resource;
+      // prepare the remaining accounts
+      const mintIxRemainingAccounts: web3.AccountMeta[][] = [
+        // output resource
+        [
+          {
+            isSigner: false,
+            isWritable: true,
+            pubkey: new PublicKey(resources["outputResource"].proof!.tree_id),
+          },
+          ...resources["outputResource"].proof!.proof!.map((e) => ({
+            isSigner: false,
+            isWritable: false,
+            pubkey: new PublicKey(e),
+          })),
+        ],
 
-        // fetching the proffs of the resources account
-        const compressedAccount = (
-          await getCompressedAccountsByTree(resource.tree)
-        ).at(-1)!;
+        // user's proofs
+        [
+          {
+            isSigner: false,
+            isWritable: true,
+            pubkey: new PublicKey(profile.proof!.tree_id),
+          },
+          ...user.proof!.proof!.map((e) => ({
+            isSigner: false,
+            isWritable: false,
+            pubkey: new PublicKey(e),
+          })),
+        ],
 
-        const accountProff = (await getAssetProof(
-          Number(compressedAccount.leaf_idx),
-          resource.tree
-        ))!;
-        const proffs = accountProff.proof.slice(0, 2);
+        // profile's proofs
+        [
+          {
+            isSigner: false,
+            isWritable: true,
+            pubkey: new PublicKey(profile.proof!.tree_id),
+          },
+          ...profile.proof!.proof!.map((e) => ({
+            isSigner: false,
+            isWritable: false,
+            pubkey: new PublicKey(e),
+          })),
+        ],
+      ];
 
-        // console.log(compressedAccount.parsed_data, resource.label, "PROFFS");
-        // appending proffs & tree into the remaining accounts
-        ixAccounts.anchorRemainingAccounts?.push(
-          ...[
-            { pubkey: resource.tree, isSigner: false, isWritable: true },
-            ...proffs.map((e) => ({
-              pubkey: new PublicKey(e),
-              isSigner: false,
-              isWritable: false,
-            })),
-          ]
-        );
-
-        // appending args
-        args.push({
-          proofSize: proffs.length + 1,
-          holdingState: {
-            leafIdx: Number(accountProff!.leaf_index),
-            root: Array.from(new PublicKey(accountProff!.root).toBytes()),
-            holding: {
-              __kind: compressedAccount.parsed_data.__kind,
-              holder: new PublicKey(
-                compressedAccount.parsed_data.params.holder.split(":").at(-1)
-              ),
-              balance: compressedAccount.parsed_data.params.balance,
+      // prepare the first mint instruction of craft
+      const mintIx = createCraftMintRecipeInstruction(
+        {
+          outputResource: resources["outputResource"].resource,
+          wallet: adminHC.identity().address,
+          recipe: data.fungible.recipe.address,
+          payer: adminHC.identity().address,
+          project: adminHC.project().address,
+          recipeProof: recipieProffAddress,
+          authority: adminHC.identity().address,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+          clock: web3.SYSVAR_CLOCK_PUBKEY,
+          compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+          hiveControl: HPL_HIVE_CONTROL_PROGRAM,
+          instructionsSysvar: web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+          logWrapper: SPL_NOOP_PROGRAM_ID,
+          rentSysvar: web3.SYSVAR_RENT_PUBKEY,
+          anchorRemainingAccounts: mintIxRemainingAccounts.flat(),
+          vault: VAULT,
+        },
+        {
+          args: {
+            holding: null,
+            proofSize: mintIxRemainingAccounts.map((e) => e.length),
+            profile: {
+              root: Array.from(new PublicKey(profile.proof!.root).toBytes()),
+              identity: profile.identity,
+              leafIdx: Number(profile.leaf_idx),
+              platformData: profile.platformData,
+              customData: profile.customData,
+              info: Array.from(profileInfoHash(profile.info)),
+            },
+            user: {
+              id: user.id,
+              infoHash: Array.from(userInfoHash(user.info)),
+              leafIdx: Number(user.leaf_idx),
+              root: Array.from(new PublicKey(user.proof!.root).toBytes()),
+              wallets: {
+                wallets: user.wallets.wallets.map((e) => new PublicKey(e)),
+                shadow: new PublicKey(user.wallets.shadow),
+              },
             },
           },
-        });
-      }
-      const ix = createCraftRecipeInstruction(ixAccounts, {
-        args: args,
-      });
+        }
+      );
 
-      const operation = new Operation(
+      // prepare the burn instruction of craft
+      const burnIx = createCraftBurnRecipeInstruction(
+        {
+          inputResourceOne: resources["inputResourceOne"].resource,
+          inputResourceTwo: resources["inputResourceTwo"].resource,
+          wallet: adminHC.identity().address,
+          recipe: data.fungible.recipe.address,
+          payer: adminHC.identity().address,
+          project: adminHC.project().address,
+          recipeProof: recipieProffAddress,
+          authority: adminHC.identity().address,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+          clock: web3.SYSVAR_CLOCK_PUBKEY,
+          compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+          logWrapper: SPL_NOOP_PROGRAM_ID,
+          rentSysvar: web3.SYSVAR_RENT_PUBKEY,
+          anchorRemainingAccounts: mintIxRemainingAccounts.flat(),
+        },
+        {
+          args: {
+            user: {
+              id: user.id,
+              infoHash: Array.from(userInfoHash(user.info)),
+              leafIdx: Number(user.leaf_idx),
+              root: Array.from(new PublicKey(user.proof!.root).toBytes()),
+              wallets: {
+                wallets: user.wallets.wallets.map((e) => new PublicKey(e)),
+                shadow: new PublicKey(user.wallets.shadow),
+              },
+            },
+
+            holdings: [
+              // first input
+              {
+                holdingState: {
+                  holding: {
+                    __kind: "Fungible",
+                    balance:
+                      "balance" in resources["inputResourceOne"].state!.params
+                        ? Number(
+                            resources["inputResourceOne"].state!.params.balance
+                          )
+                        : 0,
+                    holder:
+                      "balance" in resources["inputResourceOne"].state!.params
+                        ? new web3.PublicKey(
+                            resources[
+                              "inputResourceOne"
+                            ].state!.params.holder_address
+                          )
+                        : PublicKey.default,
+                  },
+                  leafIdx: Number(
+                    resources["inputResourceOne"].proof.leaf_index
+                  ),
+                  root: Array.from(
+                    new PublicKey(
+                      resources["inputResourceOne"].proof.root
+                    ).toBytes()
+                  ),
+                },
+                proofSize: resources["inputResourceOne"].proof.proof.length,
+              },
+
+              // second input
+              {
+                holdingState: {
+                  holding: {
+                    __kind: "Fungible",
+                    balance:
+                      "balance" in resources["inputResourceTwo"].state!.params
+                        ? Number(
+                            resources["inputResourceTwo"].state!.params.balance
+                          )
+                        : 0,
+                    holder:
+                      "balance" in resources["inputResourceTwo"].state!.params
+                        ? new web3.PublicKey(
+                            resources[
+                              "inputResourceTwo"
+                            ].state!.params.holder_address
+                          )
+                        : PublicKey.default,
+                  },
+                  leafIdx: Number(
+                    resources["inputResourceTwo"].proof.leaf_index
+                  ),
+                  root: Array.from(
+                    new PublicKey(
+                      resources["inputResourceTwo"].proof.root
+                    ).toBytes()
+                  ),
+                },
+                proofSize: resources["inputResourceTwo"].proof.proof.length,
+              },
+            ],
+          },
+        }
+      );
+
+      const op = new Operation(
         adminHC,
-        [
-          ComputeBudgetProgram.setComputeUnitLimit({
-            units: 1200000,
-          }),
-          ix,
-        ],
+        [mintIx, burnIx],
         [adminHC.identity().signer as KeypairLike]
       );
 
-      operation.add_lut(lookupTable);
+      op.add_lut(lookupTable);
 
-      const [{ signature, confirmResponse }] = await operation
-        .send({
-          skipPreflight: true,
-          commitment: "processed",
-          preflightCommitment: "processed",
-        })
-        .catch((e) => {
-          console.error(e, "Craft Recipe Error");
-          return e;
-        });
+      const [{ signature }] = await op.send({
+        skipPreflight: true,
+        commitment: "processed",
+      });
 
-      console.log(signature, "Craft Recipe");
+      console.log(signature, "Craft Recipie Instruction");
 
-      // setting the flag to true
       data.fungible.recipe.isCrafted = true;
 
-      // saving the data to the file
+      // save data file
       saveData(data);
     });
-
-    // it("UnWrap Resource", async () => {
-    //   const resources = data.fungible.resources.filter(
-    //     (e) => e.flags.isUnWrapped === false
-    //   );
-
-    //   for (const resource of resources) {
-    //     const recipientAccount = getAssociatedTokenAddressSync(
-    //       resource.mint,
-    //       adminHC.identity().address,
-    //       false,
-    //       TOKEN_2022_PROGRAM_ID
-    //     );
-
-    //     const resourceAccount = (
-    //       await getCompressedAccountsByTree(resource.tree)
-    //     ).at(-1)!;
-
-    //     const proff = (await getAssetProof(
-    //       Number(resourceAccount.leaf_idx),
-    //       resource.tree
-    //     ))!;
-
-    //     console.log(resourceAccount.parsed_data, "RESOURCE ACCOUNT");
-
-    //     const ix = createUnwrapResourceInstruction(
-    //       {
-    //         mint: resource.mint,
-    //         merkleTree: resource.tree,
-    //         recipientAccount,
-    //         resource: resource.resource,
-    //         project: adminHC.project().address,
-    //         payer: adminHC.identity().address,
-    //         owner: adminHC.identity().address,
-    //         clock: SYSVAR_CLOCK_PUBKEY,
-    //         rentSysvar: SYSVAR_RENT_PUBKEY,
-    //         logWrapper: SPL_NOOP_PROGRAM_ID,
-    //         tokenProgram: TOKEN_2022_PROGRAM_ID,
-    //         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-    //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-    //         anchorRemainingAccounts: proff.proof.map((e) => ({
-    //           isSigner: false,
-    //           isWritable: false,
-    //           pubkey: new PublicKey(e),
-    //         })),
-    //       },
-    //       {
-    //         args: {
-    //           __kind: "Fungible",
-    //           amount: 100 ** 9,
-    //           holdingState: {
-    //             leafIdx: Number(proff.leaf_index),
-    //             root: Array.from(new PublicKey(proff.root).toBytes()),
-    //             holding: {
-    //               __kind: resourceAccount.parsed_data.__kind,
-    //               holder: new PublicKey(
-    //                 resourceAccount.parsed_data.params.holder.split(":").at(-1)
-    //               ),
-    //               balance: resourceAccount.parsed_data.params.balance,
-    //             },
-    //           },
-    //         },
-    //       }
-    //     );
-
-    //     const op = new Operation(
-    //       adminHC,
-    //       [ix],
-    //       [adminHC.identity().signer as KeypairLike]
-    //     );
-
-    //     const [{ signature }] = await op.send({
-    //       skipPreflight: true,
-    //       commitment: "processed",
-    //     });
-
-    //     console.log(signature, "Unwrap Signature");
-
-    //     // setting the flag to true
-    //     data.fungible.resources.find((e) =>
-    //       e.resource.equals(resource.resource)
-    //     )!.flags.isUnWrapped = true;
-
-    //     // saving the data to the file
-    //     saveData(data);
-    //   }
-    // });
-
-    // it.skip("Wrap Resource", async () => {
-    //   const resources = data.fungible.resources.filter(
-    //     (e) => e.flags.isWrapped === false
-    //   );
-
-    //   for (const resource of resources) {
-    //     const recipientAccount = getAssociatedTokenAddressSync(
-    //       resource.mint,
-    //       adminHC.identity().address,
-    //       false,
-    //       TOKEN_2022_PROGRAM_ID
-    //     );
-
-    //     const resourceAccount = (
-    //       await getCompressedAccountsByTree(resource.tree)
-    //     ).at(-1)!;
-    //     const proff = (await getAssetProof(
-    //       Number(resourceAccount.leaf_idx),
-    //       resource.tree
-    //     ))!;
-
-    //     const ix = createWrapResourceInstruction(
-    //       {
-    //         mint: resource.mint,
-    //         merkleTree: resource.tree,
-    //         tokenAccount: recipientAccount,
-    //         resource: resource.resource,
-    //         project: adminHC.project().address,
-    //         payer: adminHC.identity().address,
-    //         owner: adminHC.identity().address,
-    //         clock: SYSVAR_CLOCK_PUBKEY,
-    //         rentSysvar: SYSVAR_RENT_PUBKEY,
-    //         logWrapper: SPL_NOOP_PROGRAM_ID,
-    //         tokenProgram: TOKEN_2022_PROGRAM_ID,
-    //         compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-    //         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-    //         anchorRemainingAccounts: proff.proof.map((e) => ({
-    //           isSigner: false,
-    //           isWritable: false,
-    //           pubkey: new PublicKey(e),
-    //         })),
-    //       },
-    //       {
-    //         args: {
-    //           __kind: "Fungible",
-    //           amount: 100 ** 9,
-    //           holdingState: {
-    //             leafIdx: Number(proff.leaf_index),
-    //             root: Array.from(new PublicKey(proff.root).toBytes()),
-    //             holding: {
-    //               __kind: resourceAccount.parsed_data.__kind,
-    //               holder: new PublicKey(
-    //                 resourceAccount.parsed_data.params.holder.split(":").at(-1)
-    //               ),
-    //               balance: resourceAccount.parsed_data.params.balance,
-    //             },
-    //           },
-    //         },
-    //       }
-    //     );
-
-    //     const op = new Operation(
-    //       adminHC,
-    //       [ix],
-    //       [adminHC.identity().signer as KeypairLike]
-    //     );
-
-    //     const [{ signature }] = await op.send({
-    //       skipPreflight: true,
-    //       commitment: "processed",
-    //     });
-
-    //     console.log(signature, "Unwrap Signature");
-
-    //     // setting the flag to true
-    //     data.fungible.resources.find((e) =>
-    //       e.resource.equals(resource.resource)
-    //     )!.flags.isWrapped = true;
-
-    //     // saving the data to the file
-    //     saveData(data);
-    //   }
-    // });
   });
 });
