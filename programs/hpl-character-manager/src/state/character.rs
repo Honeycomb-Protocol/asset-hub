@@ -43,12 +43,6 @@ pub enum NftWrapCriteria {
     MerkleTree(Pubkey),
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
-pub enum DataOrHash<Data> {
-    Data(Data),
-    Hash([u8; 32]),
-}
-
 #[compressed_account(chunk = used_by)]
 pub enum CharacterUsedBy {
     None,

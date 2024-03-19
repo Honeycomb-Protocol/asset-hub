@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-beta.15",
+  "version": "0.0.2-beta.17",
   "name": "hpl_character_manager",
   "instructions": [
     {
@@ -1004,10 +1004,10 @@
         },
         {
           "name": "owner",
-          "isMut": true,
-          "isSigner": true,
+          "isMut": false,
+          "isSigner": false,
           "docs": [
-            "The user who owns the character"
+            "The wallet that owns the character"
           ]
         },
         {

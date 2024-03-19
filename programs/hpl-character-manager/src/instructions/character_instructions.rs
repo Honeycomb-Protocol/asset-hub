@@ -2,8 +2,11 @@ use {
     crate::{errors::HplCharacterManagerError, state::*},
     anchor_lang::prelude::*,
     hpl_hive_control::{program::HplHiveControl, state::Project},
-    hpl_toolkit::compression::{
-        merkle_tree_apply_fn_deep, CompressedDataChunk, CompressedDataEvent, ToNode,
+    hpl_toolkit::{
+        compression::{
+            merkle_tree_apply_fn_deep, CompressedDataChunk, CompressedDataEvent, ToNode,
+        },
+        DataOrHash,
     },
     spl_account_compression::{program::SplAccountCompression, Noop},
 };
@@ -150,9 +153,9 @@ pub struct VerifyCharacter<'info> {
     #[account(mut)]
     pub merkle_tree: AccountInfo<'info>,
 
-    /// The user who owns the character
-    #[account(mut)]
-    pub owner: Signer<'info>,
+    /// The wallet that owns the character
+    /// CHECK: This is safe
+    pub owner: AccountInfo<'info>,
 
     /// NATIVE SYSTEM PROGRAM
     pub system_program: Program<'info, System>,
