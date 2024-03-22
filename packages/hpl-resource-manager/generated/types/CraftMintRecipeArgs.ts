@@ -6,10 +6,7 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-import {
-  CraftResourceUserParams,
-  craftResourceUserParamsBeet,
-} from './CraftResourceUserParams'
+import { CraftResourceUser, craftResourceUserBeet } from './CraftResourceUser'
 import {
   CraftMintProfileParams,
   craftMintProfileParamsBeet,
@@ -19,10 +16,10 @@ import {
   holdingAccountArgsBeet,
 } from './HoldingAccountArgs'
 export type CraftMintRecipeArgs = {
-  user: CraftResourceUserParams
+  user: CraftResourceUser
   profile: CraftMintProfileParams
   holding: beet.COption<HoldingAccountArgs>
-  proofSize: number[] /* size: 3 */
+  proofSize: number[] /* size: 2 */
 }
 
 /**
@@ -32,10 +29,10 @@ export type CraftMintRecipeArgs = {
 export const craftMintRecipeArgsBeet =
   new beet.FixableBeetArgsStruct<CraftMintRecipeArgs>(
     [
-      ['user', craftResourceUserParamsBeet],
+      ['user', craftResourceUserBeet],
       ['profile', craftMintProfileParamsBeet],
       ['holding', beet.coption(holdingAccountArgsBeet)],
-      ['proofSize', beet.uniformFixedSizeArray(beet.u8, 3)],
+      ['proofSize', beet.uniformFixedSizeArray(beet.u8, 2)],
     ],
     'CraftMintRecipeArgs'
   )

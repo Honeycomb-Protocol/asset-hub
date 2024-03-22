@@ -6,16 +6,13 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-import {
-  CraftResourceUserParams,
-  craftResourceUserParamsBeet,
-} from './CraftResourceUserParams'
+import { CraftResourceUser, craftResourceUserBeet } from './CraftResourceUser'
 import {
   CraftBurnHoldingParams,
   craftBurnHoldingParamsBeet,
 } from './CraftBurnHoldingParams'
 export type CraftBurnRecipeArgs = {
-  user: CraftResourceUserParams
+  user: CraftResourceUser
   holdings: CraftBurnHoldingParams[]
 }
 
@@ -26,7 +23,7 @@ export type CraftBurnRecipeArgs = {
 export const craftBurnRecipeArgsBeet =
   new beet.FixableBeetArgsStruct<CraftBurnRecipeArgs>(
     [
-      ['user', craftResourceUserParamsBeet],
+      ['user', craftResourceUserBeet],
       ['holdings', beet.array(craftBurnHoldingParamsBeet)],
     ],
     'CraftBurnRecipeArgs'

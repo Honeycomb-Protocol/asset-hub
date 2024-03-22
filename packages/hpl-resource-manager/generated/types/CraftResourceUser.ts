@@ -7,7 +7,7 @@
 
 import * as beet from '@metaplex-foundation/beet'
 import { Wallets, walletsBeet } from './Wallets'
-export type CraftResourceUserParams = {
+export type CraftResourceUser = {
   id: beet.bignum
   leafIdx: number
   root: number[] /* size: 32 */
@@ -19,8 +19,8 @@ export type CraftResourceUserParams = {
  * @category userTypes
  * @category generated
  */
-export const craftResourceUserParamsBeet =
-  new beet.FixableBeetArgsStruct<CraftResourceUserParams>(
+export const craftResourceUserBeet =
+  new beet.FixableBeetArgsStruct<CraftResourceUser>(
     [
       ['id', beet.u64],
       ['leafIdx', beet.u32],
@@ -28,5 +28,5 @@ export const craftResourceUserParamsBeet =
       ['infoHash', beet.uniformFixedSizeArray(beet.u8, 32)],
       ['wallets', walletsBeet],
     ],
-    'CraftResourceUserParams'
+    'CraftResourceUser'
   )

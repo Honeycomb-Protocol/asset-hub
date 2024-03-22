@@ -100,7 +100,7 @@ pub fn create_resource(ctx: Context<CreateResource>, args: CreateResourceArgs) -
 }
 
 #[derive(Accounts)]
-pub struct InitilizeResourceTree<'info> {
+pub struct InitializeResourceTree<'info> {
     pub project: Box<Account<'info, Project>>,
 
     #[account(mut, has_one = project)]
@@ -132,18 +132,17 @@ pub struct InitilizeResourceTree<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct InitilizeResourceTreeArgs {
+pub struct InitializeResourceTreeArgs {
     pub max_depth: u32,
     pub max_buffer_size: u32,
 }
 
-pub fn initilize_resource_tree(
-    ctx: Context<InitilizeResourceTree>,
-    args: InitilizeResourceTreeArgs,
+pub fn initialize_resource_tree(
+    ctx: Context<InitializeResourceTree>,
+    args: InitializeResourceTreeArgs,
 ) -> Result<()> {
     let resource = &mut ctx.accounts.resource;
 
-    msg!("Reallocating resource account to fit the merkle tree.");
     reallocate(
         32,
         resource.to_account_info(),
@@ -152,14 +151,13 @@ pub fn initilize_resource_tree(
         &ctx.accounts.system_program,
     )?;
 
-    msg!("Initializing the resource tree.");
     // create the compressed token account using controlled merkle tree
     resource
         .merkle_trees
         .merkle_trees
         .push(ctx.accounts.merkle_tree.key());
 
-    // emiting the event for the merkle tree
+    // emit the event for the merkle tree
     let event = CompressedDataEvent::tree(
         ctx.accounts.merkle_tree.key(),
         resource.merkle_trees.schema.clone(),
@@ -168,7 +166,6 @@ pub fn initilize_resource_tree(
     );
     event.wrap(&ctx.accounts.log_wrapper)?;
 
-    msg!("Creating the merkle tree for the resource.");
     // create the merkle tree for the resource
     let bump_binding = [resource.bump];
     let signer_seeds = resource.seeds(&bump_binding);

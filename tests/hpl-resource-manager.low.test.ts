@@ -1,11 +1,9 @@
-import base58 from "bs58";
 import createEdgeClient, {
   Holding,
   PlatformData,
   Profile,
   ProfileInfo,
   Proof,
-  Transaction,
   User,
   UserInfo,
   Wallets,
@@ -36,14 +34,15 @@ import * as web3 from "@solana/web3.js";
 import { Client, cacheExchange, fetchExchange } from "@urql/core";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
 import {
-  InitilizeRecipeInstructionAccounts,
+  InitializeRecipeInstructionAccounts,
   PROGRAM_ID,
   createBurnResourceInstruction,
   createCraftBurnRecipeInstruction,
   createCraftMintRecipeInstruction,
+  createCraftProofInstruction,
   createCreateResourceInstruction,
-  createInitilizeRecipeInstruction,
-  createInitilizeResourceTreeInstruction,
+  createInitializeRecipeInstruction,
+  createInitializeResourceTreeInstruction,
   createMintResourceInstruction,
 } from "../packages/hpl-resource-manager";
 import getHoneycombs from "../scripts/prepare";
@@ -61,7 +60,7 @@ jest.setTimeout(6000000);
 
 const edgeClient = createEdgeClient(
   new Client({
-    url: "http://localhost:4000",
+    url: "https://edge.eboy.dev/",
     exchanges: [cacheExchange, fetchExchange],
   })
 );
@@ -90,28 +89,12 @@ const recipePda = (
 };
 
 /**  ************************* HASH FUNCTIONS ************************* */
-const profileHash = (profile: Profile): Buffer =>
-  keccak256Hash([
-    new web3.PublicKey(profile.project).toBuffer(),
-    u64Hash(profile.userId),
-    stringHash(profile.identity),
-    profileInfoHash(profile.info),
-    platformDataHash(profile.platformData),
-    customDataHash(profile.customData),
-  ]);
 
 const profileInfoHash = (info: ProfileInfo): Buffer =>
   keccak256Hash([
     optionHash(info.name, stringHash),
     optionHash(info.bio, stringHash),
     optionHash(info.pfp, stringHash),
-  ]);
-
-const platformDataHash = (platformData: PlatformData): Buffer =>
-  keccak256Hash([
-    customDataHash(platformData.custom),
-    arrayHash(platformData.achievements, u32Hash),
-    u64Hash(platformData.xp),
   ]);
 
 const customDataHash = (customData: { [key: string]: string[] }): Buffer =>
@@ -462,16 +445,16 @@ describe("Resource Manager", () => {
     });
 
     it.skip("Populate Resources", async () => {
-      const poulateJson = Object.keys(resourceDir).flatMap((key) =>
+      const populateJson = Object.keys(resourceDir).flatMap((key) =>
         Object.values(resourceDir[key]).concat()
       ) as ResourcesDirectoryResource[];
 
       const batchSize = 15;
-      const batches = Math.ceil(poulateJson.length / batchSize);
+      const batches = Math.ceil(populateJson.length / batchSize);
       const signatures: string[] = [];
 
       for (let i = 0; i < batches; i++) {
-        const batch = poulateJson.slice(i * batchSize, (i + 1) * batchSize);
+        const batch = populateJson.slice(i * batchSize, (i + 1) * batchSize);
 
         console.log("Populating Resources", i, "Batch");
         const sigs: string[] = await Promise.all(
@@ -570,16 +553,16 @@ describe("Resource Manager", () => {
         readFileSync("./tests/resources.json").toString()
       ) as ResourcesDirectory;
 
-      const poulateJson = Object.keys(resourceDir).flatMap((key) =>
+      const populateJson = Object.keys(resourceDir).flatMap((key) =>
         Object.values(resourceDir[key]).concat()
       ) as ResourcesDirectoryResource[];
 
       const batchSize = 15;
-      const batches = Math.ceil(poulateJson.length / batchSize);
+      const batches = Math.ceil(populateJson.length / batchSize);
       const signatures: string[] = [];
 
       for (let i = 0; i < batches; i++) {
-        const batch = poulateJson.slice(i * batchSize, (i + 1) * batchSize);
+        const batch = populateJson.slice(i * batchSize, (i + 1) * batchSize);
 
         console.log("Populating Recipe", i, "Batch");
         const sigs = await Promise.all(
@@ -593,7 +576,7 @@ describe("Resource Manager", () => {
             );
 
             /// preparing the accounts for recipe
-            const accounts: InitilizeRecipeInstructionAccounts = {
+            const accounts: InitializeRecipeInstructionAccounts = {
               key: key.publicKey,
               recipe: recipeAddress,
               outputResource: new PublicKey(dt.addresses.resource),
@@ -627,13 +610,13 @@ describe("Resource Manager", () => {
             }
 
             // instructions
-            const ix = createInitilizeRecipeInstruction(accounts, {
+            const ix = createInitializeRecipeInstruction(accounts, {
               args: {
                 outputCharacteristics: new Map(),
                 amounts: amounts,
                 xp: {
                   label: "XP",
-                  increament: dt.xp_gain,
+                  increment: dt.xp_gain,
                 },
               },
             });
@@ -663,16 +646,16 @@ describe("Resource Manager", () => {
     });
 
     it.skip("Populate Resource Tree", async () => {
-      const poulateJson = Object.keys(resourceDir).flatMap((key) =>
+      const populateJson = Object.keys(resourceDir).flatMap((key) =>
         Object.values(resourceDir[key]).concat()
       ) as ResourcesDirectoryResource[];
 
       const batchSize = 15;
-      const batches = Math.ceil(poulateJson.length / batchSize);
+      const batches = Math.ceil(populateJson.length / batchSize);
       const signatures: string[] = [];
 
       for (let i = 0; i < batches; i++) {
-        const batch = poulateJson.slice(i * batchSize, (i + 1) * batchSize);
+        const batch = populateJson.slice(i * batchSize, (i + 1) * batchSize);
         const sigs: string[] = await Promise.all(
           batch.map(async (resource) => {
             if (!resource.addresses.resource) throw new Error("No Resources");
@@ -700,7 +683,7 @@ describe("Resource Manager", () => {
               programId: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
             });
 
-            const ix = createInitilizeResourceTreeInstruction(
+            const ix = createInitializeResourceTreeInstruction(
               {
                 merkleTree: merkleTreeKeyPair.publicKey,
                 resource: new PublicKey(resource.addresses.resource),
@@ -745,7 +728,7 @@ describe("Resource Manager", () => {
       // saving the data to the file
       writeFileSync("./tests/resources.json", JSON.stringify(resourceDir));
 
-      expect(signatures.length).toBe(poulateJson.length);
+      expect(signatures.length).toBe(populateJson.length);
     });
 
     it.skip("Create Lut Address", async () => {
@@ -838,7 +821,7 @@ describe("Resource Manager", () => {
 
   /** *************************** ACTUAL TEST CASES **************************** */
 
-  describe("Funglible Resources ", () => {
+  describe("Fungible Resources ", () => {
     it("Create Resources", async () => {
       if (data.fungible.resources.length > 0) return;
 
@@ -950,7 +933,7 @@ describe("Resource Manager", () => {
           programId: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
         });
 
-        const ix = createInitilizeResourceTreeInstruction(
+        const ix = createInitializeResourceTreeInstruction(
           {
             merkleTree: merkleTreeKeyPair.publicKey,
             resource: resource.resource,
@@ -1054,7 +1037,7 @@ describe("Resource Manager", () => {
 
         console.log(_resource, "_resource");
 
-        const proff = (await getAssetProof(
+        const proof = (await getAssetProof(
           Number(_resource.leaf_idx),
           resource.tree
         ))!;
@@ -1073,7 +1056,7 @@ describe("Resource Manager", () => {
             logWrapper: SPL_NOOP_PROGRAM_ID,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
             compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-            anchorRemainingAccounts: proff.proof.map((e) => ({
+            anchorRemainingAccounts: proof.proof.map((e) => ({
               isSigner: false,
               isWritable: false,
               pubkey: new PublicKey(e),
@@ -1084,8 +1067,8 @@ describe("Resource Manager", () => {
               __kind: "Fungible",
               amount: 100,
               holdingState: {
-                leafIdx: Number(proff.leaf_index),
-                root: Array.from(new PublicKey(proff.root).toBytes()),
+                leafIdx: Number(proof.leaf_index),
+                root: Array.from(new PublicKey(proof.root).toBytes()),
 
                 holding: {
                   __kind: _resource.parsed_data.__kind,
@@ -1121,7 +1104,7 @@ describe("Resource Manager", () => {
       }
     });
 
-    it.skip("Create Lookup Table", async () => {
+    it("Create Lookup Table", async () => {
       if (data.fungible.resources.length === 0)
         throw new Error("No Resources Found");
 
@@ -1143,7 +1126,7 @@ describe("Resource Manager", () => {
           recentSlot: slot,
         });
 
-      // EXTENDING THE LOOK UP TABLE WITH REPEATATIVE ADDRESSES
+      // EXTENDING THE LOOK UP TABLE WITH REPETITIVE ADDRESSES
       const extendLutInstruction =
         web3.AddressLookupTableProgram.extendLookupTable({
           addresses: [
@@ -1151,14 +1134,17 @@ describe("Resource Manager", () => {
             ...data.fungible.resources.map((e) => e.tree),
             adminHC.project().address,
             TOKEN_PROGRAM_ID,
+            TOKEN_2022_PROGRAM_ID,
             METADATA_PROGRAM_ID,
             SPL_NOOP_PROGRAM_ID,
-            web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
             ASSOCIATED_TOKEN_PROGRAM_ID,
             web3.SYSVAR_CLOCK_PUBKEY,
-            TOKEN_2022_PROGRAM_ID,
+            web3.SYSVAR_INSTRUCTIONS_PUBKEY,
             web3.SystemProgram.programId,
+            HPL_HIVE_CONTROL_PROGRAM,
+            VAULT,
+            PROGRAM_ID,
           ],
           lookupTable: lookupTableAddressPub,
           payer: adminHC.identity().address,
@@ -1190,7 +1176,7 @@ describe("Resource Manager", () => {
       saveData(data);
     });
 
-    it.skip("Initilize Recipe", async () => {
+    it("Initialize Recipe", async () => {
       if (data.fungible.recipe.address) return;
       if (data.fungible.resources.length === 0)
         throw new Error("No Resources Found");
@@ -1202,12 +1188,12 @@ describe("Resource Manager", () => {
       );
 
       /// preparing the accounts for recipe
-      const accounts: InitilizeRecipeInstructionAccounts = {
+      const accounts: InitializeRecipeInstructionAccounts = {
         key: key.publicKey,
         recipe: recipeAddress,
         outputResource: PublicKey.default,
         inputResourceOne: PublicKey.default,
-        inputResourceTwo: undefined,
+        inputResourceTwo: PublicKey.default,
         inputResourceFour: undefined,
         inputResourceThree: undefined,
         payer: adminHC.identity().address,
@@ -1224,13 +1210,13 @@ describe("Resource Manager", () => {
       }
 
       // instructions
-      const ix = createInitilizeRecipeInstruction(accounts, {
+      const ix = createInitializeRecipeInstruction(accounts, {
         args: {
           outputCharacteristics: new Map(),
           amounts: data.fungible.resources.map((e) => 100),
           xp: {
             label: "XP",
-            increament: 100,
+            increment: 100,
           },
         },
       });
@@ -1246,7 +1232,7 @@ describe("Resource Manager", () => {
         commitment: "processed",
       });
 
-      console.log(signature, "Initilize Recipe");
+      console.log(signature, "Initialize Recipe");
       data.fungible.recipe.address = recipeAddress;
 
       // saving the data to the file
@@ -1265,6 +1251,7 @@ describe("Resource Manager", () => {
       const user = await edgeClient
         .findUsers({
           wallets: [String(adminHC.identity().address)],
+          includeProof: true,
         })
         .then((user) => user.user.at(-1));
       if (!user) throw new Error("User not found");
@@ -1273,13 +1260,17 @@ describe("Resource Manager", () => {
         .findProfiles({
           userIds: [user.id],
           projects: [adminHC.project().address.toBase58()],
+          includeProof: true,
         })
         .then(({ profile: [profileT] }) => profileT);
 
       if (!profile) throw new Error("Profile not found");
+      console.log(profile!.proof!.proof, "PROFILE");
+      profile!.proof!.proof = profile!.proof!.proof.slice(0, 2);
+      console.log(profile!.proof!.proof, "PROFILE 2");
 
-      // recipie proof
-      const [recipieProffAddress] = PublicKey.findProgramAddressSync(
+      // recipe proof
+      const [recipeProofAddress] = PublicKey.findProgramAddressSync(
         [
           Buffer.from("recipe_proof"),
           data.fungible.recipe.address.toBuffer(),
@@ -1288,10 +1279,10 @@ describe("Resource Manager", () => {
         PROGRAM_ID
       );
 
-      // prepare resources
+      // prepare resources into an resource object
       const resources: Record<
         string,
-        Resource & { proof: Proof; state?: Holding }
+        Resource & { state?: Holding; proof?: Proof }
       > = {};
 
       for (const resource of data.fungible.resources) {
@@ -1301,45 +1292,70 @@ describe("Resource Manager", () => {
             await edgeClient.findHoldings({
               holder: adminHC.identity().address.toBase58(),
               trees: [resource.tree.toBase58()],
+              includeProof: true,
             })
-          )[0],
+          ).holdings.at(-1),
+
           proof: (
             await edgeClient.fetchProofs({
-              leaves: [
-                {
-                  tree: String(resource.tree),
-                  index: "0",
-                },
-              ],
+              leaves: {
+                tree: resource.tree.toBase58(),
+                index: "0",
+              },
             })
-          ).proof[0],
+          ).proof.at(-1),
         };
+
+        resources[resource.label].proof!.proof = resources[
+          resource.label
+        ].proof!.proof.slice(0, 2);
       }
 
-      // prepare the remaining accounts
+      // prepare the remaining accounts for proof instruction
+      const proofIxRemainingAccounts: web3.AccountMeta[] =
+        user.proof!.proof!.map((e) => ({
+          isSigner: false,
+          isWritable: false,
+          pubkey: new PublicKey(e),
+        }));
+
+      // prepare the proof instruction of craft
+      const proofIx = createCraftProofInstruction(
+        {
+          recipeProof: recipeProofAddress,
+          payer: adminHC.identity().address,
+          project: adminHC.project().address,
+          recipe: data.fungible.recipe.address,
+          authority: adminHC.identity().address,
+          merkleTree: new PublicKey(user.tree_id),
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+          compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+          anchorRemainingAccounts: proofIxRemainingAccounts,
+        },
+        {
+          args: {
+            id: user.id,
+            infoHash: Array.from(userInfoHash(user.info)),
+            leafIdx: Number(user.leaf_idx),
+            root: Array.from(new PublicKey(user.proof!.root).toBytes()),
+            wallets: {
+              wallets: user.wallets.wallets.map((e) => new PublicKey(e)),
+              shadow: new PublicKey(user.wallets.shadow),
+            },
+          },
+        }
+      );
+
+      // prepare the remaining accounts for mint instruction
       const mintIxRemainingAccounts: web3.AccountMeta[][] = [
         // output resource
         [
           {
             isSigner: false,
             isWritable: true,
-            pubkey: new PublicKey(resources["outputResource"].proof!.tree_id),
+            pubkey: resources["outputResource"].tree,
           },
           ...resources["outputResource"].proof!.proof!.map((e) => ({
-            isSigner: false,
-            isWritable: false,
-            pubkey: new PublicKey(e),
-          })),
-        ],
-
-        // user's proofs
-        [
-          {
-            isSigner: false,
-            isWritable: true,
-            pubkey: new PublicKey(profile.proof!.tree_id),
-          },
-          ...user.proof!.proof!.map((e) => ({
             isSigner: false,
             isWritable: false,
             pubkey: new PublicKey(e),
@@ -1365,11 +1381,11 @@ describe("Resource Manager", () => {
       const mintIx = createCraftMintRecipeInstruction(
         {
           outputResource: resources["outputResource"].resource,
+          recipeProof: recipeProofAddress,
           wallet: adminHC.identity().address,
           recipe: data.fungible.recipe.address,
-          payer: adminHC.identity().address,
           project: adminHC.project().address,
-          recipeProof: recipieProffAddress,
+          payer: adminHC.identity().address,
           authority: adminHC.identity().address,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
           clock: web3.SYSVAR_CLOCK_PUBKEY,
@@ -1389,8 +1405,14 @@ describe("Resource Manager", () => {
               root: Array.from(new PublicKey(profile.proof!.root).toBytes()),
               identity: profile.identity,
               leafIdx: Number(profile.leaf_idx),
-              platformData: profile.platformData,
-              customData: profile.customData,
+              platformData: {
+                achievements: profile.platformData.achievements,
+                xp: profile.platformData.xp,
+                custom: new Map(Object.entries(profile.platformData.custom)),
+              },
+              customData: Array.from(
+                keccak256Hash([customDataHash(profile.customData)])
+              ),
               info: Array.from(profileInfoHash(profile.info)),
             },
             user: {
@@ -1407,6 +1429,35 @@ describe("Resource Manager", () => {
         }
       );
 
+      // prepare the remaining accounts for burn instruction
+      const burnIxRemainingAccounts: web3.AccountMeta[][] = [
+        [
+          {
+            isSigner: false,
+            isWritable: true,
+            pubkey: resources["inputResourceOne"].tree,
+          },
+          ...resources["inputResourceOne"].proof!.proof!.map((e) => ({
+            isSigner: false,
+            isWritable: false,
+            pubkey: new PublicKey(e),
+          })),
+        ],
+
+        [
+          {
+            isSigner: false,
+            isWritable: true,
+            pubkey: resources["inputResourceTwo"].tree,
+          },
+          ...resources["inputResourceTwo"].proof!.proof!.map((e) => ({
+            isSigner: false,
+            isWritable: false,
+            pubkey: new PublicKey(e),
+          })),
+        ],
+      ];
+
       // prepare the burn instruction of craft
       const burnIx = createCraftBurnRecipeInstruction(
         {
@@ -1416,14 +1467,14 @@ describe("Resource Manager", () => {
           recipe: data.fungible.recipe.address,
           payer: adminHC.identity().address,
           project: adminHC.project().address,
-          recipeProof: recipieProffAddress,
+          recipeProof: recipeProofAddress,
           authority: adminHC.identity().address,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
           clock: web3.SYSVAR_CLOCK_PUBKEY,
           compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
           logWrapper: SPL_NOOP_PROGRAM_ID,
           rentSysvar: web3.SYSVAR_RENT_PUBKEY,
-          anchorRemainingAccounts: mintIxRemainingAccounts.flat(),
+          anchorRemainingAccounts: burnIxRemainingAccounts.flat(),
         },
         {
           args: {
@@ -1460,15 +1511,15 @@ describe("Resource Manager", () => {
                         : PublicKey.default,
                   },
                   leafIdx: Number(
-                    resources["inputResourceOne"].proof.leaf_index
+                    resources["inputResourceOne"].proof!.leaf_index
                   ),
                   root: Array.from(
                     new PublicKey(
-                      resources["inputResourceOne"].proof.root
+                      resources["inputResourceOne"].proof!.root
                     ).toBytes()
                   ),
                 },
-                proofSize: resources["inputResourceOne"].proof.proof.length,
+                proofSize: burnIxRemainingAccounts[0].length,
               },
 
               // second input
@@ -1492,40 +1543,78 @@ describe("Resource Manager", () => {
                         : PublicKey.default,
                   },
                   leafIdx: Number(
-                    resources["inputResourceTwo"].proof.leaf_index
+                    resources["inputResourceTwo"].proof!.leaf_index
                   ),
                   root: Array.from(
                     new PublicKey(
-                      resources["inputResourceTwo"].proof.root
+                      resources["inputResourceTwo"].proof!.root
                     ).toBytes()
                   ),
                 },
-                proofSize: resources["inputResourceTwo"].proof.proof.length,
+                proofSize: burnIxRemainingAccounts[1].length,
               },
             ],
           },
         }
       );
 
-      const op = new Operation(
+      const proofOp = new Operation(
         adminHC,
-        [mintIx, burnIx],
+        [proofIx],
         [adminHC.identity().signer as KeypairLike]
       );
 
-      op.add_lut(lookupTable);
+      const burnOp = new Operation(
+        adminHC,
+        [
+          web3.ComputeBudgetProgram.setComputeUnitLimit({
+            units: 1200000,
+          }),
+          burnIx,
+        ],
+        [adminHC.identity().signer as KeypairLike]
+      );
 
-      const [{ signature }] = await op.send({
+      const mintOp = new Operation(
+        adminHC,
+        [
+          web3.ComputeBudgetProgram.setComputeUnitLimit({
+            units: 1200000,
+          }),
+          mintIx,
+        ],
+        [adminHC.identity().signer as KeypairLike]
+      );
+
+      proofOp.add_lut(lookupTable);
+      burnOp.add_lut(lookupTable);
+      mintOp.add_lut(lookupTable);
+
+      // const proofRes = await proofOp.send({
+      //   skipPreflight: true,
+      //   commitment: "confirmed",
+      // });
+
+      // console.log(proofRes[0].signature, "Craft Proof");
+
+      // const burnRes = await burnOp.send({
+      //   skipPreflight: true,
+      //   commitment: "processed",
+      // });
+
+      // console.log(burnRes[0].signature, "Craft Burn");
+
+      const mintRes = await mintOp.send({
         skipPreflight: true,
-        commitment: "processed",
+        commitment: "confirmed",
       });
 
-      console.log(signature, "Craft Recipie Instruction");
+      console.log(mintRes[0].signature, "Craft Mint");
 
       data.fungible.recipe.isCrafted = true;
 
       // save data file
-      saveData(data);
+      // saveData(data);
     });
   });
 });

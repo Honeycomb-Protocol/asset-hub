@@ -20,11 +20,11 @@ pub mod hpl_resource_manager {
         instructions::create_resource(ctx, args)
     }
 
-    pub fn initilize_resource_tree(
-        ctx: Context<InitilizeResourceTree>,
-        args: InitilizeResourceTreeArgs,
+    pub fn initialize_resource_tree(
+        ctx: Context<InitializeResourceTree>,
+        args: InitializeResourceTreeArgs,
     ) -> Result<()> {
-        instructions::initilize_resource_tree(ctx, args)
+        instructions::initialize_resource_tree(ctx, args)
     }
 
     pub fn mint_resource<'info>(
@@ -55,11 +55,18 @@ pub mod hpl_resource_manager {
     //     instructions::unwrap_resource(ctx, args)
     // }
 
-    pub fn initilize_recipe(
-        ctx: Context<InitilizeRecipe>,
-        args: InitilizeRecipeArgs,
+    pub fn initialize_recipe(
+        ctx: Context<InitializeRecipe>,
+        args: InitializeRecipeArgs,
     ) -> Result<()> {
-        instructions::initilize_recipe(ctx, args)
+        instructions::initialize_recipe(ctx, args)
+    }
+
+    pub fn craft_proof<'info>(
+        ctx: Context<'_, '_, '_, 'info, CraftProof<'info>>,
+        args: CraftResourceUser,
+    ) -> Result<()> {
+        instructions::craft_proof(ctx, args)
     }
 
     pub fn craft_burn_recipe<'info>(

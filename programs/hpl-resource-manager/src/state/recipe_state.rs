@@ -42,7 +42,7 @@ impl Recipe {
         self.inputs = Vec::new();
         self.xp = XpPair {
             label: "".to_string(),
-            increament: 0,
+            increment: 0,
         };
         self.output = ResourceAmountPair {
             resource: Pubkey::default(),
@@ -62,7 +62,7 @@ pub struct ResourceAmountPair {
 pub struct XpPair {
     pub label: String,
 
-    pub increament: u64,
+    pub increment: u64,
 }
 
 #[account]

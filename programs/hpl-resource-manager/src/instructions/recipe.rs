@@ -9,8 +9,8 @@ use {
 };
 
 #[derive(Accounts)]
-#[instruction(args: InitilizeRecipeArgs)]
-pub struct InitilizeRecipe<'info> {
+#[instruction(args: InitializeRecipeArgs)]
+pub struct InitializeRecipe<'info> {
     #[account()]
     pub project: Box<Account<'info, Project>>,
 
@@ -59,13 +59,13 @@ pub struct InitilizeRecipe<'info> {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct InitilizeRecipeArgs {
+pub struct InitializeRecipeArgs {
     pub xp: XpPair,
     pub amounts: Vec<u64>,
     pub output_characteristics: HashMap<String, String>,
 }
 
-pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipeArgs) -> Result<()> {
+pub fn initialize_recipe(ctx: Context<InitializeRecipe>, args: InitializeRecipeArgs) -> Result<()> {
     let recipe = &mut ctx.accounts.recipe;
 
     // verify the holding account leaf
@@ -95,7 +95,7 @@ pub fn initilize_recipe(ctx: Context<InitilizeRecipe>, args: InitilizeRecipeArgs
         resource: ctx.accounts.output_resource.key(),
     };
 
-    // pushing resources with respect to thier amounts
+    // pushing resources with respect to their amounts
     recipe.inputs.push(ResourceAmountPair {
         amount: *args.amounts.get(1).unwrap_or(&0),
         resource: ctx.accounts.input_resource_one.key(),

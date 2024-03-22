@@ -9,93 +9,86 @@ import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  InitilizeRecipeArgs,
-  initilizeRecipeArgsBeet,
-} from '../types/InitilizeRecipeArgs'
+  InitializeResourceTreeArgs,
+  initializeResourceTreeArgsBeet,
+} from '../types/InitializeResourceTreeArgs'
 
 /**
  * @category Instructions
- * @category InitilizeRecipe
+ * @category InitializeResourceTree
  * @category generated
  */
-export type InitilizeRecipeInstructionArgs = {
-  args: InitilizeRecipeArgs
+export type InitializeResourceTreeInstructionArgs = {
+  args: InitializeResourceTreeArgs
 }
 /**
  * @category Instructions
- * @category InitilizeRecipe
+ * @category InitializeResourceTree
  * @category generated
  */
-export const initilizeRecipeStruct = new beet.FixableBeetArgsStruct<
-  InitilizeRecipeInstructionArgs & {
+export const initializeResourceTreeStruct = new beet.BeetArgsStruct<
+  InitializeResourceTreeInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', initilizeRecipeArgsBeet],
+    ['args', initializeResourceTreeArgsBeet],
   ],
-  'InitilizeRecipeInstructionArgs'
+  'InitializeResourceTreeInstructionArgs'
 )
 /**
- * Accounts required by the _initilizeRecipe_ instruction
+ * Accounts required by the _initializeResourceTree_ instruction
  *
  * @property [] project
- * @property [] key
- * @property [_writable_] recipe
+ * @property [_writable_] resource
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
+ * @property [_writable_, **signer**] merkleTree
  * @property [] rentSysvar
- * @property [_writable_] outputResource
- * @property [] inputResourceOne
- * @property [] inputResourceTwo (optional)
- * @property [] inputResourceThree (optional)
- * @property [] inputResourceFour (optional)
+ * @property [] compressionProgram
+ * @property [] logWrapper
+ * @property [] clock
  * @category Instructions
- * @category InitilizeRecipe
+ * @category InitializeResourceTree
  * @category generated
  */
-export type InitilizeRecipeInstructionAccounts = {
+export type InitializeResourceTreeInstructionAccounts = {
   project: web3.PublicKey
-  key: web3.PublicKey
-  recipe: web3.PublicKey
+  resource: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  merkleTree: web3.PublicKey
   rentSysvar: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  outputResource: web3.PublicKey
-  inputResourceOne: web3.PublicKey
-  inputResourceTwo?: web3.PublicKey
-  inputResourceThree?: web3.PublicKey
-  inputResourceFour?: web3.PublicKey
+  compressionProgram: web3.PublicKey
+  logWrapper: web3.PublicKey
+  clock: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const initilizeRecipeInstructionDiscriminator = [
-  19, 35, 51, 41, 55, 104, 180, 163,
+export const initializeResourceTreeInstructionDiscriminator = [
+  56, 242, 88, 103, 76, 159, 131, 106,
 ]
 
 /**
- * Creates a _InitilizeRecipe_ instruction.
- *
- * Optional accounts that are not provided default to the program ID since
- * this was indicated in the IDL from which this instruction was generated.
+ * Creates a _InitializeResourceTree_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category InitilizeRecipe
+ * @category InitializeResourceTree
  * @category generated
  */
-export function createInitilizeRecipeInstruction(
-  accounts: InitilizeRecipeInstructionAccounts,
-  args: InitilizeRecipeInstructionArgs,
+export function createInitializeResourceTreeInstruction(
+  accounts: InitializeResourceTreeInstructionAccounts,
+  args: InitializeResourceTreeInstructionArgs,
   programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
-  const [data] = initilizeRecipeStruct.serialize({
-    instructionDiscriminator: initilizeRecipeInstructionDiscriminator,
+  const [data] = initializeResourceTreeStruct.serialize({
+    instructionDiscriminator: initializeResourceTreeInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -105,12 +98,7 @@ export function createInitilizeRecipeInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.key,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.recipe,
+      pubkey: accounts.resource,
       isWritable: true,
       isSigner: false,
     },
@@ -121,6 +109,11 @@ export function createInitilizeRecipeInstruction(
     },
     {
       pubkey: accounts.payer,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.merkleTree,
       isWritable: true,
       isSigner: true,
     },
@@ -140,27 +133,17 @@ export function createInitilizeRecipeInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.outputResource,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.inputResourceOne,
+      pubkey: accounts.compressionProgram,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.inputResourceTwo ?? programId,
+      pubkey: accounts.logWrapper,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.inputResourceThree ?? programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.inputResourceFour ?? programId,
+      pubkey: accounts.clock,
       isWritable: false,
       isSigner: false,
     },

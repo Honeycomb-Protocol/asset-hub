@@ -10,7 +10,7 @@ pub struct Resource {
     /// Bump seed for the PDA
     pub bump: u8,
 
-    /// The project this resouce is associated with
+    /// The project this resource is associated with
     pub project: Pubkey,
 
     /// The mint of this resource

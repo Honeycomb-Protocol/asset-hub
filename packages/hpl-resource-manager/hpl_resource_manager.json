@@ -56,7 +56,7 @@
       ]
     },
     {
-      "name": "initilizeResourceTree",
+      "name": "initializeResourceTree",
       "accounts": [
         {
           "name": "project",
@@ -127,7 +127,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "InitilizeResourceTreeArgs"
+            "defined": "InitializeResourceTreeArgs"
           }
         }
       ]
@@ -284,7 +284,7 @@
       ]
     },
     {
-      "name": "initilizeRecipe",
+      "name": "initializeRecipe",
       "accounts": [
         {
           "name": "project",
@@ -359,7 +359,65 @@
         {
           "name": "args",
           "type": {
-            "defined": "InitilizeRecipeArgs"
+            "defined": "InitializeRecipeArgs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "craftProof",
+      "accounts": [
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "recipe",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipeProof",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CraftResourceUser"
           }
         }
       ]
@@ -384,7 +442,7 @@
         },
         {
           "name": "recipeProof",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -677,93 +735,7 @@
   ],
   "types": [
     {
-      "name": "CraftMintProfileParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "root",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "leafIdx",
-            "type": "u32"
-          },
-          {
-            "name": "identity",
-            "type": "string"
-          },
-          {
-            "name": "info",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "customData",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "platformData",
-            "type": {
-              "defined": "PlatformData"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "CraftMintRecipeArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "user",
-            "type": {
-              "defined": "CraftResourceUserParams"
-            }
-          },
-          {
-            "name": "profile",
-            "type": {
-              "defined": "CraftMintProfileParams"
-            }
-          },
-          {
-            "name": "holding",
-            "type": {
-              "option": {
-                "defined": "HoldingAccountArgs"
-              }
-            }
-          },
-          {
-            "name": "proofSize",
-            "type": {
-              "array": [
-                "u8",
-                3
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "CraftResourceUserParams",
+      "name": "CraftResourceUser",
       "type": {
         "kind": "struct",
         "fields": [
@@ -828,7 +800,7 @@
           {
             "name": "user",
             "type": {
-              "defined": "CraftResourceUserParams"
+              "defined": "CraftResourceUser"
             }
           },
           {
@@ -843,7 +815,93 @@
       }
     },
     {
-      "name": "InitilizeRecipeArgs",
+      "name": "CraftMintProfileParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "leafIdx",
+            "type": "u32"
+          },
+          {
+            "name": "identity",
+            "type": "string"
+          },
+          {
+            "name": "info",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "customData",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "platformData",
+            "type": {
+              "defined": "PlatformData"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CraftMintRecipeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": {
+              "defined": "CraftResourceUser"
+            }
+          },
+          {
+            "name": "profile",
+            "type": {
+              "defined": "CraftMintProfileParams"
+            }
+          },
+          {
+            "name": "holding",
+            "type": {
+              "option": {
+                "defined": "HoldingAccountArgs"
+              }
+            }
+          },
+          {
+            "name": "proofSize",
+            "type": {
+              "array": [
+                "u8",
+                2
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeRecipeArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -892,7 +950,7 @@
       }
     },
     {
-      "name": "InitilizeResourceTreeArgs",
+      "name": "InitializeResourceTreeArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -960,7 +1018,7 @@
             "type": "string"
           },
           {
-            "name": "increament",
+            "name": "increment",
             "type": "u64"
           }
         ]

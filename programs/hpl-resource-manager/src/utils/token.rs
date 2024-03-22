@@ -172,8 +172,6 @@ pub fn create_mint_with_extensions<'info>(
         &token22_program.key(),
     );
 
-    msg!("Creating mint account");
-
     // invoking the mint account creation with the signer seeds
     invoke(
         &account_instruction,
@@ -184,8 +182,6 @@ pub fn create_mint_with_extensions<'info>(
         let instruction = params
             .instruction(&token22_program.key(), &mint.key())
             .unwrap();
-
-        msg!("Creating mint extension account");
 
         // invoking the extensions instructions with the signer seeds
         invoke(&instruction, &[mint.to_owned()])?;
@@ -201,7 +197,6 @@ pub fn create_mint_with_extensions<'info>(
 
     // invoking the mint account creation with the signer seeds
     invoke(&mint_instruction, &[mint.to_account_info()])?;
-    msg!("Mint account created");
 
     let data = mint.try_borrow_data().unwrap();
     let slice = data.deref().to_vec();
@@ -235,7 +230,6 @@ pub fn create_metadata_for_mint<'info>(
         metadata.uri,
     );
 
-    msg!("Creating metadata account");
     invoke_signed(
         &instruction,
         &[
@@ -306,7 +300,6 @@ pub fn update_metadata_for_mint<'info>(
     }
 
     for instruction in instructions {
-        msg!("Updating metadata account");
         invoke_signed(
             &instruction,
             &[
@@ -393,7 +386,6 @@ pub fn mint_tokens<'info>(
     )
     .unwrap();
 
-    msg!("Minting to account");
     invoke_signed(
         &mint_to_instruction,
         &[
@@ -424,7 +416,6 @@ pub fn burn_tokens<'info>(
     )
     .unwrap();
 
-    msg!("Burning from account");
     invoke(
         &burn_instruction,
         &[

@@ -6,7 +6,7 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-export type InitilizeResourceTreeArgs = {
+export type InitializeResourceTreeArgs = {
   maxDepth: number
   maxBufferSize: number
 }
@@ -15,11 +15,11 @@ export type InitilizeResourceTreeArgs = {
  * @category userTypes
  * @category generated
  */
-export const initilizeResourceTreeArgsBeet =
-  new beet.BeetArgsStruct<InitilizeResourceTreeArgs>(
+export const initializeResourceTreeArgsBeet =
+  new beet.BeetArgsStruct<InitializeResourceTreeArgs>(
     [
       ['maxDepth', beet.u32],
       ['maxBufferSize', beet.u32],
     ],
-    'InitilizeResourceTreeArgs'
+    'InitializeResourceTreeArgs'
   )

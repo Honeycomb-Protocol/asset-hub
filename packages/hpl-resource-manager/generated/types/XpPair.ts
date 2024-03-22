@@ -8,7 +8,7 @@
 import * as beet from '@metaplex-foundation/beet'
 export type XpPair = {
   label: string
-  increament: beet.bignum
+  increment: beet.bignum
 }
 
 /**
@@ -18,7 +18,7 @@ export type XpPair = {
 export const xpPairBeet = new beet.FixableBeetArgsStruct<XpPair>(
   [
     ['label', beet.utf8String],
-    ['increament', beet.u64],
+    ['increment', beet.u64],
   ],
   'XpPair'
 )
