@@ -315,60 +315,6 @@ pub fn update_metadata_for_mint<'info>(
     Ok(())
 }
 
-// pub fn get_mint_metadata<'info>(mint: AccountInfo<'info>) -> Result<TokenMetadata> {
-//     let buffer = mint.try_borrow_data()?;
-//     let mint = StateWithExtensions::<Mint>::unpack(&buffer)?;
-
-//     mint.get_variable_len_extension::<TokenMetadata>()
-//         .map_err(|err| err.into())
-// }
-
-// pub fn update_compressed_supply<'info>(
-//     token22_program: AccountInfo<'info>,
-//     mint: AccountInfo<'info>,
-//     resource: &Account<'info, Resource>,
-//     amount: u64,
-//     is_burning: bool,
-// ) -> Result<()> {
-//     let resource_metadata = get_mint_metadata(mint.to_account_info())?;
-//     let mut supply = 0;
-
-//     if resource_metadata.additional_metadata.len() > 0 {
-//         supply = resource_metadata
-//             .additional_metadata
-//             .iter()
-//             .find_map(|(key, value)| {
-//                 if key == "compressed_supply" {
-//                     Some(value.parse::<u64>().unwrap())
-//                 } else {
-//                     None
-//                 }
-//             })
-//             .unwrap();
-//     }
-
-//     if is_burning {
-//         supply -= amount;
-//     } else {
-//         supply += amount;
-//     }
-//     // updateing the compressed supply from mint's metadata
-//     update_metadata_for_mint(
-//         token22_program.to_account_info(),
-//         mint.to_account_info(),
-//         &resource,
-//         ResourceMetadataUpdateArgs {
-//             field: Some("compressed_supply".to_string()),
-//             value: Some(supply.to_string()),
-//             name: None,
-//             symbol: None,
-//             uri: None,
-//         },
-//     )?;
-
-//     Ok(())
-// }
-
 pub fn mint_tokens<'info>(
     token_program_id: &AccountInfo<'info>,
     mint: &AccountInfo<'info>,
