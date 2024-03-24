@@ -50,7 +50,7 @@ export class CurrencyManagerFetchClient extends FetchClient {
   ): Promise<Currency | null> {
     try {
       return Currency.fromAccountInfo(
-        await this.getAccount(address, { forceFetch, commitment })
+        await this.getAccount(address, { commitment })
       )[0];
     } catch {
       return null;
@@ -72,7 +72,7 @@ export class CurrencyManagerFetchClient extends FetchClient {
     try {
       return unpackMint(
         address,
-        await this.getAccount(address, { forceFetch, commitment })
+        await this.getAccount(address, { commitment })
       );
     } catch {
       return null;
@@ -93,7 +93,7 @@ export class CurrencyManagerFetchClient extends FetchClient {
   ): Promise<Metadata | null> {
     try {
       return Metadata.fromAccountInfo(
-        await this.getAccount(metadataPda(mint)[0], { forceFetch, commitment })
+        await this.getAccount(metadataPda(mint)[0], { commitment })
       )[0];
     } catch {
       return null;
@@ -172,7 +172,7 @@ export class CurrencyManagerFetchClient extends FetchClient {
             .holderAccount(addressOrArgs.owner, addressOrArgs.currency)[0];
 
       return HolderAccount.fromAccountInfo(
-        await this.getAccount(address, { forceFetch, commitment })
+        await this.getAccount(address, { commitment })
       )[0];
     } catch {
       return null;
@@ -194,7 +194,7 @@ export class CurrencyManagerFetchClient extends FetchClient {
     try {
       return unpackTokenAccount(
         address,
-        await this.getAccount(address, { forceFetch, commitment })
+        await this.getAccount(address, { commitment })
       );
     } catch {
       return null;

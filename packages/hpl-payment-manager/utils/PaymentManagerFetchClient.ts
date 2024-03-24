@@ -41,7 +41,6 @@ export class PaymentManagerFetchClient extends FetchClient {
     try {
       return PaymentStructure.fromAccountInfo(
         await this.getAccount(address, {
-          forceFetch,
           commitment,
         })
       )[0];
@@ -64,7 +63,6 @@ export class PaymentManagerFetchClient extends FetchClient {
     try {
       return PaymentSession.fromAccountInfo(
         await this.getAccount(address, {
-          forceFetch,
           commitment,
         })
       )[0];
