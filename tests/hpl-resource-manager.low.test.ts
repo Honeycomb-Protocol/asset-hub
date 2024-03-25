@@ -1,7 +1,5 @@
 import createEdgeClient, {
   Holding,
-  PlatformData,
-  Profile,
   ProfileInfo,
   Proof,
   User,
@@ -37,9 +35,9 @@ import {
   InitializeRecipeInstructionAccounts,
   PROGRAM_ID,
   createBurnResourceInstruction,
-  createCraftBurnRecipeInstruction,
-  createCraftMintRecipeInstruction,
-  createCraftProofInstruction,
+  createCraftRecipeBurnInstruction,
+  createCraftRecipeMintInstruction,
+  createCraftRecipeProofInstruction,
   createCreateResourceInstruction,
   createInitializeRecipeInstruction,
   createInitializeResourceTreeInstruction,
@@ -51,7 +49,6 @@ import {
   keccak256Hash,
   optionHash,
   stringHash,
-  u32Hash,
   u64Hash,
   u8Hash,
 } from "./hash";
@@ -1320,7 +1317,7 @@ describe("Resource Manager", () => {
         }));
 
       // prepare the proof instruction of craft
-      const proofIx = createCraftProofInstruction(
+      const proofIx = createCraftRecipeProofInstruction(
         {
           recipeProof: recipeProofAddress,
           payer: adminHC.identity().address,
@@ -1378,7 +1375,7 @@ describe("Resource Manager", () => {
       ];
 
       // prepare the first mint instruction of craft
-      const mintIx = createCraftMintRecipeInstruction(
+      const mintIx = createCraftRecipeMintInstruction(
         {
           outputResource: resources["outputResource"].resource,
           recipeProof: recipeProofAddress,
@@ -1459,7 +1456,7 @@ describe("Resource Manager", () => {
       ];
 
       // prepare the burn instruction of craft
-      const burnIx = createCraftBurnRecipeInstruction(
+      const burnIx = createCraftRecipeBurnInstruction(
         {
           inputResourceOne: resources["inputResourceOne"].resource,
           inputResourceTwo: resources["inputResourceTwo"].resource,

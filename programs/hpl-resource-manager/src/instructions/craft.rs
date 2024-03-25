@@ -23,7 +23,7 @@ use {
 /* ************************** CRAFT PROOF ******************************** */
 #[derive(Accounts)]
 #[instruction(user: CraftResourceUser)]
-pub struct CraftProof<'info> {
+pub struct CraftRecipeProof<'info> {
     #[account()]
     pub project: Box<Account<'info, Project>>,
 
@@ -32,7 +32,7 @@ pub struct CraftProof<'info> {
 
     #[account(
         init,
-        space = 8 + 32,
+        space = 8 + 33,
         seeds = [b"recipe_proof", recipe.key().as_ref(), user.leaf().as_ref()],
         payer = payer,
         bump,
@@ -75,8 +75,8 @@ impl CraftResourceUser {
     }
 }
 
-pub fn craft_proof<'info>(
-    ctx: Context<'_, '_, '_, 'info, CraftProof<'info>>,
+pub fn craft_recipe_proof<'info>(
+    ctx: Context<'_, '_, '_, 'info, CraftRecipeProof<'info>>,
     user: CraftResourceUser,
 ) -> Result<()> {
     let compressed_user = user.leaf();
@@ -84,6 +84,7 @@ pub fn craft_proof<'info>(
     // recipe proof
     let recipe_proof = &mut ctx.accounts.recipe_proof;
     recipe_proof.user = compressed_user;
+    recipe_proof.is_burn = false;
 
     // verify the user leaf node
     verify_leaf(
@@ -100,8 +101,8 @@ pub fn craft_proof<'info>(
 
 /* ************************** BURN RECIPE ******************************** */
 #[derive(Accounts)]
-#[instruction(params: CraftBurnRecipeArgs)]
-pub struct CraftBurnRecipe<'info> {
+#[instruction(params: CraftRecipeBurnArgs)]
+pub struct CraftRecipeBurn<'info> {
     pub project: Box<Account<'info, Project>>,
 
     #[account(mut, has_one = project)]
@@ -112,6 +113,7 @@ pub struct CraftBurnRecipe<'info> {
     pub wallet: AccountInfo<'info>,
 
     #[account(
+        mut,
         constraint = recipe_proof.user == params.user.leaf(),
     )]
     pub recipe_proof: Account<'info, RecipeProof>,
@@ -154,7 +156,7 @@ pub struct CraftBurnHoldingParams {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CraftBurnRecipeArgs {
+pub struct CraftRecipeBurnArgs {
     pub user: CraftResourceUser,
     pub holdings: Vec<CraftBurnHoldingParams>,
 }
@@ -182,9 +184,9 @@ pub fn next_craft_recipe<'a, 'info>(
     (recipe.holding_state, &accounts[0], &accounts[1..])
 }
 
-pub fn craft_burn_recipe<'info>(
-    ctx: Context<'_, '_, '_, 'info, CraftBurnRecipe<'info>>,
-    args: CraftBurnRecipeArgs,
+pub fn craft_recipe_burn<'info>(
+    ctx: Context<'_, '_, '_, 'info, CraftRecipeBurn<'info>>,
+    args: CraftRecipeBurnArgs,
 ) -> Result<()> {
     let remaining_accounts = ctx.remaining_accounts;
     let recipe = &mut ctx.accounts.recipe;
@@ -270,13 +272,17 @@ pub fn craft_burn_recipe<'info>(
         }
     }
 
+    // update proof
+    let recipe_proof = &mut ctx.accounts.recipe_proof;
+    recipe_proof.is_burn = true;
+
     Ok(())
 }
 
 /* ************************** MINT RECIPE ******************************** */
 #[derive(Accounts)]
-#[instruction(params: CraftMintRecipeArgs)]
-pub struct CraftMintRecipe<'info> {
+#[instruction(params: CraftRecipeMintArgs)]
+pub struct CraftRecipeMint<'info> {
     #[account()]
     pub project: Box<Account<'info, Project>>,
 
@@ -287,6 +293,7 @@ pub struct CraftMintRecipe<'info> {
         mut,
         close = payer,
         constraint = recipe_proof.user == params.user.leaf(),
+        constraint = recipe_proof.is_burn == true,
     )]
     pub recipe_proof: Account<'info, RecipeProof>,
 
@@ -336,16 +343,16 @@ pub struct CraftMintProfileParams {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct CraftMintRecipeArgs {
+pub struct CraftRecipeMintArgs {
     pub user: CraftResourceUser,
     pub profile: CraftMintProfileParams,
     pub holding: Option<HoldingAccountArgs>,
     pub proof_size: [u8; 2],
 }
 
-pub fn craft_mint_recipe<'info>(
-    ctx: Context<'_, '_, '_, 'info, CraftMintRecipe<'info>>,
-    args: CraftMintRecipeArgs,
+pub fn craft_recipe_mint<'info>(
+    ctx: Context<'_, '_, '_, 'info, CraftRecipeMint<'info>>,
+    args: CraftRecipeMintArgs,
 ) -> Result<()> {
     let recipe = &mut ctx.accounts.recipe;
     let output_resource = &mut ctx.accounts.output_resource;

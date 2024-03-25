@@ -16,6 +16,7 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
  */
 export type RecipeProofArgs = {
   user: number[] /* size: 32 */
+  isBurn: boolean
 }
 
 export const recipeProofDiscriminator = [220, 50, 127, 53, 80, 23, 206, 23]
@@ -27,13 +28,16 @@ export const recipeProofDiscriminator = [220, 50, 127, 53, 80, 23, 206, 23]
  * @category generated
  */
 export class RecipeProof implements RecipeProofArgs {
-  private constructor(readonly user: number[] /* size: 32 */) {}
+  private constructor(
+    readonly user: number[] /* size: 32 */,
+    readonly isBurn: boolean
+  ) {}
 
   /**
    * Creates a {@link RecipeProof} instance from the provided args.
    */
   static fromArgs(args: RecipeProofArgs) {
-    return new RecipeProof(args.user)
+    return new RecipeProof(args.user, args.isBurn)
   }
 
   /**
@@ -140,6 +144,7 @@ export class RecipeProof implements RecipeProofArgs {
   pretty() {
     return {
       user: this.user,
+      isBurn: this.isBurn,
     }
   }
 }
@@ -157,6 +162,7 @@ export const recipeProofBeet = new beet.BeetStruct<
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['user', beet.uniformFixedSizeArray(beet.u8, 32)],
+    ['isBurn', beet.bool],
   ],
   RecipeProof.fromArgs,
   'RecipeProof'

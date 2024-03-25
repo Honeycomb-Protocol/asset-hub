@@ -11,7 +11,7 @@ import {
   CraftBurnHoldingParams,
   craftBurnHoldingParamsBeet,
 } from './CraftBurnHoldingParams'
-export type CraftBurnRecipeArgs = {
+export type CraftRecipeBurnArgs = {
   user: CraftResourceUser
   holdings: CraftBurnHoldingParams[]
 }
@@ -20,11 +20,11 @@ export type CraftBurnRecipeArgs = {
  * @category userTypes
  * @category generated
  */
-export const craftBurnRecipeArgsBeet =
-  new beet.FixableBeetArgsStruct<CraftBurnRecipeArgs>(
+export const craftRecipeBurnArgsBeet =
+  new beet.FixableBeetArgsStruct<CraftRecipeBurnArgs>(
     [
       ['user', craftResourceUserBeet],
       ['holdings', beet.array(craftBurnHoldingParamsBeet)],
     ],
-    'CraftBurnRecipeArgs'
+    'CraftRecipeBurnArgs'
   )

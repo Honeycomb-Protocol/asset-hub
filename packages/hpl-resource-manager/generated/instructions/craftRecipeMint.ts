@@ -9,82 +9,96 @@ import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  CraftResourceUser,
-  craftResourceUserBeet,
-} from '../types/CraftResourceUser'
+  CraftRecipeMintArgs,
+  craftRecipeMintArgsBeet,
+} from '../types/CraftRecipeMintArgs'
 
 /**
  * @category Instructions
- * @category CraftProof
+ * @category CraftRecipeMint
  * @category generated
  */
-export type CraftProofInstructionArgs = {
-  args: CraftResourceUser
+export type CraftRecipeMintInstructionArgs = {
+  args: CraftRecipeMintArgs
 }
 /**
  * @category Instructions
- * @category CraftProof
+ * @category CraftRecipeMint
  * @category generated
  */
-export const craftProofStruct = new beet.FixableBeetArgsStruct<
-  CraftProofInstructionArgs & {
+export const craftRecipeMintStruct = new beet.FixableBeetArgsStruct<
+  CraftRecipeMintInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', craftResourceUserBeet],
+    ['args', craftRecipeMintArgsBeet],
   ],
-  'CraftProofInstructionArgs'
+  'CraftRecipeMintInstructionArgs'
 )
 /**
- * Accounts required by the _craftProof_ instruction
+ * Accounts required by the _craftRecipeMint_ instruction
  *
  * @property [] project
  * @property [_writable_] recipe
  * @property [_writable_] recipeProof
- * @property [] merkleTree
+ * @property [_writable_] outputResource
+ * @property [] wallet
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
+ * @property [] rentSysvar
+ * @property [] instructionsSysvar
+ * @property [] vault
+ * @property [] hiveControl
+ * @property [] clock
+ * @property [] logWrapper
  * @property [] compressionProgram
  * @category Instructions
- * @category CraftProof
+ * @category CraftRecipeMint
  * @category generated
  */
-export type CraftProofInstructionAccounts = {
+export type CraftRecipeMintInstructionAccounts = {
   project: web3.PublicKey
   recipe: web3.PublicKey
   recipeProof: web3.PublicKey
-  merkleTree: web3.PublicKey
+  outputResource: web3.PublicKey
+  wallet: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
+  rentSysvar: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  instructionsSysvar: web3.PublicKey
+  vault: web3.PublicKey
+  hiveControl: web3.PublicKey
+  clock: web3.PublicKey
+  logWrapper: web3.PublicKey
   compressionProgram: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const craftProofInstructionDiscriminator = [
-  131, 99, 99, 136, 208, 85, 87, 29,
+export const craftRecipeMintInstructionDiscriminator = [
+  107, 92, 77, 34, 143, 110, 124, 154,
 ]
 
 /**
- * Creates a _CraftProof_ instruction.
+ * Creates a _CraftRecipeMint_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CraftProof
+ * @category CraftRecipeMint
  * @category generated
  */
-export function createCraftProofInstruction(
-  accounts: CraftProofInstructionAccounts,
-  args: CraftProofInstructionArgs,
+export function createCraftRecipeMintInstruction(
+  accounts: CraftRecipeMintInstructionAccounts,
+  args: CraftRecipeMintInstructionArgs,
   programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
-  const [data] = craftProofStruct.serialize({
-    instructionDiscriminator: craftProofInstructionDiscriminator,
+  const [data] = craftRecipeMintStruct.serialize({
+    instructionDiscriminator: craftRecipeMintInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -104,7 +118,12 @@ export function createCraftProofInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.merkleTree,
+      pubkey: accounts.outputResource,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.wallet,
       isWritable: false,
       isSigner: false,
     },
@@ -119,12 +138,42 @@ export function createCraftProofInstruction(
       isSigner: true,
     },
     {
+      pubkey: accounts.rentSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
       isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionsSysvar,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.vault,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.hiveControl,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clock,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.logWrapper,
       isWritable: false,
       isSigner: false,
     },

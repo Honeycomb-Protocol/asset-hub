@@ -9,99 +9,82 @@ import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import {
-  CraftBurnRecipeArgs,
-  craftBurnRecipeArgsBeet,
-} from '../types/CraftBurnRecipeArgs'
+  CraftResourceUser,
+  craftResourceUserBeet,
+} from '../types/CraftResourceUser'
 
 /**
  * @category Instructions
- * @category CraftBurnRecipe
+ * @category CraftRecipeProof
  * @category generated
  */
-export type CraftBurnRecipeInstructionArgs = {
-  args: CraftBurnRecipeArgs
+export type CraftRecipeProofInstructionArgs = {
+  args: CraftResourceUser
 }
 /**
  * @category Instructions
- * @category CraftBurnRecipe
+ * @category CraftRecipeProof
  * @category generated
  */
-export const craftBurnRecipeStruct = new beet.FixableBeetArgsStruct<
-  CraftBurnRecipeInstructionArgs & {
+export const craftRecipeProofStruct = new beet.FixableBeetArgsStruct<
+  CraftRecipeProofInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['args', craftBurnRecipeArgsBeet],
+    ['args', craftResourceUserBeet],
   ],
-  'CraftBurnRecipeInstructionArgs'
+  'CraftRecipeProofInstructionArgs'
 )
 /**
- * Accounts required by the _craftBurnRecipe_ instruction
+ * Accounts required by the _craftRecipeProof_ instruction
  *
  * @property [] project
  * @property [_writable_] recipe
- * @property [] wallet
- * @property [] recipeProof
+ * @property [_writable_] recipeProof
+ * @property [] merkleTree
  * @property [**signer**] authority
  * @property [_writable_, **signer**] payer
- * @property [] rentSysvar
- * @property [] clock
- * @property [] logWrapper
  * @property [] compressionProgram
- * @property [] inputResourceOne
- * @property [] inputResourceTwo (optional)
- * @property [] inputResourceThree (optional)
- * @property [] inputResourceFour (optional)
  * @category Instructions
- * @category CraftBurnRecipe
+ * @category CraftRecipeProof
  * @category generated
  */
-export type CraftBurnRecipeInstructionAccounts = {
+export type CraftRecipeProofInstructionAccounts = {
   project: web3.PublicKey
   recipe: web3.PublicKey
-  wallet: web3.PublicKey
   recipeProof: web3.PublicKey
+  merkleTree: web3.PublicKey
   authority: web3.PublicKey
   payer: web3.PublicKey
-  rentSysvar: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
-  clock: web3.PublicKey
-  logWrapper: web3.PublicKey
   compressionProgram: web3.PublicKey
-  inputResourceOne: web3.PublicKey
-  inputResourceTwo?: web3.PublicKey
-  inputResourceThree?: web3.PublicKey
-  inputResourceFour?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const craftBurnRecipeInstructionDiscriminator = [
-  171, 123, 42, 144, 226, 145, 145, 18,
+export const craftRecipeProofInstructionDiscriminator = [
+  163, 39, 158, 236, 139, 169, 97, 233,
 ]
 
 /**
- * Creates a _CraftBurnRecipe_ instruction.
- *
- * Optional accounts that are not provided default to the program ID since
- * this was indicated in the IDL from which this instruction was generated.
+ * Creates a _CraftRecipeProof_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CraftBurnRecipe
+ * @category CraftRecipeProof
  * @category generated
  */
-export function createCraftBurnRecipeInstruction(
-  accounts: CraftBurnRecipeInstructionAccounts,
-  args: CraftBurnRecipeInstructionArgs,
+export function createCraftRecipeProofInstruction(
+  accounts: CraftRecipeProofInstructionAccounts,
+  args: CraftRecipeProofInstructionArgs,
   programId = new web3.PublicKey('Assetw8uxLogzVXic5P8wGYpVdesS1oZHfSnBFHAu42s')
 ) {
-  const [data] = craftBurnRecipeStruct.serialize({
-    instructionDiscriminator: craftBurnRecipeInstructionDiscriminator,
+  const [data] = craftRecipeProofStruct.serialize({
+    instructionDiscriminator: craftRecipeProofInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -116,12 +99,12 @@ export function createCraftBurnRecipeInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.wallet,
-      isWritable: false,
+      pubkey: accounts.recipeProof,
+      isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.recipeProof,
+      pubkey: accounts.merkleTree,
       isWritable: false,
       isSigner: false,
     },
@@ -136,11 +119,6 @@ export function createCraftBurnRecipeInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.rentSysvar,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
       isWritable: false,
       isSigner: false,
@@ -151,37 +129,7 @@ export function createCraftBurnRecipeInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.clock,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.logWrapper,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.compressionProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.inputResourceOne,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.inputResourceTwo ?? programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.inputResourceThree ?? programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.inputResourceFour ?? programId,
       isWritable: false,
       isSigner: false,
     },

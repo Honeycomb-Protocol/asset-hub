@@ -15,7 +15,7 @@ import {
   HoldingAccountArgs,
   holdingAccountArgsBeet,
 } from './HoldingAccountArgs'
-export type CraftMintRecipeArgs = {
+export type CraftRecipeMintArgs = {
   user: CraftResourceUser
   profile: CraftMintProfileParams
   holding: beet.COption<HoldingAccountArgs>
@@ -26,13 +26,13 @@ export type CraftMintRecipeArgs = {
  * @category userTypes
  * @category generated
  */
-export const craftMintRecipeArgsBeet =
-  new beet.FixableBeetArgsStruct<CraftMintRecipeArgs>(
+export const craftRecipeMintArgsBeet =
+  new beet.FixableBeetArgsStruct<CraftRecipeMintArgs>(
     [
       ['user', craftResourceUserBeet],
       ['profile', craftMintProfileParamsBeet],
       ['holding', beet.coption(holdingAccountArgsBeet)],
       ['proofSize', beet.uniformFixedSizeArray(beet.u8, 2)],
     ],
-    'CraftMintRecipeArgs'
+    'CraftRecipeMintArgs'
   )

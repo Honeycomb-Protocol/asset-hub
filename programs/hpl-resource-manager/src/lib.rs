@@ -62,24 +62,24 @@ pub mod hpl_resource_manager {
         instructions::initialize_recipe(ctx, args)
     }
 
-    pub fn craft_proof<'info>(
-        ctx: Context<'_, '_, '_, 'info, CraftProof<'info>>,
+    pub fn craft_recipe_proof<'info>(
+        ctx: Context<'_, '_, '_, 'info, CraftRecipeProof<'info>>,
         args: CraftResourceUser,
     ) -> Result<()> {
-        instructions::craft_proof(ctx, args)
+        instructions::craft_recipe_proof(ctx, args)
     }
 
-    pub fn craft_burn_recipe<'info>(
-        ctx: Context<'_, '_, '_, 'info, CraftBurnRecipe<'info>>,
-        args: CraftBurnRecipeArgs,
+    pub fn craft_recipe_burn<'info>(
+        ctx: Context<'_, '_, '_, 'info, CraftRecipeBurn<'info>>,
+        args: CraftRecipeBurnArgs,
     ) -> Result<()> {
-        instructions::craft_burn_recipe(ctx, args)
+        instructions::craft_recipe_burn(ctx, args)
     }
 
-    pub fn craft_mint_recipe<'info>(
-        ctx: Context<'_, '_, '_, 'info, CraftMintRecipe<'info>>,
-        args: CraftMintRecipeArgs,
+    pub fn craft_recipe_mint<'info>(
+        ctx: Context<'_, '_, '_, 'info, CraftRecipeMint<'info>>,
+        args: CraftRecipeMintArgs,
     ) -> Result<()> {
-        instructions::craft_mint_recipe(ctx, args)
+        instructions::craft_recipe_mint(ctx, args)
     }
 }

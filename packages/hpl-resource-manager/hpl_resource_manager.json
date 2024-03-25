@@ -365,7 +365,7 @@
       ]
     },
     {
-      "name": "craftProof",
+      "name": "craftRecipeProof",
       "accounts": [
         {
           "name": "project",
@@ -423,7 +423,7 @@
       ]
     },
     {
-      "name": "craftBurnRecipe",
+      "name": "craftRecipeBurn",
       "accounts": [
         {
           "name": "project",
@@ -442,7 +442,7 @@
         },
         {
           "name": "recipeProof",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -513,13 +513,13 @@
         {
           "name": "args",
           "type": {
-            "defined": "CraftBurnRecipeArgs"
+            "defined": "CraftRecipeBurnArgs"
           }
         }
       ]
     },
     {
-      "name": "craftMintRecipe",
+      "name": "craftRecipeMint",
       "accounts": [
         {
           "name": "project",
@@ -609,7 +609,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "CraftMintRecipeArgs"
+            "defined": "CraftRecipeMintArgs"
           }
         }
       ]
@@ -678,6 +678,10 @@
                 32
               ]
             }
+          },
+          {
+            "name": "isBurn",
+            "type": "bool"
           }
         ]
       }
@@ -697,7 +701,7 @@
           {
             "name": "project",
             "docs": [
-              "The project this resouce is associated with"
+              "The project this resource is associated with"
             ],
             "type": "publicKey"
           },
@@ -793,7 +797,7 @@
       }
     },
     {
-      "name": "CraftBurnRecipeArgs",
+      "name": "CraftRecipeBurnArgs",
       "type": {
         "kind": "struct",
         "fields": [
@@ -864,7 +868,7 @@
       }
     },
     {
-      "name": "CraftMintRecipeArgs",
+      "name": "CraftRecipeMintArgs",
       "type": {
         "kind": "struct",
         "fields": [

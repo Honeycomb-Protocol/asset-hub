@@ -67,6 +67,7 @@ pub struct XpPair {
 
 #[account]
 pub struct RecipeProof {
-    // compressed user leaf node
     pub user: [u8; 32],
+
+    pub is_burn: bool,
 }
